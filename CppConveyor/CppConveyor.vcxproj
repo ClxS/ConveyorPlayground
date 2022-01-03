@@ -142,6 +142,15 @@
     <ClCompile Include="CppConveyor.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Conveyor.h" />
+    <ClInclude Include="Entity.h" />
+    <ClInclude Include="Enums.h" />
+    <ClInclude Include="Grid.h" />
+    <ClInclude Include="Item.h" />
+    <ClInclude Include="Position.h" />
+    <ClInclude Include="Renderer.h" />
+    <ClInclude Include="Sequence.h" />
+    <ClInclude Include="Simulator.h" />
     <ClInclude Include="vector_set.h" />
   </ItemGroup>
   <ItemGroup>

@@ -4,6 +4,9 @@
     <Filter Include="Util">
       <UniqueIdentifier>{643a69d9-0080-4b81-873d-6f112f263940}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Grid">
+      <UniqueIdentifier>{ac6dc7af-cee2-43e1-b66c-08b65e9f3869}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CppConveyor.cpp" />
@@ -12,8 +15,24 @@
     <ClInclude Include="vector_set.h">
       <Filter>Util</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="data.txt" />
+    <ClInclude Include="Enums.h" />
+    <ClInclude Include="Position.h" />
+    <ClInclude Include="Entity.h">
+      <Filter>Grid</Filter>
+    </ClInclude>
+    <ClInclude Include="Item.h">
+      <Filter>Grid</Filter>
+    </ClInclude>
+    <ClInclude Include="Conveyor.h">
+      <Filter>Grid</Filter>
+    </ClInclude>
+    <ClInclude Include="Sequence.h">
+      <Filter>Grid</Filter>
+    </ClInclude>
+    <ClInclude Include="Grid.h">
+      <Filter>Grid</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.h" />
+    <ClInclude Include="Simulator.h" />
   </ItemGroup>
 </Project>
