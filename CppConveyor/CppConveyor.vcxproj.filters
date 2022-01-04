@@ -17,6 +17,8 @@
       <Filter>Grid</Filter>
     </ClCompile>
     <ClCompile Include="Simulator.cpp" />
+    <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="FileReader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="vector_set.h">
@@ -44,5 +46,6 @@
     <ClInclude Include="Producer.h">
       <Filter>Grid</Filter>
     </ClInclude>
+    <ClInclude Include="FileReader.h" />
   </ItemGroup>
 </Project>

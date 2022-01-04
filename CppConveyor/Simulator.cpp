@@ -164,8 +164,8 @@ void cpp_conv::simulation::simulate(
         }
 
         cpp_conv::Conveyor* pConveyor = reinterpret_cast<cpp_conv::Conveyor*>(pForwardEntity);
-        Item*& forwardTargetItem = pConveyor->m_pChannels[0].m_pItems[0];
-        Item*& forwardPendingItem = pConveyor->m_pChannels[0].m_pItems[0];
+        Item*& forwardTargetItem = pConveyor->m_pChannels[rand() % cpp_conv::c_conveyorChannels].m_pItems[0];
+        Item*& forwardPendingItem = pConveyor->m_pChannels[rand() % cpp_conv::c_conveyorChannels].m_pItems[0];
         if (!forwardTargetItem && !forwardPendingItem)
         {
             forwardPendingItem = pItem;

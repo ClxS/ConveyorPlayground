@@ -141,7 +141,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CppConveyor.cpp" />
+    <ClCompile Include="FileReader.cpp" />
     <ClCompile Include="Grid.cpp" />
+    <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Sequence.cpp" />
     <ClCompile Include="Simulator.cpp" />
   </ItemGroup>
@@ -149,6 +151,7 @@
     <ClInclude Include="Conveyor.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Enums.h" />
+    <ClInclude Include="FileReader.h" />
     <ClInclude Include="Grid.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="Position.h" />
