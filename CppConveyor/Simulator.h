@@ -29,30 +29,54 @@ namespace cpp_conv
                     }
 
                     cpp_conv::Conveyor* pForwardNode = reinterpret_cast<cpp_conv::Conveyor*>(pForwardEntity);
-                    if (rNode == sequence.GetHeadConveyor())
+                    for (int iChannelIdx = 0; iChannelIdx < cpp_conv::c_conveyorChannels; iChannelIdx++)
                     {
-                        // Following node is empty, we can just move there
-                        if (rNode->m_pItem && !pForwardNode->m_pItem && !pForwardNode->m_pPendingItem)
+                        // Move the head slot items to the following conveyor
+                        Item*& currentItem = rNode->m_pChannels[iChannelIdx].m_pItems[Conveyor::Channel::Slot::LastSlot];
+                        Item*& forwardTargetItem = pForwardNode->m_pChannels[iChannelIdx].m_pItems[Conveyor::Channel::Slot::FirstSlot];
+                        Item*& forwardPendingItem = pForwardNode->m_pChannels[iChannelIdx].m_pItems[Conveyor::Channel::Slot::FirstSlot];
+
+                        if (rNode == sequence.GetHeadConveyor())
                         {
-                            pForwardNode->m_pPendingItem = rNode->m_pItem;
-                            rNode->m_pItem = nullptr;
-                        }
-                        else if (!pForwardNode->m_pPendingItem)
-                        {
-                            // Otherwise we need to check if we're in a circular segment
-                            if (IsCircular(grid, sequences, &sequence))
+                            // Following node is empty, we can just move there
+                            if (currentItem &&
+                                !forwardTargetItem &&
+                                !forwardPendingItem)
                             {
-                                pForwardNode->m_pPendingItem = rNode->m_pItem;
-                                rNode->m_pItem = nullptr;
+                                forwardPendingItem = currentItem;
+                                currentItem = nullptr;
+                            }
+                            else if (!pForwardNode->m_pChannels[iChannelIdx].m_pPendingItems[Conveyor::Channel::Slot::FirstSlot])
+                            {
+                                // Otherwise we need to check if we're in a circular segment
+                                if (IsCircular(grid, sequences, &sequence))
+                                {
+                                    forwardPendingItem = currentItem;
+                                    currentItem = nullptr;
+                                }
                             }
                         }
-                    }
-                    else
-                    {
-                        if (rNode->m_pItem && !pForwardNode->m_pItem && !pForwardNode->m_pPendingItem)
+                        else
                         {
-                            pForwardNode->m_pPendingItem = rNode->m_pItem;
-                            rNode->m_pItem = nullptr;
+                            if (currentItem && !forwardTargetItem && !forwardPendingItem)
+                            {
+                                forwardPendingItem = currentItem;
+                                currentItem = nullptr;
+                            }
+                        }
+
+                        // Move inner items forwards
+                        for (int iChannelSlot = Conveyor::Channel::Slot::LastSlot - 1; iChannelSlot >= Conveyor::Channel::Slot::FirstSlot; iChannelSlot--)
+                        {
+                            Item*& currentItem = rNode->m_pChannels[iChannelIdx].m_pItems[iChannelSlot];
+                            Item*& forwardTargetItem = rNode->m_pChannels[iChannelIdx].m_pItems[iChannelSlot + 1];
+                            Item*& forwardPendingItem = rNode->m_pChannels[iChannelIdx].m_pItems[iChannelSlot + 1];
+
+                            if (currentItem && !forwardTargetItem && !forwardPendingItem)
+                            {
+                                forwardPendingItem = currentItem;
+                                currentItem = nullptr;
+                            }
                         }
                     }
                 }
@@ -60,10 +84,16 @@ namespace cpp_conv
 
             for (cpp_conv::Conveyor* pConveyor : conveyors)
             {
-                if (pConveyor->m_pPendingItem)
+                for (cpp_conv::Conveyor::Channel& channel : pConveyor->m_pChannels)
                 {
-                    pConveyor->m_pItem = pConveyor->m_pPendingItem;
-                    pConveyor->m_pPendingItem = nullptr;
+                    for (int iChannelSlot = Conveyor::Channel::Slot::FirstSlot; iChannelSlot <= Conveyor::Channel::Slot::LastSlot; iChannelSlot++)
+                    {
+                        if (channel.m_pPendingItems[iChannelSlot])
+                        {
+                            channel.m_pItems[iChannelSlot] = channel.m_pPendingItems[iChannelSlot];
+                            channel.m_pPendingItems[iChannelSlot] = nullptr;
+                        }
+                    }
                 }
             }
         }

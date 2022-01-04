@@ -140,6 +140,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CppConveyor.cpp" />
+    <ClCompile Include="Grid.cpp" />
+    <ClCompile Include="Sequence.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Conveyor.h" />

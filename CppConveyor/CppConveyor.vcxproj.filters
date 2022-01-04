@@ -10,6 +10,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CppConveyor.cpp" />
+    <ClCompile Include="Sequence.cpp">
+      <Filter>Grid</Filter>
+    </ClCompile>
+    <ClCompile Include="Grid.cpp">
+      <Filter>Grid</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="vector_set.h">

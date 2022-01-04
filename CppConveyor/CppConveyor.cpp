@@ -62,7 +62,7 @@ int main()
 
     HANDLE hConsole = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
 
-    for (int i = 0; i < 200; i++)
+    for (int i = 0; i < 500; i++)
     {
         cpp_conv::simulation::Simulate(grid, sequences, conveyors);
         cpp_conv::renderer::PrintGrid(hConsole, screenBuffer, grid);
@@ -70,12 +70,21 @@ int main()
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
         // Debug populate the grid
-        if (i % 5 == 0)
+        if (i % 8 == 0)
         {
             cpp_conv::Conveyor* pConveyor = reinterpret_cast<cpp_conv::Conveyor*>(grid[6][20]);
-            if (!pConveyor->m_pItem)
+            if (!pConveyor->m_pChannels[0].m_pItems[0])
             {
-                pConveyor->m_pItem = new cpp_conv::Aluminium();
+                pConveyor->m_pChannels[0].m_pItems[0] = new cpp_conv::Aluminium();
+            }
+        }
+
+        if (i % 7 == 0)
+        {
+            cpp_conv::Conveyor* pConveyor = reinterpret_cast<cpp_conv::Conveyor*>(grid[6][20]);
+            if (!pConveyor->m_pChannels[0].m_pItems[0])
+            {
+                pConveyor->m_pChannels[1].m_pItems[0] = new cpp_conv::Copper();
             }
         }
     }
