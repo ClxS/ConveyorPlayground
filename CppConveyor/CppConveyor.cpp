@@ -26,9 +26,9 @@ int main()
     cpp_conv::grid::EntityGrid grid;
     memset(&grid, 0, sizeof(grid));
     std::vector<cpp_conv::Conveyor*> conveyors;
-    std::vector<cpp_conv::Producer*> producers;
+    std::vector<cpp_conv::Entity*> vOtherEntities;
 
-    cpp_conv::file_reader::readFile("data.txt", grid, conveyors, producers);
+    cpp_conv::file_reader::readFile("data.txt", grid, conveyors, vOtherEntities);
     std::vector<cpp_conv::Sequence> sequences = cpp_conv::InitializeSequences(grid, conveyors);
 
     wchar_t screenBuffer[cpp_conv::renderer::c_screenHeight][cpp_conv::renderer::c_screenWidth];
@@ -38,7 +38,7 @@ int main()
     cpp_conv::renderer::init(hConsole);
     while(true)
     {
-        cpp_conv::simulation::simulate(grid, sequences, conveyors, producers);
+        cpp_conv::simulation::simulate(grid, sequences, conveyors, vOtherEntities);
         cpp_conv::renderer::render(hConsole, screenBuffer, grid);
 
         std::this_thread::sleep_for(std::chrono::milliseconds(30));

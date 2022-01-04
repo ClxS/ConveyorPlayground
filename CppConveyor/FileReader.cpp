@@ -3,8 +3,14 @@
 #include <fstream>
 #include "Conveyor.h"
 #include "Producer.h"
+#include "Junction.h"
 
-void cpp_conv::file_reader::readFile(std::string strFileName, cpp_conv::grid::EntityGrid& grid, std::vector<cpp_conv::Conveyor*>& vConveyors, std::vector<cpp_conv::Producer*>& vProducers)
+void cpp_conv::file_reader::readFile(
+    std::string strFileName, 
+    cpp_conv::grid::EntityGrid& grid,
+    std::vector<cpp_conv::Conveyor*>& vConveyors, 
+    std::vector<cpp_conv::Entity*>& vOtherEntities
+)
 {
     std::ifstream file(strFileName.c_str());
 
@@ -20,21 +26,12 @@ void cpp_conv::file_reader::readFile(std::string strFileName, cpp_conv::grid::En
             case '>': pEntity = new cpp_conv::Conveyor(col, row, Direction::Right); break;
             case '<': pEntity = new cpp_conv::Conveyor(col, row, Direction::Left); break;
             case '^': pEntity = new cpp_conv::Conveyor(col, row, Direction::Down); break;
-            case '/': pEntity = new cpp_conv::Conveyor(col, row, Direction::Up); break;
-            case 'A':
-            {
-                cpp_conv::Producer* pProducer = new cpp_conv::Producer(col, row, Direction::Right, new cpp_conv::Copper(), 5);
-                vProducers.push_back(pProducer);
-                pEntity = pProducer;
-                break;
-            }
-            case 'D':
-            {
-                cpp_conv::Producer* pProducer = new cpp_conv::Producer(col, row, Direction::Left, new cpp_conv::Copper(), 5);
-                vProducers.push_back(pProducer);
-                pEntity = pProducer;
-                break;
-            }
+            case 'v': pEntity = new cpp_conv::Conveyor(col, row, Direction::Up); break;
+            case 'A': pEntity = new cpp_conv::Producer(col, row, Direction::Right, new cpp_conv::Copper(), 5); break;
+            case 'D': pEntity = new cpp_conv::Producer(col, row, Direction::Left, new cpp_conv::Copper(), 5); break;
+            case 'F': pEntity = new cpp_conv::Producer(col, row, Direction::Down, new cpp_conv::Copper(), 5); break;
+            case 'G': pEntity = new cpp_conv::Producer(col, row, Direction::Up, new cpp_conv::Copper(), 5); break;
+            case 'J': pEntity = new cpp_conv::Junction(col, row); break;
             }
 
             if (pEntity)
@@ -44,6 +41,10 @@ void cpp_conv::file_reader::readFile(std::string strFileName, cpp_conv::grid::En
                 if (pEntity->m_eEntityKind == EntityKind::Conveyor)
                 {
                     vConveyors.push_back(reinterpret_cast<cpp_conv::Conveyor*>(pEntity));
+                }
+                else
+                {
+                    vOtherEntities.push_back(pEntity);
                 }
             }
         }

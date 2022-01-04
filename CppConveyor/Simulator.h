@@ -11,6 +11,6 @@ namespace cpp_conv
 
     namespace simulation
     {
-        void simulate(cpp_conv::grid::EntityGrid& grid, std::vector<cpp_conv::Sequence>& sequences, std::vector<cpp_conv::Conveyor*>& conveyors, std::vector<cpp_conv::Producer*>& producer);
+        void simulate(cpp_conv::grid::EntityGrid& grid, std::vector<cpp_conv::Sequence>& sequences, std::vector<cpp_conv::Conveyor*>& conveyors, std::vector<cpp_conv::Entity*>& vOtherEntities);
     }
 }

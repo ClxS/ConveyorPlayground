@@ -94,6 +94,10 @@ cpp_conv::Conveyor::Conveyor(int32_t x, int32_t y, Direction direction, Item* pI
 {
 }
 
+void cpp_conv::Conveyor::Tick(cpp_conv::grid::EntityGrid& grid)
+{
+}
+
 void cpp_conv::Conveyor::Draw(HANDLE hConsole, cpp_conv::renderer::ScreenBuffer screenBuffer, cpp_conv::grid::EntityGrid& grid, int x, int y) const
 {
     int colour = m_pSequenceId;

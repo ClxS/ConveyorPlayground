@@ -13,5 +13,10 @@ namespace cpp_conv
 
 namespace cpp_conv::file_reader
 {
-	void readFile(std::string strFileName, cpp_conv::grid::EntityGrid& grid, std::vector<cpp_conv::Conveyor*>& vConveyors, std::vector<cpp_conv::Producer*>& vProducers);
+	void readFile(
+		std::string strFileName, 
+		cpp_conv::grid::EntityGrid& grid, 
+		std::vector<cpp_conv::Conveyor*>& vConveyors,
+		std::vector<cpp_conv::Entity*>& vOtherEntities
+	);
 }

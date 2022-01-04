@@ -12,14 +12,13 @@ namespace cpp_conv
 	public:
 		Producer(int x, int y, Direction direction, Item* pItem, uint64_t productionRate);
 
-		void Tick();
-
 		bool IsReadyToProduce() const;
 
 		Item* ProduceItem();
 
 		Direction GetDirection() const { return m_direction; }
 
+		void Tick(cpp_conv::grid::EntityGrid& grid);
 		void Draw(HANDLE hConsole, cpp_conv::renderer::ScreenBuffer screenBuffer, cpp_conv::grid::EntityGrid& grid, int x, int y) const;
 
 	private:

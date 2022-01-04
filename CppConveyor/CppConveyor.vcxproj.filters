@@ -34,6 +34,9 @@
     <ClCompile Include="Producer.cpp">
       <Filter>Grid\Entities</Filter>
     </ClCompile>
+    <ClCompile Include="Junction.cpp">
+      <Filter>Grid\Entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="vector_set.h">
@@ -61,6 +64,9 @@
     </ClInclude>
     <ClInclude Include="Sequence.h">
       <Filter>Grid\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Junction.h">
+      <Filter>Grid\Entities</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
