@@ -11,6 +11,8 @@ namespace cpp_conv
     constexpr int c_conveyorChannels = 2;
     constexpr int c_conveyorChannelSlots = 2;
 
+    class Sequence;
+
     class Conveyor : public Entity
     {
     public:
@@ -38,10 +40,12 @@ namespace cpp_conv
         Conveyor(int32_t x, int32_t y, Direction direction, Item* pItem = nullptr)
             : Entity(x, y, EntityKind::Conveyor)
             , m_direction(direction)
+            , m_pSequenceId(0)
         {
         }
 
         Direction m_direction;
+        int m_pSequenceId;
 
         std::array<Channel, c_conveyorChannels> m_pChannels;
 

@@ -41,4 +41,7 @@
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Simulator.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="data.txt" />
+  </ItemGroup>
 </Project>

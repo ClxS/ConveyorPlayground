@@ -47,9 +47,10 @@ namespace cpp_conv
     class Sequence
     {
     public:
-        Sequence(Conveyor* pHead, Conveyor* pTail)
+        Sequence(Conveyor* pHead, Conveyor* pTail, int iSequenceId)
             : m_pHeadConveyor(pHead)
             , m_pTailConveyor(pTail)
+            , m_iSequenceId(iSequenceId)
         {
         }
 
@@ -64,9 +65,15 @@ namespace cpp_conv
             return SequenceIterator(*this, grid);
         }
 
+        int GetSequenceId() const
+        {
+            return m_iSequenceId;
+        }
+
     private:
         Conveyor* m_pHeadConveyor;
         Conveyor* m_pTailConveyor;
+        int m_iSequenceId;
     };
 
     Conveyor* TraceHeadConveyor(const grid::EntityGrid& grid, const Conveyor& searchStart);

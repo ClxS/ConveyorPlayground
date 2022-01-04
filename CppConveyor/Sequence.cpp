@@ -151,6 +151,8 @@ std::vector<Sequence> cpp_conv::InitializeSequences(grid::EntityGrid& grid, std:
 {
     std::vector<Sequence> vSequences;
     cpp_conveyor::vector_set<const Conveyor*> alreadyProcessedConveyors(conveyors.size());
+
+    int iId = 0;
     for (auto& conveyor : conveyors)
     {
         if (alreadyProcessedConveyors.contains(conveyor))
@@ -158,12 +160,15 @@ std::vector<Sequence> cpp_conv::InitializeSequences(grid::EntityGrid& grid, std:
             continue;
         }
 
+        iId++;
         Conveyor* pHeadConveyor = TraceHeadConveyor(grid, *conveyor);
         Conveyor* pTailConveyor = TraceTailConveyor(grid, *conveyor, *pHeadConveyor);
 
-        vSequences.emplace_back(pHeadConveyor, pTailConveyor);
-        for (auto& rNode : vSequences.back().IterateSequence(grid))
+        vSequences.emplace_back(pHeadConveyor, pTailConveyor, iId);
+        Sequence& sequence = vSequences.back();
+        for (auto& rNode : sequence.IterateSequence(grid))
         {
+            rNode.m_pSequenceId = iId;
             alreadyProcessedConveyors.insert(&rNode);
         }
     }
