@@ -116,6 +116,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -142,6 +143,7 @@
     <ClCompile Include="CppConveyor.cpp" />
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="Sequence.cpp" />
+    <ClCompile Include="Simulator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Conveyor.h" />
@@ -150,6 +152,7 @@
     <ClInclude Include="Grid.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="Position.h" />
+    <ClInclude Include="Producer.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Sequence.h" />
     <ClInclude Include="Simulator.h" />

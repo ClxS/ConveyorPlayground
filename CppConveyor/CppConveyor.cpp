@@ -22,7 +22,7 @@
 void DebugPopulate(cpp_conv::grid::EntityGrid& grid, int i)
 {
     // Debug populate the grid
-    if (i % 8 == 0)
+    if (i % 4 == 0)
     {
         cpp_conv::Conveyor* pConveyor = reinterpret_cast<cpp_conv::Conveyor*>(grid[6][20]);
         if (!pConveyor->m_pChannels[0].m_pItems[0])
@@ -31,33 +31,33 @@ void DebugPopulate(cpp_conv::grid::EntityGrid& grid, int i)
         }
     }
 
-    if (i % 7 == 0)
+    /*if (i % 7 == 0)
     {
         cpp_conv::Conveyor* pConveyor = reinterpret_cast<cpp_conv::Conveyor*>(grid[6][20]);
-        if (!pConveyor->m_pChannels[0].m_pItems[0])
+        if (!pConveyor->m_pChannels[1].m_pItems[0])
         {
             pConveyor->m_pChannels[1].m_pItems[0] = new cpp_conv::Copper();
         }
-    }
+    }*/
 
-    // Debug populate the grid
-    if (i % 8 == 0)
-    {
-        cpp_conv::Conveyor* pConveyor = reinterpret_cast<cpp_conv::Conveyor*>(grid[2][0]);
-        if (!pConveyor->m_pChannels[0].m_pItems[0])
-        {
-            pConveyor->m_pChannels[0].m_pItems[0] = new cpp_conv::Aluminium();
-        }
-    }
+    //// Debug populate the grid
+    //if (i % 8 == 0)
+    //{
+    //    cpp_conv::Conveyor* pConveyor = reinterpret_cast<cpp_conv::Conveyor*>(grid[2][0]);
+    //    if (!pConveyor->m_pChannels[0].m_pItems[0])
+    //    {
+    //        pConveyor->m_pChannels[0].m_pItems[0] = new cpp_conv::Aluminium();
+    //    }
+    //}
 
-    if (i % 7 == 0)
-    {
-        cpp_conv::Conveyor* pConveyor = reinterpret_cast<cpp_conv::Conveyor*>(grid[2][0]);
-        if (!pConveyor->m_pChannels[0].m_pItems[0])
-        {
-            pConveyor->m_pChannels[1].m_pItems[0] = new cpp_conv::Copper();
-        }
-    }
+    //if (i % 7 == 0)
+    //{
+    //    cpp_conv::Conveyor* pConveyor = reinterpret_cast<cpp_conv::Conveyor*>(grid[2][0]);
+    //    if (!pConveyor->m_pChannels[1].m_pItems[0])
+    //    {
+    //        pConveyor->m_pChannels[1].m_pItems[0] = new cpp_conv::Copper();
+    //    }
+    //}
 }
 
 int main()
@@ -79,7 +79,8 @@ int main()
             {
             case '>': pConveyor = new cpp_conv::Conveyor(col, row, Direction::Right); break;
             case '<': pConveyor = new cpp_conv::Conveyor(col, row, Direction::Left); break;
-            case 'A': pConveyor = new cpp_conv::Conveyor(col, row, Direction::Left, new cpp_conv::Copper()); break;
+            case 'A': pConveyor = new cpp_conv::Conveyor(col, row, Direction::Right, new cpp_conv::Copper()); break;
+            case 'D': pConveyor = new cpp_conv::Conveyor(col, row, Direction::Left, new cpp_conv::Copper()); break;
             case '^': pConveyor = new cpp_conv::Conveyor(col, row, Direction::Down); break;
             case '/': pConveyor = new cpp_conv::Conveyor(col, row, Direction::Up); break;
             }
@@ -109,7 +110,7 @@ int main()
         cpp_conv::simulation::Simulate(grid, sequences, conveyors);
         cpp_conv::renderer::PrintGrid(hConsole, screenBuffer, grid);
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(70));
+        std::this_thread::sleep_for(std::chrono::milliseconds(30));
 
         DebugPopulate(grid, i);        
     }

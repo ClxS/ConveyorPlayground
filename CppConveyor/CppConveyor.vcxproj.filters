@@ -16,6 +16,7 @@
     <ClCompile Include="Grid.cpp">
       <Filter>Grid</Filter>
     </ClCompile>
+    <ClCompile Include="Simulator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="vector_set.h">
@@ -40,8 +41,8 @@
     </ClInclude>
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Simulator.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="data.txt" />
+    <ClInclude Include="Producer.h">
+      <Filter>Grid</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
