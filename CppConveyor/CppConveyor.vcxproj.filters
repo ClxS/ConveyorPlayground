@@ -7,18 +7,33 @@
     <Filter Include="Grid">
       <UniqueIdentifier>{ac6dc7af-cee2-43e1-b66c-08b65e9f3869}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Grid\Entities">
+      <UniqueIdentifier>{fa3901af-12e8-4f77-9f30-566906026f88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Grid\Item">
+      <UniqueIdentifier>{9e3ad025-2bd3-4dfb-9f04-933d607cf270}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Grid\Utility">
+      <UniqueIdentifier>{40cbfeba-c596-454e-a84d-8be7283e1206}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CppConveyor.cpp" />
-    <ClCompile Include="Sequence.cpp">
-      <Filter>Grid</Filter>
-    </ClCompile>
     <ClCompile Include="Grid.cpp">
       <Filter>Grid</Filter>
     </ClCompile>
     <ClCompile Include="Simulator.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="FileReader.cpp" />
+    <ClCompile Include="Sequence.cpp">
+      <Filter>Grid\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Conveyor.cpp">
+      <Filter>Grid\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Producer.cpp">
+      <Filter>Grid\Entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="vector_set.h">
@@ -26,26 +41,26 @@
     </ClInclude>
     <ClInclude Include="Enums.h" />
     <ClInclude Include="Position.h" />
-    <ClInclude Include="Entity.h">
-      <Filter>Grid</Filter>
-    </ClInclude>
-    <ClInclude Include="Item.h">
-      <Filter>Grid</Filter>
-    </ClInclude>
-    <ClInclude Include="Conveyor.h">
-      <Filter>Grid</Filter>
-    </ClInclude>
-    <ClInclude Include="Sequence.h">
-      <Filter>Grid</Filter>
-    </ClInclude>
     <ClInclude Include="Grid.h">
       <Filter>Grid</Filter>
     </ClInclude>
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Simulator.h" />
-    <ClInclude Include="Producer.h">
-      <Filter>Grid</Filter>
-    </ClInclude>
     <ClInclude Include="FileReader.h" />
+    <ClInclude Include="Entity.h">
+      <Filter>Grid\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Conveyor.h">
+      <Filter>Grid\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Producer.h">
+      <Filter>Grid\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Item.h">
+      <Filter>Grid\Item</Filter>
+    </ClInclude>
+    <ClInclude Include="Sequence.h">
+      <Filter>Grid\Utility</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

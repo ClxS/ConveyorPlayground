@@ -1,5 +1,6 @@
-#pragma once
+﻿#pragma once
 
+#include "Renderer.h"
 #include "Entity.h"
 
 namespace cpp_conv
@@ -9,47 +10,17 @@ namespace cpp_conv
 	class Producer : public Entity
 	{
 	public:
-		Producer(int x, int y, Direction direction, Item* pItem, uint64_t productionRate)
-			: Entity(x, y, EntityKind::Producer)
-			, m_pItem(pItem)
-			, m_direction(direction)
-			, m_tick(0)
-			, m_productionRate(productionRate)
-			, m_bProductionReady(false)
-		{
-		}
+		Producer(int x, int y, Direction direction, Item* pItem, uint64_t productionRate);
 
-		void Tick()
-		{
-			if (m_bProductionReady)
-			{
-				return;
-			}
+		void Tick();
 
-			m_tick++; 
-			if ((m_tick % m_productionRate) == 0)
-			{
-				m_bProductionReady = true;
-			}
-		}
+		bool IsReadyToProduce() const;
 
-		bool IsReadyToProduce() const
-		{
-			return m_bProductionReady;
-		}
-
-		Item* ProduceItem()
-		{
-			if (!m_bProductionReady)
-			{
-				return nullptr;
-			}
-
-			m_bProductionReady = false;
-			return m_pItem;
-		}
+		Item* ProduceItem();
 
 		Direction GetDirection() const { return m_direction; }
+
+		void Draw(HANDLE hConsole, cpp_conv::renderer::ScreenBuffer screenBuffer, cpp_conv::grid::EntityGrid& grid, int x, int y) const;
 
 	private:
 		Item* m_pItem;

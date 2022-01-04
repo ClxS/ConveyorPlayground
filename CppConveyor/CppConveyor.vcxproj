@@ -140,9 +140,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Conveyor.cpp" />
     <ClCompile Include="CppConveyor.cpp" />
     <ClCompile Include="FileReader.cpp" />
     <ClCompile Include="Grid.cpp" />
+    <ClCompile Include="Producer.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Sequence.cpp" />
     <ClCompile Include="Simulator.cpp" />

@@ -1,4 +1,7 @@
 ﻿#include "Renderer.h"
+#include "Entity.h"
+#include "Conveyor.h"
+#include "Producer.h"
 
 WORD GetColourAttribute(int colour, bool allowBackFill)
 {
@@ -30,8 +33,8 @@ WORD GetColourAttribute(int colour, bool allowBackFill)
     return FOREGROUND_RED | FOREGROUND_INTENSITY;
 }
 
-void SetPixel(HANDLE hConsole, cpp_conv::renderer::ScreenBuffer screenBuffer, wchar_t value, int x, int y,
-    int colour, bool allowBackFill = false)
+void cpp_conv::renderer::setPixel(HANDLE hConsole, cpp_conv::renderer::ScreenBuffer screenBuffer, wchar_t value, int x, int y,
+    int colour, bool allowBackFill)
 {
     if (screenBuffer[y][x] == value)
     {
@@ -50,87 +53,6 @@ void SetPixel(HANDLE hConsole, cpp_conv::renderer::ScreenBuffer screenBuffer, wc
     WriteConsoleOutputCharacterW(hConsole, &value, 1, pos, &dwBytesWritten);
 }
 
-void DrawConveyorBorder(HANDLE hConsole, cpp_conv::renderer::ScreenBuffer screenBuffer, int x, int y,
-    int colour)
-{
-    for (int i = 0; i < 4; i++)
-    {
-        if (i != 0 && i != 3)
-        {
-            SetPixel(hConsole, screenBuffer, L'│', x, y + i, colour);
-            SetPixel(hConsole, screenBuffer, L'│', x + 3, y + i, colour);
-        }
-
-        if (i != 0 && i != 3)
-        {
-            SetPixel(hConsole, screenBuffer, L'─', x + i, y, colour);
-            SetPixel(hConsole, screenBuffer, L'─', x + i, y + 3, colour);
-        }
-
-        if (i == 0 || i == 3)
-        {
-            SetPixel(hConsole, screenBuffer, L'┼', x + i, y, colour);
-            SetPixel(hConsole, screenBuffer, L'┼', x + i, y + 3, colour);
-        }
-    }
-}
-
-void DrawConveyorItem(
-    HANDLE hConsole,
-    cpp_conv::renderer::ScreenBuffer screenBuffer,
-    wchar_t value,
-    int x,
-    int y,
-    int iChannelIdx,
-    int iChannelSlot,
-    Direction direction,
-    int colour,
-    bool allowBackFill = false)
-{
-    switch (direction)
-    {
-    case Direction::Left:
-        SetPixel(hConsole, screenBuffer, value, x + cpp_conv::c_conveyorChannelSlots - iChannelSlot, y + cpp_conv::c_conveyorChannels - iChannelIdx, colour, allowBackFill);
-        break;
-    case Direction::Up:
-        SetPixel(hConsole, screenBuffer, value, x + cpp_conv::c_conveyorChannels - iChannelIdx, y + 1 + iChannelSlot, colour, allowBackFill);
-        break;
-    case Direction::Right:
-        SetPixel(hConsole, screenBuffer, value, x + 1 + iChannelSlot, y + 1 + iChannelIdx, colour, allowBackFill);
-        break;
-    case Direction::Down:
-        SetPixel(hConsole, screenBuffer, value, x + 1 + iChannelIdx, y + cpp_conv::c_conveyorChannelSlots - iChannelSlot, colour, allowBackFill);
-        break;
-    }
-}
-
-void DrawConveyorArrow(
-    HANDLE hConsole,
-    cpp_conv::renderer::ScreenBuffer screenBuffer,
-    int x,
-    int y,
-    int iChannelIdx,
-    int iChannelSlot,
-    Direction direction,
-    int colour)
-{
-    switch (direction)
-    {
-    case Direction::Left:
-        DrawConveyorItem(hConsole, screenBuffer, L'←', x, y, iChannelIdx, iChannelSlot, direction, colour);
-        break;
-    case Direction::Up:
-        DrawConveyorItem(hConsole, screenBuffer, L'↓', x, y, iChannelIdx, iChannelSlot, direction, colour);
-        break;
-    case Direction::Right:
-        DrawConveyorItem(hConsole, screenBuffer, L'→', x, y, iChannelIdx, iChannelSlot, direction, colour);
-        break;
-    case Direction::Down:
-        DrawConveyorItem(hConsole, screenBuffer, L'↑', x, y, iChannelIdx, iChannelSlot, direction, colour);
-        break;
-    }
-}
-
 void cpp_conv::renderer::init(HANDLE& hConsole)
 {
     hConsole = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
@@ -147,7 +69,7 @@ void cpp_conv::renderer::init(HANDLE& hConsole)
     SetCurrentConsoleFontEx(hConsole, FALSE, &cfi);
 }
 
-void cpp_conv::renderer::render(HANDLE hConsole, wchar_t screenBuffer[c_screenHeight][c_screenWidth], cpp_conv::grid::EntityGrid& grid)
+void cpp_conv::renderer::render(HANDLE hConsole, cpp_conv::renderer::ScreenBuffer screenBuffer, cpp_conv::grid::EntityGrid& grid)
 {
     for (int y = 0; y < grid.size(); y++)
     {
@@ -156,69 +78,11 @@ void cpp_conv::renderer::render(HANDLE hConsole, wchar_t screenBuffer[c_screenHe
             auto cell = grid[y][x];
             if (cell == nullptr)
             {
-                SetPixel(hConsole, screenBuffer, L' ', x * 4, y * 4, 0);
+                //cpp_conv::renderer::setPixel(hConsole, screenBuffer, L' ', x * cpp_conv::renderer::c_gridScale, y * cpp_conv::renderer::c_gridScale, 0);
             }
-            else if (cell->m_eEntityKind == EntityKind::Conveyor)
+            else
             {
-                const cpp_conv::Conveyor* pConveyor = reinterpret_cast<const cpp_conv::Conveyor*>(cell);
-
-                int colour = pConveyor->m_pSequenceId;
-
-                int conveyorX = x * 3;
-                int conveyorY = y * 3;
-
-                DrawConveyorBorder(hConsole, screenBuffer, conveyorX, conveyorY, colour);
-
-                for (int iChannelIdx = 0; iChannelIdx < c_conveyorChannels; ++iChannelIdx)
-                {
-                    for (int iChannelSlot = 0; iChannelSlot < c_conveyorChannels; ++iChannelSlot)
-                    {
-                        if (pConveyor->m_pChannels[iChannelIdx].m_pItems[iChannelSlot] != nullptr)
-                        {
-                            DrawConveyorItem(
-                                hConsole,
-                                screenBuffer,
-                                pConveyor->m_pChannels[iChannelIdx].m_pItems[iChannelSlot]->GetDisplayIcon(),
-                                conveyorX,
-                                conveyorY,
-                                iChannelIdx,
-                                iChannelSlot,
-                                pConveyor->m_direction,
-                                colour,
-                                true);
-                        }
-                        else
-                        {
-                            DrawConveyorArrow(hConsole, screenBuffer, conveyorX, conveyorY, iChannelIdx, iChannelSlot, pConveyor->m_direction, colour);
-                        }
-                    }
-                }
-            }
-            else if (cell->m_eEntityKind == EntityKind::Producer)
-            {
-                cpp_conv::Producer* pProducer = reinterpret_cast<cpp_conv::Producer*>(cell);
-
-                for (int conveyorY = y * 3 + 1; conveyorY < y * 3 + 3; conveyorY++)
-                {
-                    for (int conveyorX = x * 3 + 1; conveyorX < x * 3 + 3; conveyorX++)
-                    {
-                        switch (pProducer->GetDirection())
-                        {
-                        case Direction::Left:
-                            SetPixel(hConsole, screenBuffer, L'←', conveyorX, conveyorY, 0, true);
-                            break;
-                        case Direction::Up:
-                            SetPixel(hConsole, screenBuffer, L'↓', conveyorX, conveyorY, 0, true);
-                            break;
-                        case Direction::Right:
-                            SetPixel(hConsole, screenBuffer, L'→', conveyorX, conveyorY, 0, true);
-                            break;
-                        case Direction::Down:
-                            SetPixel(hConsole, screenBuffer, L'↑', conveyorX, conveyorY, 0, true);
-                            break;
-                        }
-                    }
-                }
+                cell->Draw(hConsole, screenBuffer, grid, x, y);
             }
         }
     }

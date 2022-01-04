@@ -2,6 +2,7 @@
 
 #include <array>
 
+#include "Renderer.h"
 #include "Entity.h"
 #include "Enums.h"
 #include "Item.h"
@@ -27,27 +28,20 @@ namespace cpp_conv
                 };
             };
 
-            Channel()
-            {
-                std::fill(std::begin(m_pItems), std::end(m_pItems), nullptr);
-                std::fill(std::begin(m_pPendingItems), std::end(m_pPendingItems), nullptr);
-            }
+            Channel();
 
             std::array<Item*, c_conveyorChannelSlots> m_pItems;
             std::array<Item*, c_conveyorChannelSlots> m_pPendingItems;
         };
 
-        Conveyor(int32_t x, int32_t y, Direction direction, Item* pItem = nullptr)
-            : Entity(x, y, EntityKind::Conveyor)
-            , m_direction(direction)
-            , m_pSequenceId(0)
-        {
-        }
+        Conveyor(int32_t x, int32_t y, Direction direction, Item* pItem = nullptr);
 
         Direction m_direction;
         int m_pSequenceId;
 
         std::array<Channel, c_conveyorChannels> m_pChannels;
+
+        void Draw(HANDLE hConsole, cpp_conv::renderer::ScreenBuffer screenBuffer, cpp_conv::grid::EntityGrid& grid, int x, int y) const;
 
         static_assert(c_conveyorChannels >= 1, "Conveyors must have at least once channel");
         static_assert(c_conveyorChannelSlots >= 1, "Conveyors channels must have at least once slot");
