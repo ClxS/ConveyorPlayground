@@ -25,9 +25,6 @@ namespace cpp_conv
 
             wcscpy_s<32>(cfi.FaceName, L"Lucida Console");
             SetCurrentConsoleFontEx(hConsole, FALSE, &cfi);
-
-            /*wcscpy(cfi.FaceName, L"Consolas");
-            SetCurrentConsoleFontEx(GetStdHandle(STD_OUTPUT_HANDLE), FALSE, &cfi);*/
         }
 
         WORD GetColourAttribute(int colour)
@@ -107,13 +104,13 @@ namespace cpp_conv
                 SetPixel(hConsole, screenBuffer, value, x + c_conveyorChannelSlots - iChannelSlot, y + c_conveyorChannels - iChannelIdx, colour);
                 break;
             case Direction::Up:
-                SetPixel(hConsole, screenBuffer, value, x + c_conveyorChannels - iChannelIdx, y + c_conveyorChannelSlots - iChannelSlot, colour);
+                SetPixel(hConsole, screenBuffer, value, x + c_conveyorChannels - iChannelIdx, y + 1 + iChannelSlot, colour);
                 break;
             case Direction::Right:
                 SetPixel(hConsole, screenBuffer, value, x + 1 + iChannelSlot, y + 1 + iChannelIdx, colour);
                 break;
             case Direction::Down:
-                SetPixel(hConsole, screenBuffer, value, x + 1 + iChannelIdx, y + 1 + iChannelSlot, colour);
+                SetPixel(hConsole, screenBuffer, value, x + 1 + iChannelIdx, y + c_conveyorChannelSlots - iChannelSlot, colour);
                 break;
             }
         }
