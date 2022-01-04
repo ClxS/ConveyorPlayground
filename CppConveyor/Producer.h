@@ -25,7 +25,7 @@ namespace cpp_conv
 		Item* m_pItem;
 		Direction m_direction;
 
-		uint64_t m_tick;
+		uint64_t m_uiTick;
 		uint64_t m_productionRate;
 		bool m_bProductionReady;
 	};

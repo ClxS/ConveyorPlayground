@@ -1,11 +1,13 @@
 ﻿#include "Producer.h"
 #include "Conveyor.h"
+#include <array>
+#include <random>
 
 cpp_conv::Producer::Producer(int x, int y, Direction direction, Item* pItem, uint64_t productionRate)
 	: Entity(x, y, EntityKind::Producer)
 	, m_pItem(pItem)
 	, m_direction(direction)
-	, m_tick(0)
+	, m_uiTick(0)
 	, m_productionRate(productionRate)
 	, m_bProductionReady(false)
 {
@@ -34,8 +36,8 @@ void cpp_conv::Producer::Tick(cpp_conv::grid::EntityGrid& grid)
 		return;
 	}
 
-	m_tick++;
-	if ((m_tick % m_productionRate) == 0)
+	m_uiTick++;
+	if ((m_uiTick % m_productionRate) == 0)
 	{
 		m_bProductionReady = true;
 	}
@@ -57,12 +59,37 @@ void cpp_conv::Producer::Tick(cpp_conv::grid::EntityGrid& grid)
 		return;
 	}
 
-	cpp_conv::Conveyor* pConveyor = reinterpret_cast<cpp_conv::Conveyor*>(pForwardEntity);
-	Item*& forwardTargetItem = pConveyor->m_pChannels[rand() % cpp_conv::c_conveyorChannels].m_pItems[0];
-	Item*& forwardPendingItem = pConveyor->m_pChannels[rand() % cpp_conv::c_conveyorChannels].m_pItems[0];
-	if (!forwardTargetItem && !forwardPendingItem)
+	std::array<int, cpp_conv::c_conveyorChannels> arrDirectionEntities;
+	for (int arrChannelIdx = 0; arrChannelIdx < cpp_conv::c_conveyorChannels; ++arrChannelIdx)
 	{
-		forwardPendingItem = pItem;
+		arrDirectionEntities[arrChannelIdx] = arrChannelIdx;
+	}
+
+	std::default_random_engine engine(m_uiTick % 256);
+	for (auto i = (arrDirectionEntities.end() - arrDirectionEntities.begin()) - 1; i > 0; --i)
+	{
+		std::uniform_int_distribution<decltype(i)> d(0, i);
+		std::swap(arrDirectionEntities.begin()[i], arrDirectionEntities.begin()[d(engine)]);
+	}
+
+	bool bProduced = false;
+	for (int iChannel : arrDirectionEntities)
+	{
+		cpp_conv::Conveyor* pConveyor = reinterpret_cast<cpp_conv::Conveyor*>(pForwardEntity);
+		Item*& forwardTargetItem = pConveyor->m_pChannels[iChannel].m_pItems[0];
+		Item*& forwardPendingItem = pConveyor->m_pChannels[iChannel].m_pItems[0];
+		if (!forwardTargetItem && !forwardPendingItem)
+		{
+			forwardPendingItem = pItem;
+			bProduced = true;
+			break;
+		}
+	}
+
+	if (!bProduced)
+	{
+		m_pItem = pItem;
+		m_bProductionReady = true;
 	}
 }
 
