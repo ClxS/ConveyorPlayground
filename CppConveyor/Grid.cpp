@@ -13,11 +13,11 @@ cpp_conv::Entity* cpp_conv::grid::SafeGetEntity(const EntityGrid& grid, Position
     return grid[pos.m_y][pos.m_x];
 }
 
-Position cpp_conv::grid::GetForwardPosition(const cpp_conv::Conveyor& conveyor)
+Position cpp_conv::grid::GetForwardPosition(const cpp_conv::Entity& entity, Direction direction)
 {
     Position facingDirection = { 0, 0 };
 
-    switch (conveyor.m_direction)
+    switch (direction)
     {
     case Direction::Left: facingDirection = { -1, 0 }; break;
     case Direction::Up: facingDirection = { 0, 1 }; break;
@@ -25,7 +25,12 @@ Position cpp_conv::grid::GetForwardPosition(const cpp_conv::Conveyor& conveyor)
     case Direction::Down: facingDirection = { 0, -1 }; break;
     }
 
-    return conveyor.m_position + facingDirection;
+    return entity.m_position + facingDirection;
+}
+
+Position cpp_conv::grid::GetForwardPosition(const cpp_conv::Conveyor& conveyor)
+{    
+    return GetForwardPosition(conveyor, conveyor.m_direction);
 }
 
 Position cpp_conv::grid::GetRightPosition(const cpp_conv::Conveyor& conveyor)

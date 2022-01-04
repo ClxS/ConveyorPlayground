@@ -4,6 +4,7 @@
 
 #include "Entity.h"
 #include "Conveyor.h"
+#include "Producer.h"
 #include "Grid.h"
 
 namespace cpp_conv
@@ -27,23 +28,38 @@ namespace cpp_conv
             SetCurrentConsoleFontEx(hConsole, FALSE, &cfi);
         }
 
-        WORD GetColourAttribute(int colour)
+        WORD GetColourAttribute(int colour, bool allowBackFill)
         {
-            switch (colour % 6)
+            if (allowBackFill)
             {
-            case 0: return FOREGROUND_RED | FOREGROUND_INTENSITY;
-            case 1: return FOREGROUND_GREEN | FOREGROUND_INTENSITY;
-            case 2: return FOREGROUND_BLUE | FOREGROUND_INTENSITY;
-            case 3: return FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
-            case 4: return FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
-            case 5: return FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+                switch (colour % 6)
+                {
+                case 0: return FOREGROUND_RED | FOREGROUND_INTENSITY | BACKGROUND_BLUE;
+                case 1: return FOREGROUND_GREEN | FOREGROUND_INTENSITY | BACKGROUND_BLUE;
+                case 2: return FOREGROUND_BLUE | FOREGROUND_INTENSITY | BACKGROUND_GREEN;
+                case 3: return FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY | BACKGROUND_RED;
+                case 4: return FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY | BACKGROUND_GREEN;
+                case 5: return FOREGROUND_GREEN | FOREGROUND_GREEN | FOREGROUND_INTENSITY | BACKGROUND_RED;
+                }
+            }
+            else
+            {
+                switch (colour % 6)
+                {
+                case 0: return FOREGROUND_RED | FOREGROUND_INTENSITY;
+                case 1: return FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+                case 2: return FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+                case 3: return FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+                case 4: return FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+                case 5: return FOREGROUND_GREEN | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+                }
             }
 
             return FOREGROUND_RED | FOREGROUND_INTENSITY;
         }
 
         void SetPixel(HANDLE hConsole, wchar_t screenBuffer[c_screenHeight][c_screenWidth], wchar_t value, int x, int y,
-            int colour)
+            int colour, bool allowBackFill = false)
         {
             if (screenBuffer[y][x] == value)
             {
@@ -57,7 +73,7 @@ namespace cpp_conv
 
             SetConsoleActiveScreenBuffer(hConsole);
 
-            WORD attribute = GetColourAttribute(colour);
+            WORD attribute = GetColourAttribute(colour, allowBackFill);
             WriteConsoleOutputAttribute(hConsole, &attribute, 1, pos, &dwBytesWritten);
             WriteConsoleOutputCharacterW(hConsole, &value, 1, pos, &dwBytesWritten);
         }
@@ -142,7 +158,7 @@ namespace cpp_conv
             }
         }
 
-        void PrintGrid(HANDLE hConsole, wchar_t screenBuffer[c_screenHeight][c_screenWidth], cpp_conv::grid::EntityGrid& grid)
+        void render(HANDLE hConsole, wchar_t screenBuffer[c_screenHeight][c_screenWidth], cpp_conv::grid::EntityGrid& grid)
         {
             for (int y = 0; y < grid.size(); y++)
             {
@@ -196,6 +212,32 @@ namespace cpp_conv
                                 else
                                 {
                                     DrawConveyorArrow(hConsole, screenBuffer, conveyorX, conveyorY, iChannelIdx, iChannelSlot, pConveyor->m_direction, colour);
+                                }
+                            }
+                        }
+                    }
+                    else if (cell->m_eEntityKind == EntityKind::Producer)
+                    {
+                        cpp_conv::Producer* pProducer = reinterpret_cast<cpp_conv::Producer*>(cell);
+
+                        for (int conveyorY = y * 3 + 1; conveyorY < y * 3 + 3; conveyorY++)
+                        {
+                            for (int conveyorX = x * 3 + 1; conveyorX < x * 3 + 3; conveyorX++)
+                            {
+                                switch (pProducer->GetDirection())
+                                {
+                                case Direction::Left:
+                                    SetPixel(hConsole, screenBuffer, L'←', conveyorX, conveyorY, 8, true);
+                                    break;
+                                case Direction::Up:
+                                    SetPixel(hConsole, screenBuffer, L'↓', conveyorX, conveyorY, 8, true);
+                                    break;
+                                case Direction::Right:
+                                    SetPixel(hConsole, screenBuffer, L'→', conveyorX, conveyorY, 8, true);
+                                    break;
+                                case Direction::Down:
+                                    SetPixel(hConsole, screenBuffer, L'↑', conveyorX, conveyorY, 8, true);
+                                    break;
                                 }
                             }
                         }

@@ -18,53 +18,14 @@
 #include "Sequence.h"
 #include "Renderer.h"
 #include "Simulator.h"
-
-void DebugPopulate(cpp_conv::grid::EntityGrid& grid, int i)
-{
-    // Debug populate the grid
-    if (i % 4 == 0)
-    {
-        cpp_conv::Conveyor* pConveyor = reinterpret_cast<cpp_conv::Conveyor*>(grid[6][20]);
-        if (!pConveyor->m_pChannels[0].m_pItems[0])
-        {
-            pConveyor->m_pChannels[0].m_pItems[0] = new cpp_conv::Aluminium();
-        }
-    }
-
-    /*if (i % 7 == 0)
-    {
-        cpp_conv::Conveyor* pConveyor = reinterpret_cast<cpp_conv::Conveyor*>(grid[6][20]);
-        if (!pConveyor->m_pChannels[1].m_pItems[0])
-        {
-            pConveyor->m_pChannels[1].m_pItems[0] = new cpp_conv::Copper();
-        }
-    }*/
-
-    //// Debug populate the grid
-    //if (i % 8 == 0)
-    //{
-    //    cpp_conv::Conveyor* pConveyor = reinterpret_cast<cpp_conv::Conveyor*>(grid[2][0]);
-    //    if (!pConveyor->m_pChannels[0].m_pItems[0])
-    //    {
-    //        pConveyor->m_pChannels[0].m_pItems[0] = new cpp_conv::Aluminium();
-    //    }
-    //}
-
-    //if (i % 7 == 0)
-    //{
-    //    cpp_conv::Conveyor* pConveyor = reinterpret_cast<cpp_conv::Conveyor*>(grid[2][0]);
-    //    if (!pConveyor->m_pChannels[1].m_pItems[0])
-    //    {
-    //        pConveyor->m_pChannels[1].m_pItems[0] = new cpp_conv::Copper();
-    //    }
-    //}
-}
+#include "Producer.h"
 
 int main()
 {
     cpp_conv::grid::EntityGrid grid;
     memset(&grid, 0, sizeof(grid));
     std::vector<cpp_conv::Conveyor*> conveyors;
+    std::vector<cpp_conv::Producer*> producers;
 
     std::ifstream file("data.txt");
 
@@ -74,21 +35,37 @@ int main()
     {
         for(int col = 0; col < buf.size(); col++)
         {
-            cpp_conv::Conveyor* pConveyor = nullptr;
+            cpp_conv::Entity* pEntity = nullptr;
             switch (buf[col])
             {
-            case '>': pConveyor = new cpp_conv::Conveyor(col, row, Direction::Right); break;
-            case '<': pConveyor = new cpp_conv::Conveyor(col, row, Direction::Left); break;
-            case 'A': pConveyor = new cpp_conv::Conveyor(col, row, Direction::Right, new cpp_conv::Copper()); break;
-            case 'D': pConveyor = new cpp_conv::Conveyor(col, row, Direction::Left, new cpp_conv::Copper()); break;
-            case '^': pConveyor = new cpp_conv::Conveyor(col, row, Direction::Down); break;
-            case '/': pConveyor = new cpp_conv::Conveyor(col, row, Direction::Up); break;
+            case '>': pEntity = new cpp_conv::Conveyor(col, row, Direction::Right); break;
+            case '<': pEntity = new cpp_conv::Conveyor(col, row, Direction::Left); break;
+            case '^': pEntity = new cpp_conv::Conveyor(col, row, Direction::Down); break;
+            case '/': pEntity = new cpp_conv::Conveyor(col, row, Direction::Up); break;
+            case 'A':
+            {
+                cpp_conv::Producer* pProducer = new cpp_conv::Producer(col, row, Direction::Right, new cpp_conv::Copper(), 5);
+                producers.push_back(pProducer);
+                pEntity = pProducer;
+                break;
+            }
+            case 'D':
+            {
+                cpp_conv::Producer* pProducer = new cpp_conv::Producer(col, row, Direction::Left, new cpp_conv::Copper(), 5);
+                producers.push_back(pProducer);
+                pEntity = pProducer;
+                break;
+            }
             }
 
-            if (pConveyor)
+            if (pEntity)
             {
-                grid[row][col] = pConveyor;
-                conveyors.push_back(pConveyor);
+                grid[row][col] = pEntity;
+
+                if (pEntity->m_eEntityKind == EntityKind::Conveyor)
+                {
+                    conveyors.push_back(reinterpret_cast<cpp_conv::Conveyor*>(pEntity));
+                }
             }
         }
 
@@ -105,14 +82,12 @@ int main()
     HANDLE hConsole = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
 
     cpp_conv::renderer::init(hConsole);
-    for (int i = 0; i < 500; i++)
+    while(true)
     {
-        cpp_conv::simulation::Simulate(grid, sequences, conveyors);
-        cpp_conv::renderer::PrintGrid(hConsole, screenBuffer, grid);
+        cpp_conv::simulation::simulate(grid, sequences, conveyors, producers);
+        cpp_conv::renderer::render(hConsole, screenBuffer, grid);
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(30));
-
-        DebugPopulate(grid, i);        
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
 
     CloseHandle(hConsole);

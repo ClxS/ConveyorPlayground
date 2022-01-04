@@ -1,4 +1,5 @@
 #include "Simulator.h"
+#include "Producer.h"
 
 cpp_conv::Conveyor::Channel* GetTargetChannel(cpp_conv::Conveyor& sourceNode, cpp_conv::Conveyor& targetNode, int iSourceChannel)
 {
@@ -39,7 +40,11 @@ int GetChannelTargetSlot(cpp_conv::Conveyor& sourceNode, cpp_conv::Conveyor& tar
     }
 }
 
-void cpp_conv::simulation::Simulate(cpp_conv::grid::EntityGrid& grid, std::vector<cpp_conv::Sequence>& sequences, std::vector<cpp_conv::Conveyor*>& conveyors)
+void cpp_conv::simulation::simulate(
+    cpp_conv::grid::EntityGrid& grid,
+    std::vector<cpp_conv::Sequence>& sequences,
+    std::vector<cpp_conv::Conveyor*>& conveyors,
+    std::vector<cpp_conv::Producer*>& producer)
 {
     for (auto& sequence : sequences)
     {
@@ -135,6 +140,35 @@ void cpp_conv::simulation::Simulate(cpp_conv::grid::EntityGrid& grid, std::vecto
                     channel.m_pPendingItems[iChannelSlot] = nullptr;
                 }
             }
+        }
+    }
+
+    for (cpp_conv::Producer* pProducer : producer)
+    {
+        pProducer->Tick();
+        if (!pProducer->IsReadyToProduce())
+        {
+            continue;
+        }
+     
+        Item* pItem = pProducer->ProduceItem();
+        if (!pItem)
+        {
+            continue;
+        }
+
+        cpp_conv::Entity* pForwardEntity = cpp_conv::grid::SafeGetEntity(grid, cpp_conv::grid::GetForwardPosition(*pProducer, pProducer->GetDirection()));
+        if (!pForwardEntity || pForwardEntity->m_eEntityKind != EntityKind::Conveyor)
+        {
+            continue;
+        }
+
+        cpp_conv::Conveyor* pConveyor = reinterpret_cast<cpp_conv::Conveyor*>(pForwardEntity);
+        Item*& forwardTargetItem = pConveyor->m_pChannels[0].m_pItems[0];
+        Item*& forwardPendingItem = pConveyor->m_pChannels[0].m_pItems[0];
+        if (!forwardTargetItem && !forwardPendingItem)
+        {
+            forwardPendingItem = pItem;
         }
     }
 }

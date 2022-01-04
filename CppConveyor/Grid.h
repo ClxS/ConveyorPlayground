@@ -2,6 +2,7 @@
 
 #include <array>
 #include "Position.h"
+#include "Enums.h"
 
 namespace cpp_conv
 {
@@ -14,6 +15,7 @@ namespace cpp_conv
         using EntityGrid = std::array<GridRow, 64>;
 
         Entity* SafeGetEntity(const EntityGrid& grid, Position pos);
+        Position GetForwardPosition(const Entity& entity, Direction direction);
         Position GetForwardPosition(const Conveyor& conveyor);
         Position GetRightPosition(const Conveyor& conveyor);
         Position GetBackwardsPosition(const Conveyor& conveyor);
