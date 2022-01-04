@@ -12,12 +12,10 @@ namespace cpp_conv
 	public:
 		Junction(int x, int y);
 
-		void Tick(cpp_conv::grid::EntityGrid& grid);
+		void Tick(const SceneContext& kContext);
 		void Draw(HANDLE hConsole, cpp_conv::renderer::ScreenBuffer screenBuffer, cpp_conv::grid::EntityGrid& grid, int x, int y) const;
 
-		bool HasSpace() const;
-
-		void AddItem(Item* pItem);
+		bool AddItem(Item* pItem);
 
 	private:
 		Item* m_pItem;

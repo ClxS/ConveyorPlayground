@@ -37,6 +37,12 @@
     <ClCompile Include="Junction.cpp">
       <Filter>Grid\Entities</Filter>
     </ClCompile>
+    <ClCompile Include="Underground.cpp">
+      <Filter>Grid\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="TargetingUtility.cpp">
+      <Filter>Grid\Utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="vector_set.h">
@@ -68,5 +74,12 @@
     <ClInclude Include="Junction.h">
       <Filter>Grid\Entities</Filter>
     </ClInclude>
+    <ClInclude Include="Underground.h">
+      <Filter>Grid\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="TargetingUtility.h">
+      <Filter>Grid\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneContext.h" />
   </ItemGroup>
 </Project>

@@ -149,6 +149,8 @@
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Sequence.cpp" />
     <ClCompile Include="Simulator.cpp" />
+    <ClCompile Include="TargetingUtility.cpp" />
+    <ClCompile Include="Underground.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Conveyor.h" />
@@ -161,8 +163,11 @@
     <ClInclude Include="Position.h" />
     <ClInclude Include="Producer.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="SceneContext.h" />
     <ClInclude Include="Sequence.h" />
     <ClInclude Include="Simulator.h" />
+    <ClInclude Include="TargetingUtility.h" />
+    <ClInclude Include="Underground.h" />
     <ClInclude Include="vector_set.h" />
   </ItemGroup>
   <ItemGroup>

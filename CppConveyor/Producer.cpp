@@ -1,5 +1,6 @@
 ﻿#include "Producer.h"
 #include "Conveyor.h"
+#include "SceneContext.h"
 #include <array>
 #include <random>
 
@@ -29,7 +30,7 @@ cpp_conv::Item* cpp_conv::Producer::ProduceItem()
 	return m_pItem;
 }
 
-void cpp_conv::Producer::Tick(cpp_conv::grid::EntityGrid& grid)
+void cpp_conv::Producer::Tick(const SceneContext& kContext)
 {
 	if (m_bProductionReady)
 	{
@@ -53,7 +54,7 @@ void cpp_conv::Producer::Tick(cpp_conv::grid::EntityGrid& grid)
 		return;
 	}
 
-	cpp_conv::Entity* pForwardEntity = cpp_conv::grid::SafeGetEntity(grid, cpp_conv::grid::GetForwardPosition(*this, GetDirection()));
+	cpp_conv::Entity* pForwardEntity = cpp_conv::grid::SafeGetEntity(kContext.m_grid, cpp_conv::grid::GetForwardPosition(*this, GetDirection()));
 	if (!pForwardEntity || pForwardEntity->m_eEntityKind != EntityKind::Conveyor)
 	{
 		return;
@@ -95,25 +96,25 @@ void cpp_conv::Producer::Tick(cpp_conv::grid::EntityGrid& grid)
 
 void cpp_conv::Producer::Draw(HANDLE hConsole, cpp_conv::renderer::ScreenBuffer screenBuffer, cpp_conv::grid::EntityGrid& grid, int x, int y) const
 {
-	for (int conveyorY = y * 3 + 1; conveyorY < y * 3 + 3; conveyorY++)
+	wchar_t character = L' ';
+	switch (m_direction)
 	{
-		for (int conveyorX = x * 3 + 1; conveyorX < x * 3 + 3; conveyorX++)
-		{
-			switch (m_direction)
-			{
-			case Direction::Left:
-				cpp_conv::renderer::setPixel(hConsole, screenBuffer, L'←', conveyorX, conveyorY, 0, true);
-				break;
-			case Direction::Up:
-				cpp_conv::renderer::setPixel(hConsole, screenBuffer, L'↓', conveyorX, conveyorY, 0, true);
-				break;
-			case Direction::Right:
-				cpp_conv::renderer::setPixel(hConsole, screenBuffer, L'→', conveyorX, conveyorY, 0, true);
-				break;
-			case Direction::Down:
-				cpp_conv::renderer::setPixel(hConsole, screenBuffer, L'↑', conveyorX, conveyorY, 0, true);
-				break;
-			}
-		}
+	case Direction::Left:
+		character = L'←';
+		break;
+	case Direction::Up:
+		character = L'↑';
+		break;
+	case Direction::Right:
+		character = L'→';
+		break;
+	case Direction::Down:
+		character = L'↓';
+		break;
 	}
+
+	cpp_conv::renderer::setPixel(hConsole, screenBuffer, character, x * cpp_conv::renderer::c_gridScale + 1, y * cpp_conv::renderer::c_gridScale + 1, 1, true);
+	cpp_conv::renderer::setPixel(hConsole, screenBuffer, character, x * cpp_conv::renderer::c_gridScale + 2, y * cpp_conv::renderer::c_gridScale + 1, 1, true);
+	cpp_conv::renderer::setPixel(hConsole, screenBuffer, character, x * cpp_conv::renderer::c_gridScale + 1, y * cpp_conv::renderer::c_gridScale + 2, 1, true);
+	cpp_conv::renderer::setPixel(hConsole, screenBuffer, character, x * cpp_conv::renderer::c_gridScale + 2, y * cpp_conv::renderer::c_gridScale + 2, 1, true);
 }

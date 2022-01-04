@@ -9,6 +9,7 @@ constexpr int c_maxCircularCheckDepth = 64;
 namespace cpp_conv
 {
     class Sequence;
+    struct SceneContext;
 
     class SequenceIterator
     {
@@ -53,6 +54,8 @@ namespace cpp_conv
             , m_iSequenceId(iSequenceId)
         {
         }
+
+        void Tick(const SceneContext& kContext);
 
         const Conveyor* GetHeadConveyor() const { return m_pHeadConveyor; }
         const Conveyor* GetTailConveyor() const { return m_pTailConveyor; }

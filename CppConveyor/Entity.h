@@ -7,6 +7,7 @@
 
 namespace cpp_conv
 {
+    struct SceneContext;
     class Entity
     {
     public:
@@ -16,7 +17,7 @@ namespace cpp_conv
         {
         }
 
-        virtual void Tick(cpp_conv::grid::EntityGrid& grid) = 0;
+        virtual void Tick(const SceneContext& kContext) = 0;
         virtual void Draw(HANDLE hConsole, cpp_conv::renderer::ScreenBuffer screenBuffer, cpp_conv::grid::EntityGrid& grid, int x, int y) const = 0;
 
         Position m_position;

@@ -1,5 +1,10 @@
 #include "Sequence.h"
 
+#include "TargetingUtility.h"
+#include "Junction.h"
+#include "Underground.h"
+#include "SceneContext.h"
+
 using namespace cpp_conv;
 using cpp_conv::SequenceIterator;
 
@@ -217,4 +222,101 @@ bool cpp_conv::IsCircular(grid::EntityGrid& grid, std::vector<Sequence>& sequenc
     }
 
     return false;
+}
+
+void cpp_conv::Sequence::Tick(const SceneContext& kContext)
+{
+    std::vector<cpp_conv::Conveyor*> sequencePoints;
+    for (auto& rNode : IterateSequence(kContext.m_grid))
+    {
+        sequencePoints.push_back(&rNode);
+    }
+
+    std::reverse(sequencePoints.begin(), sequencePoints.end());
+    for (cpp_conv::Conveyor* rNode : sequencePoints)
+    {
+        for (int iChannelIdx = 0; iChannelIdx < cpp_conv::c_conveyorChannels; iChannelIdx++)
+        {
+            cpp_conv::Entity* pForwardEntity = cpp_conv::grid::SafeGetEntity(kContext.m_grid, cpp_conv::grid::GetForwardPosition(*rNode));
+            Item*& frontMostItem = rNode->m_pChannels[iChannelIdx].m_pItems[Conveyor::Channel::Slot::LastSlot];
+            if (frontMostItem)
+            {
+                if (pForwardEntity && pForwardEntity->m_eEntityKind == EntityKind::Conveyor)
+                {
+                    cpp_conv::Conveyor* pForwardNode = reinterpret_cast<cpp_conv::Conveyor*>(pForwardEntity);
+
+                    // Move the head slot items to the following conveyor
+                    if (rNode == GetHeadConveyor())
+                    {
+                        cpp_conv::Conveyor::Channel* pTargetChannel = cpp_conv::targeting_util::GetTargetChannel(*rNode, *pForwardNode, iChannelIdx);
+                        if (!pTargetChannel)
+                        {
+                            continue;
+                        }
+
+                        int forwardTargetItemSlot = cpp_conv::targeting_util::GetChannelTargetSlot(*rNode, *pForwardNode, iChannelIdx);
+
+                        Item*& forwardTargetItem = pTargetChannel->m_pItems[forwardTargetItemSlot];
+                        Item*& forwardPendingItem = pTargetChannel->m_pPendingItems[forwardTargetItemSlot];
+
+                        // Following node is empty, we can just move there
+                        if (!forwardTargetItem && !forwardPendingItem)
+                        {
+                            forwardPendingItem = frontMostItem;
+                            frontMostItem = nullptr;
+                        }
+                        else if (!pForwardNode->m_pChannels[iChannelIdx].m_pPendingItems[Conveyor::Channel::Slot::FirstSlot])
+                        {
+                            // Otherwise we need to check if we're in a circular segment
+                            if (IsCircular(kContext.m_grid, kContext.m_sequences, this))
+                            {
+                                forwardPendingItem = frontMostItem;
+                                frontMostItem = nullptr;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Item*& forwardTargetItem = pForwardNode->m_pChannels[iChannelIdx].m_pItems[Conveyor::Channel::Slot::FirstSlot];
+                        Item*& forwardPendingItem = pForwardNode->m_pChannels[iChannelIdx].m_pPendingItems[Conveyor::Channel::Slot::FirstSlot];
+                        if (!forwardTargetItem && !forwardPendingItem)
+                        {
+                            forwardPendingItem = frontMostItem;
+                            frontMostItem = nullptr;
+                        }
+                    }
+                }
+                else if (pForwardEntity && pForwardEntity->m_eEntityKind == EntityKind::Junction)
+                {
+                    cpp_conv::Junction* pJunction = reinterpret_cast<cpp_conv::Junction*>(pForwardEntity);
+                    if (pJunction->AddItem(frontMostItem))
+                    {
+                        frontMostItem = nullptr;
+                    }
+                }
+                else if (pForwardEntity && pForwardEntity->m_eEntityKind == EntityKind::Underground)
+                {
+                    cpp_conv::Underground* pUnderground = reinterpret_cast<cpp_conv::Underground*>(pForwardEntity);
+                    if (pUnderground->AddItem(kContext.m_grid, frontMostItem, iChannelIdx))
+                    {
+                        frontMostItem = nullptr;
+                    }
+                }
+            }
+
+            // Move inner items forwards
+            for (int iChannelSlot = Conveyor::Channel::Slot::LastSlot - 1; iChannelSlot >= Conveyor::Channel::Slot::FirstSlot; iChannelSlot--)
+            {
+                Item*& currentItem = rNode->m_pChannels[iChannelIdx].m_pItems[iChannelSlot];
+                Item*& forwardTargetItem = rNode->m_pChannels[iChannelIdx].m_pItems[iChannelSlot + 1];
+                Item*& forwardPendingItem = rNode->m_pChannels[iChannelIdx].m_pItems[iChannelSlot + 1];
+
+                if (currentItem && !forwardTargetItem && !forwardPendingItem)
+                {
+                    forwardPendingItem = currentItem;
+                    currentItem = nullptr;
+                }
+            }
+        }
+    }
 }

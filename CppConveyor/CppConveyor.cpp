@@ -18,6 +18,7 @@
 #include "Simulator.h"
 #include "Producer.h"
 #include "FileReader.h"
+#include "SceneContext.h"
 
 int main()
 {
@@ -36,9 +37,11 @@ int main()
 
     HANDLE hConsole;
     cpp_conv::renderer::init(hConsole);
+
+    cpp_conv::SceneContext kSceneContext = { grid, sequences, conveyors, vOtherEntities };
     while(true)
     {
-        cpp_conv::simulation::simulate(grid, sequences, conveyors, vOtherEntities);
+        cpp_conv::simulation::simulate(kSceneContext);
         cpp_conv::renderer::render(hConsole, screenBuffer, grid);
 
         std::this_thread::sleep_for(std::chrono::milliseconds(30));

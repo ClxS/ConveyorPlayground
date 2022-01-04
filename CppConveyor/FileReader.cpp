@@ -4,6 +4,7 @@
 #include "Conveyor.h"
 #include "Producer.h"
 #include "Junction.h"
+#include "Underground.h"
 
 void cpp_conv::file_reader::readFile(
     std::string strFileName, 
@@ -32,6 +33,10 @@ void cpp_conv::file_reader::readFile(
             case 'F': pEntity = new cpp_conv::Producer(col, row, Direction::Down, new cpp_conv::Copper(), 5); break;
             case 'G': pEntity = new cpp_conv::Producer(col, row, Direction::Up, new cpp_conv::Copper(), 5); break;
             case 'J': pEntity = new cpp_conv::Junction(col, row); break;
+            case 'u': pEntity = new cpp_conv::Underground(col, row, Direction::Down); break;
+            case 'y': pEntity = new cpp_conv::Underground(col, row, Direction::Up); break;
+            case 'i': pEntity = new cpp_conv::Underground(col, row, Direction::Left); break;
+            case 'o': pEntity = new cpp_conv::Underground(col, row, Direction::Right); break;
             }
 
             if (pEntity)

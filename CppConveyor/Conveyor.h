@@ -13,6 +13,7 @@ namespace cpp_conv
     constexpr int c_conveyorChannelSlots = 2;
 
     class Sequence;
+    struct SceneContext;
 
     class Conveyor : public Entity
     {
@@ -41,7 +42,7 @@ namespace cpp_conv
 
         std::array<Channel, c_conveyorChannels> m_pChannels;
 
-        void Tick(cpp_conv::grid::EntityGrid& grid);
+        void Tick(const SceneContext& kContext);
         void Draw(HANDLE hConsole, cpp_conv::renderer::ScreenBuffer screenBuffer, cpp_conv::grid::EntityGrid& grid, int x, int y) const;
 
         static_assert(c_conveyorChannels >= 1, "Conveyors must have at least once channel");

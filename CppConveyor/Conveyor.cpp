@@ -1,4 +1,5 @@
 ﻿#include "Conveyor.h"
+#include "SceneContext.h"
 
 void DrawConveyorBorder(HANDLE hConsole, cpp_conv::renderer::ScreenBuffer screenBuffer, int x, int y,
     int colour)
@@ -94,8 +95,19 @@ cpp_conv::Conveyor::Conveyor(int32_t x, int32_t y, Direction direction, Item* pI
 {
 }
 
-void cpp_conv::Conveyor::Tick(cpp_conv::grid::EntityGrid& grid)
+void cpp_conv::Conveyor::Tick(const SceneContext&)
 {
+    for (cpp_conv::Conveyor::Channel& channel : m_pChannels)
+    {
+        for (int iChannelSlot = Conveyor::Channel::Slot::FirstSlot; iChannelSlot <= Conveyor::Channel::Slot::LastSlot; iChannelSlot++)
+        {
+            if (channel.m_pPendingItems[iChannelSlot])
+            {
+                channel.m_pItems[iChannelSlot] = channel.m_pPendingItems[iChannelSlot];
+                channel.m_pPendingItems[iChannelSlot] = nullptr;
+            }
+        }
+    }
 }
 
 void cpp_conv::Conveyor::Draw(HANDLE hConsole, cpp_conv::renderer::ScreenBuffer screenBuffer, cpp_conv::grid::EntityGrid& grid, int x, int y) const

@@ -1,5 +1,6 @@
 ﻿#include "Junction.h"
 #include "Conveyor.h"
+#include "SceneContext.h"
 
 #include <algorithm> 
 #include <array>
@@ -23,9 +24,9 @@ cpp_conv::Junction::Junction(int x, int y)
 {
 }
 
-void cpp_conv::Junction::Tick(cpp_conv::grid::EntityGrid& grid)
+void cpp_conv::Junction::Tick(const SceneContext& kContext)
 {
-	if (HasSpace())
+	if (!m_pItem)
 	{
 		return;
 	}
@@ -33,10 +34,10 @@ void cpp_conv::Junction::Tick(cpp_conv::grid::EntityGrid& grid)
 	m_uiTick++;
 	std::array<std::tuple<cpp_conv::Entity*, Direction>, 4> arrDirectionEntities =
 	{
-		std::make_tuple(cpp_conv::grid::SafeGetEntity(grid, cpp_conv::grid::GetForwardPosition(*this, Direction::Up)), Direction::Up),
-		std::make_tuple(cpp_conv::grid::SafeGetEntity(grid, cpp_conv::grid::GetForwardPosition(*this, Direction::Right)), Direction::Right),
-		std::make_tuple(cpp_conv::grid::SafeGetEntity(grid, cpp_conv::grid::GetForwardPosition(*this, Direction::Down)), Direction::Down),
-		std::make_tuple(cpp_conv::grid::SafeGetEntity(grid, cpp_conv::grid::GetForwardPosition(*this, Direction::Left)), Direction::Left),
+		std::make_tuple(cpp_conv::grid::SafeGetEntity(kContext.m_grid, cpp_conv::grid::GetForwardPosition(*this, Direction::Up)), Direction::Up),
+		std::make_tuple(cpp_conv::grid::SafeGetEntity(kContext.m_grid, cpp_conv::grid::GetForwardPosition(*this, Direction::Right)), Direction::Right),
+		std::make_tuple(cpp_conv::grid::SafeGetEntity(kContext.m_grid, cpp_conv::grid::GetForwardPosition(*this, Direction::Down)), Direction::Down),
+		std::make_tuple(cpp_conv::grid::SafeGetEntity(kContext.m_grid, cpp_conv::grid::GetForwardPosition(*this, Direction::Left)), Direction::Left),
 	};
 
 	std::default_random_engine engine(m_uiTick % 256);
@@ -93,17 +94,13 @@ void cpp_conv::Junction::Draw(HANDLE hConsole, cpp_conv::renderer::ScreenBuffer 
 	cpp_conv::renderer::setPixel(hConsole, screenBuffer, L'↓', x * cpp_conv::renderer::c_gridScale + 2, y * cpp_conv::renderer::c_gridScale + 2, 1, true);
 }
 
-bool cpp_conv::Junction::HasSpace() const
+bool cpp_conv::Junction::AddItem(Item* pItem)
 {
-	return !m_pItem; 
-}
-
-void cpp_conv::Junction::AddItem(Item* pItem)
-{
-	if (!HasSpace())
+	if (m_pItem)
 	{
-		return;
+		return false;
 	}
 
 	m_pItem = pItem;
+	return true;
 }

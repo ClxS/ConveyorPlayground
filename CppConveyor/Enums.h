@@ -22,5 +22,6 @@ enum class EntityKind
 {
     Conveyor,
     Producer,
-    Junction
+    Junction,
+    Underground
 };

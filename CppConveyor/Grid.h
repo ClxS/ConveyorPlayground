@@ -15,6 +15,7 @@ namespace cpp_conv
         using EntityGrid = std::array<GridRow, 64>;
 
         Entity* SafeGetEntity(const EntityGrid& grid, Position pos);
+        Position GetForwardPosition(const Position& position, Direction direction);
         Position GetForwardPosition(const Entity& entity, Direction direction);
         Position GetForwardPosition(const Conveyor& conveyor);
         Position GetRightPosition(const Conveyor& conveyor);
