@@ -36,6 +36,11 @@ WORD GetColourAttribute(int colour, bool allowBackFill)
 void cpp_conv::renderer::setPixel(RenderContext& kContext, wchar_t value, int x, int y,
     int colour, bool allowBackFill)
 {
+    if (x >= kContext.m_surface.GetWidth() || y >= kContext.m_surface.GetHeight())
+    {
+        return;
+    }
+
     WriteSurface& rSurface = kContext.m_surface;
     CHAR_INFO& rCell = rSurface.GetData()[x + rSurface.GetWidth() * y];
 

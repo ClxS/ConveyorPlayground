@@ -40,6 +40,22 @@ std::string to_string_with_precision(const T a_value, const int n = 2)
     return out.str();
 }
 
+std::tuple<int, int> getConsoleDimensions()
+{
+    // get handle to the console window
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+
+    // retrieve screen buffer info
+    CONSOLE_SCREEN_BUFFER_INFO scrBufferInfo;
+    GetConsoleScreenBufferInfo(hOut, &scrBufferInfo);
+
+    // current window size
+    short winWidth = scrBufferInfo.srWindow.Right - scrBufferInfo.srWindow.Left + 1;
+    short winHeight = scrBufferInfo.srWindow.Bottom - scrBufferInfo.srWindow.Top + 1;
+
+    return std::make_tuple(winWidth, winHeight);
+}
+
 int main()
 {
     srand(time(NULL));
@@ -52,7 +68,10 @@ int main()
     cpp_conv::file_reader::readFile("data.txt", grid, conveyors, vOtherEntities);
     std::vector<cpp_conv::Sequence> sequences = cpp_conv::InitializeSequences(grid, conveyors);
 
-    cpp_conv::renderer::SwapChain swapChain(256, 256);
+    int width, height;
+    std::tie(width, height) = getConsoleDimensions();
+
+    cpp_conv::renderer::SwapChain swapChain(width, height);
     cpp_conv::renderer::init(swapChain);
 
     cpp_conv::SceneContext kSceneContext = { grid, sequences, conveyors, vOtherEntities };
@@ -63,7 +82,7 @@ int main()
 
     uint32_t frameCounter = 0;
 
-    constexpr auto targetFrameTime = std::chrono::duration<int64_t, std::ratio<1, 2>>(1);
+    constexpr auto targetFrameTime = std::chrono::duration<int64_t, std::ratio<1, 10>>(1);
     auto nextFrame = clock.now() + targetFrameTime;
     std::chrono::steady_clock::time_point lastFrame = {};
     std::chrono::nanoseconds simulationTime = {};
