@@ -60,11 +60,11 @@ int main()
         swapChain.SwapAndPresent();
 
         lastFrame = clock.now();
-        if (std::chrono::duration_cast<std::chrono::seconds>(lastFrame - startTime) >= std::chrono::seconds{ 1 })
+        if (std::chrono::duration_cast<std::chrono::seconds>(lastFrame - startTime) >= std::chrono::seconds{ 5 })
         {
             startTime = lastFrame;
 
-            OutputDebugStringA((std::string("\nFps: ") + std::to_string(frameCounter)).c_str());
+            OutputDebugStringA((std::string("\nFps: ") + std::to_string(frameCounter / 5)).c_str());
             frameCounter = 0;
         }
 
