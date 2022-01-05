@@ -1,9 +1,28 @@
 #pragma once
 
+#include <cstdint>
+#include <vector>
+#include <Windows.h>
+
 namespace cpp_conv::renderer
 {
-	constexpr int c_screenWidth = 256;
-	constexpr int c_screenHeight = 256;
+	class WriteSurface;
+	struct SurfaceInitArgs;
 
-	using ScreenBuffer = wchar_t[c_screenHeight][c_screenWidth];
+	class ScreenBuffer
+	{
+	public:
+		ScreenBuffer(WriteSurface& rWriteSurface);
+		~ScreenBuffer();
+
+		void Initialize(SurfaceInitArgs& rArgs);
+
+		void Present();
+
+		void Shutdown();
+
+	private:
+		WriteSurface& m_rWriteSurface;
+		HANDLE m_hBufferHandle;
+	};
 }

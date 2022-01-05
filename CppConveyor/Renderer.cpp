@@ -1,5 +1,6 @@
 ﻿#include "Renderer.h"
 #include "RenderContext.h"
+#include "SwapChain.h"
 #include "Entity.h"
 
 WORD GetColourAttribute(int colour, bool allowBackFill)
@@ -35,27 +36,15 @@ WORD GetColourAttribute(int colour, bool allowBackFill)
 void cpp_conv::renderer::setPixel(RenderContext& kContext, wchar_t value, int x, int y,
     int colour, bool allowBackFill)
 {
-    if (kContext.m_screenBuffer[y][x] == value)
-    {
-        return;
-    }
+    WriteSurface& rSurface = kContext.m_surface;
+    CHAR_INFO& rCell = rSurface.GetData()[x + rSurface.GetWidth() * y];
 
-    kContext.m_screenBuffer[y][x] = value;
-
-    COORD pos = { (SHORT)x, (SHORT)y };
-    DWORD dwBytesWritten = 0;
-
-    SetConsoleActiveScreenBuffer(kContext.m_hConsole);
-
-    WORD attribute = GetColourAttribute(colour, allowBackFill);
-    WriteConsoleOutputAttribute(kContext.m_hConsole, &attribute, 1, pos, &dwBytesWritten);
-    WriteConsoleOutputCharacterW(kContext.m_hConsole, &value, 1, pos, &dwBytesWritten);
+    rCell.Char.UnicodeChar = value;
+    rCell.Attributes = GetColourAttribute(colour, allowBackFill);
 }
 
-void cpp_conv::renderer::init(HANDLE& hConsole)
+void cpp_conv::renderer::init(cpp_conv::renderer::SwapChain& rSwapChain)
 {
-    hConsole = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
-
     CONSOLE_FONT_INFOEX cfi;
     cfi.cbSize = sizeof cfi;
     cfi.nFont = 0;
@@ -65,7 +54,9 @@ void cpp_conv::renderer::init(HANDLE& hConsole)
     cfi.FontWeight = FW_HEAVY;
 
     wcscpy_s<32>(cfi.FaceName, L"Lucida Console");
-    SetCurrentConsoleFontEx(hConsole, FALSE, &cfi);
+    SurfaceInitArgs kArgs = { cfi };
+
+    rSwapChain.Initialize(kArgs);
 }
 
 void cpp_conv::renderer::render(RenderContext& kContext)

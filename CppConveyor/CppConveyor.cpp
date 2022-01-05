@@ -20,6 +20,7 @@
 #include "FileReader.h"
 #include "SceneContext.h"
 #include "RenderContext.h"
+#include "SwapChain.h"
 
 int main()
 {
@@ -33,22 +34,30 @@ int main()
     cpp_conv::file_reader::readFile("data.txt", grid, conveyors, vOtherEntities);
     std::vector<cpp_conv::Sequence> sequences = cpp_conv::InitializeSequences(grid, conveyors);
 
-    wchar_t screenBuffer[cpp_conv::renderer::c_screenHeight][cpp_conv::renderer::c_screenWidth];
-    memset(screenBuffer, ' ', 10 * 10);
-
-    HANDLE hConsole;
-    cpp_conv::renderer::init(hConsole);
+    cpp_conv::renderer::SwapChain swapChain(256, 256);
+    cpp_conv::renderer::init(swapChain);
 
     cpp_conv::SceneContext kSceneContext = { grid, sequences, conveyors, vOtherEntities };
-    cpp_conv::RenderContext kRenderContext = { hConsole, screenBuffer, grid };
+    cpp_conv::RenderContext kRenderContext = { swapChain.GetWriteSurface(), grid};
 
+    std::chrono::high_resolution_clock clock = {};
+    std::chrono::steady_clock::time_point startTime = clock.now();
+
+    uint32_t frameCounter = 0;
     while(true)
     {
         cpp_conv::simulation::simulate(kSceneContext);
         cpp_conv::renderer::render(kRenderContext);
+        swapChain.SwapAndPresent();
+        frameCounter++;
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(30));
+        std::chrono::steady_clock::time_point currentTime = clock.now();
+        if (std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTime) >= std::chrono::seconds{ 1 })
+        {
+            startTime = currentTime;
+
+            OutputDebugStringA((std::string("\nFps: ") + std::to_string(frameCounter)).c_str());
+            frameCounter = 0;
+        }
     }
-
-    CloseHandle(hConsole);
 }

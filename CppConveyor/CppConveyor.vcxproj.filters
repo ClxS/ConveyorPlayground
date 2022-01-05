@@ -4,84 +4,127 @@
     <Filter Include="Util">
       <UniqueIdentifier>{643a69d9-0080-4b81-873d-6f112f263940}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Grid">
+    <Filter Include="Renderer">
+      <UniqueIdentifier>{ddbfcae2-c982-42d4-b1f6-f4919187eb24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{4e9171bd-c266-44df-8ce2-da1435959948}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Grid">
       <UniqueIdentifier>{ac6dc7af-cee2-43e1-b66c-08b65e9f3869}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Grid\Entities">
+    <Filter Include="Scene\Grid\Entities">
       <UniqueIdentifier>{fa3901af-12e8-4f77-9f30-566906026f88}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Grid\Item">
+    <Filter Include="Scene\Grid\Item">
       <UniqueIdentifier>{9e3ad025-2bd3-4dfb-9f04-933d607cf270}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Grid\Utility">
+    <Filter Include="Scene\Grid\Utility">
       <UniqueIdentifier>{40cbfeba-c596-454e-a84d-8be7283e1206}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CppConveyor.cpp" />
     <ClCompile Include="Grid.cpp">
-      <Filter>Grid</Filter>
+      <Filter>Scene\Grid</Filter>
     </ClCompile>
-    <ClCompile Include="Simulator.cpp" />
-    <ClCompile Include="Renderer.cpp" />
-    <ClCompile Include="FileReader.cpp" />
     <ClCompile Include="Sequence.cpp">
-      <Filter>Grid\Utility</Filter>
+      <Filter>Scene\Grid\Utility</Filter>
     </ClCompile>
     <ClCompile Include="Conveyor.cpp">
-      <Filter>Grid\Entities</Filter>
+      <Filter>Scene\Grid\Entities</Filter>
     </ClCompile>
     <ClCompile Include="Producer.cpp">
-      <Filter>Grid\Entities</Filter>
+      <Filter>Scene\Grid\Entities</Filter>
     </ClCompile>
     <ClCompile Include="Junction.cpp">
-      <Filter>Grid\Entities</Filter>
+      <Filter>Scene\Grid\Entities</Filter>
     </ClCompile>
     <ClCompile Include="Underground.cpp">
-      <Filter>Grid\Entities</Filter>
+      <Filter>Scene\Grid\Entities</Filter>
     </ClCompile>
     <ClCompile Include="TargetingUtility.cpp">
-      <Filter>Grid\Utility</Filter>
+      <Filter>Scene\Grid\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Simulator.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="FileReader.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="ScreenBuffer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="WriteSurface.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="SwapChain.cpp">
+      <Filter>Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="vector_set.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="Enums.h" />
-    <ClInclude Include="Position.h" />
     <ClInclude Include="Grid.h">
-      <Filter>Grid</Filter>
+      <Filter>Scene\Grid</Filter>
     </ClInclude>
-    <ClInclude Include="Renderer.h" />
-    <ClInclude Include="Simulator.h" />
-    <ClInclude Include="FileReader.h" />
     <ClInclude Include="Entity.h">
-      <Filter>Grid\Entities</Filter>
+      <Filter>Scene\Grid\Entities</Filter>
     </ClInclude>
     <ClInclude Include="Conveyor.h">
-      <Filter>Grid\Entities</Filter>
+      <Filter>Scene\Grid\Entities</Filter>
     </ClInclude>
     <ClInclude Include="Producer.h">
-      <Filter>Grid\Entities</Filter>
+      <Filter>Scene\Grid\Entities</Filter>
     </ClInclude>
     <ClInclude Include="Item.h">
-      <Filter>Grid\Item</Filter>
+      <Filter>Scene\Grid\Item</Filter>
     </ClInclude>
     <ClInclude Include="Sequence.h">
-      <Filter>Grid\Utility</Filter>
+      <Filter>Scene\Grid\Utility</Filter>
     </ClInclude>
     <ClInclude Include="Junction.h">
-      <Filter>Grid\Entities</Filter>
+      <Filter>Scene\Grid\Entities</Filter>
     </ClInclude>
     <ClInclude Include="Underground.h">
-      <Filter>Grid\Entities</Filter>
+      <Filter>Scene\Grid\Entities</Filter>
     </ClInclude>
     <ClInclude Include="TargetingUtility.h">
-      <Filter>Grid\Utility</Filter>
+      <Filter>Scene\Grid\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="SceneContext.h" />
-    <ClInclude Include="RenderContext.h" />
-    <ClInclude Include="ScreenBuffer.h" />
+    <ClInclude Include="Renderer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderContext.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Simulator.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneContext.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="ScreenBuffer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Enums.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Position.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="FileReader.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="SwapChain.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="WriteSurface.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

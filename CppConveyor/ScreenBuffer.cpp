@@ -1,0 +1,75 @@
+#include "ScreenBuffer.h"
+#include "WriteSurface.h"
+#include "SwapChain.h"
+
+cpp_conv::renderer::ScreenBuffer::ScreenBuffer(WriteSurface& rWriteSurface)
+	: m_rWriteSurface(rWriteSurface)
+	, m_hBufferHandle(0)
+{
+}
+
+cpp_conv::renderer::ScreenBuffer::~ScreenBuffer()
+{
+	Shutdown();
+}
+
+void cpp_conv::renderer::ScreenBuffer::Initialize(SurfaceInitArgs& rArgs)
+{
+	COORD coordBufSize = { (SHORT)m_rWriteSurface.GetWidth(), (SHORT)m_rWriteSurface.GetHeight() };
+	SMALL_RECT srctWriteRect;
+	srctWriteRect.Left = srctWriteRect.Top = 0;
+	srctWriteRect.Right = m_rWriteSurface.GetWidth() - 1;
+	srctWriteRect.Bottom = m_rWriteSurface.GetHeight() - 1;
+
+	m_hBufferHandle = CreateConsoleScreenBuffer(
+		GENERIC_WRITE,
+		0,
+		NULL,                    // default security attributes 
+		CONSOLE_TEXTMODE_BUFFER, // must be TEXTMODE 
+		NULL);                   // reserved; must be NULL 
+
+	if (rArgs.m_surfaceFont.cbSize != 0)
+	{
+		SetCurrentConsoleFontEx(m_hBufferHandle, FALSE, &rArgs.m_surfaceFont);
+	}
+
+	SetConsoleScreenBufferSize(m_hBufferHandle, coordBufSize);
+	SetConsoleWindowInfo(m_hBufferHandle, TRUE, &srctWriteRect);
+}
+
+void cpp_conv::renderer::ScreenBuffer::Present()
+{
+	COORD coordBufSize = { (SHORT)m_rWriteSurface.GetWidth(), (SHORT)m_rWriteSurface.GetHeight() };
+	COORD coordBufCoord = { 0, 0 };
+	SMALL_RECT srctWriteRect;
+	srctWriteRect.Left = srctWriteRect.Top = 0;
+	srctWriteRect.Right = m_rWriteSurface.GetWidth() - 1;
+	srctWriteRect.Bottom = m_rWriteSurface.GetHeight() - 1;
+
+	BOOL fSuccess = WriteConsoleOutput(
+		m_hBufferHandle,
+		m_rWriteSurface.GetData().data(),
+		coordBufSize,     // col-row size of chiBuffer 
+		coordBufCoord,    // top left src cell in chiBuffer 
+		&srctWriteRect);
+
+	if (!SetConsoleActiveScreenBuffer(m_hBufferHandle))
+	{
+		printf("SetConsoleActiveScreenBuffer failed - (%d)\n", GetLastError());
+	}
+
+	if (m_rWriteSurface.IsClearOnPresent())
+	{
+		m_rWriteSurface.Clear();
+	}
+}
+
+void cpp_conv::renderer::ScreenBuffer::Shutdown()
+{
+	if (m_hBufferHandle == 0)
+	{
+		return;
+	}
+
+	CloseHandle(m_hBufferHandle);
+}

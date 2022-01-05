@@ -147,10 +147,13 @@
     <ClCompile Include="Junction.cpp" />
     <ClCompile Include="Producer.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="ScreenBuffer.cpp" />
     <ClCompile Include="Sequence.cpp" />
     <ClCompile Include="Simulator.cpp" />
+    <ClCompile Include="SwapChain.cpp" />
     <ClCompile Include="TargetingUtility.cpp" />
     <ClCompile Include="Underground.cpp" />
+    <ClCompile Include="WriteSurface.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Conveyor.h" />
@@ -168,9 +171,11 @@
     <ClInclude Include="ScreenBuffer.h" />
     <ClInclude Include="Sequence.h" />
     <ClInclude Include="Simulator.h" />
+    <ClInclude Include="SwapChain.h" />
     <ClInclude Include="TargetingUtility.h" />
     <ClInclude Include="Underground.h" />
     <ClInclude Include="vector_set.h" />
+    <ClInclude Include="WriteSurface.h" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="data.txt">

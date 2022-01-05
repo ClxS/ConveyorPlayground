@@ -9,7 +9,9 @@ namespace cpp_conv::renderer
 {
 	constexpr int c_gridScale = 3;
 
-	void init(HANDLE& hConsole);
+	class SwapChain;
+
+	void init(SwapChain& rSwapChain);
     void render(RenderContext& kContext);
 
 	void setPixel(RenderContext& kContext, wchar_t value, int x, int y, int colour, bool allowBackFill = false);
