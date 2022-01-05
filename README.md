@@ -4,14 +4,17 @@ Discrete positioning based console driven Factorio-inspired Conveyor System.
 
 Basic proof of concept thrown together in a couple of hours. Code is messy and not suitable for use!
 
-## Cornering!
+## Placement!
+![Placement2](https://user-images.githubusercontent.com/15245663/148277984-eb7a4dc4-b06f-48f2-8bd2-3192577325c4.gif)
+
+## Cornering!!
 ![Cornering](https://user-images.githubusercontent.com/15245663/148225418-4fe61b11-98ea-463a-a598-a7fe7960059e.gif)
 
-## Underground Tunnels!!
+## Underground Tunnels!!!
 
 ![9](https://user-images.githubusercontent.com/15245663/148123693-f1f6f03a-d3c3-49d0-aff1-bbf206747cc9.gif)
 
-## Junction Nodes!!!!
+## Junction Nodes!!!!!
 
 ![7](https://user-images.githubusercontent.com/15245663/148123726-4f6756f2-bf54-401b-a1e6-db26aada6efb.gif)
 
