@@ -71,12 +71,12 @@ void cpp_conv::Junction::Tick(const SceneContext& kContext)
 		bool bFound = false;
 		for (cpp_conv::Conveyor::Channel& rChannel : pConveyor->m_pChannels)
 		{
-			if (rChannel.m_pItems[cpp_conv::Conveyor::Channel::Slot::FirstSlot] || rChannel.m_pPendingItems[cpp_conv::Conveyor::Channel::Slot::FirstSlot])
+			if (rChannel.m_pItems[0] || rChannel.m_pPendingItems[0])
 			{
 				continue;
 			}
 
-			rChannel.m_pPendingItems[cpp_conv::Conveyor::Channel::Slot::FirstSlot] = m_pItem;
+			rChannel.m_pPendingItems[0] = m_pItem;
 			m_pItem = nullptr;
 			bFound = true;
 			break;

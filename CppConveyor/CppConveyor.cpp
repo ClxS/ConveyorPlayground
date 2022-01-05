@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <chrono>
 #include <thread>
+#include <format>
 #include <Windows.h>
 
 #include "vector_set.h"
@@ -21,6 +22,23 @@
 #include "SceneContext.h"
 #include "RenderContext.h"
 #include "SwapChain.h"
+
+#define STR_COMBINE_DIRECT(X,Y) X##Y
+#define STR_COMBINE2(X,Y) STR_COMBINE_DIRECT(X,Y)
+#define PROFILE(VAR, INSTRUCTION)\
+    auto STR_COMBINE2(start, __LINE__) = clock.now();\
+    INSTRUCTION;\
+    auto STR_COMBINE2(end, __LINE__) = clock.now();\
+    VAR += STR_COMBINE2(end, __LINE__) - STR_COMBINE2(start, __LINE__);
+
+template <typename T>
+std::string to_string_with_precision(const T a_value, const int n = 2)
+{
+    std::ostringstream out;
+    out.precision(n);
+    out << std::fixed << a_value;
+    return out.str();
+}
 
 int main()
 {
@@ -45,26 +63,42 @@ int main()
 
     uint32_t frameCounter = 0;
 
-    constexpr auto targetFrameTime = std::chrono::duration<int64_t, std::ratio<1, 15>>(1);
+    constexpr auto targetFrameTime = std::chrono::duration<int64_t, std::ratio<1, 2>>(1);
     auto nextFrame = clock.now() + targetFrameTime;
     std::chrono::steady_clock::time_point lastFrame = {};
+    std::chrono::nanoseconds simulationTime = {};
+    std::chrono::nanoseconds renderTime = {};
+    std::chrono::nanoseconds sleepTime = {};
+    std::chrono::nanoseconds presentTime = {};
     while(true)
     {
         frameCounter++;
-        cpp_conv::simulation::simulate(kSceneContext);
-        cpp_conv::renderer::render(kRenderContext);
 
-        std::this_thread::sleep_until(nextFrame);
+        PROFILE(simulationTime, cpp_conv::simulation::simulate(kSceneContext));
+        PROFILE(renderTime, cpp_conv::renderer::render(kRenderContext));
+        PROFILE(sleepTime, std::this_thread::sleep_until(nextFrame));
+        PROFILE(presentTime, swapChain.SwapAndPresent());
+
         nextFrame += targetFrameTime;
-
-        swapChain.SwapAndPresent();
-
         lastFrame = clock.now();
         if (std::chrono::duration_cast<std::chrono::seconds>(lastFrame - startTime) >= std::chrono::seconds{ 5 })
         {
             startTime = lastFrame;
 
-            OutputDebugStringA((std::string("\nFps: ") + std::to_string(frameCounter / 5)).c_str());
+            auto totalTime = simulationTime + renderTime + sleepTime + presentTime;
+            std::string strMsg = std::format("\n\nFPS: {}\nSimulation: {} ({}%)\nRender: {} ({}%)\nSleep: {} ({}%)\nPresent: {} ({}%)",
+                std::to_string(frameCounter / 5),
+                to_string_with_precision(std::chrono::duration_cast<std::chrono::milliseconds>(simulationTime / frameCounter)),
+                to_string_with_precision(((double)simulationTime.count() / (double)totalTime.count()) * 100),
+                to_string_with_precision(std::chrono::duration_cast<std::chrono::milliseconds>(renderTime / frameCounter)),
+                to_string_with_precision(((double)renderTime.count() / (double)totalTime.count()) * 100),
+                to_string_with_precision(std::chrono::duration_cast<std::chrono::milliseconds>(sleepTime / frameCounter)),
+                to_string_with_precision(((double)sleepTime.count() / (double)totalTime.count()) * 100),
+                to_string_with_precision(std::chrono::duration_cast<std::chrono::milliseconds>(presentTime / frameCounter)),
+                to_string_with_precision(((double)presentTime.count() / (double)totalTime.count()) * 100)
+                );
+
+            OutputDebugStringA(strMsg.c_str());
             frameCounter = 0;
         }
 

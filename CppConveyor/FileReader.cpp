@@ -28,10 +28,10 @@ void cpp_conv::file_reader::readFile(
             case '<': pEntity = new cpp_conv::Conveyor(col, row, Direction::Left); break;
             case '^': pEntity = new cpp_conv::Conveyor(col, row, Direction::Down); break;
             case 'v': pEntity = new cpp_conv::Conveyor(col, row, Direction::Up); break;
-            case 'A': pEntity = new cpp_conv::Producer(col, row, Direction::Right, new cpp_conv::Copper(), 5); break;
-            case 'D': pEntity = new cpp_conv::Producer(col, row, Direction::Left, new cpp_conv::Copper(), 5); break;
-            case 'F': pEntity = new cpp_conv::Producer(col, row, Direction::Down, new cpp_conv::Copper(), 5); break;
-            case 'G': pEntity = new cpp_conv::Producer(col, row, Direction::Up, new cpp_conv::Copper(), 5); break;
+            case 'A': pEntity = new cpp_conv::Producer(col, row, Direction::Right, new cpp_conv::Copper(), 7); break;
+            case 'D': pEntity = new cpp_conv::Producer(col, row, Direction::Left, new cpp_conv::Copper(), 7); break;
+            case 'F': pEntity = new cpp_conv::Producer(col, row, Direction::Down, new cpp_conv::Copper(), 7); break;
+            case 'G': pEntity = new cpp_conv::Producer(col, row, Direction::Up, new cpp_conv::Copper(), 7); break;
             case 'J': pEntity = new cpp_conv::Junction(col, row); break;
             case 'u': pEntity = new cpp_conv::Underground(col, row, Direction::Down); break;
             case 'y': pEntity = new cpp_conv::Underground(col, row, Direction::Up); break;

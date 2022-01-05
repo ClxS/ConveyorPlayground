@@ -80,9 +80,12 @@ namespace cpp_conv
     };
 
     Conveyor* TraceHeadConveyor(const grid::EntityGrid& grid, const Conveyor& searchStart);
-    Conveyor* TraceTailConveyor(grid::EntityGrid& grid, Conveyor& searchStart, Conveyor& head);
+    Conveyor* TraceTailConveyor(const grid::EntityGrid& grid, Conveyor& searchStart, Conveyor& head);
 
     std::vector<Sequence> InitializeSequences(grid::EntityGrid& grid, std::vector<Conveyor*>& conveyors);
 
-    bool IsCircular(grid::EntityGrid& grid, std::vector<Sequence>& sequences, Sequence* pStartSequence);
+    bool IsCircular(const grid::EntityGrid& grid, std::vector<Sequence>& sequences, Sequence* pStartSequence);
+
+    bool IsCornerConveyor(const grid::EntityGrid& grid, const Conveyor& rConveyor);
+    std::tuple<int, Direction> GetInnerMostCornerChannel(const grid::EntityGrid& grid, const Conveyor& rConveyor);
 }

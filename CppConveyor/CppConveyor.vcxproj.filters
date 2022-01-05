@@ -126,5 +126,8 @@
     <ClInclude Include="WriteSurface.h">
       <Filter>Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="Direction.h">
+      <Filter>Util</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

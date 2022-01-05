@@ -3,6 +3,7 @@
 #include <array>
 #include "Position.h"
 #include "Enums.h"
+#include "Entity.h"
 
 namespace cpp_conv
 {
@@ -23,5 +24,17 @@ namespace cpp_conv
         Position GetLeftPosition(const Conveyor& conveyor);
 
         bool IsConveyor(const Entity* pEntity);
+
+        template<typename TEntity>
+        TEntity* SafeGetEntity(const EntityGrid& grid, Position pos, EntityKind expectedKind)
+        {
+            Entity* pEntity = SafeGetEntity(grid, pos);
+            if (pEntity == nullptr || pEntity->m_eEntityKind != expectedKind)
+            {
+                return nullptr;
+            }
+
+            return reinterpret_cast<TEntity*>(pEntity);
+        }
     }
 }

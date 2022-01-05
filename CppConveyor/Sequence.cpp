@@ -4,6 +4,8 @@
 #include "Junction.h"
 #include "Underground.h"
 #include "SceneContext.h"
+#include "Direction.h"
+#include <cassert>
 
 using namespace cpp_conv;
 using cpp_conv::SequenceIterator;
@@ -24,7 +26,7 @@ SequenceIterator::IterateNode& SequenceIterator::IterateNode::operator++()
     }
     else
     {
-        m_pCurrent = reinterpret_cast<Conveyor*>(grid::SafeGetEntity(m_grid, grid::GetForwardPosition(*m_pCurrent)));
+        m_pCurrent = grid::SafeGetEntity<Conveyor>(m_grid, grid::GetForwardPosition(*m_pCurrent), EntityKind::Conveyor);
     }
 
     return *this;
@@ -61,7 +63,7 @@ Conveyor* cpp_conv::TraceHeadConveyor(const grid::EntityGrid& grid, const Convey
         RelativeDirection::Left,
     };
 
-    Conveyor* pCurrentConveyor = reinterpret_cast<Conveyor*>(grid::SafeGetEntity(grid, searchStart.m_position));
+    Conveyor* pCurrentConveyor = grid::SafeGetEntity<Conveyor>(grid, searchStart.m_position, EntityKind::Conveyor);
     while (true)
     {
         Position forwardPosition = grid::GetForwardPosition(*pCurrentConveyor);
@@ -74,9 +76,9 @@ Conveyor* cpp_conv::TraceHeadConveyor(const grid::EntityGrid& grid, const Convey
         Conveyor* pTargetConveyor = reinterpret_cast<Conveyor*>(pTarget);
 
         Entity* vPotentialNeighbours[4];
-        vPotentialNeighbours[(int)RelativeDirection::Backwards] = grid::SafeGetEntity(grid, grid::GetBackwardsPosition(*pTargetConveyor));
-        vPotentialNeighbours[(int)RelativeDirection::Right] = grid::SafeGetEntity(grid, grid::GetRightPosition(*pTargetConveyor));
-        vPotentialNeighbours[(int)RelativeDirection::Left] = grid::SafeGetEntity(grid, grid::GetLeftPosition(*pTargetConveyor));
+        vPotentialNeighbours[(int)RelativeDirection::Backwards] = grid::SafeGetEntity<Conveyor>(grid, grid::GetBackwardsPosition(*pTargetConveyor), EntityKind::Conveyor);
+        vPotentialNeighbours[(int)RelativeDirection::Right] = grid::SafeGetEntity<Conveyor>(grid, grid::GetRightPosition(*pTargetConveyor), EntityKind::Conveyor);
+        vPotentialNeighbours[(int)RelativeDirection::Left] = grid::SafeGetEntity<Conveyor>(grid, grid::GetLeftPosition(*pTargetConveyor), EntityKind::Conveyor);
 
         for (auto direction : directionPriority)
         {
@@ -107,7 +109,7 @@ Conveyor* cpp_conv::TraceHeadConveyor(const grid::EntityGrid& grid, const Convey
     return pCurrentConveyor;
 }
 
-Conveyor* cpp_conv::TraceTailConveyor(grid::EntityGrid& grid, Conveyor& searchStart, Conveyor& head)
+Conveyor* FindNextTailConveyor(const grid::EntityGrid& grid, const Conveyor& rCurrentConveyor)
 {
     static RelativeDirection directionPriority[] =
     {
@@ -116,31 +118,40 @@ Conveyor* cpp_conv::TraceTailConveyor(grid::EntityGrid& grid, Conveyor& searchSt
         RelativeDirection::Left,
     };
 
-    Conveyor* pCurrentConveyor = reinterpret_cast<Conveyor*>(grid::SafeGetEntity(grid, searchStart.m_position));
-    while (true)
+    Conveyor* vPotentialNeighbours[4];
+    vPotentialNeighbours[(int)RelativeDirection::Backwards] = grid::SafeGetEntity<Conveyor>(grid, grid::GetBackwardsPosition(rCurrentConveyor), EntityKind::Conveyor);
+    vPotentialNeighbours[(int)RelativeDirection::Right] = grid::SafeGetEntity<Conveyor>(grid, grid::GetRightPosition(rCurrentConveyor), EntityKind::Conveyor);
+    vPotentialNeighbours[(int)RelativeDirection::Left] = grid::SafeGetEntity<Conveyor>(grid, grid::GetLeftPosition(rCurrentConveyor), EntityKind::Conveyor);
+
+    Conveyor* pTargetConveyor = nullptr;
+    for (auto direction : directionPriority)
     {
-        Entity* vPotentialNeighbours[4];
-        vPotentialNeighbours[(int)RelativeDirection::Backwards] = grid::SafeGetEntity(grid, grid::GetBackwardsPosition(*pCurrentConveyor));
-        vPotentialNeighbours[(int)RelativeDirection::Right] = grid::SafeGetEntity(grid, grid::GetRightPosition(*pCurrentConveyor));
-        vPotentialNeighbours[(int)RelativeDirection::Left] = grid::SafeGetEntity(grid, grid::GetLeftPosition(*pCurrentConveyor));
-
-        Conveyor* pTargetConveyor = nullptr;
-        for (auto direction : directionPriority)
+        Conveyor* pDirectionEntity = vPotentialNeighbours[(int)direction];
+        if (pDirectionEntity == nullptr || pDirectionEntity->m_eEntityKind != EntityKind::Conveyor)
         {
-            Entity* pDirectionEntity = vPotentialNeighbours[(int)direction];
-            if (pDirectionEntity == nullptr || pDirectionEntity->m_eEntityKind != EntityKind::Conveyor)
-            {
-                continue;
-            }
-
-            Conveyor* pDirectionConveyor = reinterpret_cast<Conveyor*>(pDirectionEntity);
-            if (grid::GetForwardPosition(*pDirectionConveyor) == pCurrentConveyor->m_position)
-            {
-                pTargetConveyor = pDirectionConveyor;
-                break;
-            }
+            continue;
         }
 
+        Conveyor* pDirectionConveyor = reinterpret_cast<Conveyor*>(pDirectionEntity);
+        if (grid::GetForwardPosition(*pDirectionConveyor) == rCurrentConveyor.m_position)
+        {
+            pTargetConveyor = pDirectionConveyor;
+            break;
+        }
+    }
+
+    return pTargetConveyor;
+}
+
+Conveyor* cpp_conv::TraceTailConveyor(const grid::EntityGrid& grid, Conveyor& searchStart, Conveyor& head)
+{
+    Conveyor* pCurrentConveyor = reinterpret_cast<Conveyor*>(grid::SafeGetEntity(grid, searchStart.m_position));
+
+    assert(pCurrentConveyor != nullptr); // If it is null here, we are misusing this method.
+
+    while (true)
+    {
+        Conveyor* pTargetConveyor = FindNextTailConveyor(grid, *pCurrentConveyor);
         if (!pTargetConveyor || pTargetConveyor == &searchStart || pTargetConveyor == &head)
         {
             break;
@@ -181,7 +192,7 @@ std::vector<Sequence> cpp_conv::InitializeSequences(grid::EntityGrid& grid, std:
     return vSequences;
 }
 
-bool cpp_conv::IsCircular(grid::EntityGrid& grid, std::vector<Sequence>& sequences, Sequence* pStartSequence)
+bool cpp_conv::IsCircular(const grid::EntityGrid& grid, std::vector<Sequence>& sequences, Sequence* pStartSequence)
 {
     Sequence* pCurrentSequence = pStartSequence;
     int checkedDepth = 0;
@@ -224,6 +235,36 @@ bool cpp_conv::IsCircular(grid::EntityGrid& grid, std::vector<Sequence>& sequenc
     return false;
 }
 
+bool cpp_conv::IsCornerConveyor(const grid::EntityGrid& grid, const Conveyor& rConveyor)
+{
+    Conveyor* pBackConverter = FindNextTailConveyor(grid, rConveyor);
+    if (pBackConverter == nullptr)
+    {
+        return false;
+    }
+
+    return pBackConverter->m_direction != rConveyor.m_direction;
+}
+
+std::tuple<int, Direction> cpp_conv::GetInnerMostCornerChannel(const grid::EntityGrid& grid, const Conveyor& rConveyor)
+{
+    Conveyor* pBackConverter = FindNextTailConveyor(grid, rConveyor);
+    if (pBackConverter == nullptr || pBackConverter->m_direction == rConveyor.m_direction)
+    {
+        return std::make_tuple(-1, Direction::Up);
+    }
+
+    Direction selfDirection = rConveyor.m_direction;
+    Direction backDirection = pBackConverter->m_direction;
+    while (selfDirection != Direction::Up)
+    {
+        selfDirection = cpp_conv::direction::Rotate90DegreeClockwise(selfDirection);
+        backDirection = cpp_conv::direction::Rotate90DegreeClockwise(backDirection);
+    }
+
+    return std::make_tuple(backDirection == Direction::Right ? 1 : 0, pBackConverter->m_direction);
+}
+
 void cpp_conv::Sequence::Tick(const SceneContext& kContext)
 {
     std::vector<cpp_conv::Conveyor*> sequencePoints;
@@ -235,10 +276,21 @@ void cpp_conv::Sequence::Tick(const SceneContext& kContext)
     std::reverse(sequencePoints.begin(), sequencePoints.end());
     for (cpp_conv::Conveyor* rNode : sequencePoints)
     {
+        bool bIsCornerConveyor = IsCornerConveyor(kContext.m_grid, *rNode);
+        int iInnerMostChannel;
+        Direction eCornerDirection;
+        std::tie(iInnerMostChannel, eCornerDirection) = GetInnerMostCornerChannel(kContext.m_grid, *rNode);
+
         for (int iChannelIdx = 0; iChannelIdx < cpp_conv::c_conveyorChannels; iChannelIdx++)
         {
+            int iChannelLength = cpp_conv::c_conveyorChannelSlots;
+            if (bIsCornerConveyor)
+            {
+                iChannelLength += iInnerMostChannel == iChannelIdx ? -1 : 1;
+            }
+
             cpp_conv::Entity* pForwardEntity = cpp_conv::grid::SafeGetEntity(kContext.m_grid, cpp_conv::grid::GetForwardPosition(*rNode));
-            Item*& frontMostItem = rNode->m_pChannels[iChannelIdx].m_pItems[Conveyor::Channel::Slot::LastSlot];
+            Item*& frontMostItem = rNode->m_pChannels[iChannelIdx].m_pItems[iChannelLength - 1];
             if (frontMostItem)
             {
                 if (pForwardEntity && pForwardEntity->m_eEntityKind == EntityKind::Conveyor)
@@ -254,7 +306,7 @@ void cpp_conv::Sequence::Tick(const SceneContext& kContext)
                             continue;
                         }
 
-                        int forwardTargetItemSlot = cpp_conv::targeting_util::GetChannelTargetSlot(*rNode, *pForwardNode, iChannelIdx);
+                        int forwardTargetItemSlot = cpp_conv::targeting_util::GetChannelTargetSlot(kContext.m_grid, *rNode, *pForwardNode, iChannelIdx);
 
                         Item*& forwardTargetItem = pTargetChannel->m_pItems[forwardTargetItemSlot];
                         Item*& forwardPendingItem = pTargetChannel->m_pPendingItems[forwardTargetItemSlot];
@@ -265,7 +317,7 @@ void cpp_conv::Sequence::Tick(const SceneContext& kContext)
                             forwardPendingItem = frontMostItem;
                             frontMostItem = nullptr;
                         }
-                        else if (!pForwardNode->m_pChannels[iChannelIdx].m_pPendingItems[Conveyor::Channel::Slot::FirstSlot])
+                        else if (!pForwardNode->m_pChannels[iChannelIdx].m_pPendingItems[0])
                         {
                             // Otherwise we need to check if we're in a circular segment
                             if (IsCircular(kContext.m_grid, kContext.m_sequences, this))
@@ -277,8 +329,8 @@ void cpp_conv::Sequence::Tick(const SceneContext& kContext)
                     }
                     else
                     {
-                        Item*& forwardTargetItem = pForwardNode->m_pChannels[iChannelIdx].m_pItems[Conveyor::Channel::Slot::FirstSlot];
-                        Item*& forwardPendingItem = pForwardNode->m_pChannels[iChannelIdx].m_pPendingItems[Conveyor::Channel::Slot::FirstSlot];
+                        Item*& forwardTargetItem = pForwardNode->m_pChannels[iChannelIdx].m_pItems[0];
+                        Item*& forwardPendingItem = pForwardNode->m_pChannels[iChannelIdx].m_pPendingItems[0];
                         if (!forwardTargetItem && !forwardPendingItem)
                         {
                             forwardPendingItem = frontMostItem;
@@ -305,7 +357,7 @@ void cpp_conv::Sequence::Tick(const SceneContext& kContext)
             }
 
             // Move inner items forwards
-            for (int iChannelSlot = Conveyor::Channel::Slot::LastSlot - 1; iChannelSlot >= Conveyor::Channel::Slot::FirstSlot; iChannelSlot--)
+            for (int iChannelSlot = iChannelLength - 2; iChannelSlot >= 0; iChannelSlot--)
             {
                 Item*& currentItem = rNode->m_pChannels[iChannelIdx].m_pItems[iChannelSlot];
                 Item*& forwardTargetItem = rNode->m_pChannels[iChannelIdx].m_pItems[iChannelSlot + 1];

@@ -21,19 +21,10 @@ namespace cpp_conv
     public:
         struct Channel
         {
-            struct Slot
-            {
-                enum ESlot
-                {
-                    FirstSlot = 0,
-                    LastSlot = c_conveyorChannelSlots - 1
-                };
-            };
-
             Channel();
 
-            std::array<Item*, c_conveyorChannelSlots> m_pItems;
-            std::array<Item*, c_conveyorChannelSlots> m_pPendingItems;
+            std::array<Item*, c_conveyorChannelSlots + 1> m_pItems;
+            std::array<Item*, c_conveyorChannelSlots + 1> m_pPendingItems;
         };
 
         Conveyor(int32_t x, int32_t y, Direction direction, Item* pItem = nullptr);
