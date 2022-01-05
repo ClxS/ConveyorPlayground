@@ -22,6 +22,8 @@ cpp_conv::Conveyor::Channel* cpp_conv::targeting_util::GetTargetChannel(cpp_conv
     case Direction::Left: return targetNode.m_direction == Direction::Up ? &targetNode.m_pChannels[0] : &targetNode.m_pChannels[1];
     case Direction::Right: return targetNode.m_direction == Direction::Up ? &targetNode.m_pChannels[1] : &targetNode.m_pChannels[0];
     }
+
+    return nullptr;
 }
 
 int cpp_conv::targeting_util::GetChannelTargetSlot(const grid::EntityGrid& grid, cpp_conv::Conveyor& sourceNode, cpp_conv::Conveyor& targetNode, int iSourceChannel)

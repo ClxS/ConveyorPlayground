@@ -141,29 +141,36 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Command.cpp" />
+    <ClCompile Include="ConsoleAppHost.cpp" />
     <ClCompile Include="Conveyor.cpp" />
-    <ClCompile Include="CppConveyor.cpp" />
     <ClCompile Include="FileReader.cpp" />
+    <ClCompile Include="FrameLimiter.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="Grid.cpp" />
-    <ClCompile Include="Input.cpp" />
+    <ClCompile Include="ConsoleInput.cpp" />
     <ClCompile Include="Junction.cpp" />
     <ClCompile Include="Producer.cpp" />
+    <ClCompile Include="Profiler.cpp" />
     <ClCompile Include="Renderer.cpp" />
-    <ClCompile Include="ScreenBuffer.cpp" />
+    <ClCompile Include="ConsoleScreenBuffer.cpp" />
     <ClCompile Include="Sequence.cpp" />
     <ClCompile Include="Simulator.cpp" />
     <ClCompile Include="SwapChain.cpp" />
     <ClCompile Include="TargetingUtility.cpp" />
     <ClCompile Include="Underground.cpp" />
-    <ClCompile Include="WriteSurface.cpp" />
+    <ClCompile Include="ConsoleWriteSurface.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AppHost.h" />
     <ClInclude Include="Command.h" />
+    <ClInclude Include="ConsoleHelper.h" />
     <ClInclude Include="Conveyor.h" />
     <ClInclude Include="Direction.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Enums.h" />
     <ClInclude Include="FileReader.h" />
+    <ClInclude Include="FrameLimiter.h" />
+    <ClInclude Include="Game.h" />
     <ClInclude Include="Grid.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="InputCommand.h" />
@@ -171,16 +178,20 @@
     <ClInclude Include="Junction.h" />
     <ClInclude Include="Position.h" />
     <ClInclude Include="Producer.h" />
+    <ClInclude Include="Profiler.h" />
     <ClInclude Include="RenderContext.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="SceneContext.h" />
+    <ClInclude Include="ConsoleScreenBuffer.h" />
     <ClInclude Include="ScreenBuffer.h" />
     <ClInclude Include="Sequence.h" />
     <ClInclude Include="Simulator.h" />
+    <ClInclude Include="StringUtility.h" />
     <ClInclude Include="SwapChain.h" />
     <ClInclude Include="TargetingUtility.h" />
     <ClInclude Include="Underground.h" />
     <ClInclude Include="vector_set.h" />
+    <ClInclude Include="ConsoleWriteSurface.h" />
     <ClInclude Include="WriteSurface.h" />
   </ItemGroup>
   <ItemGroup>

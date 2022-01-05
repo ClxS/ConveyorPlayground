@@ -57,7 +57,7 @@ void cpp_conv::Junction::Tick(const SceneContext& kContext)
 
 		std::tie(pEntity, direction) = entityDirectionPair;
 
-		if (pEntity->m_eEntityKind != EntityKind::Conveyor)
+		if (pEntity == nullptr || pEntity->m_eEntityKind != EntityKind::Conveyor)
 		{
 			continue;
 		}

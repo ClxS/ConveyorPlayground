@@ -34,7 +34,7 @@ void cpp_conv::input::receiveInput(std::queue<cpp_conv::commands::InputCommand>&
 			dwPendingEvents -= dwEventsRecieved;
 		}
 
-		for (int i = 0; i < dwEventsRecieved; ++i)
+		for (DWORD i = 0; i < dwEventsRecieved; ++i)
 		{
 			switch (recordBuffer[i].EventType)
 			{

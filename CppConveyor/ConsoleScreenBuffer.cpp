@@ -1,19 +1,19 @@
-#include "ScreenBuffer.h"
+#include "ConsoleScreenBuffer.h"
 #include "WriteSurface.h"
 #include "SwapChain.h"
 
-cpp_conv::renderer::ScreenBuffer::ScreenBuffer(WriteSurface& rWriteSurface)
+cpp_conv::renderer::ConsoleScreenBuffer::ConsoleScreenBuffer(ConsoleWriteSurface& rWriteSurface)
 	: m_rWriteSurface(rWriteSurface)
 	, m_hBufferHandle(0)
 {
 }
 
-cpp_conv::renderer::ScreenBuffer::~ScreenBuffer()
+cpp_conv::renderer::ConsoleScreenBuffer::~ConsoleScreenBuffer()
 {
 	Shutdown();
 }
 
-void cpp_conv::renderer::ScreenBuffer::Initialize(ScreenBufferInitArgs& rArgs)
+void cpp_conv::renderer::ConsoleScreenBuffer::Initialize(ConsoleScreenBufferInitArgs& rArgs)
 {
 	m_initArgs = rArgs;
 	COORD coordBufSize = { (SHORT)m_rWriteSurface.GetWidth(), (SHORT)m_rWriteSurface.GetHeight() };
@@ -38,7 +38,7 @@ void cpp_conv::renderer::ScreenBuffer::Initialize(ScreenBufferInitArgs& rArgs)
 	SetConsoleWindowInfo(m_hBufferHandle, TRUE, &srctWriteRect);
 }
 
-void cpp_conv::renderer::ScreenBuffer::Present()
+void cpp_conv::renderer::ConsoleScreenBuffer::Present()
 {
 	COORD coordBufSize = { (SHORT)m_rWriteSurface.GetWidth(), (SHORT)m_rWriteSurface.GetHeight() };
 	COORD coordBufCoord = { 0, 0 };
@@ -57,7 +57,7 @@ void cpp_conv::renderer::ScreenBuffer::Present()
 	SetConsoleCursorPosition(m_hBufferHandle, coordBufCoord);
 	if (!SetConsoleActiveScreenBuffer(m_hBufferHandle))
 	{
-		printf("SetConsoleActiveScreenBuffer failed - (%d)\n", GetLastError());
+		printf("SetConsoleActiveConsoleScreenBuffer failed - (%d)\n", GetLastError());
 	}
 
 	if (m_rWriteSurface.IsClearOnPresent())
@@ -68,7 +68,7 @@ void cpp_conv::renderer::ScreenBuffer::Present()
 	ShowScrollBar(GetConsoleWindow(), SB_BOTH, FALSE);
 }
 
-void cpp_conv::renderer::ScreenBuffer::Shutdown()
+void cpp_conv::renderer::ConsoleScreenBuffer::Shutdown()
 {
 	if (m_hBufferHandle == 0)
 	{
@@ -79,7 +79,7 @@ void cpp_conv::renderer::ScreenBuffer::Shutdown()
 	m_hBufferHandle = 0;
 }
 
-void cpp_conv::renderer::ScreenBuffer::RecreateBuffer()
+void cpp_conv::renderer::ConsoleScreenBuffer::RecreateBuffer()
 {
 	Shutdown();
 	Initialize(m_initArgs);

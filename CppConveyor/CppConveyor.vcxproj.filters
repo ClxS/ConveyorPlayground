@@ -28,9 +28,23 @@
     <Filter Include="Command">
       <UniqueIdentifier>{740c71d0-64b0-45a8-8100-d839b88502e8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="AppHost">
+      <UniqueIdentifier>{2c870289-bee9-48f5-be36-fdbcd3061560}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AppHost\Console">
+      <UniqueIdentifier>{d704bdeb-98e1-402e-b5a8-1fd3724ed7e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Profiler">
+      <UniqueIdentifier>{0e10002d-33c3-4dfb-aaf5-7b2ac024ad70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Input\Console">
+      <UniqueIdentifier>{1751f933-dd73-4f8c-b248-80f516d0d4e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Console">
+      <UniqueIdentifier>{c0703a6a-3055-4dc8-9396-95d5e6a067b7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CppConveyor.cpp" />
     <ClCompile Include="Grid.cpp">
       <Filter>Scene\Grid</Filter>
     </ClCompile>
@@ -61,20 +75,30 @@
     <ClCompile Include="FileReader.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="ScreenBuffer.cpp">
-      <Filter>Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="WriteSurface.cpp">
-      <Filter>Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="SwapChain.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="Input.cpp">
-      <Filter>Input</Filter>
-    </ClCompile>
     <ClCompile Include="Command.cpp">
       <Filter>Command</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameLimiter.cpp">
+      <Filter>Profiler</Filter>
+    </ClCompile>
+    <ClCompile Include="Profiler.cpp">
+      <Filter>Profiler</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="ConsoleAppHost.cpp">
+      <Filter>AppHost\Console</Filter>
+    </ClCompile>
+    <ClCompile Include="ConsoleInput.cpp">
+      <Filter>Input\Console</Filter>
+    </ClCompile>
+    <ClCompile Include="ConsoleWriteSurface.cpp">
+      <Filter>Renderer\Console</Filter>
+    </ClCompile>
+    <ClCompile Include="ConsoleScreenBuffer.cpp">
+      <Filter>Renderer\Console</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -120,9 +144,6 @@
     <ClInclude Include="SceneContext.h">
       <Filter>Scene</Filter>
     </ClInclude>
-    <ClInclude Include="ScreenBuffer.h">
-      <Filter>Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="Enums.h">
       <Filter>Util</Filter>
     </ClInclude>
@@ -133,9 +154,6 @@
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="SwapChain.h">
-      <Filter>Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="WriteSurface.h">
       <Filter>Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Direction.h">
@@ -149,6 +167,34 @@
     </ClInclude>
     <ClInclude Include="Command.h">
       <Filter>Command</Filter>
+    </ClInclude>
+    <ClInclude Include="AppHost.h">
+      <Filter>AppHost</Filter>
+    </ClInclude>
+    <ClInclude Include="ConsoleHelper.h">
+      <Filter>AppHost\Console</Filter>
+    </ClInclude>
+    <ClInclude Include="StringUtility.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Profiler.h">
+      <Filter>Profiler</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameLimiter.h">
+      <Filter>Profiler</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="ConsoleWriteSurface.h">
+      <Filter>Renderer\Console</Filter>
+    </ClInclude>
+    <ClInclude Include="ConsoleScreenBuffer.h">
+      <Filter>Renderer\Console</Filter>
+    </ClInclude>
+    <ClInclude Include="WriteSurface.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="ScreenBuffer.h">
+      <Filter>Renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

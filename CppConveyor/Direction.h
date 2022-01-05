@@ -13,6 +13,7 @@ namespace cpp_conv::direction
 		case Direction::Down: return Direction::Left;
 		case Direction::Left: return Direction::Up;
 		}
+		return Direction::Up;
 	}
 
 	inline Direction Rotate90DegreeCounterClockwise(Direction direction)
@@ -24,5 +25,6 @@ namespace cpp_conv::direction
 		case Direction::Down: return Direction::Right;
 		case Direction::Left: return Direction::Down;
 		}
+		return Direction::Up;
 	}
 }
