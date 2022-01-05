@@ -4,18 +4,17 @@
 
 namespace cpp_conv::renderer
 {
-	struct SurfaceInitArgs
-	{
-		CONSOLE_FONT_INFOEX m_surfaceFont;
-	};
-
 	class SwapChain
 	{
 	public:	
 		SwapChain(uint32_t uiWidth, uint32_t uiHeight);
-		void Initialize(SurfaceInitArgs& rArgs);
+		void Initialize(ScreenBufferInitArgs& rArgs);
 		void SwapAndPresent();
 		WriteSurface& GetWriteSurface();
+
+		bool RequiresResize(int iWidth, int iHeight) const;
+
+		void ResizeBuffers(int iWidth, int iHeight);
 
 	private:
 		uint32_t m_uiCurrentBuffer;

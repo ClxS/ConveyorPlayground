@@ -22,6 +22,12 @@
     <Filter Include="Scene\Grid\Utility">
       <UniqueIdentifier>{40cbfeba-c596-454e-a84d-8be7283e1206}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Input">
+      <UniqueIdentifier>{4abbe1e1-2ddc-41cf-b5a7-fd9f66756209}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Command">
+      <UniqueIdentifier>{740c71d0-64b0-45a8-8100-d839b88502e8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CppConveyor.cpp" />
@@ -63,6 +69,12 @@
     </ClCompile>
     <ClCompile Include="SwapChain.cpp">
       <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Command.cpp">
+      <Filter>Command</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -128,6 +140,15 @@
     </ClInclude>
     <ClInclude Include="Direction.h">
       <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Input.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="InputCommand.h">
+      <Filter>Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Command.h">
+      <Filter>Command</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

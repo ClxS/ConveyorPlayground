@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Conveyor.h"
+#include "Grid.h"
 
 namespace cpp_conv::targeting_util
 {

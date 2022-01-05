@@ -8,6 +8,8 @@
 #include <chrono>
 #include <thread>
 #include <format>
+#include <mutex>
+#include <queue>
 #include <Windows.h>
 
 #include "vector_set.h"
@@ -22,6 +24,8 @@
 #include "SceneContext.h"
 #include "RenderContext.h"
 #include "SwapChain.h"
+#include "Input.h"
+#include "Command.h"
 
 #define STR_COMBINE_DIRECT(X,Y) X##Y
 #define STR_COMBINE2(X,Y) STR_COMBINE_DIRECT(X,Y)
@@ -42,24 +46,21 @@ std::string to_string_with_precision(const T a_value, const int n = 2)
 
 std::tuple<int, int> getConsoleDimensions()
 {
-    // get handle to the console window
-    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-
-    // retrieve screen buffer info
-    CONSOLE_SCREEN_BUFFER_INFO scrBufferInfo;
-    GetConsoleScreenBufferInfo(hOut, &scrBufferInfo);
+    HWND console = GetConsoleWindow();
+    RECT r;
+    GetWindowRect(console, &r); //stores the console's current dimensions
 
     // current window size
-    short winWidth = scrBufferInfo.srWindow.Right - scrBufferInfo.srWindow.Left + 1;
-    short winHeight = scrBufferInfo.srWindow.Bottom - scrBufferInfo.srWindow.Top + 1;
+    short winWidth = r.right - r.left + 1;
+    short winHeight = r.bottom - r.top + 1;
 
-    return std::make_tuple(winWidth, winHeight);
+    return std::make_tuple(winWidth - 100, winHeight - 100);
 }
 
 int main()
 {
     srand(time(NULL));
-
+    
     cpp_conv::grid::EntityGrid grid;
     memset(&grid, 0, sizeof(grid));
     std::vector<cpp_conv::Conveyor*> conveyors;
@@ -74,29 +75,44 @@ int main()
     cpp_conv::renderer::SwapChain swapChain(width, height);
     cpp_conv::renderer::init(swapChain);
 
-    cpp_conv::SceneContext kSceneContext = { grid, sequences, conveyors, vOtherEntities };
-    cpp_conv::RenderContext kRenderContext = { swapChain.GetWriteSurface(), grid};
-
     std::chrono::high_resolution_clock clock = {};
     std::chrono::steady_clock::time_point startTime = clock.now();
+    cpp_conv::SceneContext kSceneContext = { { 0, 0 }, grid, sequences, conveyors, vOtherEntities, { startTime }};
+    cpp_conv::RenderContext kRenderContext = { 0, 0, swapChain.GetWriteSurface(), grid};
+
 
     uint32_t frameCounter = 0;
 
-    constexpr auto targetFrameTime = std::chrono::duration<int64_t, std::ratio<1, 10>>(1);
+    constexpr auto targetFrameTime = std::chrono::duration<int64_t, std::ratio<1, 2000>>(1);
     auto nextFrame = clock.now() + targetFrameTime;
     std::chrono::steady_clock::time_point lastFrame = {};
+    std::chrono::nanoseconds inputRecieveTime = {};
+    std::chrono::nanoseconds commandProcessTime = {};
     std::chrono::nanoseconds simulationTime = {};
     std::chrono::nanoseconds renderTime = {};
     std::chrono::nanoseconds sleepTime = {};
     std::chrono::nanoseconds presentTime = {};
+    std::queue<cpp_conv::commands::InputCommand> commands;
+
     while(true)
     {
         frameCounter++;
 
+        PROFILE(inputRecieveTime, cpp_conv::input::receiveInput(commands));
+        PROFILE(commandProcessTime, cpp_conv::command::processCommands(kSceneContext, commands));
         PROFILE(simulationTime, cpp_conv::simulation::simulate(kSceneContext));
-        PROFILE(renderTime, cpp_conv::renderer::render(kRenderContext));
+
+        std::tie(width, height) = getConsoleDimensions();
+        if (swapChain.RequiresResize(width, height))
+        {
+            swapChain.ResizeBuffers(width, height);
+        }
+
+        PROFILE(renderTime, cpp_conv::renderer::render(kSceneContext, kRenderContext));
         PROFILE(sleepTime, std::this_thread::sleep_until(nextFrame));
         PROFILE(presentTime, swapChain.SwapAndPresent());
+        HWND console = GetConsoleWindow();
+        SetConsoleMode(console, 0);
 
         nextFrame += targetFrameTime;
         lastFrame = clock.now();
@@ -104,9 +120,13 @@ int main()
         {
             startTime = lastFrame;
 
-            auto totalTime = simulationTime + renderTime + sleepTime + presentTime;
-            std::string strMsg = std::format("\n\nFPS: {}\nSimulation: {} ({}%)\nRender: {} ({}%)\nSleep: {} ({}%)\nPresent: {} ({}%)",
+            auto totalTime = inputRecieveTime + simulationTime + renderTime + sleepTime + presentTime;
+            std::string strMsg = std::format("\n\nFPS: {}\nInput: {} ({}%)\nCommand: {} ({}%)\nSimulation: {} ({}%)\nRender: {} ({}%)\nSleep: {} ({}%)\nPresent: {} ({}%)",
                 std::to_string(frameCounter / 5),
+                to_string_with_precision(std::chrono::duration_cast<std::chrono::milliseconds>(inputRecieveTime / frameCounter)),
+                to_string_with_precision(((double)inputRecieveTime.count() / (double)totalTime.count()) * 100),
+                to_string_with_precision(std::chrono::duration_cast<std::chrono::milliseconds>(commandProcessTime / frameCounter)),
+                to_string_with_precision(((double)commandProcessTime.count() / (double)totalTime.count()) * 100),
                 to_string_with_precision(std::chrono::duration_cast<std::chrono::milliseconds>(simulationTime / frameCounter)),
                 to_string_with_precision(((double)simulationTime.count() / (double)totalTime.count()) * 100),
                 to_string_with_precision(std::chrono::duration_cast<std::chrono::milliseconds>(renderTime / frameCounter)),
@@ -118,7 +138,10 @@ int main()
                 );
 
             OutputDebugStringA(strMsg.c_str());
-            frameCounter = 0;
+            OutputDebugStringA(
+                std::format("\nW: {}, H: {}", 
+                std::to_string(swapChain.GetWriteSurface().GetWidth()), 
+                std::to_string(swapChain.GetWriteSurface().GetHeight())).c_str());
         }
 
         lastFrame = clock.now();

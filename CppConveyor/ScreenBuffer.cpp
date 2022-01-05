@@ -13,8 +13,9 @@ cpp_conv::renderer::ScreenBuffer::~ScreenBuffer()
 	Shutdown();
 }
 
-void cpp_conv::renderer::ScreenBuffer::Initialize(SurfaceInitArgs& rArgs)
+void cpp_conv::renderer::ScreenBuffer::Initialize(ScreenBufferInitArgs& rArgs)
 {
+	m_initArgs = rArgs;
 	COORD coordBufSize = { (SHORT)m_rWriteSurface.GetWidth(), (SHORT)m_rWriteSurface.GetHeight() };
 	SMALL_RECT srctWriteRect;
 	srctWriteRect.Left = srctWriteRect.Top = 0;
@@ -53,6 +54,7 @@ void cpp_conv::renderer::ScreenBuffer::Present()
 		coordBufCoord,    // top left src cell in chiBuffer 
 		&srctWriteRect);
 
+	SetConsoleCursorPosition(m_hBufferHandle, coordBufCoord);
 	if (!SetConsoleActiveScreenBuffer(m_hBufferHandle))
 	{
 		printf("SetConsoleActiveScreenBuffer failed - (%d)\n", GetLastError());
@@ -62,6 +64,8 @@ void cpp_conv::renderer::ScreenBuffer::Present()
 	{
 		m_rWriteSurface.Clear();
 	}
+
+	ShowScrollBar(GetConsoleWindow(), SB_BOTH, FALSE);
 }
 
 void cpp_conv::renderer::ScreenBuffer::Shutdown()
@@ -72,4 +76,11 @@ void cpp_conv::renderer::ScreenBuffer::Shutdown()
 	}
 
 	CloseHandle(m_hBufferHandle);
+	m_hBufferHandle = 0;
+}
+
+void cpp_conv::renderer::ScreenBuffer::RecreateBuffer()
+{
+	Shutdown();
+	Initialize(m_initArgs);
 }

@@ -7,7 +7,11 @@
 namespace cpp_conv::renderer
 {
 	class WriteSurface;
-	struct SurfaceInitArgs;
+
+	struct ScreenBufferInitArgs
+	{
+		CONSOLE_FONT_INFOEX m_surfaceFont;
+	};
 
 	class ScreenBuffer
 	{
@@ -15,14 +19,18 @@ namespace cpp_conv::renderer
 		ScreenBuffer(WriteSurface& rWriteSurface);
 		~ScreenBuffer();
 
-		void Initialize(SurfaceInitArgs& rArgs);
+		void Initialize(ScreenBufferInitArgs& rArgs);
 
 		void Present();
 
 		void Shutdown();
 
+		void RecreateBuffer();
+
 	private:
 		WriteSurface& m_rWriteSurface;
 		HANDLE m_hBufferHandle;
+
+		ScreenBufferInitArgs m_initArgs;
 	};
 }

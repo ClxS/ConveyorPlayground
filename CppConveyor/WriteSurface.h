@@ -22,6 +22,8 @@ namespace cpp_conv::renderer
 		uint16_t GetHeight() const { return m_uiHeight; }
 		bool IsClearOnPresent() const { return m_bClearOnPresent; }
 
+		void Resize(int iWidth, int iHeight);
+
 	private:
 		uint16_t m_uiWidth;
 		uint16_t m_uiHeight;

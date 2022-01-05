@@ -1,9 +1,10 @@
 ﻿#pragma once
 
-#include <Windows.h>
-#include "Grid.h"
-#include "ScreenBuffer.h"
-#include "RenderContext.h"
+namespace cpp_conv
+{
+	struct SceneContext;
+	struct RenderContext;
+}
 
 namespace cpp_conv::renderer
 {
@@ -12,7 +13,7 @@ namespace cpp_conv::renderer
 	class SwapChain;
 
 	void init(SwapChain& rSwapChain);
-    void render(RenderContext& kContext);
+    void render(const SceneContext& kSceneContext, RenderContext& kContext);
 
 	void setPixel(RenderContext& kContext, wchar_t value, int x, int y, int colour, bool allowBackFill = false);
 }

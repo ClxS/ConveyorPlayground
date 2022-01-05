@@ -140,10 +140,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Command.cpp" />
     <ClCompile Include="Conveyor.cpp" />
     <ClCompile Include="CppConveyor.cpp" />
     <ClCompile Include="FileReader.cpp" />
     <ClCompile Include="Grid.cpp" />
+    <ClCompile Include="Input.cpp" />
     <ClCompile Include="Junction.cpp" />
     <ClCompile Include="Producer.cpp" />
     <ClCompile Include="Renderer.cpp" />
@@ -156,12 +158,15 @@
     <ClCompile Include="WriteSurface.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Command.h" />
     <ClInclude Include="Conveyor.h" />
     <ClInclude Include="Direction.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Enums.h" />
     <ClInclude Include="FileReader.h" />
     <ClInclude Include="Grid.h" />
+    <ClInclude Include="Input.h" />
+    <ClInclude Include="InputCommand.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="Junction.h" />
     <ClInclude Include="Position.h" />

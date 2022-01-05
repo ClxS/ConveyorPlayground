@@ -95,7 +95,7 @@ void cpp_conv::Underground::Tick(const SceneContext& kContext)
 
 	m_kLocalGrid[position.m_y][position.m_x] = kContext.m_grid[undergroundEnd.m_y][undergroundEnd.m_x];
 
-	SceneContext kLocalContext = { m_kLocalGrid, kContext.m_sequences, kContext.m_conveyors, kContext.m_vOtherEntities };
+	SceneContext kLocalContext = { 0, 0, m_kLocalGrid, kContext.m_sequences, kContext.m_conveyors, kContext.m_vOtherEntities };
 
 	Sequence innerSequence(&m_arrInternalConveyors[iUndergroundLength - 1], &m_arrInternalConveyors[0], 0);
 	innerSequence.Tick(kLocalContext);

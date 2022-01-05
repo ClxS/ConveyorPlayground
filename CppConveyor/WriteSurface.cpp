@@ -10,6 +10,7 @@ cpp_conv::renderer::WriteSurface::WriteSurface(uint16_t uiWidth, uint16_t uiHeig
 void cpp_conv::renderer::WriteSurface::Initialize()
 {
 	m_chiBuffer.resize(m_uiWidth * m_uiHeight);
+	Clear();
 }
 
 void cpp_conv::renderer::WriteSurface::Clear()
@@ -19,4 +20,11 @@ void cpp_conv::renderer::WriteSurface::Clear()
 	emptyChar.Attributes = 0;
 
 	std::fill(m_chiBuffer.begin(), m_chiBuffer.end(), emptyChar);
+}
+
+void cpp_conv::renderer::WriteSurface::Resize(int iWidth, int iHeight)
+{
+	m_uiWidth = iWidth;
+	m_uiHeight = iHeight;
+	Initialize();
 }
