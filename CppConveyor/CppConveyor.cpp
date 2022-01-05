@@ -44,20 +44,30 @@ int main()
     std::chrono::steady_clock::time_point startTime = clock.now();
 
     uint32_t frameCounter = 0;
+
+    constexpr auto targetFrameTime = std::chrono::duration<int64_t, std::ratio<1, 15>>(1);
+    auto nextFrame = clock.now() + targetFrameTime;
+    std::chrono::steady_clock::time_point lastFrame = {};
     while(true)
     {
+        frameCounter++;
         cpp_conv::simulation::simulate(kSceneContext);
         cpp_conv::renderer::render(kRenderContext);
-        swapChain.SwapAndPresent();
-        frameCounter++;
 
-        std::chrono::steady_clock::time_point currentTime = clock.now();
-        if (std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTime) >= std::chrono::seconds{ 1 })
+        std::this_thread::sleep_until(nextFrame);
+        nextFrame += targetFrameTime;
+
+        swapChain.SwapAndPresent();
+
+        lastFrame = clock.now();
+        if (std::chrono::duration_cast<std::chrono::seconds>(lastFrame - startTime) >= std::chrono::seconds{ 1 })
         {
-            startTime = currentTime;
+            startTime = lastFrame;
 
             OutputDebugStringA((std::string("\nFps: ") + std::to_string(frameCounter)).c_str());
             frameCounter = 0;
         }
+
+        lastFrame = clock.now();
     }
 }
