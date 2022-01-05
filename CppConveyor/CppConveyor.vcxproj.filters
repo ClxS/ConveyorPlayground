@@ -31,17 +31,23 @@
     <Filter Include="AppHost">
       <UniqueIdentifier>{2c870289-bee9-48f5-be36-fdbcd3061560}</UniqueIdentifier>
     </Filter>
-    <Filter Include="AppHost\Console">
-      <UniqueIdentifier>{d704bdeb-98e1-402e-b5a8-1fd3724ed7e4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Profiler">
       <UniqueIdentifier>{0e10002d-33c3-4dfb-aaf5-7b2ac024ad70}</UniqueIdentifier>
     </Filter>
     <Filter Include="Input\Console">
       <UniqueIdentifier>{1751f933-dd73-4f8c-b248-80f516d0d4e5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Renderer\Console">
-      <UniqueIdentifier>{c0703a6a-3055-4dc8-9396-95d5e6a067b7}</UniqueIdentifier>
+    <Filter Include="Platform">
+      <UniqueIdentifier>{2b8b0072-8507-451b-a277-b0977a52d587}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform\Console">
+      <UniqueIdentifier>{6d241f71-eadf-4a5a-babb-f1ecbcc0695a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform\Console\AppHost">
+      <UniqueIdentifier>{cb24d649-18b1-45a6-86fb-18a72b8b8931}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform\Console\Renderer">
+      <UniqueIdentifier>{e8325d41-6124-43af-99b1-cb9e5c48f236}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -88,17 +94,17 @@
       <Filter>Profiler</Filter>
     </ClCompile>
     <ClCompile Include="Game.cpp" />
-    <ClCompile Include="ConsoleAppHost.cpp">
-      <Filter>AppHost\Console</Filter>
-    </ClCompile>
     <ClCompile Include="ConsoleInput.cpp">
       <Filter>Input\Console</Filter>
     </ClCompile>
-    <ClCompile Include="ConsoleWriteSurface.cpp">
-      <Filter>Renderer\Console</Filter>
+    <ClCompile Include="ConsoleAppHost.cpp">
+      <Filter>Platform\Console\AppHost</Filter>
     </ClCompile>
     <ClCompile Include="ConsoleScreenBuffer.cpp">
-      <Filter>Renderer\Console</Filter>
+      <Filter>Platform\Console\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="ConsoleWriteSurface.cpp">
+      <Filter>Platform\Console\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -171,9 +177,6 @@
     <ClInclude Include="AppHost.h">
       <Filter>AppHost</Filter>
     </ClInclude>
-    <ClInclude Include="ConsoleHelper.h">
-      <Filter>AppHost\Console</Filter>
-    </ClInclude>
     <ClInclude Include="StringUtility.h">
       <Filter>Util</Filter>
     </ClInclude>
@@ -184,17 +187,20 @@
       <Filter>Profiler</Filter>
     </ClInclude>
     <ClInclude Include="Game.h" />
-    <ClInclude Include="ConsoleWriteSurface.h">
-      <Filter>Renderer\Console</Filter>
-    </ClInclude>
-    <ClInclude Include="ConsoleScreenBuffer.h">
-      <Filter>Renderer\Console</Filter>
-    </ClInclude>
     <ClInclude Include="WriteSurface.h">
       <Filter>Renderer</Filter>
     </ClInclude>
     <ClInclude Include="ScreenBuffer.h">
       <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="ConsoleHelper.h">
+      <Filter>Platform\Console\AppHost</Filter>
+    </ClInclude>
+    <ClInclude Include="ConsoleScreenBuffer.h">
+      <Filter>Platform\Console\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="ConsoleWriteSurface.h">
+      <Filter>Platform\Console\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
