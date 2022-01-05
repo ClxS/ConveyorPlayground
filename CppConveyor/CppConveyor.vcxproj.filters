@@ -81,5 +81,7 @@
       <Filter>Grid\Utility</Filter>
     </ClInclude>
     <ClInclude Include="SceneContext.h" />
+    <ClInclude Include="RenderContext.h" />
+    <ClInclude Include="ScreenBuffer.h" />
   </ItemGroup>
 </Project>

@@ -14,6 +14,7 @@ namespace cpp_conv
 
     class Sequence;
     struct SceneContext;
+    struct RenderContext;
 
     class Conveyor : public Entity
     {
@@ -43,7 +44,7 @@ namespace cpp_conv
         std::array<Channel, c_conveyorChannels> m_pChannels;
 
         void Tick(const SceneContext& kContext);
-        void Draw(HANDLE hConsole, cpp_conv::renderer::ScreenBuffer screenBuffer, cpp_conv::grid::EntityGrid& grid, int x, int y) const;
+        void Draw(RenderContext& kContext) const;
 
         static_assert(c_conveyorChannels >= 1, "Conveyors must have at least once channel");
         static_assert(c_conveyorChannelSlots >= 1, "Conveyors channels must have at least once slot");

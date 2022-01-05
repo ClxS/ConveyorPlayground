@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Renderer.h"
 #include "Entity.h"
 #include "Conveyor.h"
 #include "Grid.h"
@@ -9,6 +8,7 @@ namespace cpp_conv
 {
 	class Item;
 	struct SceneContext;
+	struct RenderContext;
 
 	constexpr int c_maxUndergroundLength = 6;
 
@@ -18,7 +18,7 @@ namespace cpp_conv
 		Underground(int x, int y, Direction direction);
 
 		void Tick(const SceneContext& kContext);
-		void Draw(HANDLE hConsole, cpp_conv::renderer::ScreenBuffer screenBuffer, cpp_conv::grid::EntityGrid& grid, int x, int y) const;
+		void Draw(RenderContext& kContext) const;
 
 		bool AddItem(cpp_conv::grid::EntityGrid& grid, Item* pItem, int iChannel);
 

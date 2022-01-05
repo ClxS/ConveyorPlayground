@@ -1,6 +1,10 @@
 ﻿#include "Producer.h"
 #include "Conveyor.h"
 #include "SceneContext.h"
+
+#include "Renderer.h"
+#include "RenderContext.h"
+
 #include <array>
 #include <random>
 
@@ -94,7 +98,7 @@ void cpp_conv::Producer::Tick(const SceneContext& kContext)
 	}
 }
 
-void cpp_conv::Producer::Draw(HANDLE hConsole, cpp_conv::renderer::ScreenBuffer screenBuffer, cpp_conv::grid::EntityGrid& grid, int x, int y) const
+void cpp_conv::Producer::Draw(RenderContext& kContext) const
 {
 	wchar_t character = L' ';
 	switch (m_direction)
@@ -113,8 +117,8 @@ void cpp_conv::Producer::Draw(HANDLE hConsole, cpp_conv::renderer::ScreenBuffer 
 		break;
 	}
 
-	cpp_conv::renderer::setPixel(hConsole, screenBuffer, character, x * cpp_conv::renderer::c_gridScale + 1, y * cpp_conv::renderer::c_gridScale + 1, 1, true);
-	cpp_conv::renderer::setPixel(hConsole, screenBuffer, character, x * cpp_conv::renderer::c_gridScale + 2, y * cpp_conv::renderer::c_gridScale + 1, 1, true);
-	cpp_conv::renderer::setPixel(hConsole, screenBuffer, character, x * cpp_conv::renderer::c_gridScale + 1, y * cpp_conv::renderer::c_gridScale + 2, 1, true);
-	cpp_conv::renderer::setPixel(hConsole, screenBuffer, character, x * cpp_conv::renderer::c_gridScale + 2, y * cpp_conv::renderer::c_gridScale + 2, 1, true);
+	cpp_conv::renderer::setPixel(kContext, character, m_position.m_x * cpp_conv::renderer::c_gridScale + 1, m_position.m_y * cpp_conv::renderer::c_gridScale + 1, 1, true);
+	cpp_conv::renderer::setPixel(kContext, character, m_position.m_x * cpp_conv::renderer::c_gridScale + 2, m_position.m_y * cpp_conv::renderer::c_gridScale + 1, 1, true);
+	cpp_conv::renderer::setPixel(kContext, character, m_position.m_x * cpp_conv::renderer::c_gridScale + 1, m_position.m_y * cpp_conv::renderer::c_gridScale + 2, 1, true);
+	cpp_conv::renderer::setPixel(kContext, character, m_position.m_x * cpp_conv::renderer::c_gridScale + 2, m_position.m_y * cpp_conv::renderer::c_gridScale + 2, 1, true);
 }

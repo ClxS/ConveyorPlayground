@@ -2,6 +2,9 @@
 #include "Conveyor.h"
 #include "SceneContext.h"
 
+#include "Renderer.h"
+#include "RenderContext.h"
+
 #include <algorithm> 
 #include <array>
 #include <random>
@@ -86,12 +89,12 @@ void cpp_conv::Junction::Tick(const SceneContext& kContext)
 	}
 }
 
-void cpp_conv::Junction::Draw(HANDLE hConsole, cpp_conv::renderer::ScreenBuffer screenBuffer, cpp_conv::grid::EntityGrid& grid, int x, int y) const
+void cpp_conv::Junction::Draw(RenderContext& kContext) const
 {
-	cpp_conv::renderer::setPixel(hConsole, screenBuffer, L'↑', x * cpp_conv::renderer::c_gridScale + 1, y * cpp_conv::renderer::c_gridScale + 1, 1, true);
-	cpp_conv::renderer::setPixel(hConsole, screenBuffer, L'→', x * cpp_conv::renderer::c_gridScale + 2, y * cpp_conv::renderer::c_gridScale + 1, 1, true);
-	cpp_conv::renderer::setPixel(hConsole, screenBuffer, L'←', x * cpp_conv::renderer::c_gridScale + 1, y * cpp_conv::renderer::c_gridScale + 2, 1, true);
-	cpp_conv::renderer::setPixel(hConsole, screenBuffer, L'↓', x * cpp_conv::renderer::c_gridScale + 2, y * cpp_conv::renderer::c_gridScale + 2, 1, true);
+	cpp_conv::renderer::setPixel(kContext, L'↑', m_position.m_x * cpp_conv::renderer::c_gridScale + 1, m_position.m_y * cpp_conv::renderer::c_gridScale + 1, 1, true);
+	cpp_conv::renderer::setPixel(kContext, L'→', m_position.m_x * cpp_conv::renderer::c_gridScale + 2, m_position.m_y * cpp_conv::renderer::c_gridScale + 1, 1, true);
+	cpp_conv::renderer::setPixel(kContext, L'←', m_position.m_x * cpp_conv::renderer::c_gridScale + 1, m_position.m_y * cpp_conv::renderer::c_gridScale + 2, 1, true);
+	cpp_conv::renderer::setPixel(kContext, L'↓', m_position.m_x * cpp_conv::renderer::c_gridScale + 2, m_position.m_y * cpp_conv::renderer::c_gridScale + 2, 1, true);
 }
 
 bool cpp_conv::Junction::AddItem(Item* pItem)

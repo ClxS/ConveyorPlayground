@@ -3,6 +3,9 @@
 #include "Sequence.h"
 #include "SceneContext.h"
 
+#include "Renderer.h"
+#include "RenderContext.h"
+
 #include <algorithm> 
 #include <array>
 #include <random>
@@ -105,7 +108,7 @@ void cpp_conv::Underground::Tick(const SceneContext& kContext)
 	memset(&m_kLocalGrid, 0, sizeof(m_kLocalGrid));
 }
 
-void cpp_conv::Underground::Draw(HANDLE hConsole, cpp_conv::renderer::ScreenBuffer screenBuffer, cpp_conv::grid::EntityGrid& grid, int x, int y) const
+void cpp_conv::Underground::Draw(RenderContext& kContext) const
 {
 	wchar_t character = L' ';
 	switch (m_direction)
@@ -124,10 +127,10 @@ void cpp_conv::Underground::Draw(HANDLE hConsole, cpp_conv::renderer::ScreenBuff
 		break;
 	}
 
-	cpp_conv::renderer::setPixel(hConsole, screenBuffer, character, x * cpp_conv::renderer::c_gridScale + 1, y * cpp_conv::renderer::c_gridScale + 1, 2, true);
-	cpp_conv::renderer::setPixel(hConsole, screenBuffer, character, x * cpp_conv::renderer::c_gridScale + 2, y * cpp_conv::renderer::c_gridScale + 1, 2, true);
-	cpp_conv::renderer::setPixel(hConsole, screenBuffer, character, x * cpp_conv::renderer::c_gridScale + 1, y * cpp_conv::renderer::c_gridScale + 2, 2, true);
-	cpp_conv::renderer::setPixel(hConsole, screenBuffer, character, x * cpp_conv::renderer::c_gridScale + 2, y * cpp_conv::renderer::c_gridScale + 2, 2, true);
+	cpp_conv::renderer::setPixel(kContext, character, m_position.m_x * cpp_conv::renderer::c_gridScale + 1, m_position.m_y * cpp_conv::renderer::c_gridScale + 1, 2, true);
+	cpp_conv::renderer::setPixel(kContext, character, m_position.m_x * cpp_conv::renderer::c_gridScale + 2, m_position.m_y * cpp_conv::renderer::c_gridScale + 1, 2, true);
+	cpp_conv::renderer::setPixel(kContext, character, m_position.m_x * cpp_conv::renderer::c_gridScale + 1, m_position.m_y * cpp_conv::renderer::c_gridScale + 2, 2, true);
+	cpp_conv::renderer::setPixel(kContext, character, m_position.m_x * cpp_conv::renderer::c_gridScale + 2, m_position.m_y * cpp_conv::renderer::c_gridScale + 2, 2, true);
 }
 
 bool cpp_conv::Underground::AddItem(cpp_conv::grid::EntityGrid& grid, Item* pItem, int iChannel)

@@ -1,11 +1,12 @@
 #pragma once
 
-#include "Renderer.h"
 #include "Entity.h"
 
 namespace cpp_conv
 {
 	class Item;
+	struct SceneContext;
+	struct RenderContext;
 
 	class Junction : public Entity
 	{
@@ -13,7 +14,7 @@ namespace cpp_conv
 		Junction(int x, int y);
 
 		void Tick(const SceneContext& kContext);
-		void Draw(HANDLE hConsole, cpp_conv::renderer::ScreenBuffer screenBuffer, cpp_conv::grid::EntityGrid& grid, int x, int y) const;
+		void Draw(RenderContext& kContext) const;
 
 		bool AddItem(Item* pItem);
 

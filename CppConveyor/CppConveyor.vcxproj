@@ -162,8 +162,10 @@
     <ClInclude Include="Junction.h" />
     <ClInclude Include="Position.h" />
     <ClInclude Include="Producer.h" />
+    <ClInclude Include="RenderContext.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="SceneContext.h" />
+    <ClInclude Include="ScreenBuffer.h" />
     <ClInclude Include="Sequence.h" />
     <ClInclude Include="Simulator.h" />
     <ClInclude Include="TargetingUtility.h" />

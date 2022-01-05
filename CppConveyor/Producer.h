@@ -7,6 +7,7 @@ namespace cpp_conv
 {
 	class Item;
 	struct SceneContext;
+	struct RenderContext;
 
 	class Producer : public Entity
 	{
@@ -20,7 +21,7 @@ namespace cpp_conv
 		Direction GetDirection() const { return m_direction; }
 
 		void Tick(const SceneContext& kContext);
-		void Draw(HANDLE hConsole, cpp_conv::renderer::ScreenBuffer screenBuffer, cpp_conv::grid::EntityGrid& grid, int x, int y) const;
+		void Draw(RenderContext& kContext) const;
 
 	private:
 		Item* m_pItem;

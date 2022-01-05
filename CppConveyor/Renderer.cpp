@@ -1,7 +1,6 @@
 ﻿#include "Renderer.h"
+#include "RenderContext.h"
 #include "Entity.h"
-#include "Conveyor.h"
-#include "Producer.h"
 
 WORD GetColourAttribute(int colour, bool allowBackFill)
 {
@@ -33,24 +32,24 @@ WORD GetColourAttribute(int colour, bool allowBackFill)
     return FOREGROUND_RED | FOREGROUND_INTENSITY;
 }
 
-void cpp_conv::renderer::setPixel(HANDLE hConsole, cpp_conv::renderer::ScreenBuffer screenBuffer, wchar_t value, int x, int y,
+void cpp_conv::renderer::setPixel(RenderContext& kContext, wchar_t value, int x, int y,
     int colour, bool allowBackFill)
 {
-    if (screenBuffer[y][x] == value)
+    if (kContext.m_screenBuffer[y][x] == value)
     {
         return;
     }
 
-    screenBuffer[y][x] = value;
+    kContext.m_screenBuffer[y][x] = value;
 
     COORD pos = { (SHORT)x, (SHORT)y };
     DWORD dwBytesWritten = 0;
 
-    SetConsoleActiveScreenBuffer(hConsole);
+    SetConsoleActiveScreenBuffer(kContext.m_hConsole);
 
     WORD attribute = GetColourAttribute(colour, allowBackFill);
-    WriteConsoleOutputAttribute(hConsole, &attribute, 1, pos, &dwBytesWritten);
-    WriteConsoleOutputCharacterW(hConsole, &value, 1, pos, &dwBytesWritten);
+    WriteConsoleOutputAttribute(kContext.m_hConsole, &attribute, 1, pos, &dwBytesWritten);
+    WriteConsoleOutputCharacterW(kContext.m_hConsole, &value, 1, pos, &dwBytesWritten);
 }
 
 void cpp_conv::renderer::init(HANDLE& hConsole)
@@ -69,20 +68,20 @@ void cpp_conv::renderer::init(HANDLE& hConsole)
     SetCurrentConsoleFontEx(hConsole, FALSE, &cfi);
 }
 
-void cpp_conv::renderer::render(HANDLE hConsole, cpp_conv::renderer::ScreenBuffer screenBuffer, cpp_conv::grid::EntityGrid& grid)
+void cpp_conv::renderer::render(RenderContext& kContext)
 {
-    for (int y = 0; y < grid.size(); y++)
+    for (int y = 0; y < kContext.m_grid.size(); y++)
     {
-        for (int x = 0; x < grid[y].size(); x++)
+        for (int x = 0; x < kContext.m_grid[y].size(); x++)
         {
-            auto cell = grid[y][x];
+            Entity* cell = kContext.m_grid[y][x];
             if (cell == nullptr)
             {
                 //cpp_conv::renderer::setPixel(hConsole, screenBuffer, L' ', x * cpp_conv::renderer::c_gridScale, y * cpp_conv::renderer::c_gridScale, 0);
             }
             else
             {
-                cell->Draw(hConsole, screenBuffer, grid, x, y);
+                cell->Draw(kContext);
             }
         }
     }
