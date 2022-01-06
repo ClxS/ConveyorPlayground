@@ -117,8 +117,8 @@ void cpp_conv::Producer::Draw(RenderContext& kContext) const
 		break;
 	}
 
-	cpp_conv::renderer::setPixel(kContext, character, m_position.m_x * cpp_conv::renderer::c_gridScale + 1, m_position.m_y * cpp_conv::renderer::c_gridScale + 1, 1, true);
+	/*cpp_conv::renderer::setPixel(kContext, character, m_position.m_x * cpp_conv::renderer::c_gridScale + 1, m_position.m_y * cpp_conv::renderer::c_gridScale + 1, 1, true);
 	cpp_conv::renderer::setPixel(kContext, character, m_position.m_x * cpp_conv::renderer::c_gridScale + 2, m_position.m_y * cpp_conv::renderer::c_gridScale + 1, 1, true);
 	cpp_conv::renderer::setPixel(kContext, character, m_position.m_x * cpp_conv::renderer::c_gridScale + 1, m_position.m_y * cpp_conv::renderer::c_gridScale + 2, 1, true);
-	cpp_conv::renderer::setPixel(kContext, character, m_position.m_x * cpp_conv::renderer::c_gridScale + 2, m_position.m_y * cpp_conv::renderer::c_gridScale + 2, 1, true);
+	cpp_conv::renderer::setPixel(kContext, character, m_position.m_x * cpp_conv::renderer::c_gridScale + 2, m_position.m_y * cpp_conv::renderer::c_gridScale + 2, 1, true);*/
 }

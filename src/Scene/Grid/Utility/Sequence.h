@@ -87,5 +87,6 @@ namespace cpp_conv
     bool IsCircular(const grid::EntityGrid& grid, std::vector<Sequence>& sequences, Sequence* pStartSequence);
 
     bool IsCornerConveyor(const grid::EntityGrid& grid, const Conveyor& rConveyor);
+    bool IsClockwiseCorner(const grid::EntityGrid& grid, const Conveyor& rConveyor);
     std::tuple<int, Direction> GetInnerMostCornerChannel(const grid::EntityGrid& grid, const Conveyor& rConveyor);
 }

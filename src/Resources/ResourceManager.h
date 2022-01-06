@@ -18,7 +18,7 @@ namespace cpp_conv::resources::resource_manager
 	void initialize();
 	void registerTypeHandler(const std::type_info& type, std::function<ResourceAsset*(FileData&)> fHandler);
 
-	AssetPtr<ResourceAsset> loadAsset(const std::type_info& type, resource_registry::RegistryId kAssetId);
+	AssetPtr<ResourceAsset> loadAsset(const std::type_info& type, registry::RegistryId kAssetId);
 
 	template<typename TType>
 	void registerTypeHandler(std::function<ResourceAsset*(FileData& rData)> fHandler)
@@ -27,7 +27,7 @@ namespace cpp_conv::resources::resource_manager
 	}
 
 	template<typename TType>
-	AssetPtr<TType> loadAsset(resource_registry::RegistryId kAssetId)
+	AssetPtr<TType> loadAsset(registry::RegistryId kAssetId)
 	{
 		auto pAsset = loadAsset(typeid(TType), kAssetId);
 		if (!pAsset)

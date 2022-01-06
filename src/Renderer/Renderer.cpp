@@ -4,53 +4,32 @@
 #include "SwapChain.h"
 #include "Entity.h"
 
-WORD GetColourAttribute(int colour, bool allowBackFill)
+#include <map>
+#include <mutex>
+#include "TileRenderHandler.h"
+
+using TypeId = size_t;
+static std::map<TypeId, std::function<void(cpp_conv::RenderContext&, const cpp_conv::resources::RenderableAsset*, cpp_conv::Transform2D)>*> g_typeHandlers;
+
+namespace
 {
-    if (allowBackFill)
+	std::mutex& getStateMutex()
+	{
+		static std::mutex s_stateMutex;
+		return s_stateMutex;
+	}
+
+    std::function<void(cpp_conv::RenderContext&, const cpp_conv::resources::RenderableAsset*, cpp_conv::Transform2D)>* getTypeHandler(const std::type_info& type)
     {
-        switch (colour % 7)
-        {
-        case 0: return FOREGROUND_RED | FOREGROUND_INTENSITY | BACKGROUND_RED;
-        case 1: return FOREGROUND_GREEN | FOREGROUND_INTENSITY | BACKGROUND_GREEN;
-        case 2: return FOREGROUND_BLUE | FOREGROUND_INTENSITY | BACKGROUND_BLUE;
-        case 3: return FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY | BACKGROUND_GREEN | BACKGROUND_BLUE;
-        case 4: return FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_BLUE;
-        case 5: return FOREGROUND_GREEN | FOREGROUND_GREEN | FOREGROUND_INTENSITY | BACKGROUND_GREEN | BACKGROUND_GREEN;
-        case 6: return FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY | BACKGROUND_GREEN | BACKGROUND_BLUE | BACKGROUND_RED;
-        }
+	    // No need to lock here, this is only called in the context of an existing lock
+	    auto iter = g_typeHandlers.find(type.hash_code());
+	    if (iter == g_typeHandlers.end())
+	    {
+		    return nullptr;
+	    }
+
+	    return iter->second;
     }
-    else
-    {
-        switch (colour % 6)
-        {
-        case 0: return FOREGROUND_RED | FOREGROUND_INTENSITY;
-        case 1: return FOREGROUND_GREEN | FOREGROUND_INTENSITY;
-        case 2: return FOREGROUND_BLUE | FOREGROUND_INTENSITY;
-        case 3: return FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
-        case 4: return FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
-        case 5: return FOREGROUND_GREEN | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
-        }
-    }
-
-    return FOREGROUND_RED | FOREGROUND_INTENSITY;
-}
-
-void cpp_conv::renderer::setPixel(RenderContext& kContext, wchar_t value, int x, int y,
-    int colour, bool allowBackFill)
-{
-    x += kContext.cameraOffsetX;
-    y += kContext.cameraOffsetY;
-
-    if (x < 0 || y < 0 || x >= kContext.m_surface.GetWidth() || y >= kContext.m_surface.GetHeight())
-    {
-        return;
-    }
-
-    WriteSurface& rSurface = kContext.m_surface;
-    CHAR_INFO& rCell = rSurface.GetData()[x + rSurface.GetWidth() * y];
-
-    rCell.Char.UnicodeChar = value;
-    rCell.Attributes = GetColourAttribute(colour, allowBackFill);
 }
 
 void cpp_conv::renderer::init(cpp_conv::renderer::SwapChain& rSwapChain)
@@ -67,14 +46,16 @@ void cpp_conv::renderer::init(cpp_conv::renderer::SwapChain& rSwapChain)
     ScreenBufferInitArgs kArgs = { cfi };
 
     rSwapChain.Initialize(kArgs);
+
+    cpp_conv::renderer::registerTileRenderHandler();
 }
 
 void drawPlayer(const cpp_conv::SceneContext& kSceneContext, cpp_conv::RenderContext& kRenderContext)
 {
-    cpp_conv::renderer::setPixel(kRenderContext, 'P', kSceneContext.m_player.m_x * cpp_conv::renderer::c_gridScale + 1, kSceneContext.m_player.m_y * cpp_conv::renderer::c_gridScale + 1, 6, true);
-    cpp_conv::renderer::setPixel(kRenderContext, 'P', kSceneContext.m_player.m_x * cpp_conv::renderer::c_gridScale + 2, kSceneContext.m_player.m_y * cpp_conv::renderer::c_gridScale + 1, 6, true);
-    cpp_conv::renderer::setPixel(kRenderContext, 'P', kSceneContext.m_player.m_x * cpp_conv::renderer::c_gridScale + 1, kSceneContext.m_player.m_y * cpp_conv::renderer::c_gridScale + 2, 6, true);
-    cpp_conv::renderer::setPixel(kRenderContext, 'P', kSceneContext.m_player.m_x * cpp_conv::renderer::c_gridScale + 2, kSceneContext.m_player.m_y * cpp_conv::renderer::c_gridScale + 2, 6, true);
+	/*cpp_conv::renderer::setPixel(kRenderContext, 'P', kSceneContext.m_player.m_x * cpp_conv::renderer::c_gridScale + 1, kSceneContext.m_player.m_y * cpp_conv::renderer::c_gridScale + 1, 6, true);
+	cpp_conv::renderer::setPixel(kRenderContext, 'P', kSceneContext.m_player.m_x * cpp_conv::renderer::c_gridScale + 2, kSceneContext.m_player.m_y * cpp_conv::renderer::c_gridScale + 1, 6, true);
+	cpp_conv::renderer::setPixel(kRenderContext, 'P', kSceneContext.m_player.m_x * cpp_conv::renderer::c_gridScale + 1, kSceneContext.m_player.m_y * cpp_conv::renderer::c_gridScale + 2, 6, true);
+	cpp_conv::renderer::setPixel(kRenderContext, 'P', kSceneContext.m_player.m_x * cpp_conv::renderer::c_gridScale + 2, kSceneContext.m_player.m_y * cpp_conv::renderer::c_gridScale + 2, 6, true);*/
 }
 
 void cpp_conv::renderer::render(const SceneContext& kSceneContext, RenderContext& kContext)
@@ -92,4 +73,26 @@ void cpp_conv::renderer::render(const SceneContext& kSceneContext, RenderContext
     }
 
     drawPlayer(kSceneContext, kContext);
+}
+
+void cpp_conv::renderer::renderAsset(const std::type_info& type, RenderContext& kContext, resources::RenderableAsset* pRenderable, Transform2D transform)
+{
+    std::function<void(cpp_conv::RenderContext&, const resources::RenderableAsset*, cpp_conv::Transform2D)>* pHandler = nullptr;
+    {
+		std::lock_guard<std::mutex> lock(getStateMutex());
+		pHandler = getTypeHandler(type);
+    }
+
+    if (!pHandler)
+    {
+        return;
+    }
+
+    (*pHandler)(kContext, pRenderable, std::move(transform));
+}
+
+void cpp_conv::renderer::registerTypeHandler(const std::type_info& type, std::function<void(cpp_conv::RenderContext&, const resources::RenderableAsset*, const cpp_conv::Transform2D&)> fHandler)
+{
+	std::lock_guard<std::mutex> lock(getStateMutex());
+	g_typeHandlers[type.hash_code()] = new std::function<void(cpp_conv::RenderContext&, const resources::RenderableAsset*, cpp_conv::Transform2D)>(fHandler);
 }

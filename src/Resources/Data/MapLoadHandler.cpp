@@ -10,19 +10,14 @@
 #include <sstream>
 #include <iostream>
 
-void cpp_conv::resources::registerMapLoadHandler()
-{
-	cpp_conv::resources::resource_manager::registerTypeHandler<cpp_conv::resources::Map>(&mapLoadHandler);
-}
-
-cpp_conv::resources::ResourceAsset* cpp_conv::resources::mapLoadHandler(cpp_conv::resources::resource_manager::FileData& rData)
+cpp_conv::resources::ResourceAsset* mapLoadHandler(cpp_conv::resources::resource_manager::FileData& rData)
 {
 	const char* pStrData = reinterpret_cast<const char*>(rData.m_pData);
 
-	std::istringstream ss(pStrData);
+	std::istringstream ss(pStrData, rData.m_uiSize);
 	std::string strLine;
 
-	Map* pMap = new Map();
+	cpp_conv::resources::Map* pMap = new cpp_conv::resources::Map();
 
 	int iRow = 0;
 	while (std::getline(ss, strLine))
@@ -66,4 +61,9 @@ cpp_conv::resources::ResourceAsset* cpp_conv::resources::mapLoadHandler(cpp_conv
 	}
 
 	return pMap;
+}
+
+void cpp_conv::resources::registerMapLoadHandler()
+{
+	cpp_conv::resources::resource_manager::registerTypeHandler<cpp_conv::resources::Map>(&mapLoadHandler);
 }

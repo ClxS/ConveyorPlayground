@@ -3,31 +3,9 @@
 
 #include "Renderer.h"
 #include "RenderContext.h"
+#include "ResourceManager.h"
 
-void DrawConveyorBorder(cpp_conv::RenderContext& kContext, int x, int y,
-    int colour)
-{
-    for (int i = 0; i < 4; i++)
-    {
-        if (i != 0 && i != 3)
-        {
-            cpp_conv::renderer::setPixel(kContext, L'│', x, y + i, colour);
-            cpp_conv::renderer::setPixel(kContext, L'│', x + 3, y + i, colour);
-        }
-
-        if (i != 0 && i != 3)
-        {
-            cpp_conv::renderer::setPixel(kContext, L'─', x + i, y, colour);
-            cpp_conv::renderer::setPixel(kContext, L'─', x + i, y + 3, colour);
-        }
-
-        if (i == 0 || i == 3)
-        {
-            cpp_conv::renderer::setPixel(kContext, L'┼', x + i, y, colour);
-            cpp_conv::renderer::setPixel(kContext, L'┼', x + i, y + 3, colour);
-        }
-    }
-}
+#include "TileAsset.h"
 
 void DrawConveyorItem(
     cpp_conv::RenderContext& kContext,
@@ -114,47 +92,76 @@ void DrawConveyorItem(
         }
     }
 
-    cpp_conv::renderer::setPixel(kContext, value, x, y, colour, allowBackFill);
+    //cpp_conv::renderer::setPixel(kContext, value, x, y, colour, allowBackFill);
 }
 
-void DrawConveyorArrow(
+void DrawConveyor(
     cpp_conv::RenderContext& kContext,
+    const cpp_conv::Conveyor& rConveyor,
     int x,
     int y,
-    int iChannelIdx,
-    int iChannelSlot,
     bool bIsCorner,
-    bool bIsInnerMostChannel,
     Direction direction,
     Direction cornerSourceDirection,
     int colour)
 {
     wchar_t arrow;
-    switch (direction)
-    {
-    case Direction::Left:
-        arrow = (bIsCorner && !bIsInnerMostChannel && iChannelSlot == 0)
-            ? cornerSourceDirection == Direction::Up ? L'↓' : L'↑'
-            : L'←';
-        break;
-    case Direction::Right:
-        arrow = (bIsCorner && !bIsInnerMostChannel && iChannelSlot == 0)
-            ? cornerSourceDirection == Direction::Up ? L'↓' : L'↑'
-            : L'→';
-        break;
-    case Direction::Up:
-        arrow = (bIsCorner && !bIsInnerMostChannel && iChannelSlot == 0)
-            ? cornerSourceDirection == Direction::Left ? L'←' : L'→'
-            : L'↓';
-        break;
-    case Direction::Down:
-        arrow = (bIsCorner && !bIsInnerMostChannel && iChannelSlot == 0)
-            ? cornerSourceDirection == Direction::Left ? L'←' : L'→'
-            : L'↑';
-        break;
-    }
+	
+    cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> pTile = nullptr;
+    cpp_conv::Transform2D transform = {};
 
-    DrawConveyorItem(kContext, arrow, x, y, iChannelIdx, iChannelSlot, bIsCorner, bIsInnerMostChannel, direction, cornerSourceDirection, colour);
+	if (!bIsCorner)
+	{
+		pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Conveyor_Straight);
+		switch (direction)
+		{
+		case Direction::Right:
+			transform = { x, y, cpp_conv::Transform2D::Rotation::DegZero };
+			break;
+		case Direction::Up:
+			transform = { x, y, cpp_conv::Transform2D::Rotation::Deg90 };
+			break;
+		case Direction::Left:
+			transform = { x, y, cpp_conv::Transform2D::Rotation::Deg180 };
+			break;
+		case Direction::Down:
+			transform = { x, y, cpp_conv::Transform2D::Rotation::Deg270 };
+			break;
+		}
+	}
+    else
+    {
+		switch (direction)
+		{
+		case Direction::Up:
+			transform = { x, y, cpp_conv::Transform2D::Rotation::DegZero };
+			break;
+		case Direction::Left:
+			transform = { x, y, cpp_conv::Transform2D::Rotation::Deg90 };
+			break;
+		case Direction::Down:
+			transform = { x, y, cpp_conv::Transform2D::Rotation::Deg180 };
+			break;
+		case Direction::Right:
+			transform = { x, y, cpp_conv::Transform2D::Rotation::Deg270 };
+			break;
+		}
+
+        if (IsClockwiseCorner(kContext.m_grid, rConveyor))
+        {
+			pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Conveyor_CornerClockwise);
+        }
+        else
+        {
+			pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Conveyor_CornerAntiClockwise);
+        }
+		
+    }   
+
+    if (pTile)
+    {
+        cpp_conv::renderer::renderAsset(kContext, pTile.get(), transform);
+    }
 }
 
 cpp_conv::Conveyor::Channel::Channel()
@@ -205,12 +212,22 @@ void cpp_conv::Conveyor::Draw(RenderContext& kContext) const
     int conveyorX = m_position.m_x * 3;
     int conveyorY = m_position.m_y * 3;
 
-    DrawConveyorBorder(kContext, conveyorX, conveyorY, colour);
+	bool bIsCorner = cpp_conv::IsCornerConveyor(kContext.m_grid, *this);
 
-    bool bIsCorner = cpp_conv::IsCornerConveyor(kContext.m_grid, *this);
-    int iInnerMostChannel;
+	int iInnerMostChannel;
     Direction eCornerDirection;
-    std::tie(iInnerMostChannel, eCornerDirection) = GetInnerMostCornerChannel(kContext.m_grid, *this);
+	std::tie(iInnerMostChannel, eCornerDirection) = GetInnerMostCornerChannel(kContext.m_grid, *this);
+
+	DrawConveyor(
+		kContext,
+        *this,
+		conveyorX,
+		conveyorY,
+		bIsCorner,
+		m_direction,
+		eCornerDirection,
+		colour);
+;
     for (int iChannelIdx = 0; iChannelIdx < c_conveyorChannels; ++iChannelIdx)
     {
         int iChannelLength = cpp_conv::c_conveyorChannelSlots;
@@ -236,20 +253,6 @@ void cpp_conv::Conveyor::Draw(RenderContext& kContext) const
                     eCornerDirection,
                     colour,
                     true);
-            }
-            else
-            {
-                DrawConveyorArrow(
-                    kContext,
-                    conveyorX,
-                    conveyorY, 
-                    iChannelIdx, 
-                    iChannelSlot,
-                    bIsCorner,
-                    iInnerMostChannel == iChannelIdx, 
-                    m_direction,
-                    eCornerDirection,
-                    colour);
             }
         }
     }

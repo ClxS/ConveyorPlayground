@@ -1,6 +1,6 @@
 #pragma once
 
-namespace cpp_conv::resources::resource_registry
+namespace cpp_conv::resources::registry
 {
 	struct RegistryId
 	{
@@ -15,10 +15,7 @@ namespace cpp_conv::resources::resource_registry
 
 	constexpr const char* c_szAssetPaths[] =
 	{
-		"platform/assets/ConveyorStraightUp",
-		"platform/assets/ConveyorStraightDown",
-		"platform/assets/ConveyorStraightLeft",
-		"platform/assets/ConveyorStraightRight",
+		"platform/assets/ConveyorStraight",
 
 		"platform/assets/ConveyorCornerClockwise",
 		"platform/assets/ConveyorCornerAntiClockwise",
@@ -27,6 +24,7 @@ namespace cpp_conv::resources::resource_registry
 	constexpr const char* c_szDataPaths[] =
 	{
 		"maps/circle",
+		"maps/simple",
 		"data/producers/MetalGenerator",
 	};
 
@@ -36,19 +34,17 @@ namespace cpp_conv::resources::resource_registry
 		c_szDataPaths,
 	};
 
-	namespace asset_assets
+	namespace visual
 	{
-		constexpr RegistryId Conveyor_StraightUp = { 0, 0 };
-		constexpr RegistryId Conveyor_StraightDown = { 1, 0 };
-		constexpr RegistryId Conveyor_StraightLeft = { 2, 0 };
-		constexpr RegistryId Conveyor_StraightRight = { 3, 0 };
-		constexpr RegistryId Conveyor_CornerClockwise = { 4, 0 };
-		constexpr RegistryId Conveyor_CornerAntiClockwise = { 5, 0 };
+		constexpr RegistryId Conveyor_Straight = { 0, 0 };
+		constexpr RegistryId Conveyor_CornerClockwise = { 1, 0 };
+		constexpr RegistryId Conveyor_CornerAntiClockwise = { 2, 0 };
 	}
 
-	namespace data_assets
+	namespace data
 	{
 		constexpr RegistryId MapCircle = { 0, 1 };
-		constexpr RegistryId Generator_Metal = { 1, 1 };
+		constexpr RegistryId MapSimple = { 1, 1 };
+		constexpr RegistryId Generator_Metal = { 2, 1 };
 	}
 }

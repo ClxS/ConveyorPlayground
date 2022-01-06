@@ -3,6 +3,7 @@
 #include "Profiler.h"
 
 #include "MapLoadHandler.h"
+#include "TileLoadHandler.h"
 
 #include <map>
 #include <memory>
@@ -10,7 +11,7 @@
 #include <fstream>
 
 using FileData = cpp_conv::resources::resource_manager::FileData;
-using RegistryId = cpp_conv::resources::resource_registry::RegistryId;
+using RegistryId = cpp_conv::resources::registry::RegistryId;
 using WeakResourcePtr = std::weak_ptr<cpp_conv::resources::ResourceAsset>;
 using TypeId = size_t;
 using LoadedAssetContainer = std::map<RegistryId, WeakResourcePtr>;
@@ -25,26 +26,27 @@ namespace
 		static std::mutex s_stateMutex;
 		return s_stateMutex;
 	}
-}
 
-// TODO[CJones] Add a persistence mechanism which keeps loaded assets in memory for X amount of time. This will let us dynamically load resources instead of
-// storing them in our game objects, but also prevent constant load/unloads every frame. This store should also have a flush mechanism to clear it on in cases like
-// scene transitions
-std::function<cpp_conv::resources::ResourceAsset* (FileData&)>* getTypeHandler(const std::type_info& type)
-{
-	// No need to lock here, this is only called in the context of an existing lock
-	auto iter = g_typeHandlers.find(type.hash_code());
-	if (iter == g_typeHandlers.end())
+	// TODO[CJones] Add a persistence mechanism which keeps loaded assets in memory for X amount of time. This will let us dynamically load resources instead of
+	// storing them in our game objects, but also prevent constant load/unloads every frame. This store should also have a flush mechanism to clear it on in cases like
+	// scene transitions
+	std::function<cpp_conv::resources::ResourceAsset* (FileData&)>* getTypeHandler(const std::type_info& type)
 	{
-		return nullptr;
-	}
+		// No need to lock here, this is only called in the context of an existing lock
+		auto iter = g_typeHandlers.find(type.hash_code());
+		if (iter == g_typeHandlers.end())
+		{
+			return nullptr;
+		}
 
-	return iter->second;
+		return iter->second;
+	}
 }
 
 void cpp_conv::resources::resource_manager::initialize()
 {
 	cpp_conv::resources::registerMapLoadHandler();
+	cpp_conv::resources::registerTileLoadHandler();
 }
 
 void cpp_conv::resources::resource_manager::registerTypeHandler(const std::type_info& type, std::function<cpp_conv::resources::ResourceAsset*(FileData&)> fHandler)
@@ -54,22 +56,21 @@ void cpp_conv::resources::resource_manager::registerTypeHandler(const std::type_
 	g_loadedTypes[type.hash_code()] = new LoadedAssetContainer();
 }
 
-cpp_conv::resources::resource_manager::FileData getFileData(cpp_conv::resources::resource_registry::RegistryId kAssetId)
+cpp_conv::resources::resource_manager::FileData getFileData(cpp_conv::resources::registry::RegistryId kAssetId)
 {
 	PROFILE_FUNC();
 	constexpr const char* c_fileExt = ".txt";
 	std::string path = "data/";
-	path += cpp_conv::resources::resource_registry::c_szCategoryPaths[kAssetId.m_category][kAssetId.m_index];
+	path += cpp_conv::resources::registry::c_szCategoryPaths[kAssetId.m_category][kAssetId.m_index];
 	path += c_fileExt;
-
-	std::fstream file;
-	file.open(path);
+	 
+	std::ifstream file;
+	file.open(path, std::ios::binary | std::ios::ate);
 	if (file.fail())
 	{
 		return {};
 	}
 
-	file.seekg(0, std::ios::end);
 	size_t uiLength = file.tellg();
 	file.seekg(0, std::ios::beg);
 
@@ -84,7 +85,7 @@ cpp_conv::resources::resource_manager::FileData getFileData(cpp_conv::resources:
 	return { pData, uiLength };
 }
 
-cpp_conv::resources::AssetPtr<cpp_conv::resources::ResourceAsset> cpp_conv::resources::resource_manager::loadAsset(const std::type_info& type, cpp_conv::resources::resource_registry::RegistryId kAssetId)
+cpp_conv::resources::AssetPtr<cpp_conv::resources::ResourceAsset> cpp_conv::resources::resource_manager::loadAsset(const std::type_info& type, cpp_conv::resources::registry::RegistryId kAssetId)
 {
 	std::lock_guard<std::mutex> lock(getStateMutex());
 	auto loadedContainerIter = g_loadedTypes.find(type.hash_code());
