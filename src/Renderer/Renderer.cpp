@@ -9,7 +9,7 @@
 #include "TileRenderHandler.h"
 #include "ResourceRegistry.h"
 #include "ResourceManager.h"
-#include "TextTileAsset.h"
+#include "TileAsset.h"
 
 using TypeId = size_t;
 static std::map<TypeId, std::function<void(cpp_conv::RenderContext&, const cpp_conv::resources::RenderableAsset*, cpp_conv::Transform2D)>*> g_typeHandlers;

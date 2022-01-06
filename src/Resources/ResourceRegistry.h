@@ -21,6 +21,7 @@ namespace cpp_conv::resources::registry
 		"platform/assets/ConveyorCornerAntiClockwise",
 
 		"platform/assets/Player",
+		"platform/assets/Junction",
 	};
 
 	constexpr const char* c_szDataPaths[] =
@@ -43,6 +44,7 @@ namespace cpp_conv::resources::registry
 		constexpr RegistryId Conveyor_CornerAntiClockwise = { 2, 0 };
 
 		constexpr RegistryId Player = { 3, 0 };
+		constexpr RegistryId Junction = { 4, 0 };
 	}
 
 	namespace data

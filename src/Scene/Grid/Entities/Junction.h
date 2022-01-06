@@ -14,7 +14,7 @@ namespace cpp_conv
 		Junction(int x, int y);
 
 		void Tick(const SceneContext& kContext);
-		void Draw(RenderContext& kContext) const;
+		void Draw(RenderContext& kRenderContext) const;
 
 		bool AddItem(Item* pItem);
 

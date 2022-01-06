@@ -9,6 +9,8 @@
 #include <array>
 #include <random>
 #include <chrono>
+#include "TileAsset.h"
+#include "ResourceManager.h"
 
 template <class RandomAccessIterator, class URNG>
 void shuffle(RandomAccessIterator first, RandomAccessIterator last, URNG&& g)
@@ -89,12 +91,22 @@ void cpp_conv::Junction::Tick(const SceneContext& kContext)
 	}
 }
 
-void cpp_conv::Junction::Draw(RenderContext& kContext) const
+void cpp_conv::Junction::Draw(RenderContext& kRenderContext) const
 {
-	/*cpp_conv::renderer::setPixel(kContext, L'↑', m_position.m_x * cpp_conv::renderer::c_gridScale + 1, m_position.m_y * cpp_conv::renderer::c_gridScale + 1, 1, true);
-	cpp_conv::renderer::setPixel(kContext, L'→', m_position.m_x * cpp_conv::renderer::c_gridScale + 2, m_position.m_y * cpp_conv::renderer::c_gridScale + 1, 1, true);
-	cpp_conv::renderer::setPixel(kContext, L'←', m_position.m_x * cpp_conv::renderer::c_gridScale + 1, m_position.m_y * cpp_conv::renderer::c_gridScale + 2, 1, true);
-	cpp_conv::renderer::setPixel(kContext, L'↓', m_position.m_x * cpp_conv::renderer::c_gridScale + 2, m_position.m_y * cpp_conv::renderer::c_gridScale + 2, 1, true);*/
+	auto pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Junction);
+	if (!pTile)
+	{
+		return;
+	}
+
+	cpp_conv::renderer::renderAsset(
+		kRenderContext,
+		pTile.get(),
+		{
+			m_position.m_x* cpp_conv::renderer::c_gridScale,
+			m_position.m_y * cpp_conv::renderer::c_gridScale,
+			cpp_conv::Transform2D::Rotation::DegZero
+		});
 }
 
 bool cpp_conv::Junction::AddItem(Item* pItem)
