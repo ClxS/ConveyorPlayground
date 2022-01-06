@@ -1,5 +1,6 @@
 #include "ResourceManager.h"
 #include "ResourceAsset.h"
+#include "Profiler.h"
 
 #include "MapLoadHandler.h"
 
@@ -17,10 +18,13 @@ using LoadedAssetContainer = std::map<RegistryId, WeakResourcePtr>;
 static std::map<TypeId, std::function<cpp_conv::resources::ResourceAsset* (FileData&)>*> g_typeHandlers;
 static std::map<TypeId, LoadedAssetContainer*> g_loadedTypes = {};
 
-std::mutex& getStateLock()
+namespace
 {
-	static std::mutex s_stateLock;
-	return s_stateLock;
+	std::mutex& getStateMutex()
+	{
+		static std::mutex s_stateMutex;
+		return s_stateMutex;
+	}
 }
 
 // TODO[CJones] Add a persistence mechanism which keeps loaded assets in memory for X amount of time. This will let us dynamically load resources instead of
@@ -45,13 +49,14 @@ void cpp_conv::resources::resource_manager::initialize()
 
 void cpp_conv::resources::resource_manager::registerTypeHandler(const std::type_info& type, std::function<cpp_conv::resources::ResourceAsset*(FileData&)> fHandler)
 {
-	std::lock_guard<std::mutex> lock(getStateLock());
+	std::lock_guard<std::mutex> lock(getStateMutex());
 	g_typeHandlers[type.hash_code()] = new std::function<cpp_conv::resources::ResourceAsset* (FileData&)>(fHandler);
 	g_loadedTypes[type.hash_code()] = new LoadedAssetContainer();
 }
 
 cpp_conv::resources::resource_manager::FileData getFileData(cpp_conv::resources::resource_registry::RegistryId kAssetId)
 {
+	PROFILE_FUNC();
 	constexpr const char* c_fileExt = ".txt";
 	std::string path = "data/";
 	path += cpp_conv::resources::resource_registry::c_szCategoryPaths[kAssetId.m_category][kAssetId.m_index];
@@ -81,7 +86,7 @@ cpp_conv::resources::resource_manager::FileData getFileData(cpp_conv::resources:
 
 cpp_conv::resources::AssetPtr<cpp_conv::resources::ResourceAsset> cpp_conv::resources::resource_manager::loadAsset(const std::type_info& type, cpp_conv::resources::resource_registry::RegistryId kAssetId)
 {
-	std::lock_guard<std::mutex> lock(getStateLock());
+	std::lock_guard<std::mutex> lock(getStateMutex());
 	auto loadedContainerIter = g_loadedTypes.find(type.hash_code());
 	if (loadedContainerIter == g_loadedTypes.end())
 	{
