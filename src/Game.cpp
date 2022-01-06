@@ -6,18 +6,21 @@
 #include "Sequence.h"
 #include "SceneContext.h"
 #include "RenderContext.h"
-#include "FileReader.h"
 #include "Command.h"
 #include "Input.h"
 #include "Simulator.h"
 #include "Renderer.h"
 #include "Profiler.h"
 #include "FrameLimiter.h"
+#include "ResourceManager.h"
+#include "Map.h"
 
 #include <tuple>
 #include <vector>
 #include <queue>
 #include <chrono>
+
+using namespace cpp_conv::resources;
 
 void cpp_conv::game::run()
 {
@@ -29,25 +32,21 @@ void cpp_conv::game::run()
 	cpp_conv::renderer::SwapChain swapChain(iWidth, iHeight);
 	cpp_conv::renderer::init(swapChain);
 
-	cpp_conv::grid::EntityGrid grid;
-	memset(&grid, 0, sizeof(grid));
+	resource_manager::initialize();
+	AssetPtr<Map> map = resource_manager::loadAsset<Map>(resource_registry::data_assets::MapCircle);
 
-	std::vector<cpp_conv::Conveyor*> conveyors;
-	std::vector<cpp_conv::Entity*> vOtherEntities;
-	cpp_conv::file_reader::readFile("data.txt", grid, conveyors, vOtherEntities);
-
-	std::vector<cpp_conv::Sequence> sequences = cpp_conv::InitializeSequences(grid, conveyors);
+	std::vector<cpp_conv::Sequence> sequences = cpp_conv::InitializeSequences(map->GetGrid(), map->GetConveyors());
 	cpp_conv::SceneContext kSceneContext =
 	{ 
 		{ 0, 0 }, 
-		grid, 
+		map->GetGrid(),
 		sequences,
-		conveyors, 
-		vOtherEntities, 
+		map->GetConveyors(),
+		map->GetOtherEntities(),
 		{ std::chrono::high_resolution_clock::now() }
 	};
 
-	cpp_conv::RenderContext kRenderContext = { 0, 0, swapChain.GetWriteSurface(), grid };
+	cpp_conv::RenderContext kRenderContext = { 0, 0, swapChain.GetWriteSurface(), map->GetGrid() };
 
 	cpp_conv::FrameLimiter frameLimter(10);
 	std::queue<cpp_conv::commands::InputCommand> commands;

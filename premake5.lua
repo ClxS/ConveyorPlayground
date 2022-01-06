@@ -1,6 +1,6 @@
 workspace "CppConveyor"
 	location "build"
-	platforms { "Console" }
+	platforms { "Console", "SDL" }
 	configurations { "Debug", "Release" }
 	filter { "platforms:Console" }
 		system "Windows"
@@ -15,8 +15,28 @@ project "CppConveyor"
 		defines {
 			"_CONSOLE"
 		}
+		postbuildcommands {
+			'robocopy "' .. path.getabsolute("data/console") .. '" "$(TargetDir)data/platform" /E',
+			'robocopy "' .. path.getabsolute("data/common") .. '" "$(TargetDir)data" /E',
+			'exit /b 0'
+		}
+		filter {
+		}
+	filter {"platforms:SDL"}
+		kind "WindowedApp"
+		defines {
+			"_SDL"
+		}
+		postbuildcommands {
+			'robocopy "' .. path.getabsolute("data/sdl") .. '" "$(TargetDir)data/platform" /E',
+			'robocopy "' .. path.getabsolute("data/common") .. '" "$(TargetDir)data" /E',
+			'exit /b 0'
+		}
+		filter {
+		}
 	filter {}
 	files { 
+		"data/**",
 		"src/**"
 	}
 	includedirs {
@@ -24,3 +44,9 @@ project "CppConveyor"
 		"src/**",
 	}
 	cppdialect "C++latest"
+	vpaths
+	{
+		["*"] = "src",
+		["data/*"] = "data/common/**",
+		["data/platform/*"] = "data/console/**",
+	}
