@@ -7,6 +7,9 @@
 #include <map>
 #include <mutex>
 #include "TileRenderHandler.h"
+#include "ResourceRegistry.h"
+#include "ResourceManager.h"
+#include "TextTileAsset.h"
 
 using TypeId = size_t;
 static std::map<TypeId, std::function<void(cpp_conv::RenderContext&, const cpp_conv::resources::RenderableAsset*, cpp_conv::Transform2D)>*> g_typeHandlers;
@@ -52,10 +55,20 @@ void cpp_conv::renderer::init(cpp_conv::renderer::SwapChain& rSwapChain)
 
 void drawPlayer(const cpp_conv::SceneContext& kSceneContext, cpp_conv::RenderContext& kRenderContext)
 {
-	/*cpp_conv::renderer::setPixel(kRenderContext, 'P', kSceneContext.m_player.m_x * cpp_conv::renderer::c_gridScale + 1, kSceneContext.m_player.m_y * cpp_conv::renderer::c_gridScale + 1, 6, true);
-	cpp_conv::renderer::setPixel(kRenderContext, 'P', kSceneContext.m_player.m_x * cpp_conv::renderer::c_gridScale + 2, kSceneContext.m_player.m_y * cpp_conv::renderer::c_gridScale + 1, 6, true);
-	cpp_conv::renderer::setPixel(kRenderContext, 'P', kSceneContext.m_player.m_x * cpp_conv::renderer::c_gridScale + 1, kSceneContext.m_player.m_y * cpp_conv::renderer::c_gridScale + 2, 6, true);
-	cpp_conv::renderer::setPixel(kRenderContext, 'P', kSceneContext.m_player.m_x * cpp_conv::renderer::c_gridScale + 2, kSceneContext.m_player.m_y * cpp_conv::renderer::c_gridScale + 2, 6, true);*/
+	auto pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Player);
+    if (!pTile)
+    {
+        return;
+    }
+
+    cpp_conv::renderer::renderAsset(
+        kRenderContext,
+        pTile.get(),
+        {
+            kSceneContext.m_player.m_x * cpp_conv::renderer::c_gridScale,
+            kSceneContext.m_player.m_y * cpp_conv::renderer::c_gridScale,
+            cpp_conv::Transform2D::Rotation::DegZero
+        });
 }
 
 void cpp_conv::renderer::render(const SceneContext& kSceneContext, RenderContext& kContext)
