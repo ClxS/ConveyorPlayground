@@ -6,6 +6,7 @@
 #include "SceneContext.h"
 #include "Direction.h"
 #include <cassert>
+#include "Profiler.h"
 
 using namespace cpp_conv;
 using cpp_conv::SequenceIterator;
@@ -237,6 +238,7 @@ bool cpp_conv::IsCircular(const grid::EntityGrid& grid, std::vector<Sequence>& s
 
 bool cpp_conv::IsCornerConveyor(const grid::EntityGrid& grid, const Conveyor& rConveyor)
 {
+    PROFILE_FUNC();
     Conveyor* pBackConverter = FindNextTailConveyor(grid, rConveyor);
     if (pBackConverter == nullptr)
     {
@@ -248,6 +250,7 @@ bool cpp_conv::IsCornerConveyor(const grid::EntityGrid& grid, const Conveyor& rC
 
 bool cpp_conv::IsClockwiseCorner(const grid::EntityGrid& grid, const Conveyor& rConveyor)
 {
+	PROFILE_FUNC();
 	Conveyor* pBackConverter = FindNextTailConveyor(grid, rConveyor);
 	if (pBackConverter == nullptr || pBackConverter->m_direction == rConveyor.m_direction)
 	{
@@ -267,7 +270,8 @@ bool cpp_conv::IsClockwiseCorner(const grid::EntityGrid& grid, const Conveyor& r
 
 std::tuple<int, Direction> cpp_conv::GetInnerMostCornerChannel(const grid::EntityGrid& grid, const Conveyor& rConveyor)
 {
-    Conveyor* pBackConverter = FindNextTailConveyor(grid, rConveyor);
+	PROFILE_FUNC();
+	Conveyor* pBackConverter = FindNextTailConveyor(grid, rConveyor);
     if (pBackConverter == nullptr || pBackConverter->m_direction == rConveyor.m_direction)
     {
         return std::make_tuple(-1, Direction::Up);

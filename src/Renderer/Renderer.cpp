@@ -10,6 +10,7 @@
 #include "ResourceRegistry.h"
 #include "ResourceManager.h"
 #include "TileAsset.h"
+#include "Profiler.h"
 
 using TypeId = size_t;
 static std::map<TypeId, std::function<void(cpp_conv::RenderContext&, const cpp_conv::resources::RenderableAsset*, cpp_conv::Transform2D, cpp_conv::Colour)>*> g_typeHandlers;
@@ -89,7 +90,8 @@ void cpp_conv::renderer::render(const SceneContext& kSceneContext, RenderContext
 
 void cpp_conv::renderer::renderAsset(const std::type_info& type, RenderContext& kContext, resources::RenderableAsset* pRenderable, Transform2D transform, Colour kColourOverride)
 {
-    std::function<void(cpp_conv::RenderContext&, const resources::RenderableAsset*, cpp_conv::Transform2D, cpp_conv::Colour)>* pHandler = nullptr;
+	PROFILE_FUNC();
+	std::function<void(cpp_conv::RenderContext&, const resources::RenderableAsset*, cpp_conv::Transform2D, cpp_conv::Colour)>* pHandler = nullptr;
     {
 		std::lock_guard<std::mutex> lock(getStateMutex());
 		pHandler = getTypeHandler(type);

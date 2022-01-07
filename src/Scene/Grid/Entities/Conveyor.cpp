@@ -6,6 +6,7 @@
 #include "ResourceManager.h"
 
 #include "TileAsset.h"
+#include "Profiler.h"
 
 cpp_conv::Colour GetColourFromId(int id)
 {
@@ -36,7 +37,8 @@ void DrawConveyorItem(
     cpp_conv::Colour colour,
     bool allowBackFill = false)
 {
-    // TODO[CJones] Normalize this
+	PROFILE_FUNC();
+	// TODO[CJones] Normalize this
     if (bIsCorner)
     {
         if (bIsInnerMostChannel)
@@ -124,7 +126,8 @@ void DrawConveyor(
     Direction cornerSourceDirection,
     cpp_conv::Colour colour)
 {
-    cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> pTile = nullptr;
+	PROFILE_FUNC();
+	cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> pTile = nullptr;
     cpp_conv::Transform2D transform = {};
 
 	if (!bIsCorner)
@@ -193,6 +196,7 @@ void cpp_conv::Conveyor::Tick(const SceneContext& kContext)
 
 void cpp_conv::Conveyor::Draw(RenderContext& kContext) const
 {
+    PROFILE_FUNC();
     Colour colour = GetColourFromId(m_pSequenceId);
 
     int conveyorX = m_position.m_x * 3;
@@ -204,7 +208,7 @@ void cpp_conv::Conveyor::Draw(RenderContext& kContext) const
     Direction eCornerDirection;
 	std::tie(iInnerMostChannel, eCornerDirection) = GetInnerMostCornerChannel(kContext.m_grid, *this);
 
-	DrawConveyor(
+    DrawConveyor(
 		kContext,
         *this,
 		conveyorX,

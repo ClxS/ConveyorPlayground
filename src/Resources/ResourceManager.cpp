@@ -92,6 +92,7 @@ cpp_conv::resources::resource_manager::FileData getFileData(cpp_conv::resources:
 
 cpp_conv::resources::AssetPtr<cpp_conv::resources::ResourceAsset> cpp_conv::resources::resource_manager::loadAsset(const std::type_info& type, cpp_conv::resources::registry::RegistryId kAssetId)
 {
+	PROFILE_FUNC();
 	std::lock_guard<std::mutex> lock(getStateMutex());
 	auto loadedContainerIter = g_loadedTypes.find(type.hash_code());
 	if (loadedContainerIter == g_loadedTypes.end())

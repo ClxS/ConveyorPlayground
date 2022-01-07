@@ -10,6 +10,7 @@ workspace "CppConveyor"
 project "CppConveyor"
 	location "build/CppConveyor"
 	language "C++"
+	editandcontinue "On"
 	filter {"platforms:Console"}
 		kind "ConsoleApp"
 		defines {
