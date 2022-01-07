@@ -1,4 +1,4 @@
-﻿#include "Conveyor.h"
+#include "Conveyor.h"
 #include "SceneContext.h"
 
 #include "Renderer.h"
@@ -7,6 +7,7 @@
 
 #include "TileAsset.h"
 #include "Profiler.h"
+#include "TargetingUtility.h"
 
 cpp_conv::Colour GetColourFromId(int id)
 {
@@ -136,7 +137,7 @@ void DrawConveyor(
     }
     else
     {
-        if (IsClockwiseCorner(kContext.m_grid, rConveyor))
+        if (cpp_conv::targeting_util::IsClockwiseCorner(kContext.m_grid, rConveyor))
         {
             pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Conveyor_CornerClockwise);
         }
@@ -168,7 +169,7 @@ cpp_conv::Conveyor::Conveyor(int32_t x, int32_t y, Direction direction, Item* pI
 
 void cpp_conv::Conveyor::Tick(const SceneContext& kContext)
 {
-    bool bIsCornerConveyor = IsCornerConveyor(kContext.m_grid, *this);
+    bool bIsCornerConveyor = cpp_conv::targeting_util::IsCornerConveyor(kContext.m_grid, *this);
     int iInnerMostChannel;
     Direction eCornerDirection;
     std::tie(iInnerMostChannel, eCornerDirection) = GetInnerMostCornerChannel(kContext.m_grid, *this);
@@ -202,7 +203,7 @@ void cpp_conv::Conveyor::Draw(RenderContext& kContext) const
     int conveyorX = m_position.m_x * 3;
     int conveyorY = m_position.m_y * 3;
 
-    bool bIsCorner = cpp_conv::IsCornerConveyor(kContext.m_grid, *this);
+    bool bIsCorner = cpp_conv::targeting_util::IsCornerConveyor(kContext.m_grid, *this);
 
     int iInnerMostChannel;
     Direction eCornerDirection;
@@ -246,4 +247,27 @@ void cpp_conv::Conveyor::Draw(RenderContext& kContext) const
             }
         }
     }
+}
+
+bool cpp_conv::Conveyor::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, const Item* pItem, int iSourceChannel)
+{
+    cpp_conv::Conveyor::Channel* pTargetChannel = cpp_conv::targeting_util::GetTargetChannel(kContext.m_grid, pSourceEntity, *this, iSourceChannel);
+    if (!pTargetChannel)
+    {
+        return false;
+    }
+
+    int forwardTargetItemSlot = cpp_conv::targeting_util::GetChannelTargetSlot(kContext.m_grid, pSourceEntity, *this, iSourceChannel);
+
+    const Item*& forwardTargetItem = pTargetChannel->m_pItems[forwardTargetItemSlot];
+    const Item*& forwardPendingItem = pTargetChannel->m_pPendingItems[forwardTargetItemSlot];
+
+    // Following node is empty, we can just move there
+    if (forwardTargetItem || forwardPendingItem)
+    {
+        return false;
+    }
+
+    forwardPendingItem = pItem;
+    return true;
 }

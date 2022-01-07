@@ -55,7 +55,7 @@ namespace cpp_conv
         {
         }
 
-        void Tick(const SceneContext& kContext);
+        void Tick(SceneContext& kContext);
 
         const Conveyor* GetHeadConveyor() const { return m_pHeadConveyor; }
         const Conveyor* GetTailConveyor() const { return m_pTailConveyor; }
@@ -86,7 +86,5 @@ namespace cpp_conv
 
     bool IsCircular(const grid::EntityGrid& grid, std::vector<Sequence>& sequences, Sequence* pStartSequence);
 
-    bool IsCornerConveyor(const grid::EntityGrid& grid, const Conveyor& rConveyor);
-    bool IsClockwiseCorner(const grid::EntityGrid& grid, const Conveyor& rConveyor);
     std::tuple<int, Direction> GetInnerMostCornerChannel(const grid::EntityGrid& grid, const Conveyor& rConveyor);
 }

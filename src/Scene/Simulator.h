@@ -12,6 +12,6 @@ namespace cpp_conv
 
     namespace simulation
     {
-        void simulate(const SceneContext& kContext);
+        void simulate(SceneContext& kContext);
     }
 }

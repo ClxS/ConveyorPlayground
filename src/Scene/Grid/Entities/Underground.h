@@ -19,8 +19,10 @@ namespace cpp_conv
 
         void Tick(const SceneContext& kContext) override;
         void Draw(RenderContext& kRenderContext) const override;
+        bool SupportsInsertion() const override { return true; }
+        bool TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, const Item* pItem, int iSourceChannel) override;
 
-        bool AddItem(cpp_conv::grid::EntityGrid& grid, Item* pItem, int iChannel);
+        Direction GetDirection() const override { return m_direction; }
 
     private:
         cpp_conv::grid::EntityGrid m_kLocalGrid;

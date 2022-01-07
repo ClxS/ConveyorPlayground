@@ -1,4 +1,4 @@
-﻿#include "Producer.h"
+#include "Producer.h"
 #include "Conveyor.h"
 #include "SceneContext.h"
 
@@ -7,6 +7,10 @@
 
 #include <array>
 #include <random>
+#include "ConsoleWriteUtility.h"
+#include "ResourceManager.h"
+#include "ResourceRegistry.h"
+#include "TileAsset.h"
 
 cpp_conv::Producer::Producer(int x, int y, Direction direction, Item* pItem, uint64_t productionRate)
     : Entity(x, y, EntityKind::Producer)
@@ -36,20 +40,18 @@ cpp_conv::Item* cpp_conv::Producer::ProduceItem()
 
 void cpp_conv::Producer::Tick(const SceneContext& kContext)
 {
-    if (m_bProductionReady)
-    {
-        return;
-    }
-
-    m_uiTick++;
-    if ((m_uiTick % m_productionRate) == 0)
-    {
-        m_bProductionReady = true;
-    }
-
     if (!IsReadyToProduce())
     {
-        return;
+        m_uiTick++;
+        if ((m_uiTick % m_productionRate) == 0)
+        {
+            m_bProductionReady = true;
+        }
+
+        if (!IsReadyToProduce())
+        {
+            return;
+        }
     }
 
     Item* pItem = ProduceItem();
@@ -58,67 +60,37 @@ void cpp_conv::Producer::Tick(const SceneContext& kContext)
         return;
     }
 
-    cpp_conv::Entity* pForwardEntity = cpp_conv::grid::SafeGetEntity(kContext.m_grid, cpp_conv::grid::GetForwardPosition(*this, GetDirection()));
-    if (!pForwardEntity || pForwardEntity->m_eEntityKind != EntityKind::Conveyor)
+    cpp_conv::Entity* pEntity = cpp_conv::grid::SafeGetEntity(kContext.m_grid, cpp_conv::grid::GetForwardPosition(*this, GetDirection()));
+    if (!pEntity || !pEntity->SupportsInsertion())
     {
         return;
     }
 
-    std::array<int, cpp_conv::c_conveyorChannels> arrDirectionEntities;
-    for (int arrChannelIdx = 0; arrChannelIdx < cpp_conv::c_conveyorChannels; ++arrChannelIdx)
+    for (int iExitChannel = 0; iExitChannel < cpp_conv::c_conveyorChannels; ++iExitChannel)
     {
-        arrDirectionEntities[arrChannelIdx] = arrChannelIdx;
-    }
-
-    std::default_random_engine engine(m_uiTick % 256);
-    for (auto i = (arrDirectionEntities.end() - arrDirectionEntities.begin()) - 1; i > 0; --i)
-    {
-        std::uniform_int_distribution<decltype(i)> d(0, i);
-        std::swap(arrDirectionEntities.begin()[i], arrDirectionEntities.begin()[d(engine)]);
-    }
-
-    bool bProduced = false;
-    for (int iChannel : arrDirectionEntities)
-    {
-        cpp_conv::Conveyor* pConveyor = reinterpret_cast<cpp_conv::Conveyor*>(pForwardEntity);
-        Item*& forwardTargetItem = pConveyor->m_pChannels[iChannel].m_pItems[0];
-        Item*& forwardPendingItem = pConveyor->m_pChannels[iChannel].m_pItems[0];
-        if (!forwardTargetItem && !forwardPendingItem)
+        if (pEntity->TryInsert(kContext, *this, m_pItem, (iExitChannel + m_uiTick) % cpp_conv::c_conveyorChannels))
         {
-            forwardPendingItem = pItem;
-            bProduced = true;
+            m_bProductionReady = false;
             break;
         }
     }
-
-    if (!bProduced)
-    {
-        m_pItem = pItem;
-        m_bProductionReady = true;
-    }
 }
 
-void cpp_conv::Producer::Draw(RenderContext& kContext) const
+void cpp_conv::Producer::Draw(RenderContext& kRenderContext) const
 {
-    wchar_t character = L' ';
-    switch (m_direction)
+    auto pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Tunnel);
+    if (!pTile)
     {
-    case Direction::Left:
-        character = L'←';
-        break;
-    case Direction::Up:
-        character = L'↑';
-        break;
-    case Direction::Right:
-        character = L'→';
-        break;
-    case Direction::Down:
-        character = L'↓';
-        break;
+        return;
     }
 
-    /*cpp_conv::renderer::setPixel(kContext, character, m_position.m_x * cpp_conv::renderer::c_gridScale + 1, m_position.m_y * cpp_conv::renderer::c_gridScale + 1, 1, true);
-    cpp_conv::renderer::setPixel(kContext, character, m_position.m_x * cpp_conv::renderer::c_gridScale + 2, m_position.m_y * cpp_conv::renderer::c_gridScale + 1, 1, true);
-    cpp_conv::renderer::setPixel(kContext, character, m_position.m_x * cpp_conv::renderer::c_gridScale + 1, m_position.m_y * cpp_conv::renderer::c_gridScale + 2, 1, true);
-    cpp_conv::renderer::setPixel(kContext, character, m_position.m_x * cpp_conv::renderer::c_gridScale + 2, m_position.m_y * cpp_conv::renderer::c_gridScale + 2, 1, true);*/
+    cpp_conv::renderer::renderAsset(
+        kRenderContext,
+        pTile.get(),
+        {
+            m_position.m_x * cpp_conv::renderer::c_gridScale,
+            m_position.m_y * cpp_conv::renderer::c_gridScale,
+            cpp_conv::rotationFromDirection(m_direction)
+        },
+        { 0xFFFFFF00 });
 }

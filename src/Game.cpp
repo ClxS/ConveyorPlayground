@@ -67,7 +67,7 @@ void cpp_conv::game::run()
     cpp_conv::renderer::init(swapChain);
 
     resource_manager::initialize();
-    AssetPtr<Map> map = resource_manager::loadAsset<Map>(registry::data::MapCircle);
+    AssetPtr<Map> map = resource_manager::loadAsset<Map>(registry::data::MapSimple);
 
     std::vector<cpp_conv::Sequence> sequences = cpp_conv::InitializeSequences(map->GetGrid(), map->GetConveyors());
     cpp_conv::SceneContext kSceneContext =
@@ -86,7 +86,7 @@ void cpp_conv::game::run()
         swapChain.GetWriteSurface(), 
         map->GetGrid() };
 
-    cpp_conv::FrameLimiter frameLimter(2000);
+    cpp_conv::FrameLimiter frameLimter(2);
     std::queue<cpp_conv::commands::CommandType> commands;
 
     frameLimter.Start();

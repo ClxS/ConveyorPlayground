@@ -3,13 +3,13 @@
 #include "Junction.h"
 #include "SceneContext.h"
 
-void cpp_conv::simulation::simulate(const SceneContext& kContext)
+void cpp_conv::simulation::simulate(SceneContext& kContext)
 {
     for (auto& sequence : kContext.m_sequences)
     {
         sequence.Tick(kContext);
     }
-
+    
     for (cpp_conv::Conveyor* pConveyor : kContext.m_conveyors)
     {
         pConveyor->Tick(kContext);        

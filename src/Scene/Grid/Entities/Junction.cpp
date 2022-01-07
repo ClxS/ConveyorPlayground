@@ -1,4 +1,4 @@
-﻿#include "Junction.h"
+#include "Junction.h"
 #include "Conveyor.h"
 #include "SceneContext.h"
 
@@ -59,29 +59,20 @@ void cpp_conv::Junction::Tick(const SceneContext& kContext)
 
         std::tie(pEntity, direction) = entityDirectionPair;
 
-        if (pEntity == nullptr || pEntity->m_eEntityKind != EntityKind::Conveyor)
+        if (pEntity == nullptr || !pEntity->SupportsInsertion())
         {
-            continue;
-        }
-
-        Conveyor* pConveyor = reinterpret_cast<Conveyor*>(pEntity);
-        if (pConveyor->m_direction != direction)
-        {
-            continue;
+            continue;  
         }
 
         bool bFound = false;
-        for (cpp_conv::Conveyor::Channel& rChannel : pConveyor->m_pChannels)
+        for (int iExitChannel = 0; iExitChannel < cpp_conv::c_conveyorChannels; ++iExitChannel)
         {
-            if (rChannel.m_pItems[0] || rChannel.m_pPendingItems[0])
+            if (pEntity->TryInsert(kContext, *this, m_pItem, iExitChannel))
             {
-                continue;
+                m_pItem = nullptr;
+                bFound = true;
+                break;
             }
-
-            rChannel.m_pPendingItems[0] = m_pItem;
-            m_pItem = nullptr;
-            bFound = true;
-            break;
         }
 
         if (bFound)
@@ -110,7 +101,7 @@ void cpp_conv::Junction::Draw(RenderContext& kRenderContext) const
         { 0xFFFF00FF });
 }
 
-bool cpp_conv::Junction::AddItem(Item* pItem)
+bool cpp_conv::Junction::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, const Item* pItem, int iSourceChannel)
 {
     if (m_pItem)
     {

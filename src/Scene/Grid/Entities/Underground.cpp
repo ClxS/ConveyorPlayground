@@ -130,11 +130,11 @@ void cpp_conv::Underground::Draw(RenderContext& kRenderContext) const
         { 0xFF0000FF });
 }
 
-bool cpp_conv::Underground::AddItem(cpp_conv::grid::EntityGrid& grid, Item* pItem, int iChannel)
+bool cpp_conv::Underground::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, const Item* pItem, int iSourceChannel)
 {
     bool bProduced = false;
-    Item*& forwardTargetItem = m_arrInternalConveyors[0].m_pChannels[iChannel].m_pItems[0];
-    Item*& forwardPendingItem = m_arrInternalConveyors[0].m_pChannels[iChannel].m_pItems[0];
+    const Item*& forwardTargetItem = m_arrInternalConveyors[0].m_pChannels[iSourceChannel].m_pItems[0];
+    const Item*& forwardPendingItem = m_arrInternalConveyors[0].m_pChannels[iSourceChannel].m_pItems[0];
     if (!forwardTargetItem && !forwardPendingItem)
     {
         forwardPendingItem = pItem;
