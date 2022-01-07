@@ -1,0 +1,20 @@
+# top-most EditorConfig file
+root = true
+
+# Unix-style newlines with a newline ending every file
+[*]
+charset = utf-8
+trim_trailing_whitespace = true
+end_of_line = lf
+insert_final_newline = true
+
+# Tab indentation (no size specified)
+[Makefile]
+indent_style = space
+
+[*.{c++,cc,cpp,cxx,h,h++,hh,hpp,hxx,inl,ipp,tlh,tli}]
+cpp_indent_multi_line_relative_to = innermost_parenthesis
+indent_style = space
+indent_size = 4
+cpp_indent_within_parentheses = align_to_parenthesis
+cpp_indent_preprocessor = none 

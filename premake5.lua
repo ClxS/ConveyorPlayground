@@ -37,6 +37,7 @@ project "CppConveyor"
 		}
 	filter {}
 	files { 
+		".editorconfig",
 		"data/**",
 		"src/**"
 	}

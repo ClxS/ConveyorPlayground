@@ -1,4 +1,4 @@
-﻿#include "Underground.h"
+#include "Underground.h"
 #include "Conveyor.h"
 #include "Sequence.h"
 #include "SceneContext.h"
