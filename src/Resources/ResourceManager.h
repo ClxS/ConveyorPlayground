@@ -17,6 +17,7 @@ namespace cpp_conv::resources::resource_manager
 
 	void initialize();
 	void registerTypeHandler(const std::type_info& type, std::function<ResourceAsset*(FileData&)> fHandler);
+	void updatePersistenceStore();
 
 	AssetPtr<ResourceAsset> loadAsset(const std::type_info& type, registry::RegistryId kAssetId);
 

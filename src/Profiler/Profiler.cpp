@@ -2,6 +2,7 @@
 #include "StringUtility.h"
 
 #include <map>
+#include <unordered_map>
 #include <mutex>
 #if _WIN32
 #include <Windows.h>
@@ -16,7 +17,7 @@ namespace
     }
 }
 
-std::map<const char*, std::chrono::nanoseconds> nameTimings;
+std::unordered_map<const char*, std::chrono::nanoseconds> nameTimings;
 
 void cpp_conv::profiler::registerTime(const char* szName, std::chrono::nanoseconds duration)
 {

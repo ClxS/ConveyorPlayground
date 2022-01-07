@@ -69,7 +69,8 @@ void cpp_conv::game::run()
 		PROFILE(Render, cpp_conv::renderer::render(kSceneContext, kRenderContext));
 		PROFILE(Present, swapChain.SwapAndPresent());
 
-		PROFILE(FrameCapSleep, frameLimter.Limit())
+		PROFILE(FrameCapSleep, frameLimter.Limit());
+		PROFILE(UpdatePersistence, cpp_conv::resources::resource_manager::updatePersistenceStore());
 		frameLimter.EndFrame();
 	}
 }

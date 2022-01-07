@@ -9,15 +9,23 @@
 #include <memory>
 #include <mutex>
 #include <fstream>
+#include <chrono>
 
 using FileData = cpp_conv::resources::resource_manager::FileData;
 using RegistryId = cpp_conv::resources::registry::RegistryId;
-using WeakResourcePtr = std::weak_ptr<cpp_conv::resources::ResourceAsset>;
+using SharedResourcePtr = std::shared_ptr<cpp_conv::resources::ResourceAsset>;
 using TypeId = size_t;
-using LoadedAssetContainer = std::map<RegistryId, WeakResourcePtr>;
 
+struct LoadedAsset
+{
+	SharedResourcePtr m_ptr;
+	std::chrono::steady_clock::time_point m_lastAccess;
+};
+
+using LoadedAssetContainer = std::map<RegistryId, LoadedAsset>;
 static std::map<TypeId, std::function<cpp_conv::resources::ResourceAsset* (FileData&)>*> g_typeHandlers;
 static std::map<TypeId, LoadedAssetContainer*> g_loadedTypes = {};
+static constexpr std::chrono::steady_clock::duration g_cacheInvalidationTime(std::chrono::seconds(10));
 
 namespace
 {
@@ -27,9 +35,6 @@ namespace
 		return s_stateMutex;
 	}
 
-	// TODO[CJones] Add a persistence mechanism which keeps loaded assets in memory for X amount of time. This will let us dynamically load resources instead of
-	// storing them in our game objects, but also prevent constant load/unloads every frame. This store should also have a flush mechanism to clear it on in cases like
-	// scene transitions
 	std::function<cpp_conv::resources::ResourceAsset* (FileData&)>* getTypeHandler(const std::type_info& type)
 	{
 		// No need to lock here, this is only called in the context of an existing lock
@@ -97,16 +102,8 @@ cpp_conv::resources::AssetPtr<cpp_conv::resources::ResourceAsset> cpp_conv::reso
 	auto existingAssetEntry = loadedContainerIter->second->find(kAssetId);
 	if (existingAssetEntry != loadedContainerIter->second->end())
 	{
-		AssetPtr<ResourceAsset> pExistingAsset = existingAssetEntry->second.lock();
-		if (pExistingAsset)
-		{
-			return pExistingAsset;
-		}
-		else
-		{
-			// Asset no longer exists, we need to re-load it.
-			loadedContainerIter->second->erase(existingAssetEntry);
-		}
+		existingAssetEntry->second.m_lastAccess = std::chrono::steady_clock::now();
+		return existingAssetEntry->second.m_ptr;
 	}
 
 	std::function<ResourceAsset* (FileData&)>* fHandler = getTypeHandler(type);
@@ -131,6 +128,33 @@ cpp_conv::resources::AssetPtr<cpp_conv::resources::ResourceAsset> cpp_conv::reso
 	}
 
 	cpp_conv::resources::AssetPtr<cpp_conv::resources::ResourceAsset> pSharedAsset(pAsset);
-	(*loadedContainerIter->second)[kAssetId] = pSharedAsset;
+	(*loadedContainerIter->second)[kAssetId] = { pSharedAsset, std::chrono::steady_clock::now() };
 	return pSharedAsset;
+}
+
+void cpp_conv::resources::resource_manager::updatePersistenceStore()
+{
+	std::lock_guard<std::mutex> lock(getStateMutex());
+
+	auto now = std::chrono::steady_clock::now();
+	for (auto& pTypeContainer : g_loadedTypes)
+	{
+		if (!pTypeContainer.second)
+		{
+			continue;
+		}
+
+		auto containerIterator = pTypeContainer.second->begin();
+		while (containerIterator != pTypeContainer.second->end())
+		{
+			if (containerIterator->second.m_ptr.use_count() == 1 && containerIterator->second.m_lastAccess - now > g_cacheInvalidationTime)
+			{
+				containerIterator = pTypeContainer.second->erase(containerIterator);
+			}
+			else
+			{
+				++containerIterator;
+			}
+		}
+	}
 }
