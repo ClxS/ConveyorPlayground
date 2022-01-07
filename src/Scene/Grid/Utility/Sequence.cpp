@@ -247,25 +247,25 @@ void cpp_conv::Sequence::Tick(SceneContext& kContext)
             }
 
             cpp_conv::Entity* pForwardEntity = cpp_conv::grid::SafeGetEntity(kContext.m_grid, cpp_conv::grid::GetForwardPosition(*rNode));
-            const Item*& frontMostItem = rNode->m_pChannels[iChannelIdx].m_pItems[iChannelLength - 1];
-            if (frontMostItem)
+            ItemId& frontMostItem = rNode->m_pChannels[iChannelIdx].m_pItems[iChannelLength - 1];
+            if (!frontMostItem.IsEmpty())
             {
                 if (rNode == GetHeadConveyor())
                 {
                     if (pForwardEntity && pForwardEntity->SupportsInsertion() && pForwardEntity->TryInsert(kContext, *rNode, frontMostItem, iChannelIdx))
                     {
-                        frontMostItem = nullptr;
+                        frontMostItem = cpp_conv::Item::None;
                     }
                 }
                 else
                 {
                     cpp_conv::Conveyor* pForwardNode = reinterpret_cast<cpp_conv::Conveyor*>(pForwardEntity);
-                    const Item*& forwardTargetItem = pForwardNode->m_pChannels[iChannelIdx].m_pItems[0];
-                    const Item*& forwardPendingItem = pForwardNode->m_pChannels[iChannelIdx].m_pPendingItems[0];
-                    if (!forwardTargetItem && !forwardPendingItem)
+                    ItemId& forwardTargetItem = pForwardNode->m_pChannels[iChannelIdx].m_pItems[0];
+                    ItemId& forwardPendingItem = pForwardNode->m_pChannels[iChannelIdx].m_pPendingItems[0];
+                    if (forwardTargetItem.IsEmpty() && forwardPendingItem.IsEmpty())
                     {
                         forwardPendingItem = frontMostItem;
-                        frontMostItem = nullptr;
+                        frontMostItem = cpp_conv::Item::None;
                     }
                 }
             }
@@ -273,14 +273,14 @@ void cpp_conv::Sequence::Tick(SceneContext& kContext)
             // Move inner items forwards
             for (int iChannelSlot = iChannelLength - 2; iChannelSlot >= 0; iChannelSlot--)
             {
-                const Item*& currentItem = rNode->m_pChannels[iChannelIdx].m_pItems[iChannelSlot];
-                const Item*& forwardTargetItem = rNode->m_pChannels[iChannelIdx].m_pItems[iChannelSlot + 1];
-                const Item*& forwardPendingItem = rNode->m_pChannels[iChannelIdx].m_pItems[iChannelSlot + 1];
+                ItemId& currentItem = rNode->m_pChannels[iChannelIdx].m_pItems[iChannelSlot];
+                ItemId& forwardTargetItem = rNode->m_pChannels[iChannelIdx].m_pItems[iChannelSlot + 1];
+                ItemId& forwardPendingItem = rNode->m_pChannels[iChannelIdx].m_pItems[iChannelSlot + 1];
 
-                if (currentItem && !forwardTargetItem && !forwardPendingItem)
+                if (currentItem.IsValid() && forwardTargetItem.IsEmpty() && forwardPendingItem.IsEmpty())
                 {
                     forwardPendingItem = currentItem;
-                    currentItem = nullptr;
+                    currentItem = cpp_conv::Item::None;
                 }
             }
         }

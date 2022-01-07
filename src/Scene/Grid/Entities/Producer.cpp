@@ -11,8 +11,9 @@
 #include "ResourceManager.h"
 #include "ResourceRegistry.h"
 #include "TileAsset.h"
+#include "ItemId.h"
 
-cpp_conv::Producer::Producer(int x, int y, Direction direction, Item* pItem, uint64_t productionRate)
+cpp_conv::Producer::Producer(int x, int y, Direction direction, ItemId pItem, uint64_t productionRate)
     : Entity(x, y, EntityKind::Producer)
     , m_pItem(pItem)
     , m_direction(direction)
@@ -27,11 +28,11 @@ bool cpp_conv::Producer::IsReadyToProduce() const
     return m_bProductionReady;
 }
 
-cpp_conv::Item* cpp_conv::Producer::ProduceItem()
+cpp_conv::ItemId cpp_conv::Producer::ProduceItem()
 {
     if (!m_bProductionReady)
     {
-        return nullptr;
+        return cpp_conv::Item::None;
     }
 
     m_bProductionReady = false;
@@ -54,8 +55,8 @@ void cpp_conv::Producer::Tick(const SceneContext& kContext)
         }
     }
 
-    Item* pItem = ProduceItem();
-    if (!pItem)
+    ItemId pItem = ProduceItem();
+    if (pItem.IsEmpty())
     {
         return;
     }

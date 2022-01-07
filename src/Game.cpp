@@ -19,6 +19,7 @@
 #include <vector>
 #include <queue>
 #include <chrono>
+#include "ItemRegistry.h"
 
 using namespace cpp_conv::resources;
 
@@ -67,6 +68,7 @@ void cpp_conv::game::run()
     cpp_conv::renderer::init(swapChain);
 
     resource_manager::initialize();
+    resources::loadItems();
     AssetPtr<Map> map = resource_manager::loadAsset<Map>(registry::data::MapSimple);
 
     std::vector<cpp_conv::Sequence> sequences = cpp_conv::InitializeSequences(map->GetGrid(), map->GetConveyors());

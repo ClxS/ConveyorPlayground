@@ -4,6 +4,7 @@
 
 #include "MapLoadHandler.h"
 #include "TileLoadHandler.h"
+#include "ItemRegistry.h"
 
 #include <map>
 #include <memory>
@@ -52,6 +53,7 @@ void cpp_conv::resources::resource_manager::initialize()
 {
     cpp_conv::resources::registerMapLoadHandler();
     cpp_conv::resources::registerTileLoadHandler();
+    cpp_conv::resources::registerItemHandler();
 }
 
 void cpp_conv::resources::resource_manager::registerTypeHandler(const std::type_info& type, std::function<cpp_conv::resources::ResourceAsset*(FileData&)> fHandler)

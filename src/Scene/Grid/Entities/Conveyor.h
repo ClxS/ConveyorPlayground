@@ -5,7 +5,7 @@
 #include "Renderer.h"
 #include "Entity.h"
 #include "Enums.h"
-#include "Item.h"
+#include "ItemId.h"
 
 namespace cpp_conv
 {
@@ -23,11 +23,11 @@ namespace cpp_conv
         {
             Channel(); 
 
-            std::array<const Item*, c_conveyorChannelSlots + 1> m_pItems;
-            std::array<const Item*, c_conveyorChannelSlots + 1> m_pPendingItems;
+            std::array<ItemId, c_conveyorChannelSlots + 1> m_pItems;
+            std::array<ItemId, c_conveyorChannelSlots + 1> m_pPendingItems;
         };
 
-        Conveyor(int32_t x, int32_t y, Direction direction, Item* pItem = nullptr);
+        Conveyor(int32_t x, int32_t y, Direction direction, ItemId pItem = {});
 
         Direction m_direction;
         int m_pSequenceId;
@@ -37,7 +37,7 @@ namespace cpp_conv
         void Tick(const SceneContext& kContext) override;
         void Draw(RenderContext& kContext) const override;
         bool SupportsInsertion() const override { return true; }
-        bool TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, const Item* pItem, int iSourceChannel) override;
+        bool TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel) override;
 
         Direction GetDirection() const override { return m_direction; }
 

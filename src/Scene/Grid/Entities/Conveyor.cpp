@@ -8,6 +8,9 @@
 #include "TileAsset.h"
 #include "Profiler.h"
 #include "TargetingUtility.h"
+#include "ItemRegistry.h"
+#include "ItemDefinition.h"
+#include "AssetPtr.h"
 
 cpp_conv::Colour GetColourFromId(int id)
 {
@@ -156,11 +159,11 @@ void DrawConveyor(
 
 cpp_conv::Conveyor::Channel::Channel()
 {
-    std::fill(std::begin(m_pItems), std::end(m_pItems), nullptr);
-    std::fill(std::begin(m_pPendingItems), std::end(m_pPendingItems), nullptr);
+    std::fill(std::begin(m_pItems), std::end(m_pItems), cpp_conv::Item::None);
+    std::fill(std::begin(m_pPendingItems), std::end(m_pPendingItems), cpp_conv::Item::None);
 }
 
-cpp_conv::Conveyor::Conveyor(int32_t x, int32_t y, Direction direction, Item* pItem)
+cpp_conv::Conveyor::Conveyor(int32_t x, int32_t y, Direction direction, ItemId pItem)
     : Entity(x, y, EntityKind::Conveyor)
     , m_direction(direction)
     , m_pSequenceId(0)
@@ -186,10 +189,10 @@ void cpp_conv::Conveyor::Tick(const SceneContext& kContext)
 
         for (int iChannelSlot = 0; iChannelSlot <= iChannelLength - 1; iChannelSlot++)
         {
-            if (rChannel.m_pPendingItems[iChannelSlot])
+            if (!rChannel.m_pPendingItems[iChannelSlot].IsEmpty())
             {
                 rChannel.m_pItems[iChannelSlot] = rChannel.m_pPendingItems[iChannelSlot];
-                rChannel.m_pPendingItems[iChannelSlot] = nullptr;
+                rChannel.m_pPendingItems[iChannelSlot] = cpp_conv::Item::None;
             }
         }
     }
@@ -229,27 +232,31 @@ void cpp_conv::Conveyor::Draw(RenderContext& kContext) const
 
         for (int iChannelSlot = 0; iChannelSlot < iChannelLength; ++iChannelSlot)
         {
-            if (m_pChannels[iChannelIdx].m_pItems[iChannelSlot] != nullptr)
+            if (!m_pChannels[iChannelIdx].m_pItems[iChannelSlot].IsEmpty())
             {
-                DrawConveyorItem(
-                    kContext,
-                    m_pChannels[iChannelIdx].m_pItems[iChannelSlot]->GetDisplayIcon(),
-                    conveyorX,
-                    conveyorY,
-                    iChannelIdx,
-                    iChannelSlot,
-                    bIsCorner,
-                    iInnerMostChannel == iChannelIdx,
-                    m_direction,
-                    eCornerDirection,
-                    colour,
-                    true);
+                cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> pItem = cpp_conv::resources::getItemDefinition(m_pChannels[iChannelIdx].m_pItems[iChannelSlot]);
+                if (pItem)
+                {
+                    DrawConveyorItem(
+                        kContext,
+                        pItem->GetDisplayIcon(),
+                        conveyorX,
+                        conveyorY,
+                        iChannelIdx,
+                        iChannelSlot,
+                        bIsCorner,
+                        iInnerMostChannel == iChannelIdx,
+                        m_direction,
+                        eCornerDirection,
+                        colour,
+                        true);
+                }
             }
         }
     }
 }
 
-bool cpp_conv::Conveyor::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, const Item* pItem, int iSourceChannel)
+bool cpp_conv::Conveyor::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, const ItemId pItem, int iSourceChannel)
 {
     cpp_conv::Conveyor::Channel* pTargetChannel = cpp_conv::targeting_util::GetTargetChannel(kContext.m_grid, pSourceEntity, *this, iSourceChannel);
     if (!pTargetChannel)
@@ -259,11 +266,11 @@ bool cpp_conv::Conveyor::TryInsert(const SceneContext& kContext, const Entity& p
 
     int forwardTargetItemSlot = cpp_conv::targeting_util::GetChannelTargetSlot(kContext.m_grid, pSourceEntity, *this, iSourceChannel);
 
-    const Item*& forwardTargetItem = pTargetChannel->m_pItems[forwardTargetItemSlot];
-    const Item*& forwardPendingItem = pTargetChannel->m_pPendingItems[forwardTargetItemSlot];
+    ItemId& forwardTargetItem = pTargetChannel->m_pItems[forwardTargetItemSlot];
+    ItemId& forwardPendingItem = pTargetChannel->m_pPendingItems[forwardTargetItemSlot];
 
     // Following node is empty, we can just move there
-    if (forwardTargetItem || forwardPendingItem)
+    if (!forwardTargetItem.IsEmpty() || !forwardPendingItem.IsEmpty())
     {
         return false;
     }

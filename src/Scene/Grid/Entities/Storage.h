@@ -14,12 +14,12 @@ namespace cpp_conv
         void Tick(const SceneContext& kContext) override;
         void Draw(RenderContext& kRenderContext) const override;
         bool SupportsInsertion() const override { return true; }
-        bool TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, const Item* pItem, int iSourceChannel) override;
+        bool TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel) override;
 
     private:
         struct ItemEntry
         {
-            const Item* m_pItem;
+            ItemId m_pItem;
             uint32_t m_pCount;
         };
 

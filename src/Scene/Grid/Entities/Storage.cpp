@@ -36,7 +36,7 @@ void cpp_conv::Storage::Draw(RenderContext& kRenderContext) const
         { 0xFFFFFF00 });
 }
 
-bool cpp_conv::Storage::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, const Item* pItem, int iSourceChannel)
+bool cpp_conv::Storage::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel)
 {
     PROFILE_FUNC();
     for (auto& rItemEntry : m_vItemEntries)

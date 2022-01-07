@@ -24,14 +24,14 @@ void shuffle(RandomAccessIterator first, RandomAccessIterator last, URNG&& g)
 
 cpp_conv::Junction::Junction(int x, int y)
     : Entity(x, y, EntityKind::Junction)
-    , m_pItem(nullptr)
+    , m_pItem(cpp_conv::Item::None)
     , m_uiTick(0)
 {
 }
 
 void cpp_conv::Junction::Tick(const SceneContext& kContext)
 {
-    if (!m_pItem)
+    if (!m_pItem.IsValid())
     {
         return;
     }
@@ -69,7 +69,7 @@ void cpp_conv::Junction::Tick(const SceneContext& kContext)
         {
             if (pEntity->TryInsert(kContext, *this, m_pItem, iExitChannel))
             {
-                m_pItem = nullptr;
+                m_pItem = cpp_conv::Item::None;
                 bFound = true;
                 break;
             }
@@ -101,9 +101,9 @@ void cpp_conv::Junction::Draw(RenderContext& kRenderContext) const
         { 0xFFFF00FF });
 }
 
-bool cpp_conv::Junction::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, const Item* pItem, int iSourceChannel)
+bool cpp_conv::Junction::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel)
 {
-    if (m_pItem)
+    if (!m_pItem.IsEmpty())
     {
         return false;
     }

@@ -3,12 +3,12 @@
 #include <cstdint>
 #include "Enums.h"
 #include "Position.h"
+#include "ItemId.h"
 
 namespace cpp_conv
 {
     struct SceneContext;
     struct RenderContext;
-    class Item;
 
     class Entity
     {
@@ -22,7 +22,7 @@ namespace cpp_conv
         virtual void Tick(const SceneContext& kContext) = 0;
         virtual void Draw(RenderContext& kContext) const = 0;
         virtual bool SupportsInsertion() const { return false; }
-        virtual bool TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, const Item* pItem, int iSourceChannel) { return false; }
+        virtual bool TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel) { return false; }
 
         virtual Direction GetDirection() const { return Direction::Left; }
 

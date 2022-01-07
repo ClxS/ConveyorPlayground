@@ -55,12 +55,12 @@ cpp_conv::Underground::Underground(int x, int y, Direction direction)
     , m_direction(direction)
     , m_arrInternalConveyors
     {
-        cpp_conv::Conveyor(x, y, direction, nullptr),
-        cpp_conv::Conveyor(x, y, direction, nullptr),
-        cpp_conv::Conveyor(x, y, direction, nullptr),
-        cpp_conv::Conveyor(x, y, direction, nullptr),
-        cpp_conv::Conveyor(x, y, direction, nullptr),
-        cpp_conv::Conveyor(x, y, direction, nullptr)
+        cpp_conv::Conveyor(x, y, direction, cpp_conv::Item::None),
+        cpp_conv::Conveyor(x, y, direction, cpp_conv::Item::None),
+        cpp_conv::Conveyor(x, y, direction, cpp_conv::Item::None),
+        cpp_conv::Conveyor(x, y, direction, cpp_conv::Item::None),
+        cpp_conv::Conveyor(x, y, direction, cpp_conv::Item::None),
+        cpp_conv::Conveyor(x, y, direction, cpp_conv::Item::None)
     }    
     , m_uiTick(0)
 {
@@ -130,12 +130,12 @@ void cpp_conv::Underground::Draw(RenderContext& kRenderContext) const
         { 0xFF0000FF });
 }
 
-bool cpp_conv::Underground::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, const Item* pItem, int iSourceChannel)
+bool cpp_conv::Underground::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel)
 {
     bool bProduced = false;
-    const Item*& forwardTargetItem = m_arrInternalConveyors[0].m_pChannels[iSourceChannel].m_pItems[0];
-    const Item*& forwardPendingItem = m_arrInternalConveyors[0].m_pChannels[iSourceChannel].m_pItems[0];
-    if (!forwardTargetItem && !forwardPendingItem)
+    ItemId& forwardTargetItem = m_arrInternalConveyors[0].m_pChannels[iSourceChannel].m_pItems[0];
+    ItemId& forwardPendingItem = m_arrInternalConveyors[0].m_pChannels[iSourceChannel].m_pItems[0];
+    if (forwardTargetItem.IsEmpty() && forwardPendingItem.IsEmpty())
     {
         forwardPendingItem = pItem;
         return true;

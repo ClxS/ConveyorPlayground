@@ -5,25 +5,24 @@
 
 namespace cpp_conv
 {
-    class Item;
     struct SceneContext;
     struct RenderContext;
 
     class Producer : public Entity
     { 
     public:
-        Producer(int x, int y, Direction direction, Item* pItem, uint64_t productionRate);
+        Producer(int x, int y, Direction direction, ItemId pItem, uint64_t productionRate);
 
         bool IsReadyToProduce() const;
 
-        Item* ProduceItem();
+        ItemId ProduceItem();
 
         void Tick(const SceneContext& kContext) override;
         void Draw(RenderContext& kRenderContext) const override;
 
         Direction GetDirection() const override { return m_direction; }
     private:
-        Item* m_pItem;
+        ItemId m_pItem;
         Direction m_direction;
 
         uint64_t m_uiTick;
