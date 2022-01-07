@@ -17,8 +17,8 @@ namespace cpp_conv
 	public:
 		Underground(int x, int y, Direction direction);
 
-		void Tick(const SceneContext& kContext);
-		void Draw(RenderContext& kContext) const;
+		void Tick(const SceneContext& kContext) override;
+		void Draw(RenderContext& kRenderContext) const override;
 
 		bool AddItem(cpp_conv::grid::EntityGrid& grid, Item* pItem, int iChannel);
 

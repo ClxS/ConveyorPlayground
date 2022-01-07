@@ -22,6 +22,7 @@ namespace cpp_conv::resources::registry
 
 		"platform/assets/Player",
 		"platform/assets/Junction",
+		"platform/assets/Tunnel",
 	};
 
 	constexpr const char* c_szDataPaths[] =
@@ -45,6 +46,7 @@ namespace cpp_conv::resources::registry
 
 		constexpr RegistryId Player = { 3, 0 };
 		constexpr RegistryId Junction = { 4, 0 };
+		constexpr RegistryId Tunnel = { 5, 0 };
 	}
 
 	namespace data

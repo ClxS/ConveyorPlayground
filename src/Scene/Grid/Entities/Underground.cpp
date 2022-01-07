@@ -10,6 +10,9 @@
 #include <array>
 #include <random>
 #include <chrono>
+#include "ResourceRegistry.h"
+#include "ResourceManager.h"
+#include "TileAsset.h"
 
 template <class RandomAccessIterator, class URNG>
 void shuffle(RandomAccessIterator first, RandomAccessIterator last, URNG&& g)
@@ -108,29 +111,23 @@ void cpp_conv::Underground::Tick(const SceneContext& kContext)
 	memset(&m_kLocalGrid, 0, sizeof(m_kLocalGrid));
 }
 
-void cpp_conv::Underground::Draw(RenderContext& kContext) const
+void cpp_conv::Underground::Draw(RenderContext& kRenderContext) const
 {
-	wchar_t character = L' ';
-	switch (m_direction)
+	auto pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Junction);
+	if (!pTile)
 	{
-	case Direction::Left:
-		character = L'←';
-		break;
-	case Direction::Up:
-		character = L'↓';
-		break;
-	case Direction::Right:
-		character = L'→';
-		break;
-	case Direction::Down:
-		character = L'↑';
-		break;
+		return;
 	}
 
-	/*cpp_conv::renderer::setPixel(kContext, character, m_position.m_x * cpp_conv::renderer::c_gridScale + 1, m_position.m_y * cpp_conv::renderer::c_gridScale + 1, 2, true);
-	cpp_conv::renderer::setPixel(kContext, character, m_position.m_x * cpp_conv::renderer::c_gridScale + 2, m_position.m_y * cpp_conv::renderer::c_gridScale + 1, 2, true);
-	cpp_conv::renderer::setPixel(kContext, character, m_position.m_x * cpp_conv::renderer::c_gridScale + 1, m_position.m_y * cpp_conv::renderer::c_gridScale + 2, 2, true);
-	cpp_conv::renderer::setPixel(kContext, character, m_position.m_x * cpp_conv::renderer::c_gridScale + 2, m_position.m_y * cpp_conv::renderer::c_gridScale + 2, 2, true);*/
+	cpp_conv::renderer::renderAsset(
+		kRenderContext,
+		pTile.get(),
+		{
+			m_position.m_x * cpp_conv::renderer::c_gridScale,
+			m_position.m_y * cpp_conv::renderer::c_gridScale,
+			cpp_conv::rotationFromDirection(m_direction)
+		},
+		{ 0xFF0000FF });
 }
 
 bool cpp_conv::Underground::AddItem(cpp_conv::grid::EntityGrid& grid, Item* pItem, int iChannel)
