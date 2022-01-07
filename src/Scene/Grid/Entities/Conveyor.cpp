@@ -112,41 +112,10 @@ void DrawConveyor(
 
 	if (!bIsCorner)
 	{
-		pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Conveyor_Straight);
-		switch (direction)
-		{
-		case Direction::Right:
-			transform = { x, y, cpp_conv::Transform2D::Rotation::DegZero };
-			break;
-		case Direction::Up:
-			transform = { x, y, cpp_conv::Transform2D::Rotation::Deg90 };
-			break;
-		case Direction::Left:
-			transform = { x, y, cpp_conv::Transform2D::Rotation::Deg180 };
-			break;
-		case Direction::Down:
-			transform = { x, y, cpp_conv::Transform2D::Rotation::Deg270 };
-			break;
-		}
+		pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Conveyor_Straight);		
 	}
     else
     {
-		switch (direction)
-		{
-		case Direction::Up:
-			transform = { x, y, cpp_conv::Transform2D::Rotation::DegZero };
-			break;
-		case Direction::Left:
-			transform = { x, y, cpp_conv::Transform2D::Rotation::Deg90 };
-			break;
-		case Direction::Down:
-			transform = { x, y, cpp_conv::Transform2D::Rotation::Deg180 };
-			break;
-		case Direction::Right:
-			transform = { x, y, cpp_conv::Transform2D::Rotation::Deg270 };
-			break;
-		}
-
         if (IsClockwiseCorner(kContext.m_grid, rConveyor))
         {
 			pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Conveyor_CornerClockwise);
@@ -154,10 +123,10 @@ void DrawConveyor(
         else
         {
 			pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Conveyor_CornerAntiClockwise);
-        }
-		
+        }		
     }   
 
+	transform = { x, y, cpp_conv::rotationFromDirection(direction) };
     if (pTile)
     {
         cpp_conv::renderer::renderAsset(kContext, pTile.get(), transform);
