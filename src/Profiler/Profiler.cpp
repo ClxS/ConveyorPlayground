@@ -48,13 +48,20 @@ void cpp_conv::profiler::logAndReset(int factor)
 
     for (auto& kvp : sortableTimings)
     {
+        auto percentage = ((double)kvp.second.count() / (double)totalDuration.count()) * 100;
+        // Last than 1%? We don't care.
+        if (percentage < 1.0)
+        {
+            continue;
+        }
+
 #if _WIN32
         OutputDebugStringA(
             std::format(
                 "\n{}: {} ({}%)",
                 kvp.first,
                 cpp_conv::string_util::to_string_with_precision(std::chrono::duration_cast<std::chrono::milliseconds>(kvp.second / factor)),
-                cpp_conv::string_util::to_string_with_precision(((double)kvp.second.count() / (double)totalDuration.count()) * 100)).c_str());
+                cpp_conv::string_util::to_string_with_precision(percentage)).c_str());
 #endif
     }
 
