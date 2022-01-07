@@ -68,7 +68,8 @@ void drawPlayer(const cpp_conv::SceneContext& kSceneContext, cpp_conv::RenderCon
             kSceneContext.m_player.m_x * cpp_conv::renderer::c_gridScale,
             kSceneContext.m_player.m_y * cpp_conv::renderer::c_gridScale,
             cpp_conv::Transform2D::Rotation::DegZero
-        });
+        },
+        { 0xFFFFFFFF });
 }
 
 void cpp_conv::renderer::render(const SceneContext& kSceneContext, RenderContext& kContext)
