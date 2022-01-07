@@ -13,8 +13,8 @@ namespace cpp_conv
 	public:
 		Junction(int x, int y);
 
-		void Tick(const SceneContext& kContext);
-		void Draw(RenderContext& kRenderContext) const;
+		void Tick(const SceneContext& kContext) override;
+		void Draw(RenderContext& kRenderContext) const override;
 
 		bool AddItem(Item* pItem);
 
