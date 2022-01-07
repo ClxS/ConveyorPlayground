@@ -29,12 +29,23 @@ void cpp_conv::profiler::logAndReset(int factor)
 {
 	std::lock_guard<std::mutex> lock(getStateMutex());
 	std::chrono::nanoseconds totalDuration = {};
+    std::vector<std::pair<const char*, std::chrono::nanoseconds>> sortableTimings;
+
     for (auto& kvp : nameTimings)
     {
         totalDuration += kvp.second;
+        sortableTimings.emplace_back(kvp.first, kvp.second);
     }
 
-    for (auto& kvp : nameTimings)
+    std::sort(
+        sortableTimings.begin(),
+        sortableTimings.end(), 
+        [](const std::pair<const char*, std::chrono::nanoseconds>& a, const std::pair<const char*, std::chrono::nanoseconds>& b)
+        {
+            return a.second > b.second;
+		});
+
+	for (auto& kvp : sortableTimings)
     {
 #if _WIN32
         OutputDebugStringA(
