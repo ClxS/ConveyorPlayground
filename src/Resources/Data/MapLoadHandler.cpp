@@ -36,7 +36,7 @@ cpp_conv::resources::ResourceAsset* mapLoadHandler(cpp_conv::resources::resource
             case 'F': pEntity = new cpp_conv::Producer(iCol, iRow, Direction::Down, new cpp_conv::Copper(), 7); break;
             case 'G': pEntity = new cpp_conv::Producer(iCol, iRow, Direction::Up, new cpp_conv::Copper(), 7); break;
             case 'J': pEntity = new cpp_conv::Junction(iCol, iRow); break;
-            case 'S': pEntity = new cpp_conv::Storage(iCol, iRow); break;
+            case 'S': pEntity = new cpp_conv::Storage(iCol, iRow, 16, 256); break;
             case 'u': pEntity = new cpp_conv::Underground(iCol, iRow, Direction::Down); break;
             case 'y': pEntity = new cpp_conv::Underground(iCol, iRow, Direction::Up); break;
             case 'i': pEntity = new cpp_conv::Underground(iCol, iRow, Direction::Left); break;

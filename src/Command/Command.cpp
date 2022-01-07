@@ -3,7 +3,7 @@
 
 #include <chrono>
 
-constexpr auto debounceTime = std::chrono::milliseconds(150);
+constexpr auto debounceTime = std::chrono::milliseconds(250);
 
 void tryUpdatePlayer(cpp_conv::SceneContext& kContext, Position newPosition)
 {

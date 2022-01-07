@@ -7,7 +7,7 @@ void cpp_conv::simulation::simulate(SceneContext& kContext)
 {
     for (auto& sequence : kContext.m_sequences)
     {
-        sequence.Tick(kContext);
+        sequence.Tick(kContext); 
     }
     
     for (cpp_conv::Conveyor* pConveyor : kContext.m_conveyors)
