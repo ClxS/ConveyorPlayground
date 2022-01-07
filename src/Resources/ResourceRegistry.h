@@ -9,7 +9,7 @@ namespace cpp_conv::resources::registry
 
 		bool operator<(const RegistryId& r) const
 		{
-			return (m_category < r.m_category || (m_index == r.m_index && m_category < r.m_category));
+			return std::make_tuple(m_index, m_category) < std::make_tuple(r.m_index, r.m_category);
 		}
 	};
 
