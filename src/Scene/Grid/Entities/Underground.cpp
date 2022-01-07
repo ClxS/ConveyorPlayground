@@ -113,7 +113,7 @@ void cpp_conv::Underground::Tick(const SceneContext& kContext)
 
 void cpp_conv::Underground::Draw(RenderContext& kRenderContext) const
 {
-	auto pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Junction);
+	auto pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Tunnel);
 	if (!pTile)
 	{
 		return;
