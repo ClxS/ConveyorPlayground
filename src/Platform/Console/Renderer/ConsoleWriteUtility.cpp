@@ -1,38 +1,53 @@
 #include "ConsoleWriteUtility.h"
+#include "Colour.h"
 
-WORD GetColourAttribute(int colour, bool allowBackFill)
+WORD cpp_conv::renderer::getWin32Colour(cpp_conv::Colour colour)
 {
-	if (allowBackFill)
+	WORD value = {};
+	if (colour.m_argb.m_a == 0xFF)
 	{
-		switch (colour % 7)
+		if (colour.m_argb.m_r)
 		{
-		case 0: return FOREGROUND_RED | FOREGROUND_INTENSITY | BACKGROUND_RED;
-		case 1: return FOREGROUND_GREEN | FOREGROUND_INTENSITY | BACKGROUND_GREEN;
-		case 2: return FOREGROUND_BLUE | FOREGROUND_INTENSITY | BACKGROUND_BLUE;
-		case 3: return FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY | BACKGROUND_GREEN | BACKGROUND_BLUE;
-		case 4: return FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_BLUE;
-		case 5: return FOREGROUND_GREEN | FOREGROUND_GREEN | FOREGROUND_INTENSITY | BACKGROUND_GREEN | BACKGROUND_GREEN;
-		case 6: return FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY | BACKGROUND_GREEN | BACKGROUND_BLUE | BACKGROUND_RED;
+			value |= FOREGROUND_RED | FOREGROUND_INTENSITY | BACKGROUND_RED;
+		}
+
+		if (colour.m_argb.m_g)
+		{
+			value |= FOREGROUND_GREEN | FOREGROUND_INTENSITY | BACKGROUND_GREEN;
+		}
+
+		if (colour.m_argb.m_b)
+		{
+			value |= FOREGROUND_BLUE | FOREGROUND_INTENSITY | BACKGROUND_BLUE;
 		}
 	}
 	else
 	{
-		switch (colour % 6)
+		if (colour.m_argb.m_r)
 		{
-		case 0: return FOREGROUND_RED | FOREGROUND_INTENSITY;
-		case 1: return FOREGROUND_GREEN | FOREGROUND_INTENSITY;
-		case 2: return FOREGROUND_BLUE | FOREGROUND_INTENSITY;
-		case 3: return FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
-		case 4: return FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
-		case 5: return FOREGROUND_GREEN | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+			value |= FOREGROUND_RED | FOREGROUND_INTENSITY;
+		}
+
+		if (colour.m_argb.m_g)
+		{
+			value |= FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+		}
+
+		if (colour.m_argb.m_b)
+		{
+			value |= FOREGROUND_BLUE | FOREGROUND_INTENSITY;
 		}
 	}
 
-	return FOREGROUND_RED | FOREGROUND_INTENSITY;
+	if (value == 0)
+	{
+		value = FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+	}
+
+	return value;
 }
 
-void cpp_conv::renderer::setCell(RenderContext& kContext, wchar_t value, int x, int y,
-	int colour, bool allowBackFill)
+void cpp_conv::renderer::setCell(RenderContext& kContext, wchar_t value, int x, int y, WORD colour)
 {
 	x += kContext.cameraOffsetX;
 	y += kContext.cameraOffsetY;
@@ -46,5 +61,5 @@ void cpp_conv::renderer::setCell(RenderContext& kContext, wchar_t value, int x, 
 	CHAR_INFO& rCell = rSurface.GetData()[x + rSurface.GetWidth() * y];
 
 	rCell.Char.UnicodeChar = value;
-	rCell.Attributes = GetColourAttribute(colour, allowBackFill);
+	rCell.Attributes = colour;
 }

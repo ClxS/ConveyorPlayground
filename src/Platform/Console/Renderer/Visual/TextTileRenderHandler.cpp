@@ -24,7 +24,7 @@ wchar_t rotateCharIfAllowed(wchar_t input, int cycle)
 	}
 }
 
-void tileRenderer(cpp_conv::RenderContext& kContext, const cpp_conv::resources::RenderableAsset* pAsset, const cpp_conv::Transform2D& kTransform)
+void tileRenderer(cpp_conv::RenderContext& kContext, const cpp_conv::resources::RenderableAsset* pAsset, const cpp_conv::Transform2D& kTransform, cpp_conv::Colour kColourOverride)
 {
 	const cpp_conv::resources::TextTileAsset* pTile = reinterpret_cast<const cpp_conv::resources::TextTileAsset*>(pAsset);
 	const std::vector<std::wstring>* vData = &pTile->GetData();
@@ -39,19 +39,24 @@ void tileRenderer(cpp_conv::RenderContext& kContext, const cpp_conv::resources::
 	{
 		for (int iCol = 0; iCol < (*vData)[iRow].size(); ++iCol)
 		{
+			if ((*vData)[iRow][iCol] == ' ')
+			{
+				continue;
+			}
+
 			switch (kTransform.m_rotation)
 			{
 			case cpp_conv::Transform2D::Rotation::DegZero:
-				cpp_conv::renderer::setCell(kContext, (*vData)[iRow][iCol], kTransform.m_x + iCol, kTransform.m_y + iRow, 1);
+				cpp_conv::renderer::setCell(kContext, (*vData)[iRow][iCol], kTransform.m_x + iCol, kTransform.m_y + iRow, cpp_conv::renderer::getWin32Colour(kColourOverride));
 				break;
 			case cpp_conv::Transform2D::Rotation::Deg90:
-				cpp_conv::renderer::setCell(kContext, rotateCharIfAllowed((*vData)[iRow][iCol], 1), kTransform.m_x + ((*vData).size() - 1 - iRow), kTransform.m_y + iCol, 1);
+				cpp_conv::renderer::setCell(kContext, rotateCharIfAllowed((*vData)[iRow][iCol], 1), kTransform.m_x + ((*vData).size() - 1 - iRow), kTransform.m_y + iCol, cpp_conv::renderer::getWin32Colour(kColourOverride));
 				break;
 			case cpp_conv::Transform2D::Rotation::Deg180:
-				cpp_conv::renderer::setCell(kContext, rotateCharIfAllowed((*vData)[iRow][iCol], 2), kTransform.m_x + (maxWidth - 1 - iCol), kTransform.m_y + ((*vData).size() - 1 - iRow), 1);
+				cpp_conv::renderer::setCell(kContext, rotateCharIfAllowed((*vData)[iRow][iCol], 2), kTransform.m_x + (maxWidth - 1 - iCol), kTransform.m_y + ((*vData).size() - 1 - iRow), cpp_conv::renderer::getWin32Colour(kColourOverride));
 				break;
 			case cpp_conv::Transform2D::Rotation::Deg270:
-				cpp_conv::renderer::setCell(kContext, rotateCharIfAllowed((*vData)[iRow][iCol], 3), kTransform.m_x + iRow, kTransform.m_y + (maxWidth - 1 - iCol), 1);
+				cpp_conv::renderer::setCell(kContext, rotateCharIfAllowed((*vData)[iRow][iCol], 3), kTransform.m_x + iRow, kTransform.m_y + (maxWidth - 1 - iCol), cpp_conv::renderer::getWin32Colour(kColourOverride));
 				break;
 			}
 		} 
