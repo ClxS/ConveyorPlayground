@@ -37,8 +37,8 @@ void DrawConveyorItem(
     cpp_conv::Colour colour,
     bool allowBackFill = false)
 {
-	PROFILE_FUNC();
-	// TODO[CJones] Normalize this
+    PROFILE_FUNC();
+    // TODO[CJones] Normalize this
     if (bIsCorner)
     {
         if (bIsInnerMostChannel)
@@ -109,11 +109,11 @@ void DrawConveyorItem(
         }
     }
 
-	auto pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::IronOre);
-	if (pTile)
-	{
+    auto pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::IronOre);
+    if (pTile)
+    {
         cpp_conv::renderer::renderAsset(kContext, pTile.get(), { x, y }, { colour.m_value | 0xFF000000 });
-	}
+    }
 }
 
 void DrawConveyor(
@@ -126,27 +126,27 @@ void DrawConveyor(
     Direction cornerSourceDirection,
     cpp_conv::Colour colour)
 {
-	PROFILE_FUNC();
-	cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> pTile = nullptr;
+    PROFILE_FUNC();
+    cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> pTile = nullptr;
     cpp_conv::Transform2D transform = {};
 
-	if (!bIsCorner)
-	{
-		pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Conveyor_Straight);		
-	}
+    if (!bIsCorner)
+    {
+        pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Conveyor_Straight);        
+    }
     else
     {
         if (IsClockwiseCorner(kContext.m_grid, rConveyor))
         {
-			pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Conveyor_CornerClockwise);
+            pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Conveyor_CornerClockwise);
         }
         else
         {
-			pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Conveyor_CornerAntiClockwise);
-        }		
+            pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Conveyor_CornerAntiClockwise);
+        }        
     }   
 
-	transform = { x, y, cpp_conv::rotationFromDirection(direction) };
+    transform = { x, y, cpp_conv::rotationFromDirection(direction) };
     if (pTile)
     {
         cpp_conv::renderer::renderAsset(kContext, pTile.get(), transform, colour);
@@ -202,20 +202,20 @@ void cpp_conv::Conveyor::Draw(RenderContext& kContext) const
     int conveyorX = m_position.m_x * 3;
     int conveyorY = m_position.m_y * 3;
 
-	bool bIsCorner = cpp_conv::IsCornerConveyor(kContext.m_grid, *this);
+    bool bIsCorner = cpp_conv::IsCornerConveyor(kContext.m_grid, *this);
 
-	int iInnerMostChannel;
+    int iInnerMostChannel;
     Direction eCornerDirection;
-	std::tie(iInnerMostChannel, eCornerDirection) = GetInnerMostCornerChannel(kContext.m_grid, *this);
+    std::tie(iInnerMostChannel, eCornerDirection) = GetInnerMostCornerChannel(kContext.m_grid, *this);
 
     DrawConveyor(
-		kContext,
+        kContext,
         *this,
-		conveyorX,
-		conveyorY,
-		bIsCorner,
-		m_direction,
-		eCornerDirection,
+        conveyorX,
+        conveyorY,
+        bIsCorner,
+        m_direction,
+        eCornerDirection,
         colour);
 ;
     for (int iChannelIdx = 0; iChannelIdx < c_conveyorChannels; ++iChannelIdx)

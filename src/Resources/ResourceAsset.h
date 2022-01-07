@@ -2,9 +2,9 @@
 
 namespace cpp_conv::resources
 {
-	class ResourceAsset
-	{
-	public:
-		virtual ~ResourceAsset() = default;
-	};
+    class ResourceAsset
+    {
+    public:
+        virtual ~ResourceAsset() = default;
+    };
 }

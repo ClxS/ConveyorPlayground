@@ -250,28 +250,28 @@ bool cpp_conv::IsCornerConveyor(const grid::EntityGrid& grid, const Conveyor& rC
 
 bool cpp_conv::IsClockwiseCorner(const grid::EntityGrid& grid, const Conveyor& rConveyor)
 {
-	PROFILE_FUNC();
-	Conveyor* pBackConverter = FindNextTailConveyor(grid, rConveyor);
-	if (pBackConverter == nullptr || pBackConverter->m_direction == rConveyor.m_direction)
-	{
-		return false;
-	}
+    PROFILE_FUNC();
+    Conveyor* pBackConverter = FindNextTailConveyor(grid, rConveyor);
+    if (pBackConverter == nullptr || pBackConverter->m_direction == rConveyor.m_direction)
+    {
+        return false;
+    }
 
-	Direction selfDirection = rConveyor.m_direction;
-	Direction backDirection = pBackConverter->m_direction;
-	while (selfDirection != Direction::Up)
-	{
-		selfDirection = cpp_conv::direction::Rotate90DegreeClockwise(selfDirection);
-		backDirection = cpp_conv::direction::Rotate90DegreeClockwise(backDirection);
-	}
+    Direction selfDirection = rConveyor.m_direction;
+    Direction backDirection = pBackConverter->m_direction;
+    while (selfDirection != Direction::Up)
+    {
+        selfDirection = cpp_conv::direction::Rotate90DegreeClockwise(selfDirection);
+        backDirection = cpp_conv::direction::Rotate90DegreeClockwise(backDirection);
+    }
 
-	return backDirection == Direction::Right;
+    return backDirection == Direction::Right;
 }
 
 std::tuple<int, Direction> cpp_conv::GetInnerMostCornerChannel(const grid::EntityGrid& grid, const Conveyor& rConveyor)
 {
-	PROFILE_FUNC();
-	Conveyor* pBackConverter = FindNextTailConveyor(grid, rConveyor);
+    PROFILE_FUNC();
+    Conveyor* pBackConverter = FindNextTailConveyor(grid, rConveyor);
     if (pBackConverter == nullptr || pBackConverter->m_direction == rConveyor.m_direction)
     {
         return std::make_tuple(-1, Direction::Up);

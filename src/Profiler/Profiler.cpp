@@ -22,14 +22,14 @@ std::unordered_map<const char*, std::chrono::nanoseconds> nameTimings;
 void cpp_conv::profiler::registerTime(const char* szName, std::chrono::nanoseconds duration)
 {
     std::lock_guard<std::mutex> lock(getStateMutex());
-	nameTimings.try_emplace(szName, 0);
-	nameTimings[szName] += duration;
+    nameTimings.try_emplace(szName, 0);
+    nameTimings[szName] += duration;
 }
 
 void cpp_conv::profiler::logAndReset(int factor)
 {
-	std::lock_guard<std::mutex> lock(getStateMutex());
-	std::chrono::nanoseconds totalDuration = {};
+    std::lock_guard<std::mutex> lock(getStateMutex());
+    std::chrono::nanoseconds totalDuration = {};
     std::vector<std::pair<const char*, std::chrono::nanoseconds>> sortableTimings;
 
     for (auto& kvp : nameTimings)
@@ -44,9 +44,9 @@ void cpp_conv::profiler::logAndReset(int factor)
         [](const std::pair<const char*, std::chrono::nanoseconds>& a, const std::pair<const char*, std::chrono::nanoseconds>& b)
         {
             return a.second > b.second;
-		});
+        });
 
-	for (auto& kvp : sortableTimings)
+    for (auto& kvp : sortableTimings)
     {
 #if _WIN32
         OutputDebugStringA(

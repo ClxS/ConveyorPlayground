@@ -6,5 +6,5 @@
 
 namespace cpp_conv::renderer
 {
-	using ScreenBuffer = ConsoleScreenBuffer;
+    using ScreenBuffer = ConsoleScreenBuffer;
 }

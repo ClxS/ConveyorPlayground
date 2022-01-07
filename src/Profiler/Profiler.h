@@ -17,8 +17,8 @@ namespace cpp_conv::profiler
 
         ~ScopeRaii()
         {
-			cpp_conv::profiler::registerTime(m_szName, std::chrono::high_resolution_clock::now() - m_start);
-		}
+            cpp_conv::profiler::registerTime(m_szName, std::chrono::high_resolution_clock::now() - m_start);
+        }
 
         const char* m_szName;
         std::chrono::steady_clock::time_point m_start;

@@ -2,5 +2,5 @@
 
 namespace cpp_conv::resources
 {
-	void registerMapLoadHandler();
+    void registerMapLoadHandler();
 }

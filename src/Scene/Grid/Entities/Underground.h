@@ -6,26 +6,26 @@
 
 namespace cpp_conv
 {
-	class Item;
-	struct SceneContext;
-	struct RenderContext;
+    class Item;
+    struct SceneContext;
+    struct RenderContext;
 
-	constexpr int c_maxUndergroundLength = 6;
+    constexpr int c_maxUndergroundLength = 6;
 
-	class Underground : public Entity
-	{
-	public:
-		Underground(int x, int y, Direction direction);
+    class Underground : public Entity
+    {
+    public:
+        Underground(int x, int y, Direction direction);
 
-		void Tick(const SceneContext& kContext) override;
-		void Draw(RenderContext& kRenderContext) const override;
+        void Tick(const SceneContext& kContext) override;
+        void Draw(RenderContext& kRenderContext) const override;
 
-		bool AddItem(cpp_conv::grid::EntityGrid& grid, Item* pItem, int iChannel);
+        bool AddItem(cpp_conv::grid::EntityGrid& grid, Item* pItem, int iChannel);
 
-	private:
-		cpp_conv::grid::EntityGrid m_kLocalGrid;
-		Direction m_direction;
-		std::array<Conveyor, c_maxUndergroundLength> m_arrInternalConveyors;
-		uint64_t m_uiTick;
-	};
+    private:
+        cpp_conv::grid::EntityGrid m_kLocalGrid;
+        Direction m_direction;
+        std::array<Conveyor, c_maxUndergroundLength> m_arrInternalConveyors;
+        uint64_t m_uiTick;
+    };
 }

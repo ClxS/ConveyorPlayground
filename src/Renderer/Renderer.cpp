@@ -17,22 +17,22 @@ static std::map<TypeId, std::function<void(cpp_conv::RenderContext&, const cpp_c
 
 namespace
 {
-	std::mutex& getStateMutex()
-	{
-		static std::mutex s_stateMutex;
-		return s_stateMutex;
-	}
+    std::mutex& getStateMutex()
+    {
+        static std::mutex s_stateMutex;
+        return s_stateMutex;
+    }
 
     std::function<void(cpp_conv::RenderContext&, const cpp_conv::resources::RenderableAsset*, cpp_conv::Transform2D, cpp_conv::Colour)>* getTypeHandler(const std::type_info& type)
     {
-	    // No need to lock here, this is only called in the context of an existing lock
-	    auto iter = g_typeHandlers.find(type.hash_code());
-	    if (iter == g_typeHandlers.end())
-	    {
-		    return nullptr;
-	    }
+        // No need to lock here, this is only called in the context of an existing lock
+        auto iter = g_typeHandlers.find(type.hash_code());
+        if (iter == g_typeHandlers.end())
+        {
+            return nullptr;
+        }
 
-	    return iter->second;
+        return iter->second;
     }
 }
 
@@ -56,7 +56,7 @@ void cpp_conv::renderer::init(cpp_conv::renderer::SwapChain& rSwapChain)
 
 void drawPlayer(const cpp_conv::SceneContext& kSceneContext, cpp_conv::RenderContext& kRenderContext)
 {
-	auto pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Player);
+    auto pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Player);
     if (!pTile)
     {
         return;
@@ -80,21 +80,21 @@ void cpp_conv::renderer::render(const SceneContext& kSceneContext, RenderContext
         pEntity->Draw(kContext);
     }
 
-	for (auto pEntity : kSceneContext.m_vOtherEntities)
-	{
-		pEntity->Draw(kContext);
-	}
+    for (auto pEntity : kSceneContext.m_vOtherEntities)
+    {
+        pEntity->Draw(kContext);
+    }
 
     drawPlayer(kSceneContext, kContext);
 }
 
 void cpp_conv::renderer::renderAsset(const std::type_info& type, RenderContext& kContext, resources::RenderableAsset* pRenderable, Transform2D transform, Colour kColourOverride)
 {
-	PROFILE_FUNC();
-	std::function<void(cpp_conv::RenderContext&, const resources::RenderableAsset*, cpp_conv::Transform2D, cpp_conv::Colour)>* pHandler = nullptr;
+    PROFILE_FUNC();
+    std::function<void(cpp_conv::RenderContext&, const resources::RenderableAsset*, cpp_conv::Transform2D, cpp_conv::Colour)>* pHandler = nullptr;
     {
-		std::lock_guard<std::mutex> lock(getStateMutex());
-		pHandler = getTypeHandler(type);
+        std::lock_guard<std::mutex> lock(getStateMutex());
+        pHandler = getTypeHandler(type);
     }
 
     if (!pHandler)
@@ -107,6 +107,6 @@ void cpp_conv::renderer::renderAsset(const std::type_info& type, RenderContext& 
 
 void cpp_conv::renderer::registerTypeHandler(const std::type_info& type, std::function<void(cpp_conv::RenderContext&, const resources::RenderableAsset*, cpp_conv::Transform2D, cpp_conv::Colour)> fHandler)
 {
-	std::lock_guard<std::mutex> lock(getStateMutex());
-	g_typeHandlers[type.hash_code()] = new std::function<void(cpp_conv::RenderContext&, const resources::RenderableAsset*, cpp_conv::Transform2D, cpp_conv::Colour)>(fHandler);
+    std::lock_guard<std::mutex> lock(getStateMutex());
+    g_typeHandlers[type.hash_code()] = new std::function<void(cpp_conv::RenderContext&, const resources::RenderableAsset*, cpp_conv::Transform2D, cpp_conv::Colour)>(fHandler);
 }

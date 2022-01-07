@@ -2,10 +2,10 @@
 
 namespace cpp_conv::resources
 {
-	enum class ResourceType
-	{
-		Map,
-		Placable,
-		Asset
-	};
+    enum class ResourceType
+    {
+        Map,
+        Placable,
+        Asset
+    };
 }

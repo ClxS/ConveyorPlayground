@@ -7,10 +7,10 @@
 
 namespace cpp_conv
 {
-	struct RenderContext
-	{
-		Quad m_cameraQuad;
-		cpp_conv::renderer::WriteSurface& m_surface;
-		cpp_conv::grid::EntityGrid& m_grid;
-	};
+    struct RenderContext
+    {
+        Quad m_cameraQuad;
+        cpp_conv::renderer::WriteSurface& m_surface;
+        cpp_conv::grid::EntityGrid& m_grid;
+    };
 }

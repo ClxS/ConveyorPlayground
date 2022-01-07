@@ -2,5 +2,5 @@
 
 namespace cpp_conv::game
 {
-	void run();
+    void run();
 }

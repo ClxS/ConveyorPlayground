@@ -6,34 +6,34 @@
 
 namespace cpp_conv::renderer
 {
-	class ConsoleWriteSurface;
+    class ConsoleWriteSurface;
 
-	struct ConsoleScreenBufferInitArgs
-	{
-		CONSOLE_FONT_INFOEX m_surfaceFont;
-	};
+    struct ConsoleScreenBufferInitArgs
+    {
+        CONSOLE_FONT_INFOEX m_surfaceFont;
+    };
 
-	class ConsoleScreenBuffer
-	{
-	public:
-		ConsoleScreenBuffer(ConsoleWriteSurface& rWriteSurface);
-		~ConsoleScreenBuffer();
+    class ConsoleScreenBuffer
+    {
+    public:
+        ConsoleScreenBuffer(ConsoleWriteSurface& rWriteSurface);
+        ~ConsoleScreenBuffer();
 
-		void Initialize(ConsoleScreenBufferInitArgs& rArgs);
+        void Initialize(ConsoleScreenBufferInitArgs& rArgs);
 
-		void Present();
+        void Present();
 
-		void Shutdown();
+        void Shutdown();
 
-		void RecreateBuffer();
+        void RecreateBuffer();
 
-	private:
-		ConsoleWriteSurface& m_rWriteSurface;
-		HANDLE m_hBufferHandle;
+    private:
+        ConsoleWriteSurface& m_rWriteSurface;
+        HANDLE m_hBufferHandle;
 
-		ConsoleScreenBufferInitArgs m_initArgs;
-	};
+        ConsoleScreenBufferInitArgs m_initArgs;
+    };
 
-	using ScreenBuffer = ConsoleScreenBuffer;
-	using ScreenBufferInitArgs = ConsoleScreenBufferInitArgs;
+    using ScreenBuffer = ConsoleScreenBuffer;
+    using ScreenBufferInitArgs = ConsoleScreenBufferInitArgs;
 }

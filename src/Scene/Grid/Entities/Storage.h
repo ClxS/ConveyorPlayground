@@ -3,13 +3,13 @@
 
 namespace cpp_conv
 {
-	class Storage : public Entity
-	{
-	public:
-		Storage(int x, int y);
+    class Storage : public Entity
+    {
+    public:
+        Storage(int x, int y);
 
-		void Tick(const SceneContext& kContext) override;
+        void Tick(const SceneContext& kContext) override;
 
-		void Draw(RenderContext& kRenderContext) const override;
-	};
+        void Draw(RenderContext& kRenderContext) const override;
+    };
 }

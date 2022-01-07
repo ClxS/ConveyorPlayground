@@ -5,5 +5,5 @@
 
 namespace cpp_conv::input
 {
-	void receiveInput(std::queue<cpp_conv::commands::CommandType>& commands);
+    void receiveInput(std::queue<cpp_conv::commands::CommandType>& commands);
 }
