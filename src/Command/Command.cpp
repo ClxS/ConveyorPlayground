@@ -44,37 +44,37 @@ void tryPlaceEntity(cpp_conv::SceneContext& kContext, EntityKind eKind, Directio
 	}
 }
 
-void cpp_conv::command::processCommands(SceneContext& kContext, std::queue<cpp_conv::commands::InputCommand>& commands)
+void cpp_conv::command::processCommands(SceneContext& kContext, RenderContext& kRenderContext, std::queue<cpp_conv::commands::CommandType>& commands)
 {
 	while (!commands.empty())
 	{
-		cpp_conv::commands::InputCommand command = commands.front();
+		cpp_conv::commands::CommandType command = commands.front();
 		commands.pop();
 
 		switch (command)
 		{
-		case cpp_conv::commands::InputCommand::MoveUp:
+		case cpp_conv::commands::CommandType::MoveUp:
 			tryUpdatePlayer(kContext, { kContext.m_player.m_x, kContext.m_player.m_y + 1 });
 			break;
-		case cpp_conv::commands::InputCommand::MoveDown:
+		case cpp_conv::commands::CommandType::MoveDown:
 			tryUpdatePlayer(kContext, { kContext.m_player.m_x, kContext.m_player.m_y - 1 });
 			break;
-		case cpp_conv::commands::InputCommand::MoveLeft:
+		case cpp_conv::commands::CommandType::MoveLeft:
 			tryUpdatePlayer(kContext, { kContext.m_player.m_x - 1, kContext.m_player.m_y });
 			break;
-		case cpp_conv::commands::InputCommand::MoveRight:
+		case cpp_conv::commands::CommandType::MoveRight:
 			tryUpdatePlayer(kContext, { kContext.m_player.m_x + 1, kContext.m_player.m_y });
 			break;
-		case cpp_conv::commands::InputCommand::PlaceConveyorUp:
+		case cpp_conv::commands::CommandType::PlaceConveyorUp:
 			tryPlaceEntity(kContext, EntityKind::Conveyor, Direction::Up);
 			break;
-		case cpp_conv::commands::InputCommand::PlaceConveyorDown:
+		case cpp_conv::commands::CommandType::PlaceConveyorDown:
 			tryPlaceEntity(kContext, EntityKind::Conveyor, Direction::Down);
 			break;
-		case cpp_conv::commands::InputCommand::PlaceConveyorLeft:
+		case cpp_conv::commands::CommandType::PlaceConveyorLeft:
 			tryPlaceEntity(kContext, EntityKind::Conveyor, Direction::Left);
 			break;
-		case cpp_conv::commands::InputCommand::PlaceConveyorRight:
+		case cpp_conv::commands::CommandType::PlaceConveyorRight:
 			tryPlaceEntity(kContext, EntityKind::Conveyor, Direction::Right);
 			break;
 		}

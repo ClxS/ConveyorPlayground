@@ -2,7 +2,7 @@
 
 namespace cpp_conv::commands
 {
-    enum class InputCommand
+    enum class CommandType
     {
         MoveLeft,
         MoveUp,
