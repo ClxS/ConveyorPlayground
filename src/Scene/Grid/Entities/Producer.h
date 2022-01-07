@@ -20,8 +20,8 @@ namespace cpp_conv
 
 		Direction GetDirection() const { return m_direction; }
 
-		void Tick(const SceneContext& kContext);
-		void Draw(RenderContext& kContext) const;
+		void Tick(const SceneContext& kContext) override;
+		void Draw(RenderContext& kContext) const override;
 
 	private:
 		Item* m_pItem;

@@ -50,10 +50,10 @@ void tileRenderer(cpp_conv::RenderContext& kContext, const cpp_conv::resources::
 				cpp_conv::renderer::setCell(kContext, (*vData)[iRow][iCol], kTransform.m_x + iCol, kTransform.m_y + iRow, cpp_conv::renderer::getWin32Colour(kColourOverride));
 				break;
 			case cpp_conv::Transform2D::Rotation::Deg90:
-				cpp_conv::renderer::setCell(kContext, rotateCharIfAllowed((*vData)[iRow][iCol], 1), kTransform.m_x + ((*vData).size() - 1 - iRow), kTransform.m_y + iCol, cpp_conv::renderer::getWin32Colour(kColourOverride));
+				cpp_conv::renderer::setCell(kContext, rotateCharIfAllowed((*vData)[iRow][iCol], 1), kTransform.m_x + ((int)(*vData).size() - 1 - iRow), kTransform.m_y + iCol, cpp_conv::renderer::getWin32Colour(kColourOverride));
 				break;
 			case cpp_conv::Transform2D::Rotation::Deg180:
-				cpp_conv::renderer::setCell(kContext, rotateCharIfAllowed((*vData)[iRow][iCol], 2), kTransform.m_x + (maxWidth - 1 - iCol), kTransform.m_y + ((*vData).size() - 1 - iRow), cpp_conv::renderer::getWin32Colour(kColourOverride));
+				cpp_conv::renderer::setCell(kContext, rotateCharIfAllowed((*vData)[iRow][iCol], 2), kTransform.m_x + (maxWidth - 1 - iCol), kTransform.m_y + ((int)(*vData).size() - 1 - iRow), cpp_conv::renderer::getWin32Colour(kColourOverride));
 				break;
 			case cpp_conv::Transform2D::Rotation::Deg270:
 				cpp_conv::renderer::setCell(kContext, rotateCharIfAllowed((*vData)[iRow][iCol], 3), kTransform.m_x + iRow, kTransform.m_y + (maxWidth - 1 - iCol), cpp_conv::renderer::getWin32Colour(kColourOverride));

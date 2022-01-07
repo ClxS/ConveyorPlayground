@@ -23,5 +23,6 @@ enum class EntityKind
     Conveyor,
     Producer,
     Junction,
-    Underground
+	Underground,
+	Storage,
 };

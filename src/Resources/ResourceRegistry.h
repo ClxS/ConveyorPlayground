@@ -7,10 +7,7 @@ namespace cpp_conv::resources::registry
 		int m_index;
 		int m_category;
 
-		bool operator<(const RegistryId& r) const
-		{
-			return std::make_tuple(m_index, m_category) < std::make_tuple(r.m_index, r.m_category);
-		}
+		bool operator<(const RegistryId& r) const;
 	};
 
 	constexpr const char* c_szAssetPaths[] =
@@ -23,6 +20,7 @@ namespace cpp_conv::resources::registry
 		"platform/assets/Player",
 		"platform/assets/Junction",
 		"platform/assets/Tunnel",
+		"platform/assets/Storage",
 	};
 
 	constexpr const char* c_szItemsPaths[] =
@@ -55,6 +53,7 @@ namespace cpp_conv::resources::registry
 		constexpr RegistryId Player = { 3, 0 };
 		constexpr RegistryId Junction = { 4, 0 };
 		constexpr RegistryId Tunnel = { 5, 0 };
+		constexpr RegistryId Storage = { 6, 0 };
 
 		constexpr RegistryId IronOre = { 0, 2 };
 		constexpr RegistryId CopperOre = { 1, 2 };

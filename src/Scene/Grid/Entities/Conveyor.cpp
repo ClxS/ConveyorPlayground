@@ -124,8 +124,6 @@ void DrawConveyor(
     Direction cornerSourceDirection,
     cpp_conv::Colour colour)
 {
-    wchar_t arrow;
-	
     cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> pTile = nullptr;
     cpp_conv::Transform2D transform = {};
 

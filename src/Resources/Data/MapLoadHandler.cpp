@@ -6,6 +6,7 @@
 #include "Junction.h"
 #include "Producer.h"
 #include "Underground.h"
+#include "Storage.h"
 
 #include <sstream>
 #include <iostream>
@@ -14,11 +15,10 @@ cpp_conv::resources::ResourceAsset* mapLoadHandler(cpp_conv::resources::resource
 {
 	const char* pStrData = reinterpret_cast<const char*>(rData.m_pData);
 
-	std::istringstream ss(pStrData, rData.m_uiSize);
+	std::istringstream ss(pStrData);
 	std::string strLine;
 
-	cpp_conv::resources::Map* pMap = new cpp_conv::resources::Map();
-
+	auto pMap = new cpp_conv::resources::Map();
 	int iRow = 0;
 	while (std::getline(ss, strLine))
 	{
@@ -36,6 +36,7 @@ cpp_conv::resources::ResourceAsset* mapLoadHandler(cpp_conv::resources::resource
 			case 'F': pEntity = new cpp_conv::Producer(iCol, iRow, Direction::Down, new cpp_conv::Copper(), 7); break;
 			case 'G': pEntity = new cpp_conv::Producer(iCol, iRow, Direction::Up, new cpp_conv::Copper(), 7); break;
 			case 'J': pEntity = new cpp_conv::Junction(iCol, iRow); break;
+			case 'S': pEntity = new cpp_conv::Storage(iCol, iRow); break;
 			case 'u': pEntity = new cpp_conv::Underground(iCol, iRow, Direction::Down); break;
 			case 'y': pEntity = new cpp_conv::Underground(iCol, iRow, Direction::Up); break;
 			case 'i': pEntity = new cpp_conv::Underground(iCol, iRow, Direction::Left); break;
