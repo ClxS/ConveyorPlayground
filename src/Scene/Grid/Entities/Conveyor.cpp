@@ -7,6 +7,21 @@
 
 #include "TileAsset.h"
 
+cpp_conv::Colour GetColourFromId(int id)
+{
+    switch (id & 7)
+    {
+    default:
+    case 0: return { 0x000000FF };
+    case 1: return { 0x0000FF00 };
+    case 2: return { 0x0000FFFF };
+    case 3: return { 0x00FF0000 };
+    case 4: return { 0x00FF00FF };
+    case 5: return { 0x00FFFF00 };
+    case 6: return { 0x00FFFFFF };
+    }
+}
+
 void DrawConveyorItem(
     cpp_conv::RenderContext& kContext,
     wchar_t value,
@@ -18,7 +33,7 @@ void DrawConveyorItem(
     bool bIsInnerMostChannel,
     Direction direction,
     Direction cornerSourceDirection,
-    int colour,
+    cpp_conv::Colour colour,
     bool allowBackFill = false)
 {
     // TODO[CJones] Normalize this
@@ -92,7 +107,11 @@ void DrawConveyorItem(
         }
     }
 
-    //cpp_conv::renderer::setPixel(kContext, value, x, y, colour, allowBackFill);
+	auto pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::IronOre);
+	if (pTile)
+	{
+        cpp_conv::renderer::renderAsset(kContext, pTile.get(), { x, y }, { colour.m_value | 0xFF000000 });
+	}
 }
 
 void DrawConveyor(
@@ -103,7 +122,7 @@ void DrawConveyor(
     bool bIsCorner,
     Direction direction,
     Direction cornerSourceDirection,
-    int colour)
+    cpp_conv::Colour colour)
 {
     wchar_t arrow;
 	
@@ -129,7 +148,7 @@ void DrawConveyor(
 	transform = { x, y, cpp_conv::rotationFromDirection(direction) };
     if (pTile)
     {
-        cpp_conv::renderer::renderAsset(kContext, pTile.get(), transform);
+        cpp_conv::renderer::renderAsset(kContext, pTile.get(), transform, colour);
     }
 }
 
@@ -176,7 +195,7 @@ void cpp_conv::Conveyor::Tick(const SceneContext& kContext)
 
 void cpp_conv::Conveyor::Draw(RenderContext& kContext) const
 {
-    int colour = m_pSequenceId;
+    Colour colour = GetColourFromId(m_pSequenceId);
 
     int conveyorX = m_position.m_x * 3;
     int conveyorY = m_position.m_y * 3;
@@ -195,7 +214,7 @@ void cpp_conv::Conveyor::Draw(RenderContext& kContext) const
 		bIsCorner,
 		m_direction,
 		eCornerDirection,
-		colour);
+        colour);
 ;
     for (int iChannelIdx = 0; iChannelIdx < c_conveyorChannels; ++iChannelIdx)
     {

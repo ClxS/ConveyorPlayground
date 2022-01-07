@@ -25,6 +25,13 @@ namespace cpp_conv::resources::registry
 		"platform/assets/Tunnel",
 	};
 
+	constexpr const char* c_szItemsPaths[] =
+	{
+		"platform/assets/items/IronOre",
+		"platform/assets/items/CopperOre",
+		"platform/assets/items/Coal",
+	};
+
 	constexpr const char* c_szDataPaths[] =
 	{
 		"maps/circle",
@@ -36,6 +43,7 @@ namespace cpp_conv::resources::registry
 	{
 		c_szAssetPaths,
 		c_szDataPaths,
+		c_szItemsPaths
 	};
 
 	namespace visual
@@ -47,6 +55,10 @@ namespace cpp_conv::resources::registry
 		constexpr RegistryId Player = { 3, 0 };
 		constexpr RegistryId Junction = { 4, 0 };
 		constexpr RegistryId Tunnel = { 5, 0 };
+
+		constexpr RegistryId IronOre = { 0, 2 };
+		constexpr RegistryId CopperOre = { 1, 2 };
+		constexpr RegistryId Coal = { 2, 2 };
 	}
 
 	namespace data

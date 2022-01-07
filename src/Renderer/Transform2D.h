@@ -13,6 +13,27 @@ namespace cpp_conv
 			Deg270  = 3,
 		};
 
+		Transform2D()
+			: m_x(0)
+			, m_y(0)
+			, m_rotation(Rotation::DegZero)
+		{
+		}
+
+		Transform2D(int x, int y)
+			: m_x(x)
+			, m_y(y)
+			, m_rotation(Rotation::DegZero)
+		{
+		}
+
+		Transform2D(int x, int y, Rotation rotation)
+			: m_x(x)
+			, m_y(y)
+			, m_rotation(rotation)
+		{
+		}
+
 		int m_x;
 
 		int m_y;
