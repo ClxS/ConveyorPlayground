@@ -18,6 +18,7 @@
 
 cpp_conv::Factory::Factory(int x, int y, Direction direction, FactoryId factoryId)
     : Entity(x, y, EntityKind::Producer)
+    , m_pFactoryId(factoryId)
     , m_pItem(ItemIds::None)
     , m_direction(direction)
     , m_uiTick(0)
@@ -95,7 +96,13 @@ void cpp_conv::Factory::Tick(const SceneContext& kContext)
 
 void cpp_conv::Factory::Draw(RenderContext& kRenderContext) const
 {
-    auto pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Tunnel);
+    auto pFactory = cpp_conv::resources::getFactoryDefinition(m_pFactoryId);
+    if (!pFactory)
+    {
+        return;
+    }
+
+    auto pTile = pFactory->GetTile();
     if (!pTile)
     {
         return;

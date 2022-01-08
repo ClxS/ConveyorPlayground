@@ -53,7 +53,7 @@ namespace cpp_conv::resources::registry
         "maps/simple",
         "data/producers/MetalGenerator",
     };
-
+     
     constexpr const char* const* c_szCategoryPaths[] =
     {
         c_szAssetPaths,

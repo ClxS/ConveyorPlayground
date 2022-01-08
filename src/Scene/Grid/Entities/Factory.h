@@ -27,6 +27,7 @@ namespace cpp_conv
 
         Direction GetDirection() const override { return m_direction; }
     private:
+        FactoryId m_pFactoryId;
         ItemId m_pItem;
         Direction m_direction;
 
