@@ -42,7 +42,7 @@ cpp_conv::resources::ResourceAsset* factoryAssetHandler(cpp_conv::resources::res
 
     std::string id;
     std::string name;
-    std::string producedItemId;
+    std::string producedRecipeId;
     int rate = 0;
 
     int idx = 0;
@@ -53,8 +53,8 @@ cpp_conv::resources::ResourceAsset* factoryAssetHandler(cpp_conv::resources::res
         {
         case 0: id = token; break;
         case 1: name = token; break;
-        case 2: producedItemId = token; break;
-        case 3: rate = std::stoi(token); break;
+        case 2: rate = std::stoi(token); break;
+        case 3: producedRecipeId = token; break;
         }
 
         idx++;
@@ -64,8 +64,8 @@ cpp_conv::resources::ResourceAsset* factoryAssetHandler(cpp_conv::resources::res
         cpp_conv::FactoryId::FromStringId(id),
         rData.m_registryId,
         name,
-        cpp_conv::ItemId::FromStringId(producedItemId),
-        rate);
+        rate,
+        cpp_conv::ItemId::FromStringId(producedRecipeId));
 }
 
 const cpp_conv::resources::AssetPtr<cpp_conv::FactoryDefinition> cpp_conv::resources::getFactoryDefinition(cpp_conv::FactoryId id)

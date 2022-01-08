@@ -42,6 +42,7 @@ namespace cpp_conv
     DEFINE_UNIQUE_DATA_TYPE(Factory);
     DEFINE_UNIQUE_DATA_TYPE(Conveyor);
     DEFINE_UNIQUE_DATA_TYPE(Inserter);
+    DEFINE_UNIQUE_DATA_TYPE(Recipe);
 }
 
 

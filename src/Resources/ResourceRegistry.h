@@ -23,6 +23,13 @@ namespace cpp_conv::resources::registry
         "platform/assets/Storage",
     };
 
+    constexpr const char* c_szDataPaths[] =
+    {
+        "maps/circle",
+        "maps/simple",
+        "data/producers/MetalGenerator",
+    };
+
     constexpr const char* c_szItemsPaths[] =
     {
         "data/items/IronOre",
@@ -39,12 +46,14 @@ namespace cpp_conv::resources::registry
 
     constexpr const char* c_szFactoryPaths[] =
     {
-        "data/Factories/Copper",
+        "data/Factories/CopperMine",
+        "data/Factories/CopperSmelter",
     };
 
     constexpr const char* c_szFactoryAssetsPaths[] =
     {
-        "platform/assets/Factories/Copper",
+        "platform/assets/Factories/CopperMine",
+        "platform/assets/Factories/CopperSmelter",
     };
 
     constexpr const char* c_szInserterPaths[] =
@@ -57,11 +66,10 @@ namespace cpp_conv::resources::registry
         "platform/assets/inserters/Basic",
     };
 
-    constexpr const char* c_szDataPaths[] =
+    constexpr const char* c_szRecipes[] =
     {
-        "maps/circle",
-        "maps/simple",
-        "data/producers/MetalGenerator",
+        "data/recipes/CopperOre",
+        "data/recipes/CopperPlate",
     };
      
     constexpr const char* const* c_szCategoryPaths[] =
@@ -74,6 +82,7 @@ namespace cpp_conv::resources::registry
         c_szFactoryAssetsPaths,
         c_szInserterPaths,
         c_szInserterAssetsPaths,
+        c_szRecipes,
     };
 
     namespace visual

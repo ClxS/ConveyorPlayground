@@ -1,3 +1,2 @@
 ITEM_COPPER_ORE
 Copper Ore
-C

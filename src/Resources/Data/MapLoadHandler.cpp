@@ -37,10 +37,13 @@ cpp_conv::resources::ResourceAsset* mapAssetHandler(cpp_conv::resources::resourc
             case 'v': pEntity = new cpp_conv::Conveyor(iCol, iRow, Direction::Up); break;
             case 'I': pEntity = new cpp_conv::Inserter(iCol, iRow, Direction::Down, cpp_conv::InserterId::FromStringId("INSERTER_BASIC")); break;
             case 'U': pEntity = new cpp_conv::Inserter(iCol, iRow, Direction::Up, cpp_conv::InserterId::FromStringId("INSERTER_BASIC")); break;
-            case 'A': pEntity = new cpp_conv::Factory(iCol, iRow, Direction::Right, cpp_conv::FactoryId::FromStringId("ITEM_COAL_PRODUCER")); break;
-            case 'D': pEntity = new cpp_conv::Factory(iCol, iRow, Direction::Left, cpp_conv::FactoryId::FromStringId("ITEM_COAL_PRODUCER")); break;
-            case 'F': pEntity = new cpp_conv::Factory(iCol, iRow, Direction::Down, cpp_conv::FactoryId::FromStringId("ITEM_COAL_PRODUCER")); break;
-            case 'G': pEntity = new cpp_conv::Factory(iCol, iRow, Direction::Up, cpp_conv::FactoryId::FromStringId("ITEM_COAL_PRODUCER")); break;
+            case 'T': pEntity = new cpp_conv::Inserter(iCol, iRow, Direction::Left, cpp_conv::InserterId::FromStringId("INSERTER_BASIC")); break;
+            case 'Y': pEntity = new cpp_conv::Inserter(iCol, iRow, Direction::Right, cpp_conv::InserterId::FromStringId("INSERTER_BASIC")); break;
+            case 'A': pEntity = new cpp_conv::Factory(iCol, iRow, Direction::Right, cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_MINE")); break;
+            case 'D': pEntity = new cpp_conv::Factory(iCol, iRow, Direction::Left, cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_MINE")); break;
+            case 'F': pEntity = new cpp_conv::Factory(iCol, iRow, Direction::Down, cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_MINE")); break;
+            case 'G': pEntity = new cpp_conv::Factory(iCol, iRow, Direction::Up, cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_MINE")); break;
+            case 'C': pEntity = new cpp_conv::Factory(iCol, iRow, cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_SMELTER")); break;
             case 'J': pEntity = new cpp_conv::Junction(iCol, iRow); break;
             case 'S': pEntity = new cpp_conv::Storage(iCol, iRow, 16, 256); break;
             case 'u': pEntity = new cpp_conv::Underground(iCol, iRow, Direction::Down); break;

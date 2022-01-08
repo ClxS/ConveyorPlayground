@@ -16,6 +16,11 @@
 #include "FactoryRegistry.h"
 #include "FactoryDefinition.h"
 
+cpp_conv::Factory::Factory(int x, int y, FactoryId factoryId)
+    : Factory(x, y, Direction::Right, factoryId)
+{
+}
+
 cpp_conv::Factory::Factory(int x, int y, Direction direction, FactoryId factoryId)
     : Entity(x, y, EntityKind::Producer)
     , m_pFactoryId(factoryId)

@@ -17,6 +17,10 @@ namespace cpp_conv
             int y,
             Direction direction,
             FactoryId factoryId);
+        Factory(
+            int x,
+            int y,
+            FactoryId factoryId);
 
         bool IsReadyToProduce() const;
 

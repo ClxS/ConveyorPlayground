@@ -1,3 +1,2 @@
 ITEM_COAL_ORE
 Coal
-C
