@@ -14,6 +14,7 @@
 #include "FrameLimiter.h"
 #include "ResourceManager.h"
 #include "Map.h"
+#include "SelfRegistration.h"
 
 #include <tuple>
 #include <vector>
@@ -68,10 +69,12 @@ void cpp_conv::game::run()
     cpp_conv::renderer::SwapChain swapChain(iWidth, iHeight);
     cpp_conv::renderer::init(swapChain);
 
-    resource_manager::initialize();
-    resources::loadItems();
-    resources::loadFactories();
+    cpp_conv::resources::registration::processSelfRegistrations();
     AssetPtr<Map> map = resource_manager::loadAsset<Map>(registry::data::MapSimple);
+    if (!map)
+    {
+        return;
+    }
 
     std::vector<cpp_conv::Sequence> sequences = cpp_conv::InitializeSequences(map->GetGrid(), map->GetConveyors());
     cpp_conv::SceneContext kSceneContext =

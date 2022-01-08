@@ -50,14 +50,6 @@ namespace
     }
 }
 
-void cpp_conv::resources::resource_manager::initialize()
-{
-    cpp_conv::resources::registerMapLoadHandler();
-    cpp_conv::resources::registerTileLoadHandler();
-    cpp_conv::resources::registerItemHandler();
-    cpp_conv::resources::registerFactoryHandler();
-}
-
 void cpp_conv::resources::resource_manager::registerTypeHandler(const std::type_info& type, std::function<cpp_conv::resources::ResourceAsset*(FileData&)> fHandler)
 {
     std::lock_guard<std::mutex> lock(getStateMutex());

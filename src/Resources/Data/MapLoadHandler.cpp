@@ -12,6 +12,7 @@
 
 #include <sstream>
 #include <iostream>
+#include "SelfRegistration.h"
 
 cpp_conv::resources::ResourceAsset* mapAssetHandler(cpp_conv::resources::resource_manager::FileData& rData)
 {
@@ -66,7 +67,4 @@ cpp_conv::resources::ResourceAsset* mapAssetHandler(cpp_conv::resources::resourc
     return pMap;
 }
 
-void cpp_conv::resources::registerMapLoadHandler()
-{
-    cpp_conv::resources::resource_manager::registerTypeHandler<cpp_conv::resources::Map>(&mapAssetHandler);
-}
+REGISTER_ASSET_LOAD_HANDLER(cpp_conv::resources::Map, mapAssetHandler);

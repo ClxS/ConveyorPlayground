@@ -4,6 +4,7 @@
 #include "TextTileAsset.h"
 
 #include <sstream>
+#include "SelfRegistration.h"
 
 cpp_conv::resources::ResourceAsset* textTileLoadHandler(cpp_conv::resources::resource_manager::FileData& rData)
 {
@@ -23,7 +24,4 @@ cpp_conv::resources::ResourceAsset* textTileLoadHandler(cpp_conv::resources::res
     return pTile;
 }
 
-void cpp_conv::resources::registerTileLoadHandler()
-{
-    cpp_conv::resources::resource_manager::registerTypeHandler<TextTileAsset>(&textTileLoadHandler);
-}
+REGISTER_ASSET_LOAD_HANDLER(cpp_conv::resources::TextTileAsset, textTileLoadHandler);

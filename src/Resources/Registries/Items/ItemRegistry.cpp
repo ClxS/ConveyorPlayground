@@ -8,9 +8,25 @@
 #include <memory>
 #include <sstream>
 #include <iostream>
+#include "SelfRegistration.h"
 
 using RegistryId = cpp_conv::resources::registry::RegistryId;
 std::vector<cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition>> g_vItems;
+
+void loadItems()
+{
+    for (int i = 0; i < sizeof(cpp_conv::resources::registry::c_szItemsPaths) / sizeof(const char*); i++)
+    {
+        RegistryId asset = { i, 2 };
+        auto pAsset = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::ItemDefinition>(asset);
+        if (!pAsset)
+        {
+            continue;
+        }
+
+        g_vItems.push_back(pAsset);
+    }
+}
 
 cpp_conv::ItemId cpp_conv::resources::itemIdFromStringId(const std::string_view str)
 {
@@ -52,26 +68,6 @@ cpp_conv::resources::ResourceAsset* itemAssetHandler(cpp_conv::resources::resour
     return new cpp_conv::ItemDefinition(cpp_conv::resources::itemIdFromStringId(id), rData.m_registryId, name, icon);
 }
 
-void cpp_conv::resources::registerItemHandler()
-{
-    cpp_conv::resources::resource_manager::registerTypeHandler<cpp_conv::ItemDefinition>(&itemAssetHandler);
-}
-
-void cpp_conv::resources::loadItems()
-{
-    for (int i = 0; i < sizeof(cpp_conv::resources::registry::c_szItemsPaths) / sizeof(const char*); i++)
-    {
-        RegistryId asset = { i, 2 };
-        auto pAsset = cpp_conv::resources::resource_manager::loadAsset<ItemDefinition>(asset);
-        if (!pAsset)
-        {
-            continue;
-        }
-
-        g_vItems.push_back(pAsset);
-    }
-}
-
 const cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> cpp_conv::resources::getItemDefinition(cpp_conv::ItemId id)
 {
     for (auto item : g_vItems)
@@ -84,3 +80,6 @@ const cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> cpp_conv::resource
 
     return nullptr;
 }
+
+REGISTER_ASSET_LOAD_HANDLER(cpp_conv::ItemDefinition, itemAssetHandler);
+REGISTER_LOAD_HANDLER(loadItems);

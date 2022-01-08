@@ -9,9 +9,25 @@
 #include <memory>
 #include <sstream>
 #include <iostream>
+#include "SelfRegistration.h"
 
 using RegistryId = cpp_conv::resources::registry::RegistryId;
 std::vector<cpp_conv::resources::AssetPtr<cpp_conv::FactoryDefinition>> g_vFactories;
+
+void loadFactories()
+{
+    for (int i = 0; i < sizeof(cpp_conv::resources::registry::c_szFactoryPaths) / sizeof(const char*); i++)
+    {
+        RegistryId asset = { i, 4 };
+        auto pAsset = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::FactoryDefinition>(asset);
+        if (!pAsset)
+        {
+            continue;
+        }
+
+        g_vFactories.push_back(pAsset);
+    }
+}
 
 cpp_conv::FactoryId cpp_conv::resources::factoryIdFromStringId(const std::string_view str)
 {
@@ -60,26 +76,6 @@ cpp_conv::resources::ResourceAsset* factoryAssetHandler(cpp_conv::resources::res
         rate);
 }
 
-void cpp_conv::resources::registerFactoryHandler()
-{
-    cpp_conv::resources::resource_manager::registerTypeHandler<cpp_conv::FactoryDefinition>(&factoryAssetHandler);
-}
-
-void cpp_conv::resources::loadFactories()
-{
-    for (int i = 0; i < sizeof(cpp_conv::resources::registry::c_szFactoryPaths) / sizeof(const char*); i++)
-    {
-        RegistryId asset = { i, 4 };
-        auto pAsset = cpp_conv::resources::resource_manager::loadAsset<FactoryDefinition>(asset);
-        if (!pAsset)
-        {
-            continue;
-        }
-
-        g_vFactories.push_back(pAsset);
-    }
-}
-
 const cpp_conv::resources::AssetPtr<cpp_conv::FactoryDefinition> cpp_conv::resources::getFactoryDefinition(cpp_conv::FactoryId id)
 {
     for (auto item : g_vFactories)
@@ -92,3 +88,6 @@ const cpp_conv::resources::AssetPtr<cpp_conv::FactoryDefinition> cpp_conv::resou
 
     return nullptr;
 }
+
+REGISTER_ASSET_LOAD_HANDLER(cpp_conv::FactoryDefinition, factoryAssetHandler);
+REGISTER_LOAD_HANDLER(loadFactories);

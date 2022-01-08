@@ -16,7 +16,6 @@ namespace cpp_conv::resources::resource_manager
         uint64_t m_uiSize;
     };
 
-    void initialize();
     void registerTypeHandler(const std::type_info& type, std::function<ResourceAsset*(FileData&)> fHandler);
     void updatePersistenceStore();
 

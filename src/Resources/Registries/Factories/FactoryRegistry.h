@@ -13,8 +13,6 @@ namespace cpp_conv
 namespace cpp_conv::resources
 {
     cpp_conv::FactoryId factoryIdFromStringId(const std::string_view str);
-    void registerFactoryHandler();
-    void loadFactories();
 
     const cpp_conv::resources::AssetPtr<cpp_conv::FactoryDefinition> getFactoryDefinition(cpp_conv::FactoryId id);
 }
