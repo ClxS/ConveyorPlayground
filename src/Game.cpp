@@ -88,7 +88,7 @@ void cpp_conv::game::run()
         swapChain.GetWriteSurface(), 
         map->GetGrid() };
 
-    cpp_conv::FrameLimiter frameLimter(5000);
+    cpp_conv::FrameLimiter frameLimter(1);
     std::queue<cpp_conv::commands::CommandType> commands;
 
     frameLimter.Start();

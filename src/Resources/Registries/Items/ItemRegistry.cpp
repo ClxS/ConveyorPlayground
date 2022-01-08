@@ -12,22 +12,16 @@
 using RegistryId = cpp_conv::resources::registry::RegistryId;
 std::vector<cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition>> g_vItems;
 
-namespace
+cpp_conv::ItemId cpp_conv::resources::itemIdFromStringId(const std::string_view str)
 {
-    // This is a copy of AtlasCore's hash. I've moved it here so that
-    // AtlasProfiler has zero dependencies, in case I want to use it in another
-    // project in the future
-    constexpr uint64_t hashString(const std::string_view str)
+    uint64_t result = 0xcbf29ce484222325;
+    for (char c : str)
     {
-        uint64_t result = 0xcbf29ce484222325;
-        for (char c : str)
-        {
-            result *= 1099511628211;
-            result ^= c;
-        }
-
-        return result;
+        result *= 1099511628211;
+        result ^= c;
     }
+
+    return { result };
 }
 
 cpp_conv::resources::ResourceAsset* itemAssetHandler(cpp_conv::resources::resource_manager::FileData& rData)
@@ -39,7 +33,7 @@ cpp_conv::resources::ResourceAsset* itemAssetHandler(cpp_conv::resources::resour
 
     std::string id;
     std::string name;
-    char icon;
+    char icon = 0;
 
     int idx = 0;
     std::string token;
@@ -55,7 +49,7 @@ cpp_conv::resources::ResourceAsset* itemAssetHandler(cpp_conv::resources::resour
         idx++;
     }
      
-    return new cpp_conv::ItemDefinition(hashString(id), name, icon);
+    return new cpp_conv::ItemDefinition(cpp_conv::resources::itemIdFromStringId(id), rData.m_registryId, name, icon);
 }
 
 void cpp_conv::resources::registerItemHandler()
@@ -82,7 +76,7 @@ const cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> cpp_conv::resource
 {
     for (auto item : g_vItems)
     {
-        if (item->GetInternalId() == id.m_uiItemId)
+        if (item->GetInternalId() == id)
         {
             return item;
         }

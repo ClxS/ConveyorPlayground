@@ -11,6 +11,7 @@ namespace cpp_conv::resources::resource_manager
 {
     struct FileData
     {
+        registry::RegistryId m_registryId;
         uint8_t* m_pData;
         uint64_t m_uiSize;
     };

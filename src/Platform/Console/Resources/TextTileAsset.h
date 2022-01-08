@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RenderableAsset.h"
+#include <vector>
 
 namespace cpp_conv::resources
 {

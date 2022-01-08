@@ -29,7 +29,7 @@ cpp_conv::Colour GetColourFromId(int id)
 
 void DrawConveyorItem(
     cpp_conv::RenderContext& kContext,
-    wchar_t value,
+    cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> pTile,
     int x,
     int y,
     int iChannelIdx,
@@ -42,6 +42,12 @@ void DrawConveyorItem(
     bool allowBackFill = false)
 {
     PROFILE_FUNC();
+
+    if (!pTile)
+    {
+        return;
+    }
+
     // TODO[CJones] Normalize this
     if (bIsCorner)
     {
@@ -113,11 +119,7 @@ void DrawConveyorItem(
         }
     }
 
-    auto pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::IronOre);
-    if (pTile)
-    {
-        cpp_conv::renderer::renderAsset(kContext, pTile.get(), { x, y }, { colour.m_value | 0xFF000000 });
-    }
+    cpp_conv::renderer::renderAsset(kContext, pTile.get(), { x, y }, { colour.m_value | 0xFF000000 });
 }
 
 void DrawConveyor(
@@ -239,7 +241,7 @@ void cpp_conv::Conveyor::Draw(RenderContext& kContext) const
                 {
                     DrawConveyorItem(
                         kContext,
-                        pItem->GetDisplayIcon(),
+                        pItem->GetTile(),
                         conveyorX,
                         conveyorY,
                         iChannelIdx,

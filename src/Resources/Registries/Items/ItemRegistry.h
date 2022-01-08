@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 #include "ItemId.h"
 #include "AssetPtr.h"
 
@@ -11,6 +12,7 @@ namespace cpp_conv
 
 namespace cpp_conv::resources
 {
+    cpp_conv::ItemId itemIdFromStringId(const std::string_view str);
     void registerItemHandler();
     void loadItems();
 

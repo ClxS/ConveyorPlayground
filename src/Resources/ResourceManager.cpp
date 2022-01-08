@@ -89,7 +89,7 @@ cpp_conv::resources::resource_manager::FileData getFileData(cpp_conv::resources:
     uint8_t* pData = new uint8_t[uiLength];
     file.read(reinterpret_cast<char*>(pData), uiLength);
 
-    return { pData, uiLength };
+    return { kAssetId, pData, uiLength };
 }
 
 cpp_conv::resources::AssetPtr<cpp_conv::resources::ResourceAsset> cpp_conv::resources::resource_manager::loadAsset(const std::type_info& type, cpp_conv::resources::registry::RegistryId kAssetId)

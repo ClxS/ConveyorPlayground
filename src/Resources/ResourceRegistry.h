@@ -25,6 +25,13 @@ namespace cpp_conv::resources::registry
 
     constexpr const char* c_szItemsPaths[] =
     {
+        "data/items/IronOre",
+        "data/items/CopperOre",
+        "data/items/Coal",
+    };
+
+    constexpr const char* c_szItemAssetsPaths[] =
+    {
         "platform/assets/items/IronOre",
         "platform/assets/items/CopperOre",
         "platform/assets/items/Coal",
@@ -41,7 +48,8 @@ namespace cpp_conv::resources::registry
     {
         c_szAssetPaths,
         c_szDataPaths,
-        c_szItemsPaths
+        c_szItemsPaths,
+        c_szItemAssetsPaths,
     };
 
     namespace visual
