@@ -55,12 +55,12 @@ cpp_conv::Underground::Underground(int x, int y, Direction direction)
     , m_direction(direction)
     , m_arrInternalConveyors
     {
-        cpp_conv::Conveyor(x, y, direction, cpp_conv::Item::None),
-        cpp_conv::Conveyor(x, y, direction, cpp_conv::Item::None),
-        cpp_conv::Conveyor(x, y, direction, cpp_conv::Item::None),
-        cpp_conv::Conveyor(x, y, direction, cpp_conv::Item::None),
-        cpp_conv::Conveyor(x, y, direction, cpp_conv::Item::None),
-        cpp_conv::Conveyor(x, y, direction, cpp_conv::Item::None)
+        cpp_conv::Conveyor(x, y, direction, cpp_conv::ItemIds::None),
+        cpp_conv::Conveyor(x, y, direction, cpp_conv::ItemIds::None),
+        cpp_conv::Conveyor(x, y, direction, cpp_conv::ItemIds::None),
+        cpp_conv::Conveyor(x, y, direction, cpp_conv::ItemIds::None),
+        cpp_conv::Conveyor(x, y, direction, cpp_conv::ItemIds::None),
+        cpp_conv::Conveyor(x, y, direction, cpp_conv::ItemIds::None)
     }    
     , m_uiTick(0)
 {

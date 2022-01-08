@@ -37,6 +37,16 @@ namespace cpp_conv::resources::registry
         "platform/assets/items/Coal",
     };
 
+    constexpr const char* c_szFactoryPaths[] =
+    {
+        "data/Factories/Copper",
+    };
+
+    constexpr const char* c_szFactoryAssetsPaths[] =
+    {
+        "platform/assets/Factories/Copper",
+    };
+
     constexpr const char* c_szDataPaths[] =
     {
         "maps/circle",
@@ -50,6 +60,8 @@ namespace cpp_conv::resources::registry
         c_szDataPaths,
         c_szItemsPaths,
         c_szItemAssetsPaths,
+        c_szFactoryPaths,
+        c_szFactoryAssetsPaths,
     };
 
     namespace visual

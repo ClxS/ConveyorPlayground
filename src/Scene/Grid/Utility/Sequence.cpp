@@ -254,7 +254,7 @@ void cpp_conv::Sequence::Tick(SceneContext& kContext)
                 {
                     if (pForwardEntity && pForwardEntity->SupportsInsertion() && pForwardEntity->TryInsert(kContext, *rNode, frontMostItem, iChannelIdx))
                     {
-                        frontMostItem = cpp_conv::Item::None;
+                        frontMostItem = cpp_conv::ItemIds::None;
                     }
                 }
                 else
@@ -265,7 +265,7 @@ void cpp_conv::Sequence::Tick(SceneContext& kContext)
                     if (forwardTargetItem.IsEmpty() && forwardPendingItem.IsEmpty())
                     {
                         forwardPendingItem = frontMostItem;
-                        frontMostItem = cpp_conv::Item::None;
+                        frontMostItem = cpp_conv::ItemIds::None;
                     }
                 }
             }
@@ -280,7 +280,7 @@ void cpp_conv::Sequence::Tick(SceneContext& kContext)
                 if (currentItem.IsValid() && forwardTargetItem.IsEmpty() && forwardPendingItem.IsEmpty())
                 {
                     forwardPendingItem = currentItem;
-                    currentItem = cpp_conv::Item::None;
+                    currentItem = cpp_conv::ItemIds::None;
                 }
             }
         }

@@ -24,7 +24,7 @@ void shuffle(RandomAccessIterator first, RandomAccessIterator last, URNG&& g)
 
 cpp_conv::Junction::Junction(int x, int y)
     : Entity(x, y, EntityKind::Junction)
-    , m_pItem(cpp_conv::Item::None)
+    , m_pItem(cpp_conv::ItemIds::None)
     , m_uiTick(0)
 {
 }
@@ -69,7 +69,7 @@ void cpp_conv::Junction::Tick(const SceneContext& kContext)
         {
             if (pEntity->TryInsert(kContext, *this, m_pItem, iExitChannel))
             {
-                m_pItem = cpp_conv::Item::None;
+                m_pItem = cpp_conv::ItemIds::None;
                 bFound = true;
                 break;
             }

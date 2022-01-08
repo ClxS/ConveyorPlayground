@@ -161,8 +161,8 @@ void DrawConveyor(
 
 cpp_conv::Conveyor::Channel::Channel()
 {
-    std::fill(std::begin(m_pItems), std::end(m_pItems), cpp_conv::Item::None);
-    std::fill(std::begin(m_pPendingItems), std::end(m_pPendingItems), cpp_conv::Item::None);
+    std::fill(std::begin(m_pItems), std::end(m_pItems), cpp_conv::ItemIds::None);
+    std::fill(std::begin(m_pPendingItems), std::end(m_pPendingItems), cpp_conv::ItemIds::None);
 }
 
 cpp_conv::Conveyor::Conveyor(int32_t x, int32_t y, Direction direction, ItemId pItem)
@@ -194,7 +194,7 @@ void cpp_conv::Conveyor::Tick(const SceneContext& kContext)
             if (!rChannel.m_pPendingItems[iChannelSlot].IsEmpty())
             {
                 rChannel.m_pItems[iChannelSlot] = rChannel.m_pPendingItems[iChannelSlot];
-                rChannel.m_pPendingItems[iChannelSlot] = cpp_conv::Item::None;
+                rChannel.m_pPendingItems[iChannelSlot] = cpp_conv::ItemIds::None;
             }
         }
     }

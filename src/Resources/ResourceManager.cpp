@@ -11,6 +11,7 @@
 #include <mutex>
 #include <fstream>
 #include <chrono>
+#include "FactoryRegistry.h"
 
 using FileData = cpp_conv::resources::resource_manager::FileData;
 using RegistryId = cpp_conv::resources::registry::RegistryId;
@@ -54,6 +55,7 @@ void cpp_conv::resources::resource_manager::initialize()
     cpp_conv::resources::registerMapLoadHandler();
     cpp_conv::resources::registerTileLoadHandler();
     cpp_conv::resources::registerItemHandler();
+    cpp_conv::resources::registerFactoryHandler();
 }
 
 void cpp_conv::resources::resource_manager::registerTypeHandler(const std::type_info& type, std::function<cpp_conv::resources::ResourceAsset*(FileData&)> fHandler)

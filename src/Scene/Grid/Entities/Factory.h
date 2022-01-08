@@ -2,16 +2,21 @@
 
 #include "Renderer.h"
 #include "Entity.h"
+#include "DataId.h"
 
 namespace cpp_conv
 {
     struct SceneContext;
     struct RenderContext;
 
-    class ProductionEntity : public Entity
+    class Factory : public Entity
     { 
     public:
-        ProductionEntity(int x, int y, Direction direction, ItemId pItem, uint64_t productionRate);
+        Factory(
+            int x,
+            int y,
+            Direction direction,
+            FactoryId factoryId);
 
         bool IsReadyToProduce() const;
 

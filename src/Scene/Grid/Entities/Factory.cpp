@@ -1,4 +1,4 @@
-#include "ProductionEntity.h"
+#include "Factory.h"
 #include "Conveyor.h"
 #include "SceneContext.h"
 
@@ -12,35 +12,51 @@
 #include "ResourceRegistry.h"
 #include "TileAsset.h"
 #include "DataId.h"
+#include "AssetPtr.h"
+#include "FactoryRegistry.h"
+#include "FactoryDefinition.h"
 
-cpp_conv::ProductionEntity::ProductionEntity(int x, int y, Direction direction, ItemId pItem, uint64_t productionRate)
+cpp_conv::Factory::Factory(int x, int y, Direction direction, FactoryId factoryId)
     : Entity(x, y, EntityKind::Producer)
-    , m_pItem(pItem)
+    , m_pItem(ItemIds::None)
     , m_direction(direction)
     , m_uiTick(0)
-    , m_productionRate(productionRate)
+    , m_productionRate(0)
     , m_bProductionReady(false)
 {
+    const cpp_conv::resources::AssetPtr<cpp_conv::FactoryDefinition> pFactory = cpp_conv::resources::getFactoryDefinition(factoryId);
+    if (!pFactory)
+    {
+        return;
+    }
+
+    m_pItem = pFactory->GetProducedItem();
+    m_productionRate = pFactory->GetProductionRate();
 }
 
-bool cpp_conv::ProductionEntity::IsReadyToProduce() const
+bool cpp_conv::Factory::IsReadyToProduce() const
 {
     return m_bProductionReady;
 }
 
-cpp_conv::ItemId cpp_conv::ProductionEntity::ProduceItem()
+cpp_conv::ItemId cpp_conv::Factory::ProduceItem()
 {
     if (!m_bProductionReady)
     {
-        return cpp_conv::Item::None;
+        return cpp_conv::ItemIds::None;
     }
 
     m_bProductionReady = false;
     return m_pItem;
 }
 
-void cpp_conv::ProductionEntity::Tick(const SceneContext& kContext)
+void cpp_conv::Factory::Tick(const SceneContext& kContext)
 {
+    if (this->m_productionRate == 0)
+    {
+        return;
+    }
+
     if (!IsReadyToProduce())
     {
         m_uiTick++;
@@ -77,7 +93,7 @@ void cpp_conv::ProductionEntity::Tick(const SceneContext& kContext)
     }
 }
 
-void cpp_conv::ProductionEntity::Draw(RenderContext& kRenderContext) const
+void cpp_conv::Factory::Draw(RenderContext& kRenderContext) const
 {
     auto pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Tunnel);
     if (!pTile)

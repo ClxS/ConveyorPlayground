@@ -15,13 +15,13 @@ namespace cpp_conv
             return m_uiItemId == other.m_uiItemId;\
         }\
     };\
-    namespace NAME\
+    namespace NAME##Ids\
     {\
         constexpr NAME##Id None = { 0 };\
     }
 
     DEFINE_UNIQUE_DATA_TYPE(Item);
-    DEFINE_UNIQUE_DATA_TYPE(Producer);
+    DEFINE_UNIQUE_DATA_TYPE(Factory);
 }
 
 
