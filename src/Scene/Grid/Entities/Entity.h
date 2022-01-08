@@ -24,6 +24,9 @@ namespace cpp_conv
         virtual bool SupportsInsertion() const { return false; }
         virtual bool TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel) { return false; }
 
+        virtual bool SupportsProvidingItem() const { return false; }
+        virtual bool TryGrab(const SceneContext& kContext, bool bSingle, std::tuple<ItemId, uint32_t>& outItem) { return false; }
+
         virtual Direction GetDirection() const { return Direction::Left; }
 
         Position m_position;

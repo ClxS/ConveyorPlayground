@@ -39,6 +39,9 @@ namespace cpp_conv
         bool SupportsInsertion() const override { return true; }
         bool TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel) override;
 
+        bool SupportsProvidingItem() const override { return true; }
+        bool TryGrab(const SceneContext& kContext, bool bSingle, std::tuple<ItemId, uint32_t>& outItem) override;
+
         Direction GetDirection() const override { return m_direction; }
 
         static_assert(c_conveyorChannels >= 1, "Conveyors must have at least once channel");

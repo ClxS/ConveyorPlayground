@@ -47,6 +47,16 @@ namespace cpp_conv::resources::registry
         "platform/assets/Factories/Copper",
     };
 
+    constexpr const char* c_szInserterPaths[] =
+    {
+        "data/inserters/Basic",
+    };
+
+    constexpr const char* c_szInserterAssetsPaths[] =
+    {
+        "platform/assets/inserters/Basic",
+    };
+
     constexpr const char* c_szDataPaths[] =
     {
         "maps/circle",
@@ -62,6 +72,8 @@ namespace cpp_conv::resources::registry
         c_szItemAssetsPaths,
         c_szFactoryPaths,
         c_szFactoryAssetsPaths,
+        c_szInserterPaths,
+        c_szInserterAssetsPaths,
     };
 
     namespace visual

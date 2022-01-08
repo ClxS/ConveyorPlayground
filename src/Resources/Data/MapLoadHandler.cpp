@@ -13,6 +13,7 @@
 #include <sstream>
 #include <iostream>
 #include "SelfRegistration.h"
+#include "Inserter.h"
 
 cpp_conv::resources::ResourceAsset* mapAssetHandler(cpp_conv::resources::resource_manager::FileData& rData)
 {
@@ -34,6 +35,8 @@ cpp_conv::resources::ResourceAsset* mapAssetHandler(cpp_conv::resources::resourc
             case '<': pEntity = new cpp_conv::Conveyor(iCol, iRow, Direction::Left); break;
             case '^': pEntity = new cpp_conv::Conveyor(iCol, iRow, Direction::Down); break;
             case 'v': pEntity = new cpp_conv::Conveyor(iCol, iRow, Direction::Up); break;
+            case 'I': pEntity = new cpp_conv::Inserter(iCol, iRow, Direction::Down, cpp_conv::InserterId::FromStringId("INSERTER_BASIC")); break;
+            case 'U': pEntity = new cpp_conv::Inserter(iCol, iRow, Direction::Up, cpp_conv::InserterId::FromStringId("INSERTER_BASIC")); break;
             case 'A': pEntity = new cpp_conv::Factory(iCol, iRow, Direction::Right, cpp_conv::FactoryId::FromStringId("ITEM_COAL_PRODUCER")); break;
             case 'D': pEntity = new cpp_conv::Factory(iCol, iRow, Direction::Left, cpp_conv::FactoryId::FromStringId("ITEM_COAL_PRODUCER")); break;
             case 'F': pEntity = new cpp_conv::Factory(iCol, iRow, Direction::Down, cpp_conv::FactoryId::FromStringId("ITEM_COAL_PRODUCER")); break;

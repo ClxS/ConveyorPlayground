@@ -17,11 +17,10 @@ namespace cpp_conv
 
         Entity* SafeGetEntity(const EntityGrid& grid, Position pos);
         Position GetForwardPosition(const Position& position, Direction direction);
-        Position GetForwardPosition(const Entity& entity, Direction direction);
-        Position GetForwardPosition(const Conveyor& conveyor);
-        Position GetRightPosition(const Conveyor& conveyor);
-        Position GetBackwardsPosition(const Conveyor& conveyor);
-        Position GetLeftPosition(const Conveyor& conveyor);
+        Position GetForwardPosition(const Entity& rEntity);
+        Position GetRightPosition(const Entity& rEntity);
+        Position GetBackwardsPosition(const Entity& rEntity);
+        Position GetLeftPosition(const Entity& rEntity);
 
         bool IsConveyor(const Entity* pEntity);
 

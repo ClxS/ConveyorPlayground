@@ -25,4 +25,5 @@ enum class EntityKind
     Junction,
     Underground,
     Storage,
+    Inserter,
 };

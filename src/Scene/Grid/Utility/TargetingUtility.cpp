@@ -76,7 +76,7 @@ cpp_conv::Conveyor::Channel* cpp_conv::targeting_util::GetTargetChannel(const cp
     Direction eSourceDirection = sourceNode.GetDirection();    
 
     int mask = (int)eSourceDirection | (int)targetNode.m_direction;
-    if (mask == 0b11 || (mask >> 2) == 0b11)
+    if (sourceNode.m_eEntityKind != EntityKind::Junction && (mask == 0b11 || (mask >> 2) == 0b11))
     {
         // The nodes are facing either other, no valid path.
         return nullptr;

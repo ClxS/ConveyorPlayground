@@ -280,3 +280,32 @@ bool cpp_conv::Conveyor::TryInsert(const SceneContext& kContext, const Entity& p
     forwardPendingItem = pItem;
     return true;
 }
+
+bool cpp_conv::Conveyor::TryGrab(const SceneContext& kContext, bool bSingle, std::tuple<ItemId, uint32_t>& outItem)
+{
+    bool bIsCorner = cpp_conv::targeting_util::IsCornerConveyor(kContext.m_grid, *this);
+    int iInnerMostChannel;
+    Direction eCornerDirection;
+    std::tie(iInnerMostChannel, eCornerDirection) = GetInnerMostCornerChannel(kContext.m_grid, *this);
+
+    for (int iChannelIdx = 0; iChannelIdx < c_conveyorChannels; ++iChannelIdx)
+    {
+        int iChannelLength = cpp_conv::c_conveyorChannelSlots;
+        if (bIsCorner)
+        {
+            iChannelLength += iInnerMostChannel == iChannelIdx ? -1 : 1;
+        }
+
+        for (int iChannelSlot = 0; iChannelSlot < iChannelLength; ++iChannelSlot)
+        {
+            if (!m_pChannels[iChannelIdx].m_pItems[iChannelSlot].IsEmpty())
+            {
+                outItem = std::make_tuple(m_pChannels[iChannelIdx].m_pItems[iChannelSlot], 1);
+                m_pChannels[iChannelIdx].m_pItems[iChannelSlot] = ItemIds::None;
+                return true;
+            }
+        }
+    }
+
+    return false;
+}

@@ -39,10 +39,10 @@ void cpp_conv::Junction::Tick(const SceneContext& kContext)
     m_uiTick++;
     std::array<std::tuple<cpp_conv::Entity*, Direction>, 4> arrDirectionEntities =
     {
-        std::make_tuple(cpp_conv::grid::SafeGetEntity(kContext.m_grid, cpp_conv::grid::GetForwardPosition(*this, Direction::Up)), Direction::Up),
-        std::make_tuple(cpp_conv::grid::SafeGetEntity(kContext.m_grid, cpp_conv::grid::GetForwardPosition(*this, Direction::Right)), Direction::Right),
-        std::make_tuple(cpp_conv::grid::SafeGetEntity(kContext.m_grid, cpp_conv::grid::GetForwardPosition(*this, Direction::Down)), Direction::Down),
-        std::make_tuple(cpp_conv::grid::SafeGetEntity(kContext.m_grid, cpp_conv::grid::GetForwardPosition(*this, Direction::Left)), Direction::Left),
+        std::make_tuple(cpp_conv::grid::SafeGetEntity(kContext.m_grid, cpp_conv::grid::GetForwardPosition(m_position, Direction::Up)), Direction::Up),
+        std::make_tuple(cpp_conv::grid::SafeGetEntity(kContext.m_grid, cpp_conv::grid::GetForwardPosition(m_position, Direction::Right)), Direction::Right),
+        std::make_tuple(cpp_conv::grid::SafeGetEntity(kContext.m_grid, cpp_conv::grid::GetForwardPosition(m_position, Direction::Down)), Direction::Down),
+        std::make_tuple(cpp_conv::grid::SafeGetEntity(kContext.m_grid, cpp_conv::grid::GetForwardPosition(m_position, Direction::Left)), Direction::Left),
     };
 
     std::default_random_engine engine(m_uiTick % 256);

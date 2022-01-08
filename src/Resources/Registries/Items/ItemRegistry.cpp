@@ -41,7 +41,6 @@ cpp_conv::resources::ResourceAsset* itemAssetHandler(cpp_conv::resources::resour
 
     std::string id;
     std::string name;
-    char icon = 0;
 
     int idx = 0;
     std::string token;
@@ -51,13 +50,12 @@ cpp_conv::resources::ResourceAsset* itemAssetHandler(cpp_conv::resources::resour
         {
         case 0: id = token; break;
         case 1: name = token; break;
-        case 2: icon = token[0]; break;
         }
 
         idx++;
     }
      
-    return new cpp_conv::ItemDefinition(cpp_conv::ItemId::FromStringId(id), rData.m_registryId, name, icon);
+    return new cpp_conv::ItemDefinition(cpp_conv::ItemId::FromStringId(id), rData.m_registryId, name);
 }
 
 const cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> cpp_conv::resources::getItemDefinition(cpp_conv::ItemId id)

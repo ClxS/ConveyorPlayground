@@ -1,12 +1,12 @@
- AvD
- AvD
- AvD
- AvD
-A>>>>>>>S
- A^D
- A^D
- A^D
- A^D
+ AvD  >>>
+ AvD  I
+ AvD  ^
+ AvD  ^
+A>>>>>J>S
+ A^D  v
+ A^D  v
+ A^D  U
+ A^D  >>>
 
 
 

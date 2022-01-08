@@ -78,7 +78,7 @@ void cpp_conv::Factory::Tick(const SceneContext& kContext)
         return;
     }
 
-    cpp_conv::Entity* pEntity = cpp_conv::grid::SafeGetEntity(kContext.m_grid, cpp_conv::grid::GetForwardPosition(*this, GetDirection()));
+    cpp_conv::Entity* pEntity = cpp_conv::grid::SafeGetEntity(kContext.m_grid, cpp_conv::grid::GetForwardPosition(*this));
     if (!pEntity || !pEntity->SupportsInsertion())
     {
         return;

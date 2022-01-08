@@ -1,3 +1,5 @@
 INSERTER_BASIC
 Basic Inserter
-10
+4
+2
+0

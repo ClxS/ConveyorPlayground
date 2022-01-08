@@ -28,21 +28,16 @@ Position cpp_conv::grid::GetForwardPosition(const Position& position, Direction 
     return position + facingDirection;
 }
 
-Position cpp_conv::grid::GetForwardPosition(const cpp_conv::Entity& entity, Direction direction)
-{
-    return GetForwardPosition(entity.m_position, direction);
-}
-
-Position cpp_conv::grid::GetForwardPosition(const cpp_conv::Conveyor& conveyor)
+Position cpp_conv::grid::GetForwardPosition(const cpp_conv::Entity& rEntity)
 {    
-    return GetForwardPosition(conveyor, conveyor.m_direction);
+    return GetForwardPosition(rEntity.m_position, rEntity.GetDirection());
 }
 
-Position cpp_conv::grid::GetRightPosition(const cpp_conv::Conveyor& conveyor)
+Position cpp_conv::grid::GetRightPosition(const cpp_conv::Entity& rEntity)
 {
     Position facingDirection = { 0, 0 };
 
-    switch (conveyor.m_direction)
+    switch (rEntity.GetDirection())
     {
     case Direction::Left: facingDirection = { 0, 1 }; break;
     case Direction::Up: facingDirection = { 1, 0 }; break;
@@ -50,19 +45,19 @@ Position cpp_conv::grid::GetRightPosition(const cpp_conv::Conveyor& conveyor)
     case Direction::Down: facingDirection = { -1, 0 }; break;
     }
 
-    return conveyor.m_position + facingDirection;
+    return rEntity.m_position + facingDirection;
 }
 
-Position cpp_conv::grid::GetBackwardsPosition(const cpp_conv::Conveyor& conveyor)
+Position cpp_conv::grid::GetBackwardsPosition(const cpp_conv::Entity& rEntity)
 {
-    Position pos = GetForwardPosition(conveyor) - conveyor.m_position;
-    return conveyor.m_position - pos;
+    Position pos = GetForwardPosition(rEntity) - rEntity.m_position;
+    return rEntity.m_position - pos;
 }
 
-Position cpp_conv::grid::GetLeftPosition(const cpp_conv::Conveyor& conveyor)
+Position cpp_conv::grid::GetLeftPosition(const cpp_conv::Entity& rEntity)
 {
-    Position pos = GetRightPosition(conveyor) - conveyor.m_position;
-    return conveyor.m_position - pos;
+    Position pos = GetRightPosition(rEntity) - rEntity.m_position;
+    return rEntity.m_position - pos;
 }
 
 bool cpp_conv::grid::IsConveyor(const cpp_conv::Entity* pEntity)

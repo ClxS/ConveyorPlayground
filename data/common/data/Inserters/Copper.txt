@@ -1,3 +1,0 @@
-INSERTER_BASIC
-Basic Inserter
-10
