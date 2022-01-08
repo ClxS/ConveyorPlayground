@@ -1,4 +1,4 @@
-#include "Producer.h"
+#include "ProductionEntity.h"
 #include "Conveyor.h"
 #include "SceneContext.h"
 
@@ -11,9 +11,9 @@
 #include "ResourceManager.h"
 #include "ResourceRegistry.h"
 #include "TileAsset.h"
-#include "ItemId.h"
+#include "DataId.h"
 
-cpp_conv::Producer::Producer(int x, int y, Direction direction, ItemId pItem, uint64_t productionRate)
+cpp_conv::ProductionEntity::ProductionEntity(int x, int y, Direction direction, ItemId pItem, uint64_t productionRate)
     : Entity(x, y, EntityKind::Producer)
     , m_pItem(pItem)
     , m_direction(direction)
@@ -23,12 +23,12 @@ cpp_conv::Producer::Producer(int x, int y, Direction direction, ItemId pItem, ui
 {
 }
 
-bool cpp_conv::Producer::IsReadyToProduce() const
+bool cpp_conv::ProductionEntity::IsReadyToProduce() const
 {
     return m_bProductionReady;
 }
 
-cpp_conv::ItemId cpp_conv::Producer::ProduceItem()
+cpp_conv::ItemId cpp_conv::ProductionEntity::ProduceItem()
 {
     if (!m_bProductionReady)
     {
@@ -39,7 +39,7 @@ cpp_conv::ItemId cpp_conv::Producer::ProduceItem()
     return m_pItem;
 }
 
-void cpp_conv::Producer::Tick(const SceneContext& kContext)
+void cpp_conv::ProductionEntity::Tick(const SceneContext& kContext)
 {
     if (!IsReadyToProduce())
     {
@@ -77,7 +77,7 @@ void cpp_conv::Producer::Tick(const SceneContext& kContext)
     }
 }
 
-void cpp_conv::Producer::Draw(RenderContext& kRenderContext) const
+void cpp_conv::ProductionEntity::Draw(RenderContext& kRenderContext) const
 {
     auto pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Tunnel);
     if (!pTile)

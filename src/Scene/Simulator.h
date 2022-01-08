@@ -6,8 +6,6 @@
 
 namespace cpp_conv
 {
-    class Producer;
-    class Conveyor;
     struct SceneContext;
 
     namespace simulation

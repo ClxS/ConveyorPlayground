@@ -4,7 +4,7 @@
 #include "Entity.h"
 #include "Conveyor.h"
 #include "Junction.h"
-#include "Producer.h"
+#include "ProductionEntity.h"
 #include "Underground.h"
 #include "Storage.h"
 #include "ItemRegistry.h"
@@ -32,10 +32,10 @@ cpp_conv::resources::ResourceAsset* mapAssetHandler(cpp_conv::resources::resourc
             case '<': pEntity = new cpp_conv::Conveyor(iCol, iRow, Direction::Left); break;
             case '^': pEntity = new cpp_conv::Conveyor(iCol, iRow, Direction::Down); break;
             case 'v': pEntity = new cpp_conv::Conveyor(iCol, iRow, Direction::Up); break;
-            case 'A': pEntity = new cpp_conv::Producer(iCol, iRow, Direction::Right, cpp_conv::resources::itemIdFromStringId("ITEM_COPPER_ORE"), 7); break;
-            case 'D': pEntity = new cpp_conv::Producer(iCol, iRow, Direction::Left, cpp_conv::resources::itemIdFromStringId("ITEM_COPPER_ORE"), 7); break;
-            case 'F': pEntity = new cpp_conv::Producer(iCol, iRow, Direction::Down, cpp_conv::resources::itemIdFromStringId("ITEM_COPPER_ORE"), 7); break;
-            case 'G': pEntity = new cpp_conv::Producer(iCol, iRow, Direction::Up, cpp_conv::resources::itemIdFromStringId("ITEM_COPPER_ORE"), 7); break;
+            case 'A': pEntity = new cpp_conv::ProductionEntity(iCol, iRow, Direction::Right, cpp_conv::resources::itemIdFromStringId("ITEM_COPPER_ORE"), 7); break;
+            case 'D': pEntity = new cpp_conv::ProductionEntity(iCol, iRow, Direction::Left, cpp_conv::resources::itemIdFromStringId("ITEM_COPPER_ORE"), 7); break;
+            case 'F': pEntity = new cpp_conv::ProductionEntity(iCol, iRow, Direction::Down, cpp_conv::resources::itemIdFromStringId("ITEM_COPPER_ORE"), 7); break;
+            case 'G': pEntity = new cpp_conv::ProductionEntity(iCol, iRow, Direction::Up, cpp_conv::resources::itemIdFromStringId("ITEM_COPPER_ORE"), 7); break;
             case 'J': pEntity = new cpp_conv::Junction(iCol, iRow); break;
             case 'S': pEntity = new cpp_conv::Storage(iCol, iRow, 16, 256); break;
             case 'u': pEntity = new cpp_conv::Underground(iCol, iRow, Direction::Down); break;

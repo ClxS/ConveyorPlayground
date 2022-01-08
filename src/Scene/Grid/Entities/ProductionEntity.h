@@ -8,10 +8,10 @@ namespace cpp_conv
     struct SceneContext;
     struct RenderContext;
 
-    class Producer : public Entity
+    class ProductionEntity : public Entity
     { 
     public:
-        Producer(int x, int y, Direction direction, ItemId pItem, uint64_t productionRate);
+        ProductionEntity(int x, int y, Direction direction, ItemId pItem, uint64_t productionRate);
 
         bool IsReadyToProduce() const;
 

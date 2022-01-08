@@ -1,6 +1,4 @@
 #include "Simulator.h"
-#include "Producer.h"
-#include "Junction.h"
 #include "SceneContext.h"
 
 void cpp_conv::simulation::simulate(SceneContext& kContext)
