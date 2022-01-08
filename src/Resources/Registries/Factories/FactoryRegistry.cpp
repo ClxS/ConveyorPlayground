@@ -10,35 +10,27 @@
 #include <sstream>
 #include <iostream>
 #include "SelfRegistration.h"
+#include "DataId.h"
 
 using RegistryId = cpp_conv::resources::registry::RegistryId;
 std::vector<cpp_conv::resources::AssetPtr<cpp_conv::FactoryDefinition>> g_vFactories;
 
-void loadFactories()
+namespace
 {
-    for (int i = 0; i < sizeof(cpp_conv::resources::registry::c_szFactoryPaths) / sizeof(const char*); i++)
+    void loadFactories()
     {
-        RegistryId asset = { i, 4 };
-        auto pAsset = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::FactoryDefinition>(asset);
-        if (!pAsset)
+        for (int i = 0; i < sizeof(cpp_conv::resources::registry::c_szFactoryPaths) / sizeof(const char*); i++)
         {
-            continue;
+            RegistryId asset = { i, 4 };
+            auto pAsset = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::FactoryDefinition>(asset);
+            if (!pAsset)
+            {
+                continue;
+            }
+
+            g_vFactories.push_back(pAsset);
         }
-
-        g_vFactories.push_back(pAsset);
     }
-}
-
-cpp_conv::FactoryId cpp_conv::resources::factoryIdFromStringId(const std::string_view str)
-{
-    uint64_t result = 0xcbf29ce484222325;
-    for (char c : str)
-    {
-        result *= 1099511628211;
-        result ^= c;
-    }
-
-    return { result };
 }
 
 cpp_conv::resources::ResourceAsset* factoryAssetHandler(cpp_conv::resources::resource_manager::FileData& rData)
@@ -69,10 +61,10 @@ cpp_conv::resources::ResourceAsset* factoryAssetHandler(cpp_conv::resources::res
     }
      
     return new cpp_conv::FactoryDefinition(
-        cpp_conv::resources::factoryIdFromStringId(id),
+        cpp_conv::FactoryId::FromStringId(id),
         rData.m_registryId,
         name,
-        cpp_conv::resources::itemIdFromStringId(producedItemId),
+        cpp_conv::ItemId::FromStringId(producedItemId),
         rate);
 }
 

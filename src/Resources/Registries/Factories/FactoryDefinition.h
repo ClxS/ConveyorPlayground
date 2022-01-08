@@ -32,7 +32,6 @@ namespace cpp_conv
     private:
         cpp_conv::FactoryId m_internalId;
         cpp_conv::resources::registry::RegistryId m_registryId;
-        std::string m_internalName;
         std::string m_strName;
         ItemId m_producedItem;
         uint32_t m_uiProductionRate;

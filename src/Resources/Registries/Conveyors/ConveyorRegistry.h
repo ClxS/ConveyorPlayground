@@ -7,10 +7,10 @@
 
 namespace cpp_conv
 {
-    class FactoryDefinition;
+    class ConveyorDefinition;
 }
 
 namespace cpp_conv::resources
 {
-    const cpp_conv::resources::AssetPtr<cpp_conv::FactoryDefinition> getFactoryDefinition(cpp_conv::FactoryId id);
+    const cpp_conv::resources::AssetPtr<cpp_conv::ConveyorDefinition> getConveyorDefinition(cpp_conv::ConveyorId id);
 }

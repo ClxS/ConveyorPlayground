@@ -1,9 +1,22 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 namespace cpp_conv
 {
+    inline uint64_t idFromStringId(const std::string_view str)
+    {
+        uint64_t result = 0xcbf29ce484222325;
+        for (char c : str)
+        {
+            result *= 1099511628211;
+            result ^= c;
+        }
+
+        return { result };
+    }
+
     #define DEFINE_UNIQUE_DATA_TYPE(NAME)\
     struct NAME##Id\
     {\
@@ -14,6 +27,11 @@ namespace cpp_conv
         {\
             return m_uiItemId == other.m_uiItemId;\
         }\
+        static NAME##Id FromStringId(const std::string_view str)\
+        {\
+            uint64_t uiId = idFromStringId(str);\
+            return {uiId};\
+        }\
     };\
     namespace NAME##Ids\
     {\
@@ -22,6 +40,8 @@ namespace cpp_conv
 
     DEFINE_UNIQUE_DATA_TYPE(Item);
     DEFINE_UNIQUE_DATA_TYPE(Factory);
+    DEFINE_UNIQUE_DATA_TYPE(Conveyor);
+    DEFINE_UNIQUE_DATA_TYPE(Inserter);
 }
 
 

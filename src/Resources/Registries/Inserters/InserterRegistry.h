@@ -7,10 +7,10 @@
 
 namespace cpp_conv
 {
-    class FactoryDefinition;
+    class InserterDefinition;
 }
 
 namespace cpp_conv::resources
 {
-    const cpp_conv::resources::AssetPtr<cpp_conv::FactoryDefinition> getFactoryDefinition(cpp_conv::FactoryId id);
+    const cpp_conv::resources::AssetPtr<cpp_conv::InserterDefinition> getInserterDefinition(cpp_conv::InserterId id);
 }

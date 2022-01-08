@@ -1,7 +1,7 @@
-#include "ItemRegistry.h"
+#include "InserterRegistry.h"
 #include "ResourceRegistry.h"
 #include "ResourceManager.h"
-#include "ItemDefinition.h"
+#include "InserterDefinition.h"
 #include "AssetPtr.h"
 
 #include <vector>
@@ -12,7 +12,7 @@
 #include "DataId.h"
 
 using RegistryId = cpp_conv::resources::registry::RegistryId;
-std::vector<cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition>> g_vItems;
+std::vector<cpp_conv::resources::AssetPtr<cpp_conv::InserterDefinition>> g_vItems;
 
 namespace
 {
@@ -21,7 +21,7 @@ namespace
         for (int i = 0; i < sizeof(cpp_conv::resources::registry::c_szItemsPaths) / sizeof(const char*); i++)
         {
             RegistryId asset = { i, 2 };
-            auto pAsset = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::ItemDefinition>(asset);
+            auto pAsset = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::InserterDefinition>(asset);
             if (!pAsset)
             {
                 continue;
@@ -32,7 +32,7 @@ namespace
     }
 }
 
-cpp_conv::resources::ResourceAsset* itemAssetHandler(cpp_conv::resources::resource_manager::FileData& rData)
+cpp_conv::resources::ResourceAsset* inserterAssetHandler(cpp_conv::resources::resource_manager::FileData& rData)
 {
     const char* pStrData = reinterpret_cast<const char*>(rData.m_pData);
 
@@ -57,10 +57,10 @@ cpp_conv::resources::ResourceAsset* itemAssetHandler(cpp_conv::resources::resour
         idx++;
     }
      
-    return new cpp_conv::ItemDefinition(cpp_conv::ItemId::FromStringId(id), rData.m_registryId, name, icon);
+    return new cpp_conv::InserterDefinition(cpp_conv::InserterId::FromStringId(id), rData.m_registryId, name, icon);
 }
 
-const cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> cpp_conv::resources::getItemDefinition(cpp_conv::ItemId id)
+const cpp_conv::resources::AssetPtr<cpp_conv::InserterDefinition> cpp_conv::resources::getInserterDefinition(cpp_conv::InserterId id)
 {
     for (auto item : g_vItems)
     {
@@ -73,5 +73,5 @@ const cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> cpp_conv::resource
     return nullptr;
 }
 
-REGISTER_ASSET_LOAD_HANDLER(cpp_conv::ItemDefinition, itemAssetHandler);
+REGISTER_ASSET_LOAD_HANDLER(cpp_conv::InserterDefinition, inserterAssetHandler);
 REGISTER_LOAD_HANDLER(loadItems);
