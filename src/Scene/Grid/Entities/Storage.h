@@ -3,6 +3,7 @@
 #include "Entity.h"
 
 #include <vector>
+#include "GeneralItemContainer.h"
 
 namespace cpp_conv
 {
@@ -20,14 +21,6 @@ namespace cpp_conv
         bool TryGrab(const SceneContext& kContext, bool bSingle, std::tuple<ItemId, uint32_t>& outItem) override;
 
     private:
-        struct ItemEntry
-        {
-            ItemId m_pItem;
-            uint32_t m_pCount;
-        };
-
-        std::vector<ItemEntry> m_vItemEntries;
-        uint32_t m_uiMaxCapacity;
-        uint32_t m_uiMaxStackSize;
+        GeneralItemContainer m_itemContainer;
     };
 }

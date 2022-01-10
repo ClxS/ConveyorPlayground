@@ -16,12 +16,14 @@
 #include "Map.h"
 #include "SelfRegistration.h"
 
+#include "ItemRegistry.h"
+#include "FactoryRegistry.h"
+#include "Gui.h"
+
 #include <tuple>
 #include <vector>
 #include <queue>
 #include <chrono>
-#include "ItemRegistry.h"
-#include "FactoryRegistry.h"
 
 using namespace cpp_conv::resources;
 
@@ -57,6 +59,25 @@ namespace
         kRenderContext.m_cameraQuad.m_x = max(kRenderContext.m_cameraQuad.m_x, 0);
         kRenderContext.m_cameraQuad.m_y = max(kRenderContext.m_cameraQuad.m_y, 0);
     }
+}
+
+void updateUI(cpp_conv::SceneContext& kSceneContext, cpp_conv::RenderContext& kRenderContext)
+{
+    using namespace cpp_conv;
+
+    ui::setContext(&kRenderContext);
+    ui::panel("Game UI", ui::Align::Stretch);
+        ui::panel("Right Panel", ui::Align::Right, 500);
+            ui::text("CPP CONVEYORS!");
+            ui::text("1");
+            ui::text("2");
+            ui::text("3");
+        ui::endPanel();
+        ui::panel("Footer", ui::Align::Bottom, 0, 18);
+            ui::text("Item:");
+        ui::endPanel();
+    ui::endPanel();
+    ui::setContext(nullptr);
 }
 
 void cpp_conv::game::run()
@@ -98,6 +119,8 @@ void cpp_conv::game::run()
     cpp_conv::FrameLimiter frameLimter(10);
     std::queue<cpp_conv::commands::CommandType> commands;
 
+    cpp_conv::ui::initializeGuiSystem(1920, 1080);
+
     frameLimter.Start();
     float fCurrentZoom = kRenderContext.m_fZoom;
     while (true)
@@ -124,6 +147,7 @@ void cpp_conv::game::run()
 
         PROFILE(UpdateCamera, updateCamera(kSceneContext, kRenderContext));
         PROFILE(Render, cpp_conv::renderer::render(kSceneContext, kRenderContext));
+        PROFILE(UpdateUI, updateUI(kSceneContext, kRenderContext));
         PROFILE(Present, swapChain.SwapAndPresent());
 
         PROFILE(FrameCapSleep, frameLimter.Limit());

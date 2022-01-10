@@ -3,6 +3,7 @@
 #include "Renderer.h"
 #include "Entity.h"
 #include "DataId.h"
+#include "GeneralItemContainer.h"
 
 namespace cpp_conv
 {
@@ -38,15 +39,8 @@ namespace cpp_conv
         bool TrySatisfyRecipeInput(const cpp_conv::FactoryDefinition* pFactory, uint64_t& uiOutEffort);
         void RunOutputCycle(const SceneContext& kContext, const cpp_conv::FactoryDefinition* pFactory);
 
-        struct ItemEntry
-        {
-            ItemId m_pItem;
-            uint32_t m_pCount;
-        };
-
-        std::vector<ItemEntry> m_vRecipeItemStorage;
-        std::vector<ItemEntry> m_vProducedItems;
-        uint32_t m_uiMaxStackSize;
+        GeneralItemContainer m_inputItems;
+        GeneralItemContainer m_outputItems;
 
         FactoryId m_hFactoryId;
         RecipeId m_hActiveRecipeId;

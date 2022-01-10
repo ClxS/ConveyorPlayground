@@ -19,6 +19,7 @@
 #include "RecipeDefinition.h"
 #include <vector>
 #include "Profiler.h"
+#include "GeneralItemContainer.h"
 
 cpp_conv::Factory::Factory(int x, int y, Direction direction, FactoryId factoryId, uint32_t uiMaxStackSize)
     : Entity(x, y, EntityKind::Producer)
@@ -27,7 +28,8 @@ cpp_conv::Factory::Factory(int x, int y, Direction direction, FactoryId factoryI
     , m_direction(direction)
     , m_uiRemainingCurrentProductionEffort(0)
     , m_bIsRecipeDemandSatisfied(false)
-    , m_uiMaxStackSize(uiMaxStackSize)
+    , m_inputItems(8, uiMaxStackSize, true)
+    , m_outputItems(8, uiMaxStackSize, true)
     , m_uiTick(0)
 {
     const cpp_conv::resources::AssetPtr<cpp_conv::FactoryDefinition> pFactory = cpp_conv::resources::getFactoryDefinition(factoryId);
@@ -58,17 +60,7 @@ bool cpp_conv::Factory::ProduceItems()
 
     for (const auto& pItem : vOutputItems)
     {
-        bool bIsMet = true;
-        for (auto& rStorageItem : m_vProducedItems)
-        {
-            if (rStorageItem.m_pItem == pItem.m_idItem && (rStorageItem.m_pCount + pItem.m_uiCount) > m_uiMaxStackSize)
-            {
-                bIsMet = false;
-                break;
-            }
-        }
-
-        if (!bIsMet)
+        if (!m_outputItems.CouldInsert(pItem.m_idItem, pItem.m_uiCount))
         {
             return false;
         }
@@ -76,21 +68,7 @@ bool cpp_conv::Factory::ProduceItems()
 
     for (const auto& pItem : vOutputItems)
     {
-        bool bIsMet = false;
-        for (auto& rStorageItem : m_vProducedItems)
-        {
-            if (rStorageItem.m_pItem == pItem.m_idItem)
-            {
-                rStorageItem.m_pCount += pItem.m_uiCount;
-                bIsMet = true;
-                break;
-            }
-        }
-
-        if (!bIsMet)
-        {
-            m_vProducedItems.emplace_back(pItem.m_idItem, pItem.m_uiCount);
-        }
+        m_outputItems.TryInsert(pItem.m_idItem, pItem.m_uiCount);
     }
 
     return true;
@@ -137,26 +115,7 @@ void cpp_conv::Factory::Draw(RenderContext& kRenderContext) const
 
 bool cpp_conv::Factory::TryGrab(const SceneContext& kContext, bool bSingle, std::tuple<ItemId, uint32_t>& outItem)
 {
-    if (m_vProducedItems.empty())
-    {
-        return false;
-    }
-
-    uint32_t uiCount = 1; 
-    if (bSingle)
-    {
-        uiCount = m_vProducedItems[0].m_pCount;
-    }
-
-    outItem = std::make_tuple(m_vProducedItems[0].m_pItem, m_vProducedItems[0].m_pCount);
-
-    m_vProducedItems[0].m_pCount -= uiCount;
-    if (m_vProducedItems[0].m_pCount == 0)
-    {
-        m_vProducedItems.erase(m_vProducedItems.begin());
-    }
-
-    return true;
+    return m_outputItems.TryTake(bSingle, outItem);
 }
 
 bool cpp_conv::Factory::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel)
@@ -166,7 +125,6 @@ bool cpp_conv::Factory::TryInsert(const SceneContext& kContext, const Entity& pS
         // We only allow inserters
         return false;
     }
-
     const cpp_conv::resources::AssetPtr<cpp_conv::RecipeDefinition> pRecipe = cpp_conv::resources::getRecipeDefinition(m_hActiveRecipeId);
     if (!pRecipe)
     {
@@ -188,23 +146,7 @@ bool cpp_conv::Factory::TryInsert(const SceneContext& kContext, const Entity& pS
         return false;
     }
 
-    auto itItems = m_vRecipeItemStorage.begin();
-    while (itItems != m_vRecipeItemStorage.end())
-    {
-        if (itItems->m_pItem == pItem)
-        {
-            if (itItems->m_pCount >= m_uiMaxStackSize)
-            {
-                return false;
-            }
-
-            itItems->m_pCount++;
-            return true;
-        }
-    }
-
-    m_vRecipeItemStorage.emplace_back(pItem, 1);
-    return true;
+    return m_inputItems.TryInsert(pItem);
 }
 
 void cpp_conv::Factory::RunProductionCycle(const cpp_conv::FactoryDefinition* pFactory)
@@ -242,7 +184,7 @@ void cpp_conv::Factory::RunProductionCycle(const cpp_conv::FactoryDefinition* pF
 
 void cpp_conv::Factory::RunOutputCycle(const SceneContext& kContext, const cpp_conv::FactoryDefinition* pFactory)
 {
-    if (!pFactory->HasOwnOutputPipe() || m_vProducedItems.empty())
+    if (!pFactory->HasOwnOutputPipe() || m_outputItems.IsEmpty())
     {
         return;
     }
@@ -253,8 +195,9 @@ void cpp_conv::Factory::RunOutputCycle(const SceneContext& kContext, const cpp_c
         return;
     }
 
-    auto itItems = m_vProducedItems.begin();
-    while (itItems != m_vProducedItems.end())
+    auto& vContainerItems = m_outputItems.GetItems();
+    auto itItems = vContainerItems.begin();
+    while(itItems != vContainerItems.end())
     {
         for (uint32_t i = 0; i < itItems->m_pCount; ++i)
         {
@@ -268,7 +211,7 @@ void cpp_conv::Factory::RunOutputCycle(const SceneContext& kContext, const cpp_c
 
         if (itItems->m_pCount == 0)
         {
-            itItems = m_vProducedItems.erase(itItems);
+            itItems = vContainerItems.erase(itItems);
         }
         else
         {
@@ -295,7 +238,7 @@ bool cpp_conv::Factory::TrySatisfyRecipeInput(const cpp_conv::FactoryDefinition*
     for (const auto& pItem : vInputItems)
     {
         bool bIsMet = false;
-        for (auto& rStorageItem : m_vRecipeItemStorage)
+        for (auto& rStorageItem : m_inputItems.GetItems())
         {
             if (rStorageItem.m_pItem == pItem.m_idItem && rStorageItem.m_pCount >= pItem.m_uiCount)
             {
@@ -312,13 +255,7 @@ bool cpp_conv::Factory::TrySatisfyRecipeInput(const cpp_conv::FactoryDefinition*
 
     for (const auto& pItem : vInputItems)
     {
-        for (auto& rStorageItem : m_vRecipeItemStorage)
-        {
-            if (rStorageItem.m_pItem == pItem.m_idItem && rStorageItem.m_pCount == pItem.m_uiCount)
-            {
-                rStorageItem.m_pCount -= pItem.m_uiCount;
-            }
-        }
+        m_inputItems.TryTake(pItem.m_idItem, pItem.m_uiCount);
     }
 
     return true;
