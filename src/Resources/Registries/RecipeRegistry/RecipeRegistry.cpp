@@ -65,7 +65,7 @@ namespace
                     std::istringstream tmp(token);
                     tmp >> item >> count;
 
-                    (bIsInputItems ? inputs : outputs).emplace_back(cpp_conv::ItemId::FromStringId(id), count);
+                    (bIsInputItems ? inputs : outputs).emplace_back(cpp_conv::ItemId::FromStringId(item), count);
                 }
 
                 break;

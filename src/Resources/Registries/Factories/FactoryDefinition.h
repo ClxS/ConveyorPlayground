@@ -18,19 +18,22 @@ namespace cpp_conv
             cpp_conv::resources::registry::RegistryId registryId,
             std::string strName,
             uint32_t productionRate,
-            ItemId producedItem)
+            bool bHasOwnOutputPipe,
+            RecipeId producedRecipe)
             : m_internalId(internalId)
             , m_registryId(registryId)
             , m_strName(std::move(strName))
             , m_uiProductionRate(productionRate)
-            , m_producedItem(producedItem)
+            , m_bHasOwnOutputPipe(bHasOwnOutputPipe)
+            , m_producedRecipe(producedRecipe)
         {
         }
 
         cpp_conv::FactoryId GetInternalId() const { return m_internalId; }
         const std::string& GetName() const { return m_strName; }
-        ItemId GetProducedItem() const { return m_producedItem; }
         uint32_t GetProductionRate() const { return m_uiProductionRate; }
+        bool HasOwnOutputPipe() const { return m_bHasOwnOutputPipe; }
+        RecipeId GetProducedRecipe() const { return m_producedRecipe; }
 
         cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> GetTile() const;
 
@@ -39,6 +42,7 @@ namespace cpp_conv
         cpp_conv::resources::registry::RegistryId m_registryId;
         std::string m_strName;
         uint32_t m_uiProductionRate;
-        ItemId m_producedItem;
+        bool m_bHasOwnOutputPipe;
+        RecipeId m_producedRecipe;
     };
 }

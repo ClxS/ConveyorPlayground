@@ -43,14 +43,14 @@ cpp_conv::resources::ResourceAsset* mapAssetHandler(cpp_conv::resources::resourc
             case 'D': pEntity = new cpp_conv::Factory(iCol, iRow, Direction::Left, cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_MINE")); break;
             case 'F': pEntity = new cpp_conv::Factory(iCol, iRow, Direction::Down, cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_MINE")); break;
             case 'G': pEntity = new cpp_conv::Factory(iCol, iRow, Direction::Up, cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_MINE")); break;
-            case 'C': pEntity = new cpp_conv::Factory(iCol, iRow, cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_SMELTER")); break;
+            case 'C': pEntity = new cpp_conv::Factory(iCol, iRow, Direction::Right, cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_SMELTER")); break;
             case 'J': pEntity = new cpp_conv::Junction(iCol, iRow); break;
             case 'S': pEntity = new cpp_conv::Storage(iCol, iRow, 16, 256); break;
             case 'u': pEntity = new cpp_conv::Underground(iCol, iRow, Direction::Down); break;
             case 'y': pEntity = new cpp_conv::Underground(iCol, iRow, Direction::Up); break;
             case 'i': pEntity = new cpp_conv::Underground(iCol, iRow, Direction::Left); break;
             case 'o': pEntity = new cpp_conv::Underground(iCol, iRow, Direction::Right); break;
-            }
+            } 
 
             if (pEntity)
             {
