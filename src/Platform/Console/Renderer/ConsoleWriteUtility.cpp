@@ -47,10 +47,13 @@ WORD cpp_conv::renderer::getWin32Colour(cpp_conv::Colour colour)
     return value;
 }
 
-void cpp_conv::renderer::setCell(RenderContext& kContext, wchar_t value, int x, int y, WORD colour)
+void cpp_conv::renderer::setCell(RenderContext& kContext, wchar_t value, int x, int y, WORD colour, bool bSuppressPan)
 {
-    x -= kContext.m_cameraQuad.GetLeft();
-    y -= kContext.m_cameraQuad.GetTop();
+    if (!bSuppressPan)
+    {
+        x -= kContext.m_cameraQuad.GetLeft();
+        y -= kContext.m_cameraQuad.GetTop();
+    }
 
     if (kContext.m_surface == nullptr || x < 0 || y < 0 || x >= kContext.m_surface->GetWidth() || y >= kContext.m_surface->GetHeight())
     {

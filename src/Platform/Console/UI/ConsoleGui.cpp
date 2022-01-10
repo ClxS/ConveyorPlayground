@@ -5,7 +5,7 @@
 #include "Gui.h"
 #include "ConsoleWriteUtility.h"
 
-void cpp_conv::ui::platform::drawText(const char* szText, cpp_conv::Colour colour, uint32_t x, uint32_t y)
+void cpp_conv::ui::platform::drawText(const std::string& szText, cpp_conv::Colour colour, uint32_t x, uint32_t y)
 {
     uint32_t designWidth, designHeight;
     std::tie(designWidth, designHeight) = getDesignDimensions();
@@ -17,13 +17,13 @@ void cpp_conv::ui::platform::drawText(const char* szText, cpp_conv::Colour colou
 
     uint32_t consoleWorldX = (uint32_t)(x * fRlativeWidth);
     uint32_t consoleWorldY = (uint32_t)(y * fRelativeHeight);
-    for (int i = 0; i < std::strlen(szText); ++i)
+    for (int i = 0; i < szText.length(); ++i)
     {
-        cpp_conv::renderer::setCell(*pRenderContext, szText[i], consoleWorldX + i, consoleWorldY, cpp_conv::renderer::getWin32Colour(colour));
+        cpp_conv::renderer::setCell(*pRenderContext, szText[i], consoleWorldX + i, consoleWorldY, cpp_conv::renderer::getWin32Colour(colour), true);
     }
 }
 
-uint32_t getTextLineHeight()
+uint32_t cpp_conv::ui::platform::getTextLineHeight()
 {
-
+    return 40;
 }
