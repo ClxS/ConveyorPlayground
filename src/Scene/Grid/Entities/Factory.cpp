@@ -97,6 +97,7 @@ bool cpp_conv::Factory::ProduceItems()
 
 void cpp_conv::Factory::Tick(const SceneContext& kContext)
 {
+    PROFILE_FUNC();
     const cpp_conv::resources::AssetPtr<cpp_conv::FactoryDefinition> pFactory = cpp_conv::resources::getFactoryDefinition(m_hFactoryId);
     if (!pFactory)
     {
