@@ -13,5 +13,8 @@ namespace cpp_conv::commands
         PlaceConveyorDown,
         PlaceConveyorLeft,
         PlaceConveyorRight,
+
+        DecrementZoom,
+        IncrementZoom,
     };
 }

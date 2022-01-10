@@ -2,6 +2,8 @@
 #include "SceneContext.h"
 
 #include <chrono>
+#include "RenderContext.h"
+#include "AppHost.h"
 
 constexpr auto debounceTime = std::chrono::milliseconds(250);
 
@@ -76,6 +78,12 @@ void cpp_conv::command::processCommands(SceneContext& kContext, RenderContext& k
             break;
         case cpp_conv::commands::CommandType::PlaceConveyorRight:
             tryPlaceEntity(kContext, EntityKind::Conveyor, Direction::Right);
+            break;
+        case cpp_conv::commands::CommandType::DecrementZoom:
+            kRenderContext.m_fZoom -= 0.1f;
+            break;
+        case cpp_conv::commands::CommandType::IncrementZoom:
+            kRenderContext.m_fZoom += 0.1f;
             break;
         }
     }

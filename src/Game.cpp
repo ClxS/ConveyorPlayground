@@ -66,9 +66,6 @@ void cpp_conv::game::run()
     int iWidth, iHeight;
     std::tie(iWidth, iHeight) = cpp_conv::apphost::getAppDimensions();
 
-    cpp_conv::renderer::SwapChain swapChain(iWidth, iHeight);
-    cpp_conv::renderer::init(swapChain);
-
     cpp_conv::resources::registration::processSelfRegistrations();
     AssetPtr<Map> map = resource_manager::loadAsset<Map>(registry::data::MapSimple);
     if (!map)
@@ -89,14 +86,20 @@ void cpp_conv::game::run()
 
     cpp_conv::RenderContext kRenderContext =
     {
-        { 0, 0, swapChain.GetWriteSurface().GetWidth(), swapChain.GetWriteSurface().GetHeight() },
-        swapChain.GetWriteSurface(), 
-        map->GetGrid() };
+        { 0, 0, 0, 0 },
+        nullptr,
+        map->GetGrid(),
+        1.0f
+    };
+
+    cpp_conv::renderer::SwapChain swapChain(iWidth, iHeight);
+    cpp_conv::renderer::init(kRenderContext, swapChain);
 
     cpp_conv::FrameLimiter frameLimter(10);
     std::queue<cpp_conv::commands::CommandType> commands;
 
     frameLimter.Start();
+    float fCurrentZoom = kRenderContext.m_fZoom;
     while (true)
     {
         PROFILE(Input, cpp_conv::input::receiveInput(commands));
@@ -108,9 +111,14 @@ void cpp_conv::game::run()
             std::tie(iNewWidth, iNewHeight) = cpp_conv::apphost::getAppDimensions();
             if (swapChain.RequiresResize(iNewWidth, iNewHeight))
             {
-                swapChain.ResizeBuffers(iNewWidth, iNewHeight);
+                swapChain.ResizeBuffers(kRenderContext, iNewWidth, iNewHeight);
                 kRenderContext.m_cameraQuad.m_uiWidth = swapChain.GetWriteSurface().GetWidth();
                 kRenderContext.m_cameraQuad.m_uiHeight = swapChain.GetWriteSurface().GetHeight();
+            }
+            else if (fCurrentZoom != kRenderContext.m_fZoom)
+            {
+                swapChain.ResizeBuffers(kRenderContext, iNewWidth, iNewHeight);
+                fCurrentZoom = kRenderContext.m_fZoom;
             }
             }());
 

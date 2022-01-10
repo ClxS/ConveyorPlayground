@@ -1,4 +1,4 @@
-﻿#include "Renderer.h"
+#include "Renderer.h"
 #include "RenderContext.h"
 #include "SceneContext.h"
 #include "SwapChain.h"
@@ -36,21 +36,12 @@ namespace
     }
 }
 
-void cpp_conv::renderer::init(cpp_conv::renderer::SwapChain& rSwapChain)
-{
-    CONSOLE_FONT_INFOEX cfi;
-    cfi.cbSize = sizeof cfi;
-    cfi.nFont = 0;
-    cfi.dwFontSize.X = 0;
-    cfi.dwFontSize.Y = 18;
-    cfi.FontFamily = FF_DONTCARE;
-    cfi.FontWeight = FW_HEAVY;
-
-    wcscpy_s<32>(cfi.FaceName, L"Lucida Console");
-    ScreenBufferInitArgs kArgs = { cfi };
-
-    rSwapChain.Initialize(kArgs);
-
+void cpp_conv::renderer::init(cpp_conv::RenderContext& kContext, cpp_conv::renderer::SwapChain& rSwapChain)
+{    
+    ScreenBufferInitArgs kArgs = { };
+    rSwapChain.Initialize(kContext, kArgs);
+    kContext.m_cameraQuad = { 0, 0, rSwapChain.GetWriteSurface().GetWidth(), rSwapChain.GetWriteSurface().GetHeight() };
+    kContext.m_surface = &rSwapChain.GetWriteSurface();
     cpp_conv::renderer::registerTileRenderHandler();
 }
 

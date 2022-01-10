@@ -13,8 +13,18 @@ cpp_conv::renderer::ConsoleScreenBuffer::~ConsoleScreenBuffer()
     Shutdown();
 }
 
-void cpp_conv::renderer::ConsoleScreenBuffer::Initialize(ConsoleScreenBufferInitArgs& rArgs)
+void cpp_conv::renderer::ConsoleScreenBuffer::Initialize(RenderContext& kRenderContext, ConsoleScreenBufferInitArgs& rArgs)
 {
+    CONSOLE_FONT_INFOEX cfi;
+    cfi.cbSize = sizeof cfi;
+    cfi.nFont = 0;
+    cfi.dwFontSize.X = 0;
+    cfi.dwFontSize.Y = (SHORT)(18 * kRenderContext.m_fZoom);
+    cfi.FontFamily = FF_DONTCARE;
+    cfi.FontWeight = FW_HEAVY;
+
+    wcscpy_s<32>(cfi.FaceName, L"Lucida Console");
+
     m_initArgs = rArgs;
     COORD coordBufSize = { (SHORT)m_rWriteSurface.GetWidth(), (SHORT)m_rWriteSurface.GetHeight() };
     SMALL_RECT srctWriteRect;
@@ -29,9 +39,9 @@ void cpp_conv::renderer::ConsoleScreenBuffer::Initialize(ConsoleScreenBufferInit
         CONSOLE_TEXTMODE_BUFFER, // must be TEXTMODE 
         NULL);                   // reserved; must be NULL 
 
-    if (rArgs.m_surfaceFont.cbSize != 0)
+    if (cfi.cbSize != 0)
     {
-        SetCurrentConsoleFontEx(m_hBufferHandle, FALSE, &rArgs.m_surfaceFont);
+        SetCurrentConsoleFontEx(m_hBufferHandle, FALSE, &cfi);
     }
 
     SetConsoleScreenBufferSize(m_hBufferHandle, coordBufSize);
@@ -79,8 +89,8 @@ void cpp_conv::renderer::ConsoleScreenBuffer::Shutdown()
     m_hBufferHandle = 0;
 }
 
-void cpp_conv::renderer::ConsoleScreenBuffer::RecreateBuffer()
+void cpp_conv::renderer::ConsoleScreenBuffer::RecreateBuffer(RenderContext& kRenderContext)
 {
     Shutdown();
-    Initialize(m_initArgs);
+    Initialize(kRenderContext, m_initArgs);
 }

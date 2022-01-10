@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <vector>
 #include <Windows.h>
+#include "RenderContext.h"
 
 namespace cpp_conv::renderer
 {
@@ -10,7 +11,6 @@ namespace cpp_conv::renderer
 
     struct ConsoleScreenBufferInitArgs
     {
-        CONSOLE_FONT_INFOEX m_surfaceFont;
     };
 
     class ConsoleScreenBuffer
@@ -19,13 +19,13 @@ namespace cpp_conv::renderer
         ConsoleScreenBuffer(ConsoleWriteSurface& rWriteSurface);
         ~ConsoleScreenBuffer();
 
-        void Initialize(ConsoleScreenBufferInitArgs& rArgs);
+        void Initialize(RenderContext& kRenderContext, ConsoleScreenBufferInitArgs& rArgs);
 
         void Present();
 
         void Shutdown();
 
-        void RecreateBuffer();
+        void RecreateBuffer(RenderContext& kRenderContext);
 
     private:
         ConsoleWriteSurface& m_rWriteSurface;

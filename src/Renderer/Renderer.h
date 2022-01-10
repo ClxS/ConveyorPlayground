@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "Transform2D.h"
 #include "Colour.h"
 #include "RenderableAsset.h"
@@ -16,7 +16,7 @@ namespace cpp_conv::renderer
 
     class SwapChain;
 
-    void init(SwapChain& rSwapChain);
+    void init(RenderContext& kContext, SwapChain& rSwapChain);
     void render(const SceneContext& kSceneContext, RenderContext& kContext);
 
     void renderAsset(const std::type_info& type, RenderContext& kContext, resources::RenderableAsset* pRenderable, Transform2D transform, Colour kColourOverride = {});

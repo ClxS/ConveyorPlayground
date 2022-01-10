@@ -19,6 +19,12 @@ void cpp_conv::input::receiveInput(std::queue<cpp_conv::commands::CommandType>& 
         return;
     }
 
+    DWORD fdwMode = ENABLE_EXTENDED_FLAGS | ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT;
+    if (!SetConsoleMode(hInputHandle, fdwMode))
+    {
+
+    }
+
     while (dwPendingEvents > 0)
     {
         DWORD dwEventsRecieved;
@@ -54,6 +60,25 @@ void cpp_conv::input::receiveInput(std::queue<cpp_conv::commands::CommandType>& 
                 case VK_OEM_COMMA: commands.push(cpp_conv::commands::CommandType::PlaceConveyorLeft); break;
                 case VK_OEM_PERIOD: commands.push(cpp_conv::commands::CommandType::PlaceConveyorRight); break;
                 }
+                break;
+            case MOUSE_EVENT:
+                if (recordBuffer[i].Event.MouseEvent.dwEventFlags != MOUSE_MOVED)
+                {
+                    switch (recordBuffer[i].Event.MouseEvent.dwEventFlags)
+                    {
+                    case MOUSE_WHEELED:
+                        if (recordBuffer[i].Event.MouseEvent.dwButtonState >> 24)
+                        {
+                            commands.push(cpp_conv::commands::CommandType::DecrementZoom);
+                        }
+                        else
+                        {
+                            commands.push(cpp_conv::commands::CommandType::IncrementZoom);
+                        }
+                        break;
+                    }
+                }
+                
                 break;
             case WINDOW_BUFFER_SIZE_EVENT:
                 static COORD previousBufferSize = {};

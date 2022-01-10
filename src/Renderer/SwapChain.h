@@ -1,6 +1,7 @@
 #pragma once
 #include "WriteSurface.h"
 #include "ScreenBuffer.h"
+#include "RenderContext.h"
 
 namespace cpp_conv::renderer
 {
@@ -8,13 +9,13 @@ namespace cpp_conv::renderer
     {
     public:    
         SwapChain(uint32_t uiWidth, uint32_t uiHeight);
-        void Initialize(ScreenBufferInitArgs& rArgs);
+        void Initialize(RenderContext& kRenderContext, ScreenBufferInitArgs& rArgs);
         void SwapAndPresent();
         WriteSurface& GetWriteSurface();
 
         bool RequiresResize(int iWidth, int iHeight) const;
 
-        void ResizeBuffers(int iWidth, int iHeight);
+        void ResizeBuffers(RenderContext& kRenderContext, int iWidth, int iHeight);
 
     private:
         uint32_t m_uiCurrentBuffer;
