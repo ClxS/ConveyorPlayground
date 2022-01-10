@@ -18,6 +18,7 @@
 #include "RecipeRegistry.h"
 #include "RecipeDefinition.h"
 #include <vector>
+#include "Profiler.h"
 
 cpp_conv::Factory::Factory(int x, int y, Direction direction, FactoryId factoryId, uint32_t uiMaxStackSize)
     : Entity(x, y, EntityKind::Producer)
