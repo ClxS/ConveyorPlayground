@@ -29,6 +29,9 @@ namespace cpp_conv
 
         virtual Direction GetDirection() const { return Direction::Left; }
 
+        virtual const char* GetName() const = 0;
+        virtual std::string GetDescription() const = 0;
+
         Position m_position;
         EntityKind m_eEntityKind;
     };

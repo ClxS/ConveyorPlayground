@@ -73,8 +73,18 @@ void updateUI(cpp_conv::SceneContext& kSceneContext, cpp_conv::RenderContext& kR
             ui::text("2");
             ui::text("3");
         ui::endPanel();
-        ui::panel("Footer", ui::Align::Bottom, 0, 18);
-            ui::text("Item:");
+        ui::panel("Footer", ui::Align::Bottom, 0, 70);
+            ui::text(std::format("Current Pos: {}, {}", kSceneContext.m_player.m_x, kSceneContext.m_player.m_y));
+
+            auto playerEntity = grid::SafeGetEntity(kSceneContext.m_grid, kSceneContext.m_player);
+            if (playerEntity)
+            {
+                ui::text(std::format("Item: {} - {}", playerEntity->GetName(), playerEntity->GetDescription()));
+            }
+            else
+            {
+                ui::text("Item: Nothing", { 0x00FF0000 });
+            }
         ui::endPanel();
     ui::endPanel();
     ui::setContext(nullptr);

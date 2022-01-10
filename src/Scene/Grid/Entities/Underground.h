@@ -23,6 +23,9 @@ namespace cpp_conv
 
         Direction GetDirection() const override { return m_direction; }
 
+        const char* GetName() const override { return "Tunnel"; }
+        std::string GetDescription() const override { return ""; }
+
     private:
         cpp_conv::grid::EntityGrid m_kLocalGrid;
         Direction m_direction;

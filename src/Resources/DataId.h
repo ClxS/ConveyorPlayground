@@ -27,6 +27,10 @@ namespace cpp_conv
         {\
             return m_uiItemId == other.m_uiItemId;\
         }\
+        bool operator<(NAME##Id other) const\
+        {\
+            return m_uiItemId < other.m_uiItemId;\
+        }\
         static NAME##Id FromStringId(const std::string_view str)\
         {\
             uint64_t uiId = idFromStringId(str);\

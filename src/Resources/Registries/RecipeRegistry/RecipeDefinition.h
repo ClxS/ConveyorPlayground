@@ -22,11 +22,13 @@ namespace cpp_conv
         RecipeDefinition(
             cpp_conv::RecipeId internalId,
             cpp_conv::resources::registry::RegistryId registryId,
+            std::string name,
             uint32_t uiEffort,
             std::vector<RecipeItem> inputItems,
             std::vector<RecipeItem> outputItems)
             : m_internalId(internalId)
             , m_registryId(registryId)
+            , m_strName(name)
             , m_uiEffort(uiEffort)
             , m_vInputItems(std::move(inputItems))
             , m_vOutputItems(std::move(outputItems))
@@ -34,6 +36,7 @@ namespace cpp_conv
         }
 
         cpp_conv::RecipeId GetInternalId() const { return m_internalId; }
+        const std::string GetName() const { return m_strName; }
 
         cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> GetTile() const;
 

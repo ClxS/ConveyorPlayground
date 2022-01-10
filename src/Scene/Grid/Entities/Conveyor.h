@@ -44,6 +44,10 @@ namespace cpp_conv
 
         Direction GetDirection() const override { return m_direction; }
 
+        const char* GetName() const override { return "Conveyor"; }
+
+        std::string GetDescription() const override;
+
         static_assert(c_conveyorChannels >= 1, "Conveyors must have at least once channel");
         static_assert(c_conveyorChannelSlots >= 1, "Conveyors channels must have at least once slot");
     };

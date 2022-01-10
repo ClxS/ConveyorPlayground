@@ -33,6 +33,10 @@ namespace cpp_conv
         bool TryGrab(const SceneContext& kContext, bool bSingle, std::tuple<ItemId, uint32_t>& outItem) override;
 
         Direction GetDirection() const override { return m_direction; }
+
+        const char* GetName() const override { return "Factory"; }
+        std::string GetDescription() const override;
+
     private:
         bool ProduceItems();
         void RunProductionCycle(const cpp_conv::FactoryDefinition* pFactory);

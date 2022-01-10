@@ -1,4 +1,5 @@
 RECIPE_COPPER_PLATE
+1 Copper Plate from 10 Copper Ore
 10
 
 ITEM_COPPER_PLATE 1

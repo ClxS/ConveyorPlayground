@@ -22,6 +22,9 @@ namespace cpp_conv
 
         Direction GetDirection() const override { return m_direction; }
 
+        const char* GetName() const override { return "Inserter"; }
+        std::string GetDescription() const override { return ""; }
+
     private:
         enum class State
         {

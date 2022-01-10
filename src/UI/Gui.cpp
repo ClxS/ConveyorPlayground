@@ -14,11 +14,11 @@ struct Panel
     Coord m_uiTopLeft;
     Coord m_uiBottomRight;
 
-    bool MoveY(uint32_t distance)
+    void MoveY(uint32_t distance)
     {
         if (m_uiTopLeft.m_y + distance > m_uiBottomRight.m_y)
         {
-            return false;
+            return;
         }
 
         m_uiTopLeft.m_y += distance;
@@ -67,7 +67,7 @@ void cpp_conv::ui::endPanel()
     g_panelStack.pop();
 }
 
-void cpp_conv::ui::text(const char* szText, Colour colour /*= { 0xFFFFFFFF }*/)
+void cpp_conv::ui::text(const std::string& szText, Colour colour /*= { 0xFFFFFFFF }*/)
 {
     Panel& rPanel = g_panelStack.back();
 

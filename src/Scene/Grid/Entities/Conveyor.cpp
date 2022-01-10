@@ -11,6 +11,8 @@
 #include "ItemRegistry.h"
 #include "ItemDefinition.h"
 #include "AssetPtr.h"
+#include <map>
+#include "DataId.h"
 
 cpp_conv::Colour GetColourFromId(int id)
 {
@@ -308,4 +310,55 @@ bool cpp_conv::Conveyor::TryGrab(const SceneContext& kContext, bool bSingle, std
     }
 
     return false;
+}
+
+std::string cpp_conv::Conveyor::GetDescription() const
+{
+    std::map<cpp_conv::ItemId, int> storedItems;
+
+    for (int iChannelIdx = 0; iChannelIdx < c_conveyorChannels; ++iChannelIdx)
+    {
+        for (int iChannelSlot = 0; iChannelSlot < cpp_conv::c_conveyorChannelSlots; ++iChannelSlot)
+        {
+            ItemId item = m_pChannels[iChannelIdx].m_pItems[iChannelSlot];
+            if (!item.IsEmpty())
+            {
+                storedItems.try_emplace(item, 0);
+                storedItems[item]++;
+            }
+        }
+    }
+
+    std::string str;
+    bool bFirst = true;
+    if (storedItems.empty())
+    {
+        str = "Conveyor is empty!";
+    }
+    else
+    {
+        for (auto& item : storedItems)
+        {
+            if (bFirst)
+            {
+                bFirst = false;
+            }
+            else
+            {
+                str += ", ";
+            }
+
+            cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> pItem = cpp_conv::resources::getItemDefinition(item.first);
+            if (pItem)
+            {
+                str += std::format("{} {}", item.second, pItem->GetName());
+            }
+            else
+            {
+                str += std::format("{} Unknown Items", item.second);
+            }
+        }
+    }
+
+    return str;
 }

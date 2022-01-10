@@ -39,6 +39,7 @@ namespace
         std::istringstream ss(copy);
 
         std::string id;
+        std::string name;
         uint32_t effort;
         std::vector<cpp_conv::RecipeDefinition::RecipeItem> inputs;
         std::vector<cpp_conv::RecipeDefinition::RecipeItem> outputs;
@@ -51,8 +52,9 @@ namespace
             switch (idx)
             {
             case 0: id = token; break;
-            case 1: effort = std::stoi(token); break;
-            case 2: break;
+            case 1: name = token; break;
+            case 2: effort = std::stoi(token); break;
+            case 3: break;
             default:
                 if (token == "")
                 {
@@ -74,7 +76,7 @@ namespace
             idx++;
         }
 
-        return new cpp_conv::RecipeDefinition(cpp_conv::RecipeId::FromStringId(id), rData.m_registryId, effort, inputs, outputs);
+        return new cpp_conv::RecipeDefinition(cpp_conv::RecipeId::FromStringId(id), rData.m_registryId, name, effort, inputs, outputs);
     }
 }
 

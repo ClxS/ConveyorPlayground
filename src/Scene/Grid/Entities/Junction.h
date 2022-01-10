@@ -17,6 +17,8 @@ namespace cpp_conv
         bool SupportsInsertion() const override { return true; }
         bool TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel) override;
 
+        const char* GetName() const override { return "Junction"; }
+        std::string GetDescription() const override { return ""; }
 
     private:
         ItemId m_pItem;

@@ -20,6 +20,9 @@ namespace cpp_conv
         bool SupportsProvidingItem() const override { return true; }
         bool TryGrab(const SceneContext& kContext, bool bSingle, std::tuple<ItemId, uint32_t>& outItem) override;
 
+        const char* GetName() const override { return "Storage"; }
+        std::string GetDescription() const override { return ""; }
+
     private:
         GeneralItemContainer m_itemContainer;
     };

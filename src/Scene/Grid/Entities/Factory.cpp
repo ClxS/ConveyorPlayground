@@ -118,6 +118,17 @@ bool cpp_conv::Factory::TryGrab(const SceneContext& kContext, bool bSingle, std:
     return m_outputItems.TryTake(bSingle, outItem);
 }
 
+std::string cpp_conv::Factory::GetDescription() const
+{
+    const cpp_conv::resources::AssetPtr<cpp_conv::RecipeDefinition> pRecipe = cpp_conv::resources::getRecipeDefinition(m_hActiveRecipeId);
+    if (!pRecipe)
+    {
+        return "Producing Unknown Recipe";
+    }
+
+    return std::format("Producing {}", pRecipe->GetName());
+}
+
 bool cpp_conv::Factory::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel)
 {
     if (pSourceEntity.m_eEntityKind != EntityKind::Inserter)
