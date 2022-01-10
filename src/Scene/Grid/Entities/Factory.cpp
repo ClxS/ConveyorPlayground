@@ -135,6 +135,78 @@ void cpp_conv::Factory::Draw(RenderContext& kRenderContext) const
         { 0xFFFFFF00 });
 }
 
+bool cpp_conv::Factory::TryGrab(const SceneContext& kContext, bool bSingle, std::tuple<ItemId, uint32_t>& outItem)
+{
+    if (m_vProducedItems.empty())
+    {
+        return false;
+    }
+
+    uint32_t uiCount = 1; 
+    if (bSingle)
+    {
+        uiCount = m_vProducedItems[0].m_pCount;
+    }
+
+    outItem = std::make_tuple(m_vProducedItems[0].m_pItem, m_vProducedItems[0].m_pCount);
+
+    m_vProducedItems[0].m_pCount -= uiCount;
+    if (m_vProducedItems[0].m_pCount == 0)
+    {
+        m_vProducedItems.erase(m_vProducedItems.begin());
+    }
+
+    return true;
+}
+
+bool cpp_conv::Factory::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel)
+{
+    if (pSourceEntity.m_eEntityKind != EntityKind::Inserter)
+    {
+        // We only allow inserters
+        return false;
+    }
+
+    const cpp_conv::resources::AssetPtr<cpp_conv::RecipeDefinition> pRecipe = cpp_conv::resources::getRecipeDefinition(m_hActiveRecipeId);
+    if (!pRecipe)
+    {
+        return false;
+    }
+
+    bool bIsRequirement = false;
+    for (auto& rItem : pRecipe->GetInputItems())
+    {
+        if (rItem.m_idItem == pItem)
+        {
+            bIsRequirement = true;
+            break;
+        }
+    }
+
+    if (!bIsRequirement)
+    {
+        return false;
+    }
+
+    auto itItems = m_vRecipeItemStorage.begin();
+    while (itItems != m_vRecipeItemStorage.end())
+    {
+        if (itItems->m_pItem == pItem)
+        {
+            if (itItems->m_pCount >= m_uiMaxStackSize)
+            {
+                return false;
+            }
+
+            itItems->m_pCount++;
+            return true;
+        }
+    }
+
+    m_vRecipeItemStorage.emplace_back(pItem, 1);
+    return true;
+}
+
 void cpp_conv::Factory::RunProductionCycle(const cpp_conv::FactoryDefinition* pFactory)
 {
     if (m_hActiveRecipeId != pFactory->GetProducedRecipe())
@@ -184,7 +256,7 @@ void cpp_conv::Factory::RunOutputCycle(const SceneContext& kContext, const cpp_c
     auto itItems = m_vProducedItems.begin();
     while (itItems != m_vProducedItems.end())
     {
-        for (int i = 0; i < itItems->m_pCount; ++i)
+        for (uint32_t i = 0; i < itItems->m_pCount; ++i)
         {
             if (!pEntity->TryInsert(kContext, *this, itItems->m_pItem, (m_uiTick + i) % cpp_conv::c_conveyorChannels))
             {

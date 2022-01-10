@@ -55,3 +55,27 @@ bool cpp_conv::Storage::TryInsert(const SceneContext& kContext, const Entity& pS
 
     return false;
 }
+
+bool cpp_conv::Storage::TryGrab(const SceneContext& kContext, bool bSingle, std::tuple<ItemId, uint32_t>& outItem)
+{
+    if (m_vItemEntries.empty())
+    {
+        return false;
+    }
+
+    uint32_t uiCount = 1;
+    if (bSingle)
+    {
+        uiCount = m_vItemEntries[0].m_pCount;
+    }
+
+    outItem = std::make_tuple(m_vItemEntries[0].m_pItem, m_vItemEntries[0].m_pCount);
+
+    m_vItemEntries[0].m_pCount -= uiCount;
+    if (m_vItemEntries[0].m_pCount == 0)
+    {
+        m_vItemEntries.erase(m_vItemEntries.begin());
+    }
+
+    return true;
+}

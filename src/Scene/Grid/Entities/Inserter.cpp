@@ -128,7 +128,7 @@ bool cpp_conv::Inserter::TryInsertItem(const SceneContext& kContext)
         return false;
     }
 
-    if (!pTargetEntity->TryInsert(kContext, *this, m_currentItem, 0))
+    if (!pTargetEntity->TryInsert(kContext, *this, m_currentItem, 0) && !pTargetEntity->TryInsert(kContext, *this, m_currentItem, 1))
     {
         return false;
     }

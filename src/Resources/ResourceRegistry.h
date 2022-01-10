@@ -35,6 +35,7 @@ namespace cpp_conv::resources::registry
         "data/items/IronOre",
         "data/items/CopperOre",
         "data/items/Coal",
+        "data/items/CopperPlate",
     };
 
     constexpr const char* c_szItemAssetsPaths[] =
@@ -42,6 +43,7 @@ namespace cpp_conv::resources::registry
         "platform/assets/items/IronOre",
         "platform/assets/items/CopperOre",
         "platform/assets/items/Coal",
+        "platform/assets/items/CopperPlate",
     };
 
     constexpr const char* c_szFactoryPaths[] =
