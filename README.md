@@ -2,7 +2,14 @@
 
 Discrete positioning based console driven Factorio-inspired Conveyor System.
 
-Basic proof of concept thrown together in a couple of hours. Code is messy and not suitable for use!
+Basic proof of concept thrown together in a couple of hours. Code is messy and not suitable for use! Images below show it's evolution over time.
+
+## Basic UI System
+![ui](https://user-images.githubusercontent.com/15245663/148829173-3736fd6f-8128-4851-b612-a70600a42965.gif)
+
+
+## Panning
+![Panning](https://user-images.githubusercontent.com/15245663/148828892-cde3ba94-36bc-42bc-a66b-0549ed44deaa.gif)
 
 ## Placement!
 ![Placement2](https://user-images.githubusercontent.com/15245663/148277984-eb7a4dc4-b06f-48f2-8bd2-3192577325c4.gif)
