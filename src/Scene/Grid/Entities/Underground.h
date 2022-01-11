@@ -2,7 +2,7 @@
 
 #include "Entity.h"
 #include "Conveyor.h"
-#include "Grid.h"
+#include "EntityGrid.h"
 
 namespace cpp_conv
 {

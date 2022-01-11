@@ -3,7 +3,7 @@
 #include <vector>
 #include "vector_set.h"
 #include "Conveyor.h"
-#include "Grid.h"
+#include "EntityGrid.h"
 
 constexpr int c_maxCircularCheckDepth = 64;
 namespace cpp_conv

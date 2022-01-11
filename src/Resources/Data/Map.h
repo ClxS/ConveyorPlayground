@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ResourceAsset.h"
-#include <Scene/Grid/Entities/Grid.h>
+#include "EntityGrid.h"
 #include <vector>
 
 namespace cpp_conv::resources

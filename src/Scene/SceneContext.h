@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <chrono>
-#include "Grid.h"
+#include "EntityGrid.h"
 #include "Sequence.h"
 
 namespace cpp_conv

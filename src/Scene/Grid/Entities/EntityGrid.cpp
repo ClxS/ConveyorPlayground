@@ -1,4 +1,4 @@
-#include "Grid.h"
+#include "EntityGrid.h"
 
 #include "Entity.h"
 #include "Conveyor.h"

@@ -95,7 +95,7 @@ void cpp_conv::ui::text(const std::string& szText, Colour colour /*= { 0xFFFFFFF
         colour,
         rPanel.m_uiTopLeft.m_x,
         rPanel.m_bInvertPlacement
-            ? (rPanel.m_uiBottomRight.m_y)
+            ? (rPanel.m_uiBottomRight.m_y - cpp_conv::ui::platform::getTextLineHeight())
             : rPanel.m_uiTopLeft.m_y);
     rPanel.MoveY(cpp_conv::ui::platform::getTextLineHeight());
 }

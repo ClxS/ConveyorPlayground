@@ -2,7 +2,7 @@
 #include "Sequence.h"
 #include "Profiler.h"
 #include "Conveyor.h"
-#include "Grid.h"
+#include "EntityGrid.h"
 #include "Direction.h"
 
 cpp_conv::Conveyor* cpp_conv::targeting_util::FindNextTailConveyor(const cpp_conv::grid::EntityGrid& grid, const cpp_conv::Conveyor& rCurrentConveyor)

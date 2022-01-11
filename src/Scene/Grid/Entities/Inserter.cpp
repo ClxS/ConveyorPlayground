@@ -15,7 +15,7 @@
 #include "TileAsset.h"
 #include "InserterDefinition.h"
 #include "InserterRegistry.h"
-#include "Grid.h"
+#include "EntityGrid.h"
 #include "ItemRegistry.h"
 #include "ItemDefinition.h"
 
