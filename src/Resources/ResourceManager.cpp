@@ -129,6 +129,28 @@ cpp_conv::resources::AssetPtr<cpp_conv::resources::ResourceAsset> cpp_conv::reso
     return pSharedAsset;
 }
 
+cpp_conv::resources::AssetPtr<cpp_conv::resources::ResourceAsset> cpp_conv::resources::resource_manager::loadAssetUncached(const std::type_info& type, registry::RegistryId kAssetId)
+{
+    std::function<ResourceAsset* (FileData&)>* fHandler = getTypeHandler(type);
+    if (!fHandler || !(*fHandler))
+    {
+        return nullptr;
+    }
+
+    FileData kFileData = getFileData(kAssetId);
+    if (!kFileData.m_pData)
+    {
+        return nullptr;
+    }
+
+    ResourceAsset* pAsset = (*fHandler)(kFileData);
+    delete[] kFileData.m_pData;
+
+    cpp_conv::resources::AssetPtr<cpp_conv::resources::ResourceAsset> pSharedAsset(pAsset);
+    return pSharedAsset;
+}
+
+
 void cpp_conv::resources::resource_manager::updatePersistenceStore()
 {
     std::lock_guard<std::mutex> lock(getStateMutex());

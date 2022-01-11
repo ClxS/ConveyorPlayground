@@ -19,6 +19,7 @@ namespace cpp_conv::resources::resource_manager
     void registerTypeHandler(const std::type_info& type, std::function<ResourceAsset*(FileData&)> fHandler);
     void updatePersistenceStore();
 
+    AssetPtr<ResourceAsset> loadAssetUncached(const std::type_info& type, registry::RegistryId kAssetId);
     AssetPtr<ResourceAsset> loadAsset(const std::type_info& type, registry::RegistryId kAssetId);
 
     template<typename TType>
@@ -31,6 +32,18 @@ namespace cpp_conv::resources::resource_manager
     AssetPtr<TType> loadAsset(registry::RegistryId kAssetId)
     {
         auto pAsset = loadAsset(typeid(TType), kAssetId);
+        if (!pAsset)
+        {
+            return nullptr;
+        }
+
+        return std::reinterpret_pointer_cast<TType>(pAsset);
+    }
+
+    template<typename TType>
+    AssetPtr<TType> loadAssetUncached(registry::RegistryId kAssetId)
+    {
+        auto pAsset = loadAssetUncached(typeid(TType), kAssetId);
         if (!pAsset)
         {
             return nullptr;
