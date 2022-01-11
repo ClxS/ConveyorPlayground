@@ -66,3 +66,8 @@ void cpp_conv::renderer::setCell(RenderContext& kContext, wchar_t value, int x, 
     rCell.Char.UnicodeChar = value;
     rCell.Attributes = colour;
 }
+
+std::tuple<uint32_t, uint32_t> cpp_conv::renderer::getConsoleSpaceDimensions(uint32_t uiWidth, uint32_t uiHeight, float scale)
+{
+    return std::make_tuple((uint32_t)(uiWidth / (18.0f * scale)), (uint32_t)(uiHeight / (18.0f * scale)));
+}

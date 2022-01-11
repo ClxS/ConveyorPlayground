@@ -73,7 +73,6 @@ void updateUI(cpp_conv::SceneContext& kSceneContext, cpp_conv::RenderContext& kR
         ui::endPanel();
         ui::panel("Footer", ui::Align::Bottom, 0, 70);
             ui::text(std::format("Current Pos: {}, {}", kSceneContext.m_player.m_x, kSceneContext.m_player.m_y));
-
             auto playerEntity = grid::SafeGetEntity(kSceneContext.m_grid, kSceneContext.m_player);
             if (playerEntity)
             {
@@ -96,7 +95,7 @@ void cpp_conv::game::run()
     std::tie(iWidth, iHeight) = cpp_conv::apphost::getAppDimensions();
 
     cpp_conv::resources::registration::processSelfRegistrations();
-    AssetPtr<Map> map = resource_manager::loadAsset<Map>(registry::data::MapSimple);
+    AssetPtr<Map> map = resource_manager::loadAsset<Map>(registry::data::MapCircle);
     if (!map)
     {
         return;
@@ -121,7 +120,7 @@ void cpp_conv::game::run()
         1.0f
     };
 
-    cpp_conv::renderer::SwapChain swapChain(iWidth, iHeight);
+    cpp_conv::renderer::SwapChain swapChain(kRenderContext, iWidth, iHeight);
     cpp_conv::renderer::init(kRenderContext, swapChain);
 
     cpp_conv::FrameLimiter frameLimter(10);
@@ -140,7 +139,7 @@ void cpp_conv::game::run()
             int iNewWidth;
             int iNewHeight;
             std::tie(iNewWidth, iNewHeight) = cpp_conv::apphost::getAppDimensions();
-            if (swapChain.RequiresResize(iNewWidth, iNewHeight))
+            if (swapChain.RequiresResize(kRenderContext, iNewWidth, iNewHeight))
             {
                 swapChain.ResizeBuffers(kRenderContext, iNewWidth, iNewHeight);
                 kRenderContext.m_cameraQuad.m_uiWidth = swapChain.GetWriteSurface().GetWidth();

@@ -14,6 +14,8 @@ struct Panel
     Coord m_uiTopLeft;
     Coord m_uiBottomRight;
 
+    bool m_bInvertPlacement;
+
     void MoveY(uint32_t distance)
     {
         if (m_uiTopLeft.m_y + distance > m_uiBottomRight.m_y)
@@ -21,7 +23,21 @@ struct Panel
             return;
         }
 
-        m_uiTopLeft.m_y += distance;
+        if (m_bInvertPlacement)
+        {
+            if (m_uiBottomRight.m_y < distance)
+            {
+                m_uiBottomRight.m_y = 0;
+            }
+            else
+            {
+                m_uiBottomRight.m_y -= distance;
+            }
+        }
+        else
+        {
+            m_uiTopLeft.m_y += distance;
+        }
     }
 };
 
@@ -33,20 +49,23 @@ std::queue<Panel> g_panelStack;
 void cpp_conv::ui::setContext(cpp_conv::RenderContext* pContext)
 {
     g_pContext = pContext;
+    while (!g_panelStack.empty())
+    {
+        g_panelStack.pop();
+    }
+
+    g_panelStack.push({ { 0, 0 }, { g_designWidth, g_designHeight } });
 }
 
 void cpp_conv::ui::initializeGuiSystem(uint32_t designWidth, uint32_t designHeight)
 {
     g_designWidth = designWidth;
     g_designHeight = designHeight;
-
-    // Add the initial global panel
-    g_panelStack.push({ { 0, 0 }, { designWidth, designHeight } });
 }
 
-void cpp_conv::ui::panel(const char* szIdentifier, Align panelAlignment, uint32_t uiWidth, uint32_t uiHeight)
+void cpp_conv::ui::panel(const char* szIdentifier, Align panelAlignment, uint32_t uiWidth, uint32_t uiHeight, bool bInvertPlacement)
 {
-    Panel newPanel = { {}, {} };
+    Panel newPanel = { {}, {}, bInvertPlacement };
 
     const Panel& rPanel = g_panelStack.back();
 
@@ -71,7 +90,13 @@ void cpp_conv::ui::text(const std::string& szText, Colour colour /*= { 0xFFFFFFF
 {
     Panel& rPanel = g_panelStack.back();
 
-    cpp_conv::ui::platform::drawText(szText, colour, rPanel.m_uiTopLeft.m_x, rPanel.m_uiTopLeft.m_y);
+    cpp_conv::ui::platform::drawText(
+        szText,
+        colour,
+        rPanel.m_uiTopLeft.m_x,
+        rPanel.m_bInvertPlacement
+            ? (rPanel.m_uiBottomRight.m_y)
+            : rPanel.m_uiTopLeft.m_y);
     rPanel.MoveY(cpp_conv::ui::platform::getTextLineHeight());
 }
 

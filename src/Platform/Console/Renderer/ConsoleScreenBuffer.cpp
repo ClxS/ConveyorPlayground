@@ -18,7 +18,7 @@ void cpp_conv::renderer::ConsoleScreenBuffer::Initialize(RenderContext& kRenderC
     CONSOLE_FONT_INFOEX cfi;
     cfi.cbSize = sizeof cfi;
     cfi.nFont = 0;
-    cfi.dwFontSize.X = 0;
+    cfi.dwFontSize.X = (SHORT)(18 * kRenderContext.m_fZoom);
     cfi.dwFontSize.Y = (SHORT)(18 * kRenderContext.m_fZoom);
     cfi.FontFamily = FF_DONTCARE;
     cfi.FontWeight = FW_HEAVY;
@@ -45,7 +45,6 @@ void cpp_conv::renderer::ConsoleScreenBuffer::Initialize(RenderContext& kRenderC
     }
 
     SetConsoleScreenBufferSize(m_hBufferHandle, coordBufSize);
-    SetConsoleWindowInfo(m_hBufferHandle, TRUE, &srctWriteRect);
 }
 
 void cpp_conv::renderer::ConsoleScreenBuffer::Present()
@@ -64,7 +63,6 @@ void cpp_conv::renderer::ConsoleScreenBuffer::Present()
         coordBufCoord,    // top left src cell in chiBuffer 
         &srctWriteRect);
 
-    SetConsoleCursorPosition(m_hBufferHandle, coordBufCoord);
     if (!SetConsoleActiveScreenBuffer(m_hBufferHandle))
     {
         printf("SetConsoleActiveConsoleScreenBuffer failed - (%d)\n", GetLastError());

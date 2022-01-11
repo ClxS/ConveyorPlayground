@@ -8,13 +8,12 @@ namespace cpp_conv::renderer
     class SwapChain
     {
     public:    
-        SwapChain(uint32_t uiWidth, uint32_t uiHeight);
+        SwapChain(RenderContext& kRenderContext, uint32_t uiWidth, uint32_t uiHeight);
         void Initialize(RenderContext& kRenderContext, ScreenBufferInitArgs& rArgs);
         void SwapAndPresent();
         WriteSurface& GetWriteSurface();
 
-        bool RequiresResize(int iWidth, int iHeight) const;
-
+        bool RequiresResize(RenderContext& kRenderContext, int iWidth, int iHeight) const;
         void ResizeBuffers(RenderContext& kRenderContext, int iWidth, int iHeight);
 
     private:

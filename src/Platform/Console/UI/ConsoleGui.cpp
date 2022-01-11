@@ -54,5 +54,6 @@ void cpp_conv::ui::platform::drawWrappedText(const std::string& szText, cpp_conv
 
 uint32_t cpp_conv::ui::platform::getTextLineHeight()
 {
-    return 40;
+    cpp_conv::RenderContext* pContext = getCurrentContext();
+    return 18 * pContext->m_fZoom;
 }

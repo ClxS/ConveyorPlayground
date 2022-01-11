@@ -81,9 +81,9 @@ void cpp_conv::input::receiveInput(std::queue<cpp_conv::commands::CommandType>& 
                 
                 break;
             case WINDOW_BUFFER_SIZE_EVENT:
-                static COORD previousBufferSize = {};
+                /*static COORD previousBufferSize = {};
                 COORD newSize = recordBuffer[i].Event.WindowBufferSizeEvent.dwSize;
-                cpp_conv::apphost::setAppDimensions(newSize.X, newSize.Y);
+                cpp_conv::apphost::setAppDimensions(newSize.X, newSize.Y);*/
                 break;
             }
         }

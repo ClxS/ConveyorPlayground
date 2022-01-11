@@ -4,12 +4,14 @@
 #include <vector>
 #include <Windows.h>
 
+namespace cpp_conv { struct RenderContext; }
+
 namespace cpp_conv::renderer
 {
     class ConsoleWriteSurface
     {
     public:
-        ConsoleWriteSurface(uint16_t uiWidth, uint16_t uiHeight, bool bClearOnPresent);
+        ConsoleWriteSurface(cpp_conv::RenderContext& kRenderContext, uint16_t uiWidth, uint16_t uiHeight, bool bClearOnPresent);
 
         void Initialize();
 
@@ -22,7 +24,8 @@ namespace cpp_conv::renderer
         uint16_t GetHeight() const { return m_uiHeight; }
         bool IsClearOnPresent() const { return m_bClearOnPresent; }
 
-        void Resize(int iWidth, int iHeight);
+        void Resize(RenderContext& kRenderContext, int iWidth, int iHeight);
+        bool RequiresResize(RenderContext& kRenderContext, int iWidth, int iHeight) const;
 
     private:
         uint16_t m_uiWidth;

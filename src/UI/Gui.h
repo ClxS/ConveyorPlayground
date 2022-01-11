@@ -44,7 +44,7 @@ namespace cpp_conv::ui
     std::tuple<uint32_t, uint32_t> getDesignDimensions();
     cpp_conv::RenderContext* getCurrentContext();
 
-    void panel(const char* szIdentifier, Align panelAlignment = Align::Stretch, uint32_t uiWidth = 0, uint32_t uiHeight = 0);
+    void panel(const char* szIdentifier, Align panelAlignment = Align::Stretch, uint32_t uiWidth = 0, uint32_t uiHeight = 0, bool bInvertPlacement = false);
 
     void endPanel();
 
