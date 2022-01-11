@@ -68,7 +68,7 @@ const Conveyor* cpp_conv::TraceHeadConveyor(const cpp_conv::WorldMap& map, const
     const Conveyor* pCurrentConveyor = map.GetEntity<Conveyor>(searchStart.m_position, EntityKind::Conveyor);
     while (true)
     {
-        Position forwardPosition = grid::GetForwardPosition(*pCurrentConveyor);
+        Vector3 forwardPosition = grid::GetForwardPosition(*pCurrentConveyor);
         const Entity* pTargetConveyor = map.GetEntity<Conveyor>(forwardPosition, EntityKind::Conveyor);
         if (pTargetConveyor == nullptr)
         {

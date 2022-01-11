@@ -25,14 +25,14 @@ void shuffle(RandomAccessIterator first, RandomAccessIterator last, URNG&& g)
     }
 }
 
-std::tuple<int, Position> GetUndergroundLength(const cpp_conv::WorldMap& map, cpp_conv::Entity* pStart, Direction direction)
+std::tuple<int, Vector3> GetUndergroundLength(const cpp_conv::WorldMap& map, cpp_conv::Entity* pStart, Direction direction)
 {
-    Position kTargetPosition;
+    Vector3 kTargetPosition;
     int iTargetUnderground = -1;
-    Position kTmpPosition = pStart->m_position;
+    Vector3 kTmpPosition = pStart->m_position;
     for (int i = 0; i < cpp_conv::c_maxUndergroundLength; i++)
     {
-        Position kForwardPosition = cpp_conv::grid::GetForwardPosition(kTmpPosition, direction);
+        Vector3 kForwardPosition = cpp_conv::grid::GetForwardPosition(kTmpPosition, direction);
         const cpp_conv::Entity* pForwardEntity = map.GetEntity(kForwardPosition);
         if (pForwardEntity == nullptr || pForwardEntity->m_eEntityKind != EntityKind::Underground)
         {
@@ -65,7 +65,7 @@ cpp_conv::Underground::Underground(int x, int y, Direction direction)
     }    
     , m_uiTick(0)
 {
-    Position position = m_position;
+    Vector3 position = m_position;
     for (int i = 0; i < cpp_conv::c_maxUndergroundLength; i++)
     {
         m_arrInternalConveyors[i].m_position = position;
@@ -76,7 +76,7 @@ cpp_conv::Underground::Underground(int x, int y, Direction direction)
 void cpp_conv::Underground::Tick(const SceneContext& kContext)
 {
     int iUndergroundLength;
-    Position undergroundEnd;
+    Vector3 undergroundEnd;
     
     std::tie(iUndergroundLength, undergroundEnd) = GetUndergroundLength(kContext.m_rMap, this, m_direction);
     if (iUndergroundLength == -1)
@@ -85,7 +85,7 @@ void cpp_conv::Underground::Tick(const SceneContext& kContext)
     }
 
     Entity* pExitEntity = kContext.m_rMap.GetEntity(undergroundEnd);
-    Position position(cpp_conv::grid::GetForwardPosition(m_position, m_direction));
+    Vector3 position(cpp_conv::grid::GetForwardPosition(m_position, m_direction));
 
     for (int i = 0; i < iUndergroundLength; i++)
     {

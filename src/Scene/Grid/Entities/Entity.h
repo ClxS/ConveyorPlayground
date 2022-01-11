@@ -2,7 +2,7 @@
 
 #include <cstdint>
 #include "Enums.h"
-#include "Position.h"
+#include "Vector3.h"
 #include "DataId.h"
 
 namespace cpp_conv
@@ -33,7 +33,7 @@ namespace cpp_conv
         virtual const char* GetName() const = 0;
         virtual std::string GetDescription() const = 0;
 
-        Position m_position;
+        Vector3 m_position;
         EntityKind m_eEntityKind;
     };
 }

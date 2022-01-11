@@ -81,10 +81,10 @@ bool cpp_conv::WorldMap::Cell::SetEntity(CellCoordinate coord, Entity* pEntity)
     return true;
 }
 
-cpp_conv::WorldMap::CellCoordinate cpp_conv::WorldMap::ToCellSpace(Position position)
+cpp_conv::WorldMap::CellCoordinate cpp_conv::WorldMap::ToCellSpace(Vector3 position)
 {
     constexpr int32_t worldToGridSpaceValue = (c_uiMaximumMapSize / 2) * c_uiCellSize;
-    constexpr Position worldToGridSpaceTransform = { worldToGridSpaceValue, worldToGridSpaceValue, 0 };
+    constexpr Vector3 worldToGridSpaceTransform = { worldToGridSpaceValue, worldToGridSpaceValue, 0 };
     position += worldToGridSpaceTransform;
 
     constexpr int32_t axisSize = c_uiMaximumMapSize * c_uiCellSize;
@@ -102,7 +102,7 @@ cpp_conv::WorldMap::CellCoordinate cpp_conv::WorldMap::ToCellSpace(Position posi
     return { iHorizontalCell, iVerticalCell, iHorizontalSlot, iVerticalSlot, position.m_depth };
 }
 
-const cpp_conv::Entity* cpp_conv::WorldMap::GetEntity(Position position) const
+const cpp_conv::Entity* cpp_conv::WorldMap::GetEntity(Vector3 position) const
 {
     CellCoordinate coord = ToCellSpace(position);
     if (coord.IsInvalid())
@@ -137,12 +137,12 @@ void cpp_conv::WorldMap::Consume(cpp_conv::resources::AssetPtr<cpp_conv::resourc
     map->GetOtherEntities().clear();
 }
 
-cpp_conv::Entity* cpp_conv::WorldMap::GetEntity(Position position)
+cpp_conv::Entity* cpp_conv::WorldMap::GetEntity(Vector3 position)
 {
     return const_cast<cpp_conv::Entity*>(const_cast<const cpp_conv::WorldMap*>(this)->GetEntity(position));
 }
 
-bool cpp_conv::WorldMap::PlaceEntity(Position position, Entity* pEntity)
+bool cpp_conv::WorldMap::PlaceEntity(Vector3 position, Entity* pEntity)
 {
     CellCoordinate coord = ToCellSpace(position);
     if (coord.IsInvalid())

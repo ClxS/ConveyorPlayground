@@ -54,16 +54,16 @@ namespace cpp_conv
         };
 
     public:
-        Entity* GetEntity(Position position);
-        const Entity* GetEntity(Position position) const;
+        Entity* GetEntity(Vector3 position);
+        const Entity* GetEntity(Vector3 position) const;
 
-        bool PlaceEntity(Position position, Entity* pEntity);
-
-        template<typename T>
-        const T* GetEntity(Position position, EntityKind kind) const;
+        bool PlaceEntity(Vector3 position, Entity* pEntity);
 
         template<typename T>
-        T* GetEntity(Position position, EntityKind kind);
+        const T* GetEntity(Vector3 position, EntityKind kind) const;
+
+        template<typename T>
+        T* GetEntity(Vector3 position, EntityKind kind);
 
         void Consume(cpp_conv::resources::AssetPtr<cpp_conv::resources::Map> map);
 
@@ -74,7 +74,7 @@ namespace cpp_conv
         using WorldMapRow = std::array<CellPtr, c_uiMaximumMapSize>;
         using WorldMapStore = std::array<WorldMapRow, c_uiMaximumMapSize>;
 
-        static CellCoordinate ToCellSpace(Position position);
+        static CellCoordinate ToCellSpace(Vector3 position);
         Cell* GetCell(CellCoordinate coord) const;
         Cell* GetOrCreateCell(CellCoordinate coord);
 
@@ -84,7 +84,7 @@ namespace cpp_conv
     };
 
     template<typename T>
-    const T* cpp_conv::WorldMap::GetEntity(Position position, EntityKind kind) const
+    const T* cpp_conv::WorldMap::GetEntity(Vector3 position, EntityKind kind) const
     {
         auto pEntity = GetEntity(position);
         if (!pEntity || pEntity->m_eEntityKind != kind)
@@ -96,7 +96,7 @@ namespace cpp_conv
     }
 
     template<typename T>
-    T* cpp_conv::WorldMap::GetEntity(Position position, EntityKind kind)
+    T* cpp_conv::WorldMap::GetEntity(Vector3 position, EntityKind kind)
     {
         return const_cast<T*>(const_cast<const cpp_conv::WorldMap*>(this)->GetEntity<T>(position, kind));
     }

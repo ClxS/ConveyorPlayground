@@ -11,7 +11,7 @@ namespace cpp_conv
 {
     struct SceneContext
     {
-        Position m_player;
+        Vector3 m_player;
         cpp_conv::WorldMap& m_rMap;
         std::vector<cpp_conv::Sequence>& m_sequences;
 

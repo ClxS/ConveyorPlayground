@@ -8,7 +8,7 @@
 
 constexpr auto debounceTime = std::chrono::milliseconds(250);
 
-void tryUpdatePlayer(cpp_conv::SceneContext& kContext, Position newPosition)
+void tryUpdatePlayer(cpp_conv::SceneContext& kContext, Vector3 newPosition)
 {
     auto now = std::chrono::high_resolution_clock::now();
     if (now - kContext.m_debounce.m_lastPlayerMove >= debounceTime)

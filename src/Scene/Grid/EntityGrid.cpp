@@ -3,9 +3,9 @@
 #include "Entity.h"
 #include "Conveyor.h"
 
-Position cpp_conv::grid::GetForwardPosition(const Position& position, Direction direction)
+Vector3 cpp_conv::grid::GetForwardPosition(const Vector3& position, Direction direction)
 {
-    Position facingDirection = { 0, 0 };
+    Vector3 facingDirection = { 0, 0 };
 
     switch (direction)
     {
@@ -18,14 +18,14 @@ Position cpp_conv::grid::GetForwardPosition(const Position& position, Direction 
     return position + facingDirection;
 }
 
-Position cpp_conv::grid::GetForwardPosition(const cpp_conv::Entity& rEntity)
+Vector3 cpp_conv::grid::GetForwardPosition(const cpp_conv::Entity& rEntity)
 {    
     return GetForwardPosition(rEntity.m_position, rEntity.GetDirection());
 }
 
-Position cpp_conv::grid::GetRightPosition(const cpp_conv::Entity& rEntity)
+Vector3 cpp_conv::grid::GetRightPosition(const cpp_conv::Entity& rEntity)
 {
-    Position facingDirection = { 0, 0 };
+    Vector3 facingDirection = { 0, 0 };
 
     switch (rEntity.GetDirection())
     {
@@ -38,14 +38,14 @@ Position cpp_conv::grid::GetRightPosition(const cpp_conv::Entity& rEntity)
     return rEntity.m_position + facingDirection;
 }
 
-Position cpp_conv::grid::GetBackwardsPosition(const cpp_conv::Entity& rEntity)
+Vector3 cpp_conv::grid::GetBackwardsPosition(const cpp_conv::Entity& rEntity)
 {
-    Position pos = GetForwardPosition(rEntity) - rEntity.m_position;
+    Vector3 pos = GetForwardPosition(rEntity) - rEntity.m_position;
     return rEntity.m_position - pos;
 }
 
-Position cpp_conv::grid::GetLeftPosition(const cpp_conv::Entity& rEntity)
+Vector3 cpp_conv::grid::GetLeftPosition(const cpp_conv::Entity& rEntity)
 {
-    Position pos = GetRightPosition(rEntity) - rEntity.m_position;
+    Vector3 pos = GetRightPosition(rEntity) - rEntity.m_position;
     return rEntity.m_position - pos;
 }
