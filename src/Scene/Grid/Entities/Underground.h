@@ -14,7 +14,7 @@ namespace cpp_conv
     class Underground : public Entity
     {
     public:
-        Underground(int x, int y, Direction direction);
+        Underground(Vector3 position, Vector3 size, Direction direction);
 
         void Tick(const SceneContext& kContext) override;
         void Draw(RenderContext& kRenderContext) const override;

@@ -19,8 +19,8 @@
 #include "ItemRegistry.h"
 #include "ItemDefinition.h"
 
-cpp_conv::Inserter::Inserter(int x, int y, Direction direction, InserterId inserterId)
-    : Entity(x, y, EntityKind::Inserter)
+cpp_conv::Inserter::Inserter(Vector3 position, Vector3 size, Direction direction, InserterId inserterId)
+    : Entity(position, size, EntityKind::Inserter)
     , m_inserterId(inserterId)
     , m_direction(direction)
     , m_transitTime(9999999)

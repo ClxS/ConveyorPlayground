@@ -10,7 +10,7 @@ namespace cpp_conv
     class Storage : public Entity
     {
     public:
-        Storage(int x, int y, uint32_t uiMaxCapacity, uint32_t uiMaxStackSize);
+        Storage(Vector3 position, Vector3 size, uint32_t uiMaxCapacity, uint32_t uiMaxStackSize);
 
         void Tick(const SceneContext& kContext) override;
         void Draw(RenderContext& kRenderContext) const override;

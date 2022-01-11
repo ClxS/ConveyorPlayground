@@ -13,8 +13,9 @@ namespace cpp_conv
     class Entity
     {
     public:
-        Entity(int32_t x, int32_t y, EntityKind eEntityKind)
-            : m_position({ x, y })
+        Entity(Vector3 position, Vector3 size, EntityKind eEntityKind)
+            : m_position(position)
+            , m_size(size)
             , m_eEntityKind(eEntityKind)
         {
         }
@@ -34,6 +35,7 @@ namespace cpp_conv
         virtual std::string GetDescription() const = 0;
 
         Vector3 m_position;
-        EntityKind m_eEntityKind;
+        const Vector3 m_size;
+        const EntityKind m_eEntityKind;
     };
 }

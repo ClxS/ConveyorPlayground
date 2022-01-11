@@ -10,7 +10,7 @@ namespace cpp_conv
     class Junction : public Entity
     {
     public:
-        Junction(int x, int y);
+        Junction(Vector3 position, Vector3 size);
 
         void Tick(const SceneContext& kContext) override;
         void Draw(RenderContext& kRenderContext) const override;

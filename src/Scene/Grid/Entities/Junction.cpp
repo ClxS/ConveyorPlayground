@@ -22,8 +22,8 @@ void shuffle(RandomAccessIterator first, RandomAccessIterator last, URNG&& g)
     }
 }
 
-cpp_conv::Junction::Junction(int x, int y)
-    : Entity(x, y, EntityKind::Junction)
+cpp_conv::Junction::Junction(Vector3 position, Vector3 size)
+    : Entity(position, size, EntityKind::Junction)
     , m_pItem(cpp_conv::ItemIds::None)
     , m_uiTick(0)
 {

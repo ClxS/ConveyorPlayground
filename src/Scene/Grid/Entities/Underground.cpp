@@ -51,24 +51,23 @@ std::tuple<int, Vector3> GetUndergroundLength(const cpp_conv::WorldMap& map, cpp
     return std::make_tuple(iTargetUnderground, kTargetPosition);
 }
 
-cpp_conv::Underground::Underground(int x, int y, Direction direction)
-    : Entity(x, y, EntityKind::Underground)
+cpp_conv::Underground::Underground(Vector3 position, Vector3 size, Direction direction)
+    : Entity(position, size, EntityKind::Underground)
     , m_direction(direction)
     , m_arrInternalConveyors
     {
-        cpp_conv::Conveyor(x, y, direction, cpp_conv::ItemIds::None),
-        cpp_conv::Conveyor(x, y, direction, cpp_conv::ItemIds::None),
-        cpp_conv::Conveyor(x, y, direction, cpp_conv::ItemIds::None),
-        cpp_conv::Conveyor(x, y, direction, cpp_conv::ItemIds::None),
-        cpp_conv::Conveyor(x, y, direction, cpp_conv::ItemIds::None),
-        cpp_conv::Conveyor(x, y, direction, cpp_conv::ItemIds::None)
+        cpp_conv::Conveyor(position, size, direction, cpp_conv::ItemIds::None),
+        cpp_conv::Conveyor(position, size, direction, cpp_conv::ItemIds::None),
+        cpp_conv::Conveyor(position, size, direction, cpp_conv::ItemIds::None),
+        cpp_conv::Conveyor(position, size, direction, cpp_conv::ItemIds::None),
+        cpp_conv::Conveyor(position, size, direction, cpp_conv::ItemIds::None),
+        cpp_conv::Conveyor(position, size, direction, cpp_conv::ItemIds::None)
     }    
     , m_uiTick(0)
 {
-    Vector3 position = m_position;
     for (int i = 0; i < cpp_conv::c_maxUndergroundLength; i++)
     {
-        m_arrInternalConveyors[i].m_position = position;
+        m_arrInternalConveyors[i].m_position = m_position;
         position = cpp_conv::grid::GetForwardPosition(position, direction);
     }
 }

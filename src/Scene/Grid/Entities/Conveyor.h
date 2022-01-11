@@ -27,7 +27,7 @@ namespace cpp_conv
             std::array<ItemId, c_conveyorChannelSlots + 1> m_pPendingItems;
         };
 
-        Conveyor(int32_t x, int32_t y, Direction direction, ItemId pItem = {});
+        Conveyor(Vector3 position, Vector3 size, Direction direction, ItemId pItem = {});
 
         Direction m_direction;
         int m_pSequenceId;

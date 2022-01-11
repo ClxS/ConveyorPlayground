@@ -5,8 +5,8 @@
 #include "TileAsset.h"
 #include "Profiler.h"
 
-cpp_conv::Storage::Storage(int x, int y, uint32_t uiMaxCapacity, uint32_t uiMaxStackSize)
-    : Entity(x, y, EntityKind::Storage)
+cpp_conv::Storage::Storage(Vector3 position, Vector3 size, uint32_t uiMaxCapacity, uint32_t uiMaxStackSize)
+    : Entity(position, size, EntityKind::Storage)
     , m_itemContainer(uiMaxCapacity, uiMaxStackSize, false)
 {
 }

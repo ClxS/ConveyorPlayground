@@ -167,8 +167,8 @@ cpp_conv::Conveyor::Channel::Channel()
     std::fill(std::begin(m_pPendingItems), std::end(m_pPendingItems), cpp_conv::ItemIds::None);
 }
 
-cpp_conv::Conveyor::Conveyor(int32_t x, int32_t y, Direction direction, ItemId pItem)
-    : Entity(x, y, EntityKind::Conveyor)
+cpp_conv::Conveyor::Conveyor(Vector3 position, Vector3 size, Direction direction, ItemId pItem)
+    : Entity(position, size, EntityKind::Conveyor)
     , m_direction(direction)
     , m_pSequenceId(0)
 {

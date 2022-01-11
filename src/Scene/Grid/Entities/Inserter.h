@@ -15,7 +15,7 @@ namespace cpp_conv
     class Inserter : public Entity
     {
     public:
-        Inserter(int x, int y, Direction direction, InserterId inserterId);
+        Inserter(Vector3 position, Vector3 size, Direction direction, InserterId inserterId);
 
         void Tick(const SceneContext& kContext) override;
         void Draw(RenderContext& kRenderContext) const override;
