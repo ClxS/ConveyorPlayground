@@ -13,6 +13,7 @@
 #include "ResourceRegistry.h"
 #include "ResourceManager.h"
 #include "TileAsset.h"
+#include "WorldMap.h"
 
 template <class RandomAccessIterator, class URNG>
 void shuffle(RandomAccessIterator first, RandomAccessIterator last, URNG&& g)
@@ -24,7 +25,7 @@ void shuffle(RandomAccessIterator first, RandomAccessIterator last, URNG&& g)
     }
 }
 
-std::tuple<int, Position> GetUndergroundLength(cpp_conv::grid::EntityGrid& grid, cpp_conv::Entity* pStart, Direction direction)
+std::tuple<int, Position> GetUndergroundLength(const cpp_conv::WorldMap& map, cpp_conv::Entity* pStart, Direction direction)
 {
     Position kTargetPosition;
     int iTargetUnderground = -1;
@@ -32,14 +33,14 @@ std::tuple<int, Position> GetUndergroundLength(cpp_conv::grid::EntityGrid& grid,
     for (int i = 0; i < cpp_conv::c_maxUndergroundLength; i++)
     {
         Position kForwardPosition = cpp_conv::grid::GetForwardPosition(kTmpPosition, direction);
-        cpp_conv::Entity* pForwardEntity = cpp_conv::grid::SafeGetEntity(grid, kForwardPosition);
+        const cpp_conv::Entity* pForwardEntity = map.GetEntity(kForwardPosition);
         if (pForwardEntity == nullptr || pForwardEntity->m_eEntityKind != EntityKind::Underground)
         {
             kTmpPosition = kForwardPosition;
             continue;
         }
 
-        iTargetUnderground = i + 2; // + 2 for the start and exit points
+        iTargetUnderground = i + 1; // + 1 for the start point
 
         // Move forward an extra one to skip the underground block
         kTmpPosition = cpp_conv::grid::GetForwardPosition(kTmpPosition, direction);
@@ -64,8 +65,6 @@ cpp_conv::Underground::Underground(int x, int y, Direction direction)
     }    
     , m_uiTick(0)
 {
-    memset(&m_kLocalGrid, 0, sizeof(m_kLocalGrid));
-
     Position position = m_position;
     for (int i = 0; i < cpp_conv::c_maxUndergroundLength; i++)
     {
@@ -79,36 +78,73 @@ void cpp_conv::Underground::Tick(const SceneContext& kContext)
     int iUndergroundLength;
     Position undergroundEnd;
     
-    std::tie(iUndergroundLength, undergroundEnd) = GetUndergroundLength(kContext.m_grid, this, m_direction);
+    std::tie(iUndergroundLength, undergroundEnd) = GetUndergroundLength(kContext.m_rMap, this, m_direction);
     if (iUndergroundLength == -1)
     {
         return;
     }
 
-    Position position(cpp_conv::c_maxUndergroundLength + 1, cpp_conv::c_maxUndergroundLength + 1);
-    
-    // TODO[CJones] This isn't really needed.
+    Entity* pExitEntity = kContext.m_rMap.GetEntity(undergroundEnd);
+    Position position(cpp_conv::grid::GetForwardPosition(m_position, m_direction));
+
     for (int i = 0; i < iUndergroundLength; i++)
     {
-        m_kLocalGrid[position.m_y][position.m_x] = &m_arrInternalConveyors[i];
         m_arrInternalConveyors[i].m_position = position;
-
         position = cpp_conv::grid::GetForwardPosition(position, m_direction);
     }
 
-    m_kLocalGrid[position.m_y][position.m_x] = kContext.m_grid[undergroundEnd.m_y][undergroundEnd.m_x];
+    for (int i = 0; i < iUndergroundLength; i++)
+    {
+        bool bIsHead = (i >= iUndergroundLength - 1);
+        Conveyor* pNode = &m_arrInternalConveyors[i];
+        for (int iChannelIdx = 0; iChannelIdx < cpp_conv::c_conveyorChannels; iChannelIdx++)
+        {
+            int iChannelLength = cpp_conv::c_conveyorChannelSlots;
 
-    SceneContext kLocalContext = { 0, 0, m_kLocalGrid, kContext.m_sequences, kContext.m_conveyors, kContext.m_vOtherEntities };
+            cpp_conv::Entity* pForwardEntity = bIsHead ? pExitEntity : &m_arrInternalConveyors[i + 1];
+            ItemId& frontMostItem = pNode->m_pChannels[iChannelIdx].m_pItems[iChannelLength - 1];
+            if (!frontMostItem.IsEmpty())
+            {
+                if (bIsHead)
+                {
+                    if (pForwardEntity && pForwardEntity->SupportsInsertion() && pForwardEntity->TryInsert(kContext, *pNode, frontMostItem, iChannelIdx))
+                    {
+                        frontMostItem = cpp_conv::ItemIds::None;
+                    }
+                }
+                else
+                {
+                    cpp_conv::Conveyor* pForwardNode = reinterpret_cast<cpp_conv::Conveyor*>(pForwardEntity);
+                    ItemId& forwardTargetItem = pForwardNode->m_pChannels[iChannelIdx].m_pItems[0];
+                    ItemId& forwardPendingItem = pForwardNode->m_pChannels[iChannelIdx].m_pPendingItems[0];
+                    if (forwardTargetItem.IsEmpty() && forwardPendingItem.IsEmpty())
+                    {
+                        forwardPendingItem = frontMostItem;
+                        frontMostItem = cpp_conv::ItemIds::None;
+                    }
+                }
+            }
 
-    Sequence innerSequence(&m_arrInternalConveyors[iUndergroundLength - 1], &m_arrInternalConveyors[0], 0);
-    innerSequence.Tick(kLocalContext);
+            // Move inner items forwards
+            for (int iChannelSlot = iChannelLength - 2; iChannelSlot >= 0; iChannelSlot--)
+            {
+                ItemId& currentItem = pNode->m_pChannels[iChannelIdx].m_pItems[iChannelSlot];
+                ItemId& forwardTargetItem = pNode->m_pChannels[iChannelIdx].m_pItems[iChannelSlot + 1];
+                ItemId& forwardPendingItem = pNode->m_pChannels[iChannelIdx].m_pItems[iChannelSlot + 1];
+
+                if (currentItem.IsValid() && forwardTargetItem.IsEmpty() && forwardPendingItem.IsEmpty())
+                {
+                    forwardPendingItem = currentItem;
+                    currentItem = cpp_conv::ItemIds::None;
+                }
+            }
+        }
+    }
 
     for (int i = 0; i < iUndergroundLength; i++)
     {
-        m_arrInternalConveyors[i].Tick(kLocalContext);
+        m_arrInternalConveyors[i].Tick(kContext);
     }
-
-    memset(&m_kLocalGrid, 0, sizeof(m_kLocalGrid));
 }
 
 void cpp_conv::Underground::Draw(RenderContext& kRenderContext) const

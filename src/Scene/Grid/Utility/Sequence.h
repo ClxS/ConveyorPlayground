@@ -5,6 +5,8 @@
 #include "Conveyor.h"
 #include "EntityGrid.h"
 
+namespace cpp_conv { class WorldMap; }
+
 constexpr int c_maxCircularCheckDepth = 64;
 namespace cpp_conv
 {
@@ -17,7 +19,7 @@ namespace cpp_conv
         class IterateNode
         {
         public:
-            IterateNode(Conveyor* pCurrent, const Conveyor* pEnd, grid::EntityGrid& grid, bool bEndSentinel);
+            IterateNode(Conveyor* pCurrent, const Conveyor* pEnd, cpp_conv::WorldMap& map, bool bEndSentinel);
 
             Conveyor& operator*() const { return *m_pCurrent; }
             Conveyor* operator->() { return m_pCurrent; }
@@ -31,24 +33,24 @@ namespace cpp_conv
         private:
             Conveyor* m_pCurrent;
             const Conveyor* m_pEnd;
-            grid::EntityGrid& m_grid;
+            cpp_conv::WorldMap& m_rMap;
             bool m_bEndSentinel;
         };
 
 
-        SequenceIterator(Sequence& sequence, grid::EntityGrid& grid);
+        SequenceIterator(Sequence& sequence, cpp_conv::WorldMap& map);
         IterateNode begin();
         IterateNode end();
 
     private:
         Sequence& m_sequence;
-        grid::EntityGrid& m_grid;
+        cpp_conv::WorldMap& m_rMap;
     };
 
     class Sequence
     {
     public:
-        Sequence(Conveyor* pHead, Conveyor* pTail, int iSequenceId)
+        Sequence(const Conveyor* pHead, const Conveyor* pTail, int iSequenceId)
             : m_pHeadConveyor(pHead)
             , m_pTailConveyor(pTail)
             , m_iSequenceId(iSequenceId)
@@ -60,12 +62,9 @@ namespace cpp_conv
         const Conveyor* GetHeadConveyor() const { return m_pHeadConveyor; }
         const Conveyor* GetTailConveyor() const { return m_pTailConveyor; }
 
-        Conveyor* GetHeadConveyor() { return m_pHeadConveyor; }
-        Conveyor* GetTailConveyor() { return m_pTailConveyor; }
-
-        SequenceIterator IterateSequence(grid::EntityGrid& grid)
+        SequenceIterator IterateSequence(cpp_conv::WorldMap& map)
         {
-            return SequenceIterator(*this, grid);
+            return SequenceIterator(*this, map);
         }
 
         int GetSequenceId() const
@@ -74,17 +73,17 @@ namespace cpp_conv
         }
 
     private:
-        Conveyor* m_pHeadConveyor;
-        Conveyor* m_pTailConveyor;
+        const Conveyor* m_pHeadConveyor;
+        const Conveyor* m_pTailConveyor;
         int m_iSequenceId;
     };
 
-    Conveyor* TraceHeadConveyor(const grid::EntityGrid& grid, const Conveyor& searchStart);
-    Conveyor* TraceTailConveyor(const grid::EntityGrid& grid, Conveyor& searchStart, Conveyor& head);
+    const Conveyor* TraceHeadConveyor(const WorldMap& map, const Conveyor& searchStart);
+    const Conveyor* TraceTailConveyor(const WorldMap& map, const Conveyor& searchStart, const Conveyor& head);
 
-    std::vector<Sequence> InitializeSequences(grid::EntityGrid& grid, std::vector<Conveyor*>& conveyors);
+    std::vector<Sequence> InitializeSequences(WorldMap& map, const std::vector<Conveyor*>& conveyors);
 
-    bool IsCircular(const grid::EntityGrid& grid, std::vector<Sequence>& sequences, Sequence* pStartSequence);
+    bool IsCircular(const cpp_conv::WorldMap& map, std::vector<Sequence>& sequences, Sequence* pStartSequence);
 
-    std::tuple<int, Direction> GetInnerMostCornerChannel(const grid::EntityGrid& grid, const Conveyor& rConveyor);
+    std::tuple<int, Direction> GetInnerMostCornerChannel(const cpp_conv::WorldMap& map, const Conveyor& rConveyor);
 }

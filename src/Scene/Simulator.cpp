@@ -1,5 +1,6 @@
 #include "Simulator.h"
 #include "SceneContext.h"
+#include "WorldMap.h"
 
 void cpp_conv::simulation::simulate(SceneContext& kContext)
 {
@@ -8,12 +9,12 @@ void cpp_conv::simulation::simulate(SceneContext& kContext)
         sequence.Tick(kContext); 
     }
 
-    for (cpp_conv::Entity* pProducer : kContext.m_vOtherEntities)
+    for (cpp_conv::Entity* pProducer : kContext.m_rMap.GetOtherEntities())
     {
         pProducer->Tick(kContext);
     }
     
-    for (cpp_conv::Conveyor* pConveyor : kContext.m_conveyors)
+    for (cpp_conv::Conveyor* pConveyor : kContext.m_rMap.GetConveyors())
     {
         pConveyor->Tick(kContext);        
     }

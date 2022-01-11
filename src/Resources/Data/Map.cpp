@@ -1,19 +1,12 @@
 #include "Map.h"
 #include <vector>
+#include "Conveyor.h"
 
 using cpp_conv::Entity;
 using cpp_conv::Conveyor;
 using cpp_conv::resources::Map;
 
 cpp_conv::resources::Map::Map()
-    : m_kEntityGrid({})
-{
-}
-
-cpp_conv::resources::Map::Map(cpp_conv::grid::EntityGrid& kGrid, std::vector<Conveyor*> vConveyors, std::vector<Entity*> vOtherEntities)
-    : m_kEntityGrid(std::move(kGrid))
-    , m_vConveyors(std::move(vConveyors))
-    , m_vOtherEntities(std::move(vOtherEntities))
 {
 }
 
@@ -37,12 +30,18 @@ std::vector<Conveyor*>& cpp_conv::resources::Map::GetConveyors()
     return m_vConveyors;
 }
 
-const cpp_conv::grid::EntityGrid& cpp_conv::resources::Map::GetGrid() const
+cpp_conv::resources::Map::~Map()
 {
-    return m_kEntityGrid;
-}
+    for (Conveyor* pConveyor : m_vConveyors)
+    {
+        delete pConveyor;
+    }
 
-cpp_conv::grid::EntityGrid& cpp_conv::resources::Map::GetGrid()
-{
-    return m_kEntityGrid;
+    for (Entity* pEntity : m_vOtherEntities)
+    {
+        delete pEntity;
+    }
+
+    m_vConveyors.clear();
+    m_vOtherEntities.clear();
 }

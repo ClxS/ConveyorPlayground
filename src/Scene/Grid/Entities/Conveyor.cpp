@@ -144,7 +144,7 @@ void DrawConveyor(
     }
     else
     {
-        if (cpp_conv::targeting_util::IsClockwiseCorner(kContext.m_grid, rConveyor))
+        if (cpp_conv::targeting_util::IsClockwiseCorner(kContext.m_rMap, rConveyor))
         {
             pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Conveyor_CornerClockwise);
         }
@@ -176,10 +176,10 @@ cpp_conv::Conveyor::Conveyor(int32_t x, int32_t y, Direction direction, ItemId p
 
 void cpp_conv::Conveyor::Tick(const SceneContext& kContext)
 {
-    bool bIsCornerConveyor = cpp_conv::targeting_util::IsCornerConveyor(kContext.m_grid, *this);
+    bool bIsCornerConveyor = cpp_conv::targeting_util::IsCornerConveyor(kContext.m_rMap, *this);
     int iInnerMostChannel;
     Direction eCornerDirection;
-    std::tie(iInnerMostChannel, eCornerDirection) = GetInnerMostCornerChannel(kContext.m_grid, *this);
+    std::tie(iInnerMostChannel, eCornerDirection) = GetInnerMostCornerChannel(kContext.m_rMap, *this);
 
     for (int iChannelIdx = 0; iChannelIdx < cpp_conv::c_conveyorChannels; iChannelIdx++)
     {
@@ -210,11 +210,11 @@ void cpp_conv::Conveyor::Draw(RenderContext& kContext) const
     int conveyorX = m_position.m_x * 3;
     int conveyorY = m_position.m_y * 3;
 
-    bool bIsCorner = cpp_conv::targeting_util::IsCornerConveyor(kContext.m_grid, *this);
+    bool bIsCorner = cpp_conv::targeting_util::IsCornerConveyor(kContext.m_rMap, *this);
 
     int iInnerMostChannel;
     Direction eCornerDirection;
-    std::tie(iInnerMostChannel, eCornerDirection) = GetInnerMostCornerChannel(kContext.m_grid, *this);
+    std::tie(iInnerMostChannel, eCornerDirection) = GetInnerMostCornerChannel(kContext.m_rMap, *this);
 
     DrawConveyor(
         kContext,
@@ -262,13 +262,13 @@ void cpp_conv::Conveyor::Draw(RenderContext& kContext) const
 
 bool cpp_conv::Conveyor::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, const ItemId pItem, int iSourceChannel)
 {
-    cpp_conv::Conveyor::Channel* pTargetChannel = cpp_conv::targeting_util::GetTargetChannel(kContext.m_grid, pSourceEntity, *this, iSourceChannel);
+    cpp_conv::Conveyor::Channel* pTargetChannel = cpp_conv::targeting_util::GetTargetChannel(kContext.m_rMap, pSourceEntity, *this, iSourceChannel);
     if (!pTargetChannel)
     {
         return false;
     }
 
-    int forwardTargetItemSlot = cpp_conv::targeting_util::GetChannelTargetSlot(kContext.m_grid, pSourceEntity, *this, iSourceChannel);
+    int forwardTargetItemSlot = cpp_conv::targeting_util::GetChannelTargetSlot(kContext.m_rMap, pSourceEntity, *this, iSourceChannel);
 
     ItemId& forwardTargetItem = pTargetChannel->m_pItems[forwardTargetItemSlot];
     ItemId& forwardPendingItem = pTargetChannel->m_pPendingItems[forwardTargetItemSlot];
@@ -285,10 +285,10 @@ bool cpp_conv::Conveyor::TryInsert(const SceneContext& kContext, const Entity& p
 
 bool cpp_conv::Conveyor::TryGrab(const SceneContext& kContext, bool bSingle, std::tuple<ItemId, uint32_t>& outItem)
 {
-    bool bIsCorner = cpp_conv::targeting_util::IsCornerConveyor(kContext.m_grid, *this);
+    bool bIsCorner = cpp_conv::targeting_util::IsCornerConveyor(kContext.m_rMap, *this);
     int iInnerMostChannel;
     Direction eCornerDirection;
-    std::tie(iInnerMostChannel, eCornerDirection) = GetInnerMostCornerChannel(kContext.m_grid, *this);
+    std::tie(iInnerMostChannel, eCornerDirection) = GetInnerMostCornerChannel(kContext.m_rMap, *this);
 
     for (int iChannelIdx = 0; iChannelIdx < c_conveyorChannels; ++iChannelIdx)
     {

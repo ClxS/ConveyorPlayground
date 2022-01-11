@@ -5,7 +5,7 @@
 
 namespace cpp_conv
 {
-    inline uint64_t idFromStringId(const std::string_view str)
+    static constexpr inline uint64_t idFromStringId(const std::string_view str)
     {
         uint64_t result = 0xcbf29ce484222325;
         for (char c : str)

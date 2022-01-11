@@ -54,8 +54,6 @@ cpp_conv::resources::ResourceAsset* mapAssetHandler(cpp_conv::resources::resourc
 
             if (pEntity)
             {
-                pMap->GetGrid()[iRow][iCol] = pEntity;
-
                 if (pEntity->m_eEntityKind == EntityKind::Conveyor)
                 {
                     pMap->GetConveyors().push_back(reinterpret_cast<cpp_conv::Conveyor*>(pEntity));

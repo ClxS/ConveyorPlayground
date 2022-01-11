@@ -5,15 +5,15 @@
 #include "EntityGrid.h"
 #include "Sequence.h"
 
+namespace cpp_conv { class WorldMap; }
+
 namespace cpp_conv
 {
     struct SceneContext
     {
         Position m_player;
-        cpp_conv::grid::EntityGrid& m_grid;
+        cpp_conv::WorldMap& m_rMap;
         std::vector<cpp_conv::Sequence>& m_sequences;
-        std::vector<cpp_conv::Conveyor*>& m_conveyors;
-        std::vector<cpp_conv::Entity*>& m_vOtherEntities;
 
         struct
         {

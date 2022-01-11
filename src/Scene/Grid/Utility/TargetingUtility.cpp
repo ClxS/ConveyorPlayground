@@ -5,7 +5,7 @@
 #include "EntityGrid.h"
 #include "Direction.h"
 
-cpp_conv::Conveyor* cpp_conv::targeting_util::FindNextTailConveyor(const cpp_conv::grid::EntityGrid& grid, const cpp_conv::Conveyor& rCurrentConveyor)
+const cpp_conv::Conveyor* cpp_conv::targeting_util::FindNextTailConveyor(const cpp_conv::WorldMap& map, const cpp_conv::Conveyor& rCurrentConveyor)
 {
     static RelativeDirection directionPriority[] =
     {
@@ -14,24 +14,23 @@ cpp_conv::Conveyor* cpp_conv::targeting_util::FindNextTailConveyor(const cpp_con
         RelativeDirection::Left,
     };
 
-    cpp_conv::Conveyor* vPotentialNeighbours[4];
-    vPotentialNeighbours[(int)RelativeDirection::Backwards] = cpp_conv::grid::SafeGetEntity<cpp_conv::Conveyor>(grid, cpp_conv::grid::GetBackwardsPosition(rCurrentConveyor), EntityKind::Conveyor);
-    vPotentialNeighbours[(int)RelativeDirection::Right] = cpp_conv::grid::SafeGetEntity<cpp_conv::Conveyor>(grid, cpp_conv::grid::GetRightPosition(rCurrentConveyor), EntityKind::Conveyor);
-    vPotentialNeighbours[(int)RelativeDirection::Left] = cpp_conv::grid::SafeGetEntity<cpp_conv::Conveyor>(grid, cpp_conv::grid::GetLeftPosition(rCurrentConveyor), EntityKind::Conveyor);
+    const cpp_conv::Conveyor* vPotentialNeighbours[4];
+    vPotentialNeighbours[(int)RelativeDirection::Backwards] = map.GetEntity<cpp_conv::Conveyor>(cpp_conv::grid::GetBackwardsPosition(rCurrentConveyor), EntityKind::Conveyor);
+    vPotentialNeighbours[(int)RelativeDirection::Right] = map.GetEntity<cpp_conv::Conveyor>(cpp_conv::grid::GetRightPosition(rCurrentConveyor), EntityKind::Conveyor);
+    vPotentialNeighbours[(int)RelativeDirection::Left] = map.GetEntity<cpp_conv::Conveyor>(cpp_conv::grid::GetLeftPosition(rCurrentConveyor), EntityKind::Conveyor);
 
-    cpp_conv::Conveyor* pTargetConveyor = nullptr;
+    const cpp_conv::Conveyor* pTargetConveyor = nullptr;
     for (auto direction : directionPriority)
     {
-        cpp_conv::Conveyor* pDirectionEntity = vPotentialNeighbours[(int)direction];
+        const cpp_conv::Conveyor* pDirectionEntity = vPotentialNeighbours[(int)direction];
         if (pDirectionEntity == nullptr || pDirectionEntity->m_eEntityKind != EntityKind::Conveyor)
         {
             continue;
         }
 
-        cpp_conv::Conveyor* pDirectionConveyor = reinterpret_cast<cpp_conv::Conveyor*>(pDirectionEntity);
-        if (cpp_conv::grid::GetForwardPosition(*pDirectionConveyor) == rCurrentConveyor.m_position)
+        if (cpp_conv::grid::GetForwardPosition(*pDirectionEntity) == rCurrentConveyor.m_position)
         {
-            pTargetConveyor = pDirectionConveyor;
+            pTargetConveyor = pDirectionEntity;
             break;
         }
     }
@@ -39,10 +38,10 @@ cpp_conv::Conveyor* cpp_conv::targeting_util::FindNextTailConveyor(const cpp_con
     return pTargetConveyor;
 }
 
-bool cpp_conv::targeting_util::IsCornerConveyor(const cpp_conv::grid::EntityGrid& grid, const cpp_conv::Conveyor& rConveyor)
+bool cpp_conv::targeting_util::IsCornerConveyor(const cpp_conv::WorldMap& map, const cpp_conv::Conveyor& rConveyor)
 {
     PROFILE_FUNC();
-    cpp_conv::Conveyor* pBackConverter = cpp_conv::targeting_util::FindNextTailConveyor(grid, rConveyor);
+    const cpp_conv::Conveyor* pBackConverter = cpp_conv::targeting_util::FindNextTailConveyor(map, rConveyor);
     if (pBackConverter == nullptr)
     {
         return false;
@@ -51,10 +50,10 @@ bool cpp_conv::targeting_util::IsCornerConveyor(const cpp_conv::grid::EntityGrid
     return pBackConverter->m_direction != rConveyor.m_direction;
 }
 
-bool cpp_conv::targeting_util::IsClockwiseCorner(const cpp_conv::grid::EntityGrid& grid, const cpp_conv::Conveyor& rConveyor)
+bool cpp_conv::targeting_util::IsClockwiseCorner(const cpp_conv::WorldMap& map, const cpp_conv::Conveyor& rConveyor)
 {
     PROFILE_FUNC();
-    cpp_conv::Conveyor* pBackConverter = cpp_conv::targeting_util::FindNextTailConveyor(grid, rConveyor);
+    const cpp_conv::Conveyor* pBackConverter = cpp_conv::targeting_util::FindNextTailConveyor(map, rConveyor);
     if (pBackConverter == nullptr || pBackConverter->m_direction == rConveyor.m_direction)
     {
         return false;
@@ -71,7 +70,7 @@ bool cpp_conv::targeting_util::IsClockwiseCorner(const cpp_conv::grid::EntityGri
     return backDirection == Direction::Right;
 }
 
-cpp_conv::Conveyor::Channel* cpp_conv::targeting_util::GetTargetChannel(const cpp_conv::grid::EntityGrid& grid, const cpp_conv::Entity& sourceNode, cpp_conv::Conveyor& targetNode, int iSourceChannel)
+cpp_conv::Conveyor::Channel* cpp_conv::targeting_util::GetTargetChannel(const cpp_conv::WorldMap& map, const cpp_conv::Entity& sourceNode, cpp_conv::Conveyor& targetNode, int iSourceChannel)
 {
     Direction eSourceDirection = sourceNode.GetDirection();    
 
@@ -82,14 +81,14 @@ cpp_conv::Conveyor::Channel* cpp_conv::targeting_util::GetTargetChannel(const cp
         return nullptr;
     }
 
-    if (IsCornerConveyor(grid, targetNode))
+    if (IsCornerConveyor(map, targetNode))
     {
-        if (&sourceNode == cpp_conv::targeting_util::FindNextTailConveyor(grid, targetNode))
+        if (&sourceNode == cpp_conv::targeting_util::FindNextTailConveyor(map, targetNode))
         {
             return &targetNode.m_pChannels[iSourceChannel];
         }
 
-        return cpp_conv::targeting_util::IsClockwiseCorner(grid, targetNode)
+        return cpp_conv::targeting_util::IsClockwiseCorner(map, targetNode)
             ? &targetNode.m_pChannels[0]
             : &targetNode.m_pChannels[1];
     }
@@ -110,7 +109,7 @@ cpp_conv::Conveyor::Channel* cpp_conv::targeting_util::GetTargetChannel(const cp
     return nullptr;
 }
 
-int cpp_conv::targeting_util::GetChannelTargetSlot(const grid::EntityGrid& grid, const cpp_conv::Entity& sourceNode, cpp_conv::Conveyor& targetNode, int iSourceChannel)
+int cpp_conv::targeting_util::GetChannelTargetSlot(const cpp_conv::WorldMap& map, const cpp_conv::Entity& sourceNode, cpp_conv::Conveyor& targetNode, int iSourceChannel)
 {
     Direction eSourceDirection = sourceNode.GetDirection();
     if (eSourceDirection == targetNode.m_direction)
@@ -120,7 +119,7 @@ int cpp_conv::targeting_util::GetChannelTargetSlot(const grid::EntityGrid& grid,
 
     int result = 0;
 
-    if (IsCornerConveyor(grid, targetNode) && &sourceNode == cpp_conv::targeting_util::FindNextTailConveyor(grid, targetNode))
+    if (IsCornerConveyor(map, targetNode) && &sourceNode == cpp_conv::targeting_util::FindNextTailConveyor(map, targetNode))
     {
         return 0;
     }
@@ -133,7 +132,7 @@ int cpp_conv::targeting_util::GetChannelTargetSlot(const grid::EntityGrid& grid,
     case Direction::Right: result = targetNode.m_direction == Direction::Up ? cpp_conv::c_conveyorChannels - 1 - iSourceChannel : iSourceChannel; break;
     }
 
-    if (cpp_conv::targeting_util::IsCornerConveyor(grid, targetNode))
+    if (cpp_conv::targeting_util::IsCornerConveyor(map, targetNode))
     {
         result++;
     }

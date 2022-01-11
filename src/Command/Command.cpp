@@ -4,16 +4,12 @@
 #include <chrono>
 #include "RenderContext.h"
 #include "AppHost.h"
+#include "WorldMap.h"
 
 constexpr auto debounceTime = std::chrono::milliseconds(250);
 
 void tryUpdatePlayer(cpp_conv::SceneContext& kContext, Position newPosition)
 {
-    if (newPosition.m_x < 0 || newPosition.m_y < 0 || newPosition.m_x >= kContext.m_grid[0].size() || newPosition.m_y < 0)
-    {
-        return;
-    }
-
     auto now = std::chrono::high_resolution_clock::now();
     if (now - kContext.m_debounce.m_lastPlayerMove >= debounceTime)
     {
@@ -30,18 +26,14 @@ void tryPlaceEntity(cpp_conv::SceneContext& kContext, EntityKind eKind, Directio
         return;
     }
 
-    if (kContext.m_grid[kContext.m_player.m_y][kContext.m_player.m_x])
-    {
-        return;
-    }
-
     switch (eKind)
     {
     case EntityKind::Conveyor:
         cpp_conv::Conveyor* pConveyor = new cpp_conv::Conveyor(kContext.m_player.m_x, kContext.m_player.m_y, eDirection);
-        kContext.m_grid[kContext.m_player.m_y][kContext.m_player.m_x] = pConveyor;
-        kContext.m_conveyors.push_back(pConveyor);
-        kContext.m_sequences = cpp_conv::InitializeSequences(kContext.m_grid, kContext.m_conveyors);
+        if (kContext.m_rMap.PlaceEntity(kContext.m_player, pConveyor))
+        {
+            kContext.m_sequences = cpp_conv::InitializeSequences(kContext.m_rMap, kContext.m_rMap.GetConveyors());
+        }
         break;
     }
 }

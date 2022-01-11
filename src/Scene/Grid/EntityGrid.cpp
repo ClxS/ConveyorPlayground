@@ -3,16 +3,6 @@
 #include "Entity.h"
 #include "Conveyor.h"
 
-cpp_conv::Entity* cpp_conv::grid::SafeGetEntity(const EntityGrid& grid, Position pos)
-{
-    if (pos.m_x < 0 || pos.m_y < 0 || pos.m_y >= grid.size() || pos.m_x >= grid[pos.m_y].size())
-    {
-        return nullptr;
-    }
-
-    return grid[pos.m_y][pos.m_x];
-}
-
 Position cpp_conv::grid::GetForwardPosition(const Position& position, Direction direction)
 {
     Position facingDirection = { 0, 0 };
@@ -58,9 +48,4 @@ Position cpp_conv::grid::GetLeftPosition(const cpp_conv::Entity& rEntity)
 {
     Position pos = GetRightPosition(rEntity) - rEntity.m_position;
     return rEntity.m_position - pos;
-}
-
-bool cpp_conv::grid::IsConveyor(const cpp_conv::Entity* pEntity)
-{
-    return pEntity != nullptr && pEntity->m_eEntityKind == EntityKind::Conveyor;
 }

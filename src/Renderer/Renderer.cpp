@@ -66,12 +66,12 @@ void drawPlayer(const cpp_conv::SceneContext& kSceneContext, cpp_conv::RenderCon
 
 void cpp_conv::renderer::render(const SceneContext& kSceneContext, RenderContext& kContext)
 {
-    for (auto pEntity : kSceneContext.m_conveyors)
+    for (auto pEntity : kSceneContext.m_rMap.GetConveyors())
     {
         pEntity->Draw(kContext);
     }
 
-    for (auto pEntity : kSceneContext.m_vOtherEntities)
+    for (auto pEntity : kSceneContext.m_rMap.GetOtherEntities())
     {
         pEntity->Draw(kContext);
     }

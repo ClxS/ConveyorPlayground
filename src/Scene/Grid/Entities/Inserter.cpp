@@ -23,8 +23,8 @@ cpp_conv::Inserter::Inserter(int x, int y, Direction direction, InserterId inser
     : Entity(x, y, EntityKind::Inserter)
     , m_inserterId(inserterId)
     , m_direction(direction)
-    , m_transitTime(999999999999)
-    , m_cooldownTime(999999999999)
+    , m_transitTime(9999999)
+    , m_cooldownTime(9999999)
     , m_supportsStacks(false)    
     , m_currentItem(ItemIds::None)
     , m_currentStackSize(0)
@@ -129,7 +129,7 @@ std::string cpp_conv::Inserter::GetDescription() const
 
 bool cpp_conv::Inserter::TryGrabItem(const SceneContext& kContext)
 {
-    auto pSourceEntity = cpp_conv::grid::SafeGetEntity(kContext.m_grid, grid::GetBackwardsPosition(*this));
+    auto pSourceEntity = kContext.m_rMap.GetEntity(grid::GetBackwardsPosition(*this));
     if (!pSourceEntity || !pSourceEntity->SupportsProvidingItem())
     {
         return false;
@@ -147,7 +147,7 @@ bool cpp_conv::Inserter::TryGrabItem(const SceneContext& kContext)
 
 bool cpp_conv::Inserter::TryInsertItem(const SceneContext& kContext)
 {
-    auto pTargetEntity = cpp_conv::grid::SafeGetEntity(kContext.m_grid, grid::GetForwardPosition(*this));
+    auto pTargetEntity = kContext.m_rMap.GetEntity(grid::GetForwardPosition(*this));
     if (!pTargetEntity || !pTargetEntity->SupportsInsertion())
     {
         return false;

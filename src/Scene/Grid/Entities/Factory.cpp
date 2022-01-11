@@ -200,7 +200,7 @@ void cpp_conv::Factory::RunOutputCycle(const SceneContext& kContext, const cpp_c
         return;
     }
 
-    cpp_conv::Entity* pEntity = cpp_conv::grid::SafeGetEntity(kContext.m_grid, cpp_conv::grid::GetForwardPosition(*this));
+    cpp_conv::Entity* pEntity = kContext.m_rMap.GetEntity(cpp_conv::grid::GetForwardPosition(*this));
     if (!pEntity || !pEntity->SupportsInsertion())
     {
         return;

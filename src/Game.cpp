@@ -24,6 +24,7 @@
 #include <vector>
 #include <queue>
 #include <chrono>
+#include "WorldMap.h"
 
 using namespace cpp_conv::resources;
 
@@ -73,7 +74,7 @@ void updateUI(cpp_conv::SceneContext& kSceneContext, cpp_conv::RenderContext& kR
         ui::endPanel();
         ui::panel("Footer", ui::Align::Bottom, 0, 3_Lines, false);
             ui::text(std::format("Current Pos: {}, {}", kSceneContext.m_player.m_x, kSceneContext.m_player.m_y));
-            auto playerEntity = grid::SafeGetEntity(kSceneContext.m_grid, kSceneContext.m_player);
+            auto playerEntity = kSceneContext.m_rMap.GetEntity(kSceneContext.m_player);
             if (playerEntity)
             {
                 ui::text(std::format("Item: {} - {}", playerEntity->GetName(), playerEntity->GetDescription()));
@@ -95,28 +96,32 @@ void cpp_conv::game::run()
     std::tie(iWidth, iHeight) = cpp_conv::apphost::getAppDimensions();
 
     cpp_conv::resources::registration::processSelfRegistrations();
-    AssetPtr<Map> map = resource_manager::loadAsset<Map>(registry::data::MapCircle);
-    if (!map)
+
+    WorldMap worldMap;
     {
-        return;
+        AssetPtr<Map> map = resource_manager::loadAssetUncached<Map>(registry::data::MapSimple);
+        if (!map)
+        {
+            return;
+        }
+
+        worldMap.Consume(map);
     }
 
-    std::vector<cpp_conv::Sequence> sequences = cpp_conv::InitializeSequences(map->GetGrid(), map->GetConveyors());
+    std::vector<cpp_conv::Sequence> sequences = cpp_conv::InitializeSequences(worldMap, worldMap.GetConveyors());
     cpp_conv::SceneContext kSceneContext =
     { 
         { 0, 0 },
-        map->GetGrid(),
+        worldMap,
         sequences,
-        map->GetConveyors(),
-        map->GetOtherEntities(),
         { std::chrono::high_resolution_clock::now() }
     };
 
     cpp_conv::RenderContext kRenderContext =
     {
         { 0, 0, 0, 0 },
+        worldMap,
         nullptr,
-        map->GetGrid(),
         1.0f
     };
 

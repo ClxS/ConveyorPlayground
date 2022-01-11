@@ -27,7 +27,6 @@ namespace cpp_conv
         std::string GetDescription() const override { return ""; }
 
     private:
-        cpp_conv::grid::EntityGrid m_kLocalGrid;
         Direction m_direction;
         std::array<Conveyor, c_maxUndergroundLength> m_arrInternalConveyors;
         uint64_t m_uiTick;

@@ -18,6 +18,7 @@ namespace cpp_conv
             , m_eEntityKind(eEntityKind)
         {
         }
+        virtual ~Entity() = default;
 
         virtual void Tick(const SceneContext& kContext) = 0;
         virtual void Draw(RenderContext& kContext) const = 0;
