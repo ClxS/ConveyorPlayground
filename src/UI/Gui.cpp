@@ -109,6 +109,11 @@ void cpp_conv::ui::wrappedText(const std::string& szText, Colour colour /*= { 0x
     rPanel.MoveY(cpp_conv::ui::platform::getTextLineHeight());
 }
 
+uint32_t operator ""_Lines(unsigned long long input)
+{
+    return (uint32_t)input * cpp_conv::ui::platform::getTextLineHeight();
+}
+
 std::tuple<uint32_t, uint32_t> cpp_conv::ui::getDesignDimensions()
 {
     return std::make_tuple(g_designWidth, g_designHeight);
