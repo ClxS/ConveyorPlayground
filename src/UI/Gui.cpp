@@ -75,6 +75,15 @@ void cpp_conv::ui::text(const std::string& szText, Colour colour /*= { 0xFFFFFFF
     rPanel.MoveY(cpp_conv::ui::platform::getTextLineHeight());
 }
 
+void cpp_conv::ui::wrappedText(const std::string& szText, Colour colour /*= { 0xFFFFFFFF }*/)
+{
+    Panel& rPanel = g_panelStack.back();
+
+    uint32_t uiLinesRequired = 0;
+    cpp_conv::ui::platform::drawWrappedText(szText, colour, rPanel.m_uiTopLeft.m_x, rPanel.m_uiTopLeft.m_y, uiLinesRequired);
+    rPanel.MoveY(cpp_conv::ui::platform::getTextLineHeight());
+}
+
 std::tuple<uint32_t, uint32_t> cpp_conv::ui::getDesignDimensions()
 {
     return std::make_tuple(g_designWidth, g_designHeight);
