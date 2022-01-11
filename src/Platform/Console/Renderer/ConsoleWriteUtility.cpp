@@ -69,5 +69,10 @@ void cpp_conv::renderer::setCell(RenderContext& kContext, wchar_t value, int x, 
 
 std::tuple<uint32_t, uint32_t> cpp_conv::renderer::getConsoleSpaceDimensions(uint32_t uiWidth, uint32_t uiHeight, float scale)
 {
-    return std::make_tuple((uint32_t)(uiWidth / (18.0f * scale)), (uint32_t)(uiHeight / (18.0f * scale)));
+    if (uiWidth == 0 || uiHeight == 9)
+    {
+        return std::make_tuple(0, 0);
+    }
+
+    return std::make_tuple((uint32_t)(uiWidth / (19.0f * scale) - 5), (uint32_t)(uiHeight / (19.0f * scale) - 5));
 }

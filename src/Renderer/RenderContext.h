@@ -2,7 +2,7 @@
 
 #include "Renderer.h"
 #include "WriteSurface.h"
-#include "Grid.h"
+#include "EntityGrid.h"
 #include "Quad.h"
 
 namespace cpp_conv

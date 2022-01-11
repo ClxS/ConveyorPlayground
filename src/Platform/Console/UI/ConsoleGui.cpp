@@ -4,6 +4,7 @@
 #include "RenderContext.h"
 #include "Gui.h"
 #include "ConsoleWriteUtility.h"
+#include "AppHost.h"
 
 void cpp_conv::ui::platform::drawText(const std::string& szText, cpp_conv::Colour colour, uint32_t x, uint32_t y)
 {
@@ -12,15 +13,35 @@ void cpp_conv::ui::platform::drawText(const std::string& szText, cpp_conv::Colou
 
     auto pRenderContext = getCurrentContext();
     auto& rSurface = pRenderContext->m_surface;
-    float fRlativeWidth = rSurface->GetWidth() / (float)designWidth;
-    float fRelativeHeight = (rSurface->GetHeight() / (float)designHeight);
+    if (rSurface->GetHeight() == 0)
+    {
+        return;
+    }
 
-    uint32_t consoleWorldX = (uint32_t)(x * fRlativeWidth);
-    uint32_t consoleWorldY = (uint32_t)(y * fRelativeHeight);
+    cpp_conv::RenderContext* pContext = getCurrentContext();
+
+    uint32_t appWidth, appHeight;
+    std::tie(appWidth, appHeight) = cpp_conv::apphost::getAppDimensions();
+
+    uint32_t consoleWorldX = (uint32_t)((((double)x / designWidth) * 1.05f) * rSurface->GetWidth());
+    uint32_t consoleWorldY = (uint32_t)((((double)y / designHeight) * 1.05f) * rSurface->GetHeight());
     for (int i = 0; i < szText.length(); ++i)
     {
         cpp_conv::renderer::setCell(*pRenderContext, szText[i], consoleWorldX + i, consoleWorldY, cpp_conv::renderer::getWin32Colour(colour), true);
     }
+
+
+    /*auto fRelativeWidthScale = designWidth / (float)appWidth;
+    auto fRelativeHeightScale = designHeight / (float)appHeight;
+    auto charWidth = 18 * pContext->m_fZoom * fRelativeWidthScale;
+    auto lineHeight = 18 * pContext->m_fZoom * fRelativeHeightScale;
+
+    uint32_t consoleWorldX = (uint32_t)(x / charWidth);
+    uint32_t consoleWorldY = (uint32_t)(y / lineHeight);
+    for (int i = 0; i < szText.length(); ++i)
+    {
+        cpp_conv::renderer::setCell(*pRenderContext, szText[i], consoleWorldX + i, consoleWorldY, cpp_conv::renderer::getWin32Colour(colour), true);
+    }*/
 }
 
 void cpp_conv::ui::platform::drawWrappedText(const std::string& szText, cpp_conv::Colour colour, uint32_t x, uint32_t y, uint32_t& linesRequired)
@@ -30,11 +51,18 @@ void cpp_conv::ui::platform::drawWrappedText(const std::string& szText, cpp_conv
 
     auto pRenderContext = getCurrentContext();
     auto& rSurface = pRenderContext->m_surface;
-    float fRlativeWidth = rSurface->GetWidth() / (float)designWidth;
-    float fRelativeHeight = (rSurface->GetHeight() / (float)designHeight);
+    if (rSurface->GetHeight() == 0)
+    {
+        return;
+    }
 
-    uint32_t consoleWorldX = (uint32_t)(x * fRlativeWidth);
-    uint32_t consoleWorldY = (uint32_t)(y * fRelativeHeight);
+    cpp_conv::RenderContext* pContext = getCurrentContext();
+
+    uint32_t appWidth, appHeight;
+    std::tie(appWidth, appHeight) = cpp_conv::apphost::getAppDimensions();
+
+    uint32_t consoleWorldX = (uint32_t)((((double)x / designWidth) * 1.05f) * rSurface->GetWidth());
+    uint32_t consoleWorldY = (uint32_t)((((double)y / designHeight) * 1.05f) * rSurface->GetHeight());
     uint32_t col = 0;
     uint32_t row = 0;    
     for (int i = 0; i < szText.length(); ++i)
@@ -54,6 +82,15 @@ void cpp_conv::ui::platform::drawWrappedText(const std::string& szText, cpp_conv
 
 uint32_t cpp_conv::ui::platform::getTextLineHeight()
 {
-    cpp_conv::RenderContext* pContext = getCurrentContext();
-    return 18 * pContext->m_fZoom;
+    uint32_t designWidth, designHeight;
+    std::tie(designWidth, designHeight) = getDesignDimensions();
+
+    auto pRenderContext = getCurrentContext();
+    auto& rSurface = pRenderContext->m_surface;
+    if (rSurface->GetHeight() == 0)
+    {
+        return 0;
+    }
+
+    return (designHeight) / rSurface->GetHeight();
 }
