@@ -27,6 +27,8 @@ namespace cpp_conv
         std::vector<ItemEntry>& GetItems() { return m_vItemEntries; }
         const std::vector<ItemEntry>& GetItems() const { return m_vItemEntries; }
 
+        std::string GetDescription() const;
+
     private:
         const uint32_t m_uiMaxCapacity;
         const uint32_t m_uiMaxStackSize;

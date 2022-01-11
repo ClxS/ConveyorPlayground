@@ -1,5 +1,10 @@
 #include "GeneralItemContainer.h"
 #include "Profiler.h"
+#include "DataId.h"
+#include <map>
+#include "AssetPtr.h"
+#include "ItemDefinition.h"
+#include "ItemRegistry.h"
 
 cpp_conv::GeneralItemContainer::GeneralItemContainer(uint32_t uiMaxCapacity, uint32_t uiMaxStackSize, bool bUniqueStacksOnly)
     : m_uiMaxCapacity(uiMaxCapacity)
@@ -163,4 +168,48 @@ bool cpp_conv::GeneralItemContainer::HasItems(ItemId item, uint32_t count)
 bool cpp_conv::GeneralItemContainer::IsEmpty()
 {
     return m_vItemEntries.empty();
+}
+
+std::string cpp_conv::GeneralItemContainer::GetDescription() const
+{
+    std::map<cpp_conv::ItemId, int> storedItems;
+
+    for(const ItemEntry& itemEntry : m_vItemEntries)
+    {
+        ItemId item = itemEntry.m_pItem;
+        if (!item.IsEmpty())
+        {
+            storedItems.try_emplace(item, 0);
+            storedItems[item] += itemEntry.m_pCount;
+        }
+    }
+
+    std::string str = "";
+    bool bFirst = true;
+    if (!storedItems.empty())
+    {
+        for (auto& item : storedItems)
+        {
+            if (bFirst)
+            {
+                bFirst = false;
+            }
+            else
+            {
+                str += ", ";
+            }
+
+            cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> pItem = cpp_conv::resources::getItemDefinition(item.first);
+            if (pItem)
+            {
+                str += std::format("{} {}", item.second, pItem->GetName());
+            }
+            else
+            {
+                str += std::format("{} Unknown Items", item.second);
+            }
+        }
+    }
+
+    return std::format("{}/{} - {}", m_vItemEntries.size(), m_uiMaxCapacity, str);
 }

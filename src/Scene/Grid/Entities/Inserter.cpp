@@ -16,6 +16,8 @@
 #include "InserterDefinition.h"
 #include "InserterRegistry.h"
 #include "Grid.h"
+#include "ItemRegistry.h"
+#include "ItemDefinition.h"
 
 cpp_conv::Inserter::Inserter(int x, int y, Direction direction, InserterId inserterId)
     : Entity(x, y, EntityKind::Inserter)
@@ -100,6 +102,29 @@ void cpp_conv::Inserter::Draw(RenderContext& kRenderContext) const
             cpp_conv::rotationFromDirection(m_direction)
         },
         { 0xFF0000FF });
+}
+
+std::string cpp_conv::Inserter::GetDescription() const
+{
+    switch (m_eCurrentState)
+    {
+    case State::WaitingPickup:
+        return "Waiting for item to pickup";
+        break;
+    case State::Transfering:
+    {
+        cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> pItem = cpp_conv::resources::getItemDefinition(m_currentItem);
+        return std::format("Transfering {}", pItem == nullptr ? "Unknown item" : pItem->GetName());
+        break;
+    }
+    case State::Cooldown:
+        return "Cooling down";
+        break;
+    default:
+        break;
+
+    }
+    return "";
 }
 
 bool cpp_conv::Inserter::TryGrabItem(const SceneContext& kContext)

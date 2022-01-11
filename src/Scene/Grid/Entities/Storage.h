@@ -21,7 +21,7 @@ namespace cpp_conv
         bool TryGrab(const SceneContext& kContext, bool bSingle, std::tuple<ItemId, uint32_t>& outItem) override;
 
         const char* GetName() const override { return "Storage"; }
-        std::string GetDescription() const override { return ""; }
+        std::string GetDescription() const override { return m_itemContainer.GetDescription(); }
 
     private:
         GeneralItemContainer m_itemContainer;
