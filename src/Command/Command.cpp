@@ -49,7 +49,7 @@ void tryPlaceEntity(cpp_conv::SceneContext& kContext, EntityKind eKind, Directio
     }
     case EntityKind::Stairs:
     {
-        Vector3 position = { kContext.m_player.m_x, kContext.m_player.m_y, 0 };
+        Vector3 position = { kContext.m_player.m_x, kContext.m_player.m_y, bModifier ? kContext.m_player.m_depth : (kContext.m_player.m_depth - 1) };
         cpp_conv::Stairs* pStairs = new cpp_conv::Stairs(position, { 1, 1, 2 }, eDirection, bModifier);
         if (!kContext.m_rMap.PlaceEntity(position, pStairs))
         {
