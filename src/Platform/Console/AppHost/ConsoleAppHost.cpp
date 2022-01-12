@@ -12,7 +12,7 @@ std::tuple<int, int> cpp_conv::apphost::getAppDimensions()
     // current window size
     short winWidth = (short)(r.right - r.left);
     short winHeight = (short)(r.bottom - r.top);
-
+     
     winWidth -= GetSystemMetrics(SM_CYEDGE) * 2;
     winHeight -= GetSystemMetrics(SM_CYSIZEFRAME) + GetSystemMetrics(SM_CYEDGE) * 2;
 

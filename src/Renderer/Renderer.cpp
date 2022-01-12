@@ -65,7 +65,7 @@ void drawPlayer(const cpp_conv::SceneContext& kSceneContext, cpp_conv::RenderCon
 }
 
 void cpp_conv::renderer::render(const SceneContext& kSceneContext, RenderContext& kContext)
-{
+{ 
     kContext.m_iCurrentLayer = kSceneContext.m_player.m_depth;
     for (auto pEntity : kSceneContext.m_rMap.GetConveyors())
     {

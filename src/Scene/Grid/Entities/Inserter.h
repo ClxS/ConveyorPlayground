@@ -13,7 +13,7 @@ namespace cpp_conv
     constexpr int c_maxInserterLength = 6;
 
     class Inserter : public Entity
-    {
+    { 
     public:
         Inserter(Vector3 position, Vector3 size, Direction direction, InserterId inserterId);
 
