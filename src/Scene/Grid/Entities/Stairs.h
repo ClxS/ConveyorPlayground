@@ -17,7 +17,7 @@ namespace cpp_conv
         bool SupportsInsertion() const override { return true; }
         bool TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel) override;
 
-        const char* GetName() const override { return "Junction"; }
+        const char* GetName() const override { return m_bIsUp ? "Stairs (Up)" : "Stairs (Down)"; }
         std::string GetDescription() const override { return ""; }
 
         Direction GetDirection() const override { return m_direction; }
