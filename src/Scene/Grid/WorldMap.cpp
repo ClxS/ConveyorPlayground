@@ -1,6 +1,7 @@
 #include "WorldMap.h"
 #include "Map.h"
 #include "Conveyor.h"
+#include <cassert>
 
 bool cpp_conv::WorldMap::Cell::HasFloor(uint32_t uiFloor) const
 {
@@ -144,19 +145,70 @@ cpp_conv::Entity* cpp_conv::WorldMap::GetEntity(Vector3 position)
 
 bool cpp_conv::WorldMap::PlaceEntity(Vector3 position, Entity* pEntity)
 {
-    CellCoordinate coord = ToCellSpace(position);
-    if (coord.IsInvalid())
+    if (!ValidateCanPlaceEntity(position, pEntity))
     {
         return false;
     }
 
-    Cell* pCell = GetOrCreateCell(coord);
-    if (!pCell)
+    for (int32_t iXPosition = position.m_x; iXPosition < (position.m_x + pEntity->m_size.m_x); ++iXPosition)
     {
-        return false;
+        for (int32_t iYPosition = position.m_y; iYPosition < (position.m_y + pEntity->m_size.m_y); ++iYPosition)
+        {
+            for (int32_t iDepthPosition = position.m_depth; iDepthPosition < (position.m_depth + pEntity->m_size.m_depth); ++iDepthPosition)
+            {
+                CellCoordinate coord = ToCellSpace({ iXPosition, iYPosition, iDepthPosition });
+                assert(!coord.IsInvalid());
+
+                Cell* pCell = GetOrCreateCell(coord);
+                assert(pCell != nullptr);
+
+                assert(pCell->SetEntity(coord, pEntity));
+            }
+        }
     }
 
-    return pCell->SetEntity(coord, pEntity);
+    if (pEntity->m_eEntityKind == EntityKind::Conveyor)
+    {
+        m_vConveyors.push_back(reinterpret_cast<Conveyor*>(pEntity));
+    }
+    else
+    {
+        m_vOtherEntities.push_back(pEntity);
+    }
+
+    return true;
+}
+
+bool cpp_conv::WorldMap::ValidateCanPlaceEntity(Vector3 position, Entity* pEntity) const
+{
+    for (int32_t iXPosition = position.m_x; iXPosition < (position.m_x + pEntity->m_size.m_x); ++iXPosition)
+    {
+        for (int32_t iYPosition = position.m_y; iYPosition < (position.m_y + pEntity->m_size.m_y); ++iYPosition)
+        {
+            for (int32_t iDepthPosition = position.m_depth; iDepthPosition < (position.m_depth + pEntity->m_size.m_depth); ++iDepthPosition)
+            {
+                Vector3 checkPosition = { iXPosition, iYPosition, iDepthPosition };
+                CellCoordinate coord = ToCellSpace(checkPosition);
+                if (coord.IsInvalid())
+                {
+                    return false;
+                }
+
+                Cell* pCell = GetCell(coord);
+                if (!pCell)
+                {
+                    continue;
+                }
+
+                if (pCell->GetEntity(coord))
+                {
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
 }
 
 cpp_conv::WorldMap::Cell* cpp_conv::WorldMap::GetCell(CellCoordinate coord) const
