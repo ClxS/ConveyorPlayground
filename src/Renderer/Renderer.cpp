@@ -66,13 +66,26 @@ void drawPlayer(const cpp_conv::SceneContext& kSceneContext, cpp_conv::RenderCon
 
 void cpp_conv::renderer::render(const SceneContext& kSceneContext, RenderContext& kContext)
 {
+    kContext.m_iCurrentLayer = kSceneContext.m_player.m_depth;
     for (auto pEntity : kSceneContext.m_rMap.GetConveyors())
     {
+        if ((pEntity->m_position.m_depth + pEntity->m_size.m_depth - 1) < kSceneContext.m_player.m_depth
+            || pEntity->m_position.m_depth > kSceneContext.m_player.m_depth)
+        {
+            continue;
+        }
+
         pEntity->Draw(kContext);
     }
 
     for (auto pEntity : kSceneContext.m_rMap.GetOtherEntities())
     {
+        if ((pEntity->m_position.m_depth + pEntity->m_size.m_depth - 1) < kSceneContext.m_player.m_depth
+            || pEntity->m_position.m_depth > kSceneContext.m_player.m_depth)
+        {
+            continue;
+        }
+
         pEntity->Draw(kContext);
     }
 

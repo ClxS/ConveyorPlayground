@@ -26,4 +26,5 @@ enum class EntityKind
     Underground,
     Storage,
     Inserter,
+    Stairs,
 };

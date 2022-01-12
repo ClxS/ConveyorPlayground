@@ -51,6 +51,8 @@ void cpp_conv::input::receiveInput(std::queue<cpp_conv::commands::CommandType>& 
             case KEY_EVENT:
                 switch (recordBuffer[i].Event.KeyEvent.wVirtualKeyCode)
                 {
+                case VK_NEXT: commands.push(cpp_conv::commands::CommandType::MoveFloorDown); break;
+                case VK_PRIOR: commands.push(cpp_conv::commands::CommandType::MoveFloorUp); break;
                 case VK_UP: commands.push(cpp_conv::commands::CommandType::MoveDown); break;
                 case VK_DOWN: commands.push(cpp_conv::commands::CommandType::MoveUp); break;
                 case VK_LEFT: commands.push(cpp_conv::commands::CommandType::MoveLeft); break;
@@ -59,6 +61,8 @@ void cpp_conv::input::receiveInput(std::queue<cpp_conv::commands::CommandType>& 
                 case VK_V: commands.push(cpp_conv::commands::CommandType::PlaceConveyorUp); break;
                 case VK_OEM_COMMA: commands.push(cpp_conv::commands::CommandType::PlaceConveyorLeft); break;
                 case VK_OEM_PERIOD: commands.push(cpp_conv::commands::CommandType::PlaceConveyorRight); break;
+                case 'S': commands.push(cpp_conv::commands::CommandType::PlaceStairsUp); break;
+                case 'D': commands.push(cpp_conv::commands::CommandType::PlaceStairsDown); break;
                 }
                 break;
             case MOUSE_EVENT:

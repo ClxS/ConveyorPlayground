@@ -73,7 +73,7 @@ void updateUI(cpp_conv::SceneContext& kSceneContext, cpp_conv::RenderContext& kR
         ui::wrappedText("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eget purus ut sem vulputate dictum. Vivamus consequat porta sagittis. Donec accumsan nisi et lorem porta, ut convallis ipsum rutrum. Pellentesque ullamcorper venenatis aliquam. Donec rhoncus dapibus magna sit amet laoreet. Nulla molestie sapien eget sem placerat, ac ultricies leo volutpat. Sed quis neque ac ante malesuada dignissim. Sed orci lectus, imperdiet non faucibus non, feugiat a massa. Morbi ullamcorper ex et purus maximus, a faucibus nibh elementum. Proin at sapien consectetur, faucibus lacus rhoncus, venenatis purus. Cras nec fringilla nisi. Cras eget faucibus velit, a elementum sem. Aenean non ligula mattis, blandit est quis, elementum lorem.");
         ui::endPanel();
         ui::panel("Footer", ui::Align::Bottom, 0, 3_Lines, false);
-            ui::text(std::format("Current Pos: {}, {}", kSceneContext.m_player.m_x, kSceneContext.m_player.m_y));
+            ui::text(std::format("Current Pos: {}, {}. Floor: {}", kSceneContext.m_player.m_x, kSceneContext.m_player.m_y, kSceneContext.m_player.m_depth));
             auto playerEntity = kSceneContext.m_rMap.GetEntity(kSceneContext.m_player);
             if (playerEntity)
             {
@@ -120,6 +120,7 @@ void cpp_conv::game::run()
     cpp_conv::RenderContext kRenderContext =
     {
         { 0, 0, 0, 0 },
+        0,
         worldMap,
         nullptr,
         1.0f

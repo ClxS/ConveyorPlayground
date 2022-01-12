@@ -13,10 +13,12 @@ namespace cpp_conv
 {
     class WorldMap
     {
+    public:
         static inline constexpr uint32_t c_uiMaximumMapSize = 128;
         static inline constexpr uint32_t c_uiCellSize = 64;
         static inline constexpr uint32_t c_uiMaximumLevel = 2;
 
+    private:
         struct CellCoordinate
         {
             int32_t m_CellX;
@@ -77,6 +79,7 @@ namespace cpp_conv
         static CellCoordinate ToCellSpace(Vector3 position);
         Cell* GetCell(CellCoordinate coord) const;
         Cell* GetOrCreateCell(CellCoordinate coord);
+        bool ValidateCanPlaceEntity(Vector3 position, Entity* pEntity) const;
 
         WorldMapStore m_WorldMap;
         std::vector<cpp_conv::Conveyor*> m_vConveyors;
