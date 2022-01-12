@@ -129,7 +129,7 @@ void cpp_conv::game::run()
     cpp_conv::renderer::SwapChain swapChain(kRenderContext, iWidth, iHeight);
     cpp_conv::renderer::init(kRenderContext, swapChain);
 
-    cpp_conv::FrameLimiter frameLimter(10);
+    cpp_conv::FrameLimiter frameLimter(1000);
     std::queue<cpp_conv::commands::CommandType> commands;
 
     cpp_conv::ui::initializeGuiSystem(1920, 1080);

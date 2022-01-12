@@ -1,5 +1,5 @@
 RECIPE_COPPER_ORE
 Copper Ore
-5
+3
 
 ITEM_COPPER_ORE 1

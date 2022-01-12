@@ -20,6 +20,7 @@
 #include <vector>
 #include "Profiler.h"
 #include "GeneralItemContainer.h"
+#include "Direction.h"
 
 cpp_conv::Factory::Factory(Vector3 position, Direction direction, FactoryId factoryId, uint32_t uiMaxStackSize)
     : Entity(position, { 1, 1, 1 }, EntityKind::Producer)
@@ -202,7 +203,10 @@ void cpp_conv::Factory::RunOutputCycle(const SceneContext& kContext, const cpp_c
         return;
     }
 
-    cpp_conv::Entity* pEntity = kContext.m_rMap.GetEntity(cpp_conv::grid::GetForwardPosition(*this));
+    Vector3 pipe = cpp_conv::direction::RotateVector(m_direction, pFactory->GetOutputPipe(), m_size);
+    pipe += m_position;
+
+    cpp_conv::Entity* pEntity = kContext.m_rMap.GetEntity(cpp_conv::grid::GetForwardPosition(pipe, m_direction));
     if (!pEntity || !pEntity->SupportsInsertion())
     {
         return;

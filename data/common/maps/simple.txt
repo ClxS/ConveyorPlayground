@@ -1,7 +1,7 @@
-AAA   DDD
-AAA>v<DDD
-AAA v DDD
-    v
-    v    CCC
-    SY>>>CCC
-         CCC
+AAA   SJS   DDD
+AAA>v  ^  v<DDD
+AAA v  I  v DDD
+    vYCCCTv
+    vYCCCTv
+    vYCCCTv
+ 

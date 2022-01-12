@@ -27,4 +27,18 @@ namespace cpp_conv::direction
         }
         return Direction::Up;
     }
+
+    inline Vector3 RotateVector(Direction direction, Vector3 location, Vector3 size)
+    {
+        constexpr Vector3 c_offset = { 1, 1, 0 };
+        size -= c_offset;
+        switch (direction)
+        {
+        case Direction::Up: return { size.m_y - location.m_y, location.m_x, location.m_depth };
+        case Direction::Left: return { size.m_x - location.m_x, size.m_y - location.m_y, location.m_depth };
+        case Direction::Down: return { size.m_y - location.m_y, size.m_x - location.m_x, location.m_depth };
+        }
+
+        return location;
+    }
 }

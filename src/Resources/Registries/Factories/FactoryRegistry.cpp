@@ -43,8 +43,9 @@ cpp_conv::resources::ResourceAsset* factoryAssetHandler(cpp_conv::resources::res
     std::string id;
     std::string name;
     std::string producedRecipeId;
-    Vector3 size;
-    bool bHasOwnOutputPipe;
+    Vector3 size = {};
+    Vector3 outputPipe = {};
+    bool bHasOwnOutputPipe = false;
     int rate = 0;
 
     int idx = 0;
@@ -62,7 +63,23 @@ cpp_conv::resources::ResourceAsset* factoryAssetHandler(cpp_conv::resources::res
             break;
         }
         case 3: rate = std::stoi(token); break;
-        case 4: bHasOwnOutputPipe = std::stoi(token); break;
+        case 4:
+        {
+            std::istringstream tmp(token);
+            int32_t hasPipe;
+            tmp >> hasPipe;
+            if (hasPipe)
+            {
+                bHasOwnOutputPipe = true;
+                tmp >> outputPipe.m_x >> outputPipe.m_y >> outputPipe.m_depth;
+            }
+            else
+            {
+                bHasOwnOutputPipe = false;
+            }
+
+            break;
+        }
         case 5: producedRecipeId = token; break;
         }
 
@@ -76,6 +93,7 @@ cpp_conv::resources::ResourceAsset* factoryAssetHandler(cpp_conv::resources::res
         size,
         rate,
         bHasOwnOutputPipe,
+        outputPipe,
         cpp_conv::RecipeId::FromStringId(producedRecipeId));
 }
 

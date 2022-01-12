@@ -51,7 +51,7 @@ cpp_conv::resources::ResourceAsset* mapAssetHandler(cpp_conv::resources::resourc
             case 'y': pEntity = new cpp_conv::Underground({ iCol, iRow }, size1x1, Direction::Up); break;
             case 'i': pEntity = new cpp_conv::Underground({ iCol, iRow }, size1x1, Direction::Left); break;
             case 'o': pEntity = new cpp_conv::Underground({ iCol, iRow }, size1x1, Direction::Right); break;
-            }
+            } 
 
             if (pEntity)
             {

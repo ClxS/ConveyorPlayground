@@ -21,6 +21,7 @@ namespace cpp_conv
             Vector3 size,
             uint32_t productionRate,
             bool bHasOwnOutputPipe,
+            Vector3 outputPipe,
             RecipeId producedRecipe)
             : m_internalId(internalId)
             , m_registryId(registryId)
@@ -28,6 +29,7 @@ namespace cpp_conv
             , m_size(size)
             , m_uiProductionRate(productionRate)
             , m_bHasOwnOutputPipe(bHasOwnOutputPipe)
+            , m_outputPipe(outputPipe)
             , m_producedRecipe(producedRecipe)
         {
         }
@@ -37,6 +39,7 @@ namespace cpp_conv
         Vector3 GetSize() const { return m_size; }
         uint32_t GetProductionRate() const { return m_uiProductionRate; }
         bool HasOwnOutputPipe() const { return m_bHasOwnOutputPipe; }
+        Vector3 GetOutputPipe() const { return m_outputPipe; }
         RecipeId GetProducedRecipe() const { return m_producedRecipe; }
 
         cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> GetTile() const;
@@ -48,6 +51,7 @@ namespace cpp_conv
         Vector3 m_size;
         uint32_t m_uiProductionRate;
         bool m_bHasOwnOutputPipe;
+        Vector3 m_outputPipe;
         RecipeId m_producedRecipe;
     };
 }
