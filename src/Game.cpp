@@ -113,7 +113,7 @@ void updateUI(cpp_conv::SceneContext& kSceneContext, cpp_conv::RenderContext& kR
 
             if (kSceneContext.m_uiContext.m_selected == (int)EntityKind::Stairs)
             {
-                ui::text("Stares go up? (T)", { 0x0000FF00 });
+                ui::text("Stairs go up? (T)", { 0x0000FF00 });
                 ui::text(kSceneContext.m_uiContext.m_bModifier ? L"   true" : L"   false", { 0x00FFFF00 });
 
             }
@@ -174,13 +174,13 @@ void cpp_conv::game::run()
         0,
         worldMap,
         nullptr,
-        1.0f
+        0.3f
     };
 
     cpp_conv::renderer::SwapChain swapChain(kRenderContext, iWidth, iHeight);
     cpp_conv::renderer::init(kRenderContext, swapChain);
 
-    cpp_conv::FrameLimiter frameLimter(5);
+    cpp_conv::FrameLimiter frameLimter(500);
     std::queue<cpp_conv::commands::CommandType> commands;
 
     cpp_conv::ui::initializeGuiSystem(1920, 1080);
@@ -211,7 +211,7 @@ void cpp_conv::game::run()
 
         PROFILE(UpdateCamera, updateCamera(kSceneContext, kRenderContext));
         PROFILE(Render, cpp_conv::renderer::render(kSceneContext, kRenderContext));
-        PROFILE(UpdateUI, updateUI(kSceneContext, kRenderContext));
+        //PROFILE(UpdateUI, updateUI(kSceneContext, kRenderContext));
         PROFILE(Present, swapChain.SwapAndPresent());
 
         PROFILE(FrameCapSleep, frameLimter.Limit());
