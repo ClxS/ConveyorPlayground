@@ -74,5 +74,5 @@ std::tuple<uint32_t, uint32_t> cpp_conv::renderer::getConsoleSpaceDimensions(uin
         return std::make_tuple(0, 0);
     }
 
-    return std::make_tuple((uint32_t)(uiWidth / (19.0f * scale) - 5), (uint32_t)(uiHeight / (19.0f * scale) - 5));
+    return std::make_tuple((uint32_t)(uiWidth / (19.0f * scale) - 0), (uint32_t)(uiHeight / (19.0f * scale) - 0));
 }

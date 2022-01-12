@@ -6,7 +6,6 @@
 #include "AppHost.h"
 
 #define VK_V 0x0056
-#define VK_7 0x0036
 
 void cpp_conv::input::receiveInput(std::queue<cpp_conv::commands::CommandType>& commands)
 {
@@ -51,18 +50,25 @@ void cpp_conv::input::receiveInput(std::queue<cpp_conv::commands::CommandType>& 
             case KEY_EVENT:
                 switch (recordBuffer[i].Event.KeyEvent.wVirtualKeyCode)
                 {
+                case '1': case VK_NUMPAD1: commands.push(cpp_conv::commands::CommandType::SelectItem1); break;
+                case '2': case VK_NUMPAD2: commands.push(cpp_conv::commands::CommandType::SelectItem2); break;
+                case '3': case VK_NUMPAD3: commands.push(cpp_conv::commands::CommandType::SelectItem3); break;
+                case '4': case VK_NUMPAD4: commands.push(cpp_conv::commands::CommandType::SelectItem4); break;
+                case '5': case VK_NUMPAD5: commands.push(cpp_conv::commands::CommandType::SelectItem5); break;
+                case '6': case VK_NUMPAD6: commands.push(cpp_conv::commands::CommandType::SelectItem6); break;
+                case '7': case VK_NUMPAD7: commands.push(cpp_conv::commands::CommandType::SelectItem7); break;
+                case '8': case VK_NUMPAD8: commands.push(cpp_conv::commands::CommandType::SelectItem8); break;
+                case '9': case VK_NUMPAD9: commands.push(cpp_conv::commands::CommandType::SelectItem9); break;
+                case 'R': commands.push(cpp_conv::commands::CommandType::RotateSelection); break;
+                case 'T': commands.push(cpp_conv::commands::CommandType::ToggleModifier); break;
+                case VK_DELETE: commands.push(cpp_conv::commands::CommandType::DeleteSelection); break;
+                case VK_RETURN: commands.push(cpp_conv::commands::CommandType::PlaceSelection); break;
                 case VK_NEXT: commands.push(cpp_conv::commands::CommandType::MoveFloorDown); break;
                 case VK_PRIOR: commands.push(cpp_conv::commands::CommandType::MoveFloorUp); break;
                 case VK_UP: commands.push(cpp_conv::commands::CommandType::MoveDown); break;
                 case VK_DOWN: commands.push(cpp_conv::commands::CommandType::MoveUp); break;
                 case VK_LEFT: commands.push(cpp_conv::commands::CommandType::MoveLeft); break;
                 case VK_RIGHT: commands.push(cpp_conv::commands::CommandType::MoveRight); break;
-                case VK_7: commands.push(cpp_conv::commands::CommandType::PlaceConveyorDown); break;
-                case VK_V: commands.push(cpp_conv::commands::CommandType::PlaceConveyorUp); break;
-                case VK_OEM_COMMA: commands.push(cpp_conv::commands::CommandType::PlaceConveyorLeft); break;
-                case VK_OEM_PERIOD: commands.push(cpp_conv::commands::CommandType::PlaceConveyorRight); break;
-                case 'S': commands.push(cpp_conv::commands::CommandType::PlaceStairsUp); break;
-                case 'D': commands.push(cpp_conv::commands::CommandType::PlaceStairsDown); break;
                 }
                 break;
             case MOUSE_EVENT:

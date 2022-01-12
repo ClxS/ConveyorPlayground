@@ -21,10 +21,12 @@ enum class RelativeDirection
 enum class EntityKind
 {
     Conveyor,
-    Producer,
-    Junction,
-    Underground,
-    Storage,
     Inserter,
+    Junction,
+    Producer,
     Stairs,
+    Storage,
+    Underground,
+
+    MAX
 };

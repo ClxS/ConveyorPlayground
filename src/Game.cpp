@@ -65,12 +65,58 @@ namespace
 void updateUI(cpp_conv::SceneContext& kSceneContext, cpp_conv::RenderContext& kRenderContext)
 {
     using namespace cpp_conv;
+    constexpr const char* c_entityNames[] =
+    {
+        "Conveyor",
+        "Inserter",
+        "Junction",
+        "Producer",
+        "Stairs",
+        "Storage",
+        "Underground",
+    };
+
+    static_assert((int32_t)EntityKind::MAX == sizeof(c_entityNames) / sizeof(const char*), "Table mismatch");
 
     ui::setContext(&kRenderContext);
     ui::panel("Game UI", ui::Align::Stretch);
-        ui::panel("Right Panel", ui::Align::Right, 500);
-        ui::text("CPP CONVEYORS!", { 0x0000FF00 });
-        ui::wrappedText("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eget purus ut sem vulputate dictum. Vivamus consequat porta sagittis. Donec accumsan nisi et lorem porta, ut convallis ipsum rutrum. Pellentesque ullamcorper venenatis aliquam. Donec rhoncus dapibus magna sit amet laoreet. Nulla molestie sapien eget sem placerat, ac ultricies leo volutpat. Sed quis neque ac ante malesuada dignissim. Sed orci lectus, imperdiet non faucibus non, feugiat a massa. Morbi ullamcorper ex et purus maximus, a faucibus nibh elementum. Proin at sapien consectetur, faucibus lacus rhoncus, venenatis purus. Cras nec fringilla nisi. Cras eget faucibus velit, a elementum sem. Aenean non ligula mattis, blandit est quis, elementum lorem.");
+        ui::panel("Right Panel", ui::Align::Right, 700);
+            ui::text("Item Type (NUM 1-9)", { 0x0000FF00 });
+            for (int32_t i = 0; i < (int32_t)EntityKind::MAX; ++i)
+            {
+                ui::text(
+                    std::format(
+                        "{} {}. {}",
+                        kSceneContext.m_uiContext.m_selected == i ? ">" : " ",
+                        i + 1,
+                        c_entityNames[i]),
+                    (kSceneContext.m_uiContext.m_selected == i ? Colour { 0x000000FF } : Colour{ 0x00FFFFFF }));
+            }
+            ui::text("Rotation (R to rotate)", { 0x0000FF00 });
+            switch (kSceneContext.m_uiContext.m_rotation)
+            {
+            case Direction::Up:
+                ui::text(L"   v", {0x00FFFF00});
+                break;
+            case Direction::Down:
+                ui::text(L"   ^", { 0x00FFFF00 });
+                break;
+            case Direction::Left:
+                ui::text(L"   <", { 0x00FFFF00 });
+                break;
+            case Direction::Right:
+                ui::text(L"   >", { 0x00FFFF00 });
+                break;
+            default:
+                break;
+            }
+
+            if (kSceneContext.m_uiContext.m_selected == (int)EntityKind::Stairs)
+            {
+                ui::text("Stares go up? (T)", { 0x0000FF00 });
+                ui::text(kSceneContext.m_uiContext.m_bModifier ? L"   true" : L"   false", { 0x00FFFF00 });
+
+            }
         ui::endPanel();
         ui::panel("Footer", ui::Align::Bottom, 0, 3_Lines, false);
             ui::text(std::format("Current Pos: {}, {}. Floor: {}", kSceneContext.m_player.m_x, kSceneContext.m_player.m_y, kSceneContext.m_player.m_depth));
@@ -114,7 +160,12 @@ void cpp_conv::game::run()
         { 0, 0 },
         worldMap,
         sequences,
-        { std::chrono::high_resolution_clock::now() }
+        { std::chrono::high_resolution_clock::now() },
+        {
+            0,
+            Direction::Right,
+            true
+        }
     };
 
     cpp_conv::RenderContext kRenderContext =
@@ -129,7 +180,7 @@ void cpp_conv::game::run()
     cpp_conv::renderer::SwapChain swapChain(kRenderContext, iWidth, iHeight);
     cpp_conv::renderer::init(kRenderContext, swapChain);
 
-    cpp_conv::FrameLimiter frameLimter(1000);
+    cpp_conv::FrameLimiter frameLimter(5);
     std::queue<cpp_conv::commands::CommandType> commands;
 
     cpp_conv::ui::initializeGuiSystem(1920, 1080);

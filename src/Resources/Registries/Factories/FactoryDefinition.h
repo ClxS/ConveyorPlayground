@@ -32,7 +32,7 @@ namespace cpp_conv
             , m_outputPipe(outputPipe)
             , m_producedRecipe(producedRecipe)
         {
-        }
+        } 
 
         cpp_conv::FactoryId GetInternalId() const { return m_internalId; }
         const std::string& GetName() const { return m_strName; }

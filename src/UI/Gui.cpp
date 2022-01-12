@@ -100,6 +100,20 @@ void cpp_conv::ui::text(const std::string& szText, Colour colour /*= { 0xFFFFFFF
     rPanel.MoveY(cpp_conv::ui::platform::getTextLineHeight());
 }
 
+void cpp_conv::ui::text(const std::wstring& szText, Colour colour /*= { 0xFFFFFFFF }*/)
+{
+    Panel& rPanel = g_panelStack.back();
+
+    cpp_conv::ui::platform::drawText(
+        szText,
+        colour,
+        rPanel.m_uiTopLeft.m_x,
+        rPanel.m_bInvertPlacement
+        ? (rPanel.m_uiBottomRight.m_y - cpp_conv::ui::platform::getTextLineHeight())
+        : rPanel.m_uiTopLeft.m_y);
+    rPanel.MoveY(cpp_conv::ui::platform::getTextLineHeight());
+}
+
 void cpp_conv::ui::wrappedText(const std::string& szText, Colour colour /*= { 0xFFFFFFFF }*/)
 {
     Panel& rPanel = g_panelStack.back();

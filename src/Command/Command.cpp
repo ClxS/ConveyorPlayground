@@ -6,6 +6,7 @@
 #include "AppHost.h"
 #include "WorldMap.h"
 #include "Stairs.h"
+#include "Direction.h"
 
 constexpr auto debounceTime = std::chrono::milliseconds(250);
 
@@ -16,22 +17,11 @@ void tryUpdatePlayer(cpp_conv::SceneContext& kContext, Vector3 newPosition)
         return;
     }
 
-    auto now = std::chrono::high_resolution_clock::now();
-    if (now - kContext.m_debounce.m_lastPlayerMove >= debounceTime)
-    {
-        kContext.m_debounce.m_lastPlayerMove = now;
-        kContext.m_player = newPosition;
-    }
+    kContext.m_player = newPosition;
 }
 
 void tryPlaceEntity(cpp_conv::SceneContext& kContext, EntityKind eKind, Direction eDirection, bool bModifier = false)
 {
-    auto now = std::chrono::high_resolution_clock::now();
-    if (now - kContext.m_debounce.m_lastPlayerMove < debounceTime)
-    {
-        return;
-    }
-
     switch (eKind)
     {
     case EntityKind::Conveyor:
@@ -67,6 +57,13 @@ void cpp_conv::command::processCommands(SceneContext& kContext, RenderContext& k
         cpp_conv::commands::CommandType command = commands.front();
         commands.pop();
 
+        auto now = std::chrono::high_resolution_clock::now();
+        if (now - kContext.m_debounce.m_lastPlayerMove < debounceTime)
+        {
+            continue;
+        }
+
+        kContext.m_debounce.m_lastPlayerMove = now;
         switch (command)
         {
         case cpp_conv::commands::CommandType::MoveUp:
@@ -86,30 +83,31 @@ void cpp_conv::command::processCommands(SceneContext& kContext, RenderContext& k
             break;
         case cpp_conv::commands::CommandType::MoveFloorUp:
             tryUpdatePlayer(kContext, { kContext.m_player.m_x, kContext.m_player.m_y, kContext.m_player.m_depth + 1 });
-            break;
-        case cpp_conv::commands::CommandType::PlaceConveyorUp:
-            tryPlaceEntity(kContext, EntityKind::Conveyor, Direction::Up);
-            break;
-        case cpp_conv::commands::CommandType::PlaceConveyorDown:
-            tryPlaceEntity(kContext, EntityKind::Conveyor, Direction::Down);
-            break;
-        case cpp_conv::commands::CommandType::PlaceConveyorLeft:
-            tryPlaceEntity(kContext, EntityKind::Conveyor, Direction::Left);
-            break;
-        case cpp_conv::commands::CommandType::PlaceConveyorRight:
-            tryPlaceEntity(kContext, EntityKind::Conveyor, Direction::Right);
-            break;
-        case cpp_conv::commands::CommandType::PlaceStairsUp:
-            tryPlaceEntity(kContext, EntityKind::Stairs, Direction::Right, true);
-            break;
-        case cpp_conv::commands::CommandType::PlaceStairsDown:
+            break;        
+       /* case cpp_conv::commands::CommandType::PlaceStairsDown:
             tryPlaceEntity(kContext, EntityKind::Stairs, Direction::Right, false);
-            break;
+            break;*/
         case cpp_conv::commands::CommandType::DecrementZoom:
             kRenderContext.m_fZoom -= 0.1f;
             break;
         case cpp_conv::commands::CommandType::IncrementZoom:
             kRenderContext.m_fZoom += 0.1f;
+            break;
+        case cpp_conv::commands::CommandType::SelectItem1: kContext.m_uiContext.m_selected = 0 % (int32_t)EntityKind::MAX; break;
+        case cpp_conv::commands::CommandType::SelectItem2: kContext.m_uiContext.m_selected = 1 % (int32_t)EntityKind::MAX; break;
+        case cpp_conv::commands::CommandType::SelectItem3: kContext.m_uiContext.m_selected = 2 % (int32_t)EntityKind::MAX; break;
+        case cpp_conv::commands::CommandType::SelectItem4: kContext.m_uiContext.m_selected = 3 % (int32_t)EntityKind::MAX; break;
+        case cpp_conv::commands::CommandType::SelectItem5: kContext.m_uiContext.m_selected = 4 % (int32_t)EntityKind::MAX; break;
+        case cpp_conv::commands::CommandType::SelectItem6: kContext.m_uiContext.m_selected = 5 % (int32_t)EntityKind::MAX; break;
+        case cpp_conv::commands::CommandType::SelectItem7: kContext.m_uiContext.m_selected = 6 % (int32_t)EntityKind::MAX; break;
+        case cpp_conv::commands::CommandType::SelectItem8: kContext.m_uiContext.m_selected = 7 % (int32_t)EntityKind::MAX; break;
+        case cpp_conv::commands::CommandType::SelectItem9: kContext.m_uiContext.m_selected = 8 % (int32_t)EntityKind::MAX; break;
+        case cpp_conv::commands::CommandType::RotateSelection:
+            kContext.m_uiContext.m_rotation = cpp_conv::direction::Rotate90DegreeClockwise(kContext.m_uiContext.m_rotation); break;
+        case cpp_conv::commands::CommandType::ToggleModifier:
+            kContext.m_uiContext.m_bModifier = !kContext.m_uiContext.m_bModifier; break;
+        case cpp_conv::commands::CommandType::PlaceSelection:
+            tryPlaceEntity(kContext, (EntityKind)kContext.m_uiContext.m_selected, kContext.m_uiContext.m_rotation, kContext.m_uiContext.m_bModifier);
             break;
         }
     }

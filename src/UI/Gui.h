@@ -34,6 +34,7 @@ namespace cpp_conv::ui
     namespace platform
     {
         void drawText(const std::string& szText, Colour colour, uint32_t x, uint32_t y);
+        void drawText(const std::wstring& szText, Colour colour, uint32_t x, uint32_t y);
         void drawWrappedText(const std::string& szText, Colour colour, uint32_t x, uint32_t y, uint32_t& linesRequired);
 
         uint32_t getTextLineHeight();
@@ -52,5 +53,6 @@ namespace cpp_conv::ui
     void endPanel();
 
     void text(const std::string& szText, Colour colour = { 0x00FFFFFF });
+    void text(const std::wstring& szText, Colour colour = { 0x00FFFFFF });
     void wrappedText(const std::string& szText, Colour colour = { 0x00FFFFFF });
 }

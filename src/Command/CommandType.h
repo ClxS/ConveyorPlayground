@@ -12,15 +12,22 @@ namespace cpp_conv::commands
         MoveFloorUp,
         MoveFloorDown,
 
-        PlaceConveyorUp,
-        PlaceConveyorDown,
-        PlaceConveyorLeft,
-        PlaceConveyorRight,
-
-        PlaceStairsUp,
-        PlaceStairsDown,
-
         DecrementZoom,
         IncrementZoom,
+
+        PlaceSelection,
+        DeleteSelection,
+
+        SelectItem1,
+        SelectItem2,
+        SelectItem3,
+        SelectItem4,
+        SelectItem5,
+        SelectItem6,
+        SelectItem7,
+        SelectItem8,
+        SelectItem9,
+        RotateSelection,
+        ToggleModifier,
     };
 }

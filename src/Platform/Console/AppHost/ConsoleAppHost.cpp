@@ -21,5 +21,6 @@ std::tuple<int, int> cpp_conv::apphost::getAppDimensions()
 
 int main()
 {
+    SetConsoleOutputCP(65001);
     cpp_conv::game::run();
 }
