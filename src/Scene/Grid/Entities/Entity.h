@@ -35,7 +35,7 @@ namespace cpp_conv
         virtual std::string GetDescription() const = 0;
 
         Vector3 m_position;
-        const Vector3 m_size;
+        Vector3 m_size;
         const EntityKind m_eEntityKind;
     };
 }

@@ -15,7 +15,7 @@ namespace cpp_conv
     { 
     public:
         Factory(
-            Vector3 position, Vector3 size,
+            Vector3 position,
             Direction direction,
             FactoryId factoryId,
             uint32_t uiMaxStackSize = 99);

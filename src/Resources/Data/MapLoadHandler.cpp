@@ -40,18 +40,18 @@ cpp_conv::resources::ResourceAsset* mapAssetHandler(cpp_conv::resources::resourc
             case 'U': pEntity = new cpp_conv::Inserter({ iCol, iRow }, size1x1, Direction::Up, cpp_conv::InserterId::FromStringId("INSERTER_BASIC")); break;
             case 'T': pEntity = new cpp_conv::Inserter({ iCol, iRow }, size1x1, Direction::Left, cpp_conv::InserterId::FromStringId("INSERTER_BASIC")); break;
             case 'Y': pEntity = new cpp_conv::Inserter({ iCol, iRow }, size1x1, Direction::Right, cpp_conv::InserterId::FromStringId("INSERTER_BASIC")); break;
-            case 'A': pEntity = new cpp_conv::Factory({ iCol, iRow }, size1x1, Direction::Right, cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_MINE")); break;
-            case 'D': pEntity = new cpp_conv::Factory({ iCol, iRow }, size1x1, Direction::Left, cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_MINE")); break;
-            case 'F': pEntity = new cpp_conv::Factory({ iCol, iRow }, size1x1, Direction::Down, cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_MINE")); break;
-            case 'G': pEntity = new cpp_conv::Factory({ iCol, iRow }, size1x1, Direction::Up, cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_MINE")); break;
-            case 'C': pEntity = new cpp_conv::Factory({ iCol, iRow }, size1x1, Direction::Right, cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_SMELTER")); break;
+            case 'A': pEntity = new cpp_conv::Factory({ iCol, iRow }, Direction::Right, cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_MINE")); break;
+            case 'D': pEntity = new cpp_conv::Factory({ iCol, iRow }, Direction::Left, cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_MINE")); break;
+            case 'F': pEntity = new cpp_conv::Factory({ iCol, iRow }, Direction::Down, cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_MINE")); break;
+            case 'G': pEntity = new cpp_conv::Factory({ iCol, iRow }, Direction::Up, cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_MINE")); break;
+            case 'C': pEntity = new cpp_conv::Factory({ iCol, iRow }, Direction::Right, cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_SMELTER")); break;
             case 'J': pEntity = new cpp_conv::Junction({ iCol, iRow }, size1x1); break;
             case 'S': pEntity = new cpp_conv::Storage({ iCol, iRow }, size1x1, 16, 256); break;
             case 'u': pEntity = new cpp_conv::Underground({ iCol, iRow }, size1x1, Direction::Down); break;
             case 'y': pEntity = new cpp_conv::Underground({ iCol, iRow }, size1x1, Direction::Up); break;
             case 'i': pEntity = new cpp_conv::Underground({ iCol, iRow }, size1x1, Direction::Left); break;
             case 'o': pEntity = new cpp_conv::Underground({ iCol, iRow }, size1x1, Direction::Right); break;
-            } 
+            }
 
             if (pEntity)
             {

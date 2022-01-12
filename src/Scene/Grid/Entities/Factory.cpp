@@ -21,8 +21,8 @@
 #include "Profiler.h"
 #include "GeneralItemContainer.h"
 
-cpp_conv::Factory::Factory(Vector3 position, Vector3 size, Direction direction, FactoryId factoryId, uint32_t uiMaxStackSize)
-    : Entity(position, size, EntityKind::Producer)
+cpp_conv::Factory::Factory(Vector3 position, Direction direction, FactoryId factoryId, uint32_t uiMaxStackSize)
+    : Entity(position, { 1, 1, 1 }, EntityKind::Producer)
     , m_hFactoryId(factoryId)
     , m_hActiveRecipeId(RecipeIds::None)
     , m_direction(direction)
@@ -37,6 +37,8 @@ cpp_conv::Factory::Factory(Vector3 position, Vector3 size, Direction direction, 
     {
         return;
     }
+
+    m_size = pFactory->GetSize();
 }
 
 bool cpp_conv::Factory::IsReadyToProduce() const
