@@ -11,6 +11,12 @@ project "CppConveyor"
 	location "build/CppConveyor"
 	language "C++"
 	editandcontinue "On"
+	files { 
+		".editorconfig",
+		"data/**",
+		"src/**"
+	}
+
 	filter {"platforms:Console"}
 		kind "ConsoleApp"
 		defines {
@@ -21,7 +27,8 @@ project "CppConveyor"
 			'robocopy "' .. path.getabsolute("data/common") .. '" "$(TargetDir)data" /E',
 			'exit /b 0'
 		}
-		filter {
+		removefiles {
+			"src/Platform/SDL/**",
 		}
 	filter {"platforms:SDL"}
 		kind "WindowedApp"
@@ -33,14 +40,10 @@ project "CppConveyor"
 			'robocopy "' .. path.getabsolute("data/common") .. '" "$(TargetDir)data" /E',
 			'exit /b 0'
 		}
-		filter {
+		removefiles {
+			"src/Platform/Console/**",
 		}
 	filter {}
-	files { 
-		".editorconfig",
-		"data/**",
-		"src/**"
-	}
 	includedirs {
 		"src",
 		"src/**",

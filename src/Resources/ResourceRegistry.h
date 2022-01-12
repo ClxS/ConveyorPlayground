@@ -29,7 +29,7 @@ namespace cpp_conv::resources::registry
     {
         "maps/circle",
         "maps/simple",
-        "data/producers/MetalGenerator",
+        "maps/bigmap",
     };
 
     constexpr const char* c_szItemsPaths[] =
@@ -111,6 +111,6 @@ namespace cpp_conv::resources::registry
     {
         constexpr RegistryId MapCircle = { 0, 1 };
         constexpr RegistryId MapSimple = { 1, 1 };
-        constexpr RegistryId Generator_Metal = { 2, 1 };
+        constexpr RegistryId MapBig = { 2, 1 };
     }
 }

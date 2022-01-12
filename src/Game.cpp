@@ -174,7 +174,7 @@ void cpp_conv::game::run()
         0,
         worldMap,
         nullptr,
-        0.3f
+        0.8f
     };
 
     cpp_conv::renderer::SwapChain swapChain(kRenderContext, iWidth, iHeight);
