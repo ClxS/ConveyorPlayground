@@ -211,7 +211,7 @@ void cpp_conv::game::run()
 
         PROFILE(UpdateCamera, updateCamera(kSceneContext, kRenderContext));
         PROFILE(Render, cpp_conv::renderer::render(kSceneContext, kRenderContext));
-        //PROFILE(UpdateUI, updateUI(kSceneContext, kRenderContext));
+        PROFILE(UpdateUI, updateUI(kSceneContext, kRenderContext));
         PROFILE(Present, swapChain.SwapAndPresent());
 
         PROFILE(FrameCapSleep, frameLimter.Limit());
