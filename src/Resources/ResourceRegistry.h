@@ -21,6 +21,8 @@ namespace cpp_conv::resources::registry
         "platform/assets/Junction",
         "platform/assets/Tunnel",
         "platform/assets/Storage",
+        "platform/assets/StairsUp",
+        "platform/assets/StairsDown",
     };
 
     constexpr const char* c_szDataPaths[] =
@@ -97,6 +99,8 @@ namespace cpp_conv::resources::registry
         constexpr RegistryId Junction = { 4, 0 };
         constexpr RegistryId Tunnel = { 5, 0 };
         constexpr RegistryId Storage = { 6, 0 };
+        constexpr RegistryId StairsUp = { 7, 0 };
+        constexpr RegistryId StairsDown = { 8, 0 };
 
         constexpr RegistryId IronOre = { 0, 2 };
         constexpr RegistryId CopperOre = { 1, 2 };

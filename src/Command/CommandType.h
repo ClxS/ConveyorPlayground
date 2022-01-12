@@ -9,10 +9,16 @@ namespace cpp_conv::commands
         MoveRight,
         MoveDown,
 
+        MoveFloorUp,
+        MoveFloorDown,
+
         PlaceConveyorUp,
         PlaceConveyorDown,
         PlaceConveyorLeft,
         PlaceConveyorRight,
+
+        PlaceStairsUp,
+        PlaceStairsDown,
 
         DecrementZoom,
         IncrementZoom,
