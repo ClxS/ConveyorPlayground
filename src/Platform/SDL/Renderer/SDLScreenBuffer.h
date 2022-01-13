@@ -23,7 +23,7 @@ namespace cpp_conv::renderer
 
         void Initialize(RenderContext& kRenderContext, SDLScreenBufferInitArgs& rArgs) {}
 
-        void Present() {}
+        void Present();
 
         void Shutdown() {}
 

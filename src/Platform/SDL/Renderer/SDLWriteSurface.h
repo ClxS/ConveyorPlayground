@@ -20,7 +20,7 @@ namespace cpp_conv::renderer
         }
 
         void Initialize() {}
-        void Clear() {}
+        void Clear();
 
         uint16_t GetWidth() const { return m_uiWidth; }
         uint16_t GetHeight() const { return m_uiHeight; }

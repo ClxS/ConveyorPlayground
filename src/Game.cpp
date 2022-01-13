@@ -148,7 +148,7 @@ void cpp_conv::game::run()
 
     WorldMap worldMap;
     {
-        AssetPtr<Map> map = resource_manager::loadAssetUncached<Map>(registry::data::MapSimple);
+        AssetPtr<Map> map = resource_manager::loadAssetUncached<Map>(registry::data::MapBig);
         if (!map)
         {
             return;
