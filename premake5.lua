@@ -43,6 +43,12 @@ project "CppConveyor"
 		removefiles {
 			"src/Platform/Console/**",
 		}
+		includedirs {
+			"third_party/SDL/include",
+		}
+		links {
+			"SDL",
+		}
 	filter {}
 	includedirs {
 		"src",
@@ -55,3 +61,6 @@ project "CppConveyor"
 		["data/*"] = "data/common/**",
 		["data/platform/*"] = "data/console/**",
 	}
+	flags { "MultiProcessorCompile" }
+
+dofile('third_party/sdl.lua')
