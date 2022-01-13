@@ -2,7 +2,7 @@
 
 Discrete positioning based console driven Factorio-inspired Conveyor System.
 
-Basic proof of concept thrown together in a couple of hours. Code is messy and not suitable for use! Images below show it's evolution over time.
+Basic proof of concept thrown together in a couple of hours. Code is messy and not suitable for use!
 
 # Build Process
 
@@ -11,6 +11,10 @@ Basic proof of concept thrown together in a couple of hours. Code is messy and n
     - This generates a Visual Studio 2022 solution.
 4) Open build/CppConveyor.sln
 5) Select a platform (SDL/Console) and hit build!
+
+# Screenshots
+
+These images show how the project evolved over time.
 
 ## Placement UI
 ![placementui](https://user-images.githubusercontent.com/15245663/149207828-56ef8805-4a4f-43f1-a8de-b9935d307683.gif)
