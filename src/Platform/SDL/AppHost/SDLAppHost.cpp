@@ -1,5 +1,6 @@
 #include <tuple>
 #include "AppHost.h"
+#include "Game.h"
 
 std::tuple<int, int> cpp_conv::apphost::getAppDimensions()
 {
@@ -12,6 +13,7 @@ extern "C"
 #endif
     int SDL_main(int argc, char* argv[])
     {
+        cpp_conv::game::run();
         return 0;
     }
 #ifdef __cplusplus
