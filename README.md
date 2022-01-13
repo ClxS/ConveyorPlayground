@@ -7,9 +7,10 @@ Basic proof of concept thrown together in a couple of hours. Code is messy and n
 # Build Process
 
 1) Git clone + pull submodules
-2) Run Generate.bat. This generates a Visual Studio 2022 solution.
-3) Open build/CppConveyor.sln
-4) Select a platform (SDL/Console) and hit build!
+2) Run Generate.bat
+    - This generates a Visual Studio 2022 solution.
+4) Open build/CppConveyor.sln
+5) Select a platform (SDL/Console) and hit build!
 
 ## Placement UI
 ![placementui](https://user-images.githubusercontent.com/15245663/149207828-56ef8805-4a4f-43f1-a8de-b9935d307683.gif)
