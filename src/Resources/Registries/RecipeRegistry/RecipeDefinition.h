@@ -1,12 +1,14 @@
 #pragma once
 
-#include <string>
 #include "ResourceAsset.h"
 #include "TileAsset.h"
 #include "DataId.h"
 #include "ResourceRegistry.h"
 #include "AssetPtr.h"
 #include "TileAsset.h"
+
+#include <vector>
+#include <string>
 
 namespace cpp_conv
 {

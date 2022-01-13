@@ -1,6 +1,10 @@
 #pragma once
 #include "RenderContext.h"
 
+#if !defined(_CONSOLE)
+#error Invalid Include
+#endif
+
 namespace cpp_conv::renderer
 {
     std::tuple<uint32_t, uint32_t> getConsoleSpaceDimensions(uint32_t uiWidth, uint32_t uiHeight, float scale);

@@ -3,6 +3,10 @@
 #include "RenderableAsset.h"
 #include <vector>
 
+#if !defined(_CONSOLE)
+#error Invalid Include
+#endif
+
 namespace cpp_conv::resources
 {
     class TextTileAsset : public RenderableAsset

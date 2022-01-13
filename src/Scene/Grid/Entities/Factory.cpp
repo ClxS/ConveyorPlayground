@@ -7,7 +7,6 @@
 
 #include <array>
 #include <random>
-#include "ConsoleWriteUtility.h"
 #include "ResourceManager.h"
 #include "ResourceRegistry.h"
 #include "TileAsset.h"

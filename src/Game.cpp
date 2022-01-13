@@ -57,8 +57,8 @@ namespace
             kRenderContext.m_cameraQuad.m_y = (playerY + c_iPadding + c_iPlayerSize) - kRenderContext.m_cameraQuad.m_uiHeight;
         }
 
-        kRenderContext.m_cameraQuad.m_x = max(kRenderContext.m_cameraQuad.m_x, 0);
-        kRenderContext.m_cameraQuad.m_y = max(kRenderContext.m_cameraQuad.m_y, 0);
+        kRenderContext.m_cameraQuad.m_x = std::max(kRenderContext.m_cameraQuad.m_x, 0);
+        kRenderContext.m_cameraQuad.m_y = std::max(kRenderContext.m_cameraQuad.m_y, 0);
     }
 }
 

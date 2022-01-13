@@ -5,6 +5,10 @@
 #include <Windows.h>
 #include "RenderContext.h"
 
+#if !defined(_CONSOLE)
+#error Invalid Include
+#endif
+
 namespace cpp_conv::renderer
 {
     class ConsoleWriteSurface;

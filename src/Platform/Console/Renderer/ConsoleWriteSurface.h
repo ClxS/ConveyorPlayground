@@ -4,6 +4,10 @@
 #include <vector>
 #include <Windows.h>
 
+#if !defined(_CONSOLE)
+#error Invalid Include
+#endif
+
 namespace cpp_conv { struct RenderContext; }
 
 namespace cpp_conv::renderer
