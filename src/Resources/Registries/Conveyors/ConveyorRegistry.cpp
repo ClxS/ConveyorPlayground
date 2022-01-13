@@ -18,9 +18,9 @@ namespace
 {
     void loadItems()
     {
-        for (int i = 0; i < sizeof(cpp_conv::resources::registry::c_szItemsPaths) / sizeof(const char*); i++)
+        for (int i = 0; i < sizeof(cpp_conv::resources::registry::c_szConveyors) / sizeof(std::filesystem::path); i++)
         {
-            RegistryId asset = { i, 2 };
+            RegistryId asset = { i, 9 };
             auto pAsset = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::ConveyorDefinition>(asset);
             if (!pAsset)
             {

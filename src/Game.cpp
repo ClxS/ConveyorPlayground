@@ -26,6 +26,9 @@
 #include <chrono>
 #include "WorldMap.h"
 
+#undef max
+#undef min
+
 using namespace cpp_conv::resources;
 
 namespace

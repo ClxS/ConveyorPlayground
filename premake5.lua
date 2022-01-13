@@ -11,6 +11,7 @@ project "CppConveyor"
 	location "build/CppConveyor"
 	language "C++"
 	editandcontinue "On"
+	debugdir "$(TargetDir)"
 	files { 
 		".editorconfig",
 		"data/**",

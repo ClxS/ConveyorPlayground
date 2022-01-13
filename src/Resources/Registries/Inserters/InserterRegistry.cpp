@@ -18,7 +18,7 @@ namespace
 {
     void loadItems()
     {
-        for (int i = 0; i < sizeof(cpp_conv::resources::registry::c_szInserterPaths) / sizeof(const char*); i++)
+        for (int i = 0; i < sizeof(cpp_conv::resources::registry::c_szInserterPaths) / sizeof(std::filesystem::path); i++)
         {
             RegistryId asset = { i, 6 };
             auto pAsset = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::InserterDefinition>(asset);

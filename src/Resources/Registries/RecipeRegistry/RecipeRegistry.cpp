@@ -18,7 +18,7 @@ namespace
 {
     void loadItems()
     {
-        for (int i = 0; i < sizeof(cpp_conv::resources::registry::c_szRecipes) / sizeof(const char*); i++)
+        for (int i = 0; i < sizeof(cpp_conv::resources::registry::c_szRecipes) / sizeof(std::filesystem::path); i++)
         {
             RegistryId asset = { i, 8 };
             auto pAsset = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::RecipeDefinition>(asset);

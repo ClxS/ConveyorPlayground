@@ -5,13 +5,14 @@
 #include "MapLoadHandler.h"
 #include "TileLoadHandler.h"
 #include "ItemRegistry.h"
+#include "FactoryRegistry.h"
 
 #include <map>
 #include <memory>
 #include <mutex>
 #include <fstream>
 #include <chrono>
-#include "FactoryRegistry.h"
+#include <filesystem>
 
 using FileData = cpp_conv::resources::resource_manager::FileData;
 using RegistryId = cpp_conv::resources::registry::RegistryId;
@@ -60,13 +61,14 @@ void cpp_conv::resources::resource_manager::registerTypeHandler(const std::type_
 cpp_conv::resources::resource_manager::FileData getFileData(cpp_conv::resources::registry::RegistryId kAssetId)
 {
     PROFILE_FUNC();
-    constexpr const char* c_fileExt = ".txt";
-    std::string path = "data/";
-    path += cpp_conv::resources::registry::c_szCategoryPaths[kAssetId.m_category][kAssetId.m_index];
-    path += c_fileExt;
-     
+    auto rootPath = std::filesystem::current_path();
+    auto filePath = rootPath
+        /
+        "data" /
+        cpp_conv::resources::registry::c_szCategoryPaths[kAssetId.m_category][kAssetId.m_index];
+
     std::ifstream file;
-    file.open(path, std::ios::binary | std::ios::ate);
+    file.open(filePath, std::ios::binary | std::ios::ate);
     if (file.fail())
     {
         return {};

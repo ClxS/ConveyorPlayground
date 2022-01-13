@@ -2,6 +2,7 @@
 
 #include "RenderableAsset.h"
 #include <vector>
+#include <string>
 
 #if !defined(_CONSOLE)
 #error Invalid Include

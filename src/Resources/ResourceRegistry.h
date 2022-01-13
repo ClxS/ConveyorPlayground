@@ -1,7 +1,33 @@
 #pragma once
+#include <filesystem>
 
 namespace cpp_conv::resources::registry
 {
+    struct PathExtension
+    {
+        PathExtension(const char* path)
+            : m_Path(path)
+        {
+        }
+
+        std::filesystem::path m_Path;
+    };
+
+    inline static std::filesystem::path operator+(const std::filesystem::path& path, const PathExtension& extension)
+    {
+        auto copy = path;
+        return copy.replace_extension(extension.m_Path);
+    }
+
+    #define P(X, EXT) std::filesystem::path(X ".ext") + EXT
+
+    inline static const PathExtension c_dataExtension = ".txt";
+    #if defined(_CONSOLE)
+    inline static const PathExtension c_assetExtension = ".txt";
+    #elif defined(_SDL)
+    inline static const PathExtension c_assetExtension = ".bmp";
+    #endif
+
     struct RegistryId
     {
         int m_index;
@@ -10,73 +36,78 @@ namespace cpp_conv::resources::registry
         bool operator<(const RegistryId& r) const;
     };
 
-    constexpr const char* c_szAssetPaths[] =
+    inline static const std::filesystem::path c_szAssetPaths[] =
     {
-        "platform/assets/ConveyorStraight",
+        P("platform/assets/ConveyorStraight", c_assetExtension),
 
-        "platform/assets/ConveyorCornerClockwise",
-        "platform/assets/ConveyorCornerAntiClockwise",
+        P("platform/assets/ConveyorCornerClockwise", c_assetExtension),
+        P("platform/assets/ConveyorCornerAntiClockwise", c_assetExtension),
 
-        "platform/assets/Player",
-        "platform/assets/Junction",
-        "platform/assets/Tunnel",
-        "platform/assets/Storage",
-        "platform/assets/StairsUp",
-        "platform/assets/StairsDown",
+        P("platform/assets/Player", c_assetExtension),
+        P("platform/assets/Junction", c_assetExtension),
+        P("platform/assets/Tunnel", c_assetExtension),
+        P("platform/assets/Storage", c_assetExtension),
+        P("platform/assets/StairsUp", c_assetExtension),
+        P("platform/assets/StairsDown", c_assetExtension),
     };
 
-    constexpr const char* c_szDataPaths[] =
+    inline static const std::filesystem::path c_szDataPaths[] =
     {
-        "maps/circle",
-        "maps/simple",
-        "maps/bigmap",
+        P("maps/circle", c_dataExtension),
+        P("maps/simple", c_dataExtension),
+        P("maps/bigmap", c_dataExtension),
     };
 
-    constexpr const char* c_szItemsPaths[] =
+    inline static const std::filesystem::path c_szItemsPaths[] =
     {
-        "data/items/IronOre",
-        "data/items/CopperOre",
-        "data/items/Coal",
-        "data/items/CopperPlate",
+        P("data/items/IronOre", c_dataExtension),
+        P("data/items/CopperOre", c_dataExtension),
+        P("data/items/Coal", c_dataExtension),
+        P("data/items/CopperPlate", c_dataExtension),
     };
 
-    constexpr const char* c_szItemAssetsPaths[] =
+    inline static const std::filesystem::path c_szItemAssetsPaths[] =
     {
-        "platform/assets/items/IronOre",
-        "platform/assets/items/CopperOre",
-        "platform/assets/items/Coal",
-        "platform/assets/items/CopperPlate",
+        P("platform/assets/items/IronOre", c_assetExtension),
+        P("platform/assets/items/CopperOre", c_assetExtension),
+        P("platform/assets/items/Coal", c_assetExtension),
+        P("platform/assets/items/CopperPlate", c_assetExtension),
     };
 
-    constexpr const char* c_szFactoryPaths[] =
+    inline static const std::filesystem::path c_szFactoryPaths[] =
     {
-        "data/Factories/CopperMine",
-        "data/Factories/CopperSmelter",
+        P("data/Factories/CopperMine", c_dataExtension),
+        P("data/Factories/CopperSmelter", c_dataExtension),
     };
 
-    constexpr const char* c_szFactoryAssetsPaths[] =
+    inline static const std::filesystem::path c_szFactoryAssetsPaths[] =
     {
-        "platform/assets/Factories/CopperMine",
-        "platform/assets/Factories/CopperSmelter",
+        P("platform/assets/Factories/CopperMine", c_assetExtension),
+        P("platform/assets/Factories/CopperSmelter", c_assetExtension),
     };
 
-    constexpr const char* c_szInserterPaths[] =
+    inline static const std::filesystem::path c_szInserterPaths[] =
     {
-        "data/inserters/Basic",
+        P("data/inserters/Basic", c_dataExtension),
     };
 
-    constexpr const char* c_szInserterAssetsPaths[] =
+    inline static const std::filesystem::path c_szInserterAssetsPaths[] =
     {
-        "platform/assets/inserters/Basic",
+        P("platform/assets/inserters/Basic", c_assetExtension),
     };
 
-    constexpr const char* c_szRecipes[] =
+    inline static const std::filesystem::path c_szRecipes[] =
     {
-        "data/recipes/CopperOre",
-        "data/recipes/CopperPlate",
+        P("data/recipes/CopperOre", c_dataExtension),
+        P("data/recipes/CopperPlate", c_dataExtension),
+    };
+
+    inline static const std::filesystem::path c_szConveyors[] =
+    {
+        P("data/conveyors/Basic", c_dataExtension),
     };
      
-    constexpr const char* const* c_szCategoryPaths[] =
+    inline static const std::filesystem::path* c_szCategoryPaths[] =
     {
         c_szAssetPaths,
         c_szDataPaths,
@@ -87,6 +118,7 @@ namespace cpp_conv::resources::registry
         c_szInserterPaths,
         c_szInserterAssetsPaths,
         c_szRecipes,
+        c_szConveyors
     };
 
     namespace visual
