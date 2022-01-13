@@ -6,6 +6,8 @@ Basic proof of concept thrown together in a couple of hours. Code is messy and n
 
 # Build Process
 
+Currently I only target Windows. More platforms might come at some point.
+
 1) Git clone + pull submodules
 2) Run Generate.bat
     - This generates a Visual Studio 2022 solution.
