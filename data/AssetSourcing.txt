@@ -1,0 +1,7 @@
+This file contains links to various assets which would fit the theme of the game.
+
+Potential 2D assets
+https://gamedeveloperstudio.itch.io/conveyor-belt-kit
+
+Potential 3D assets
+https://sketchfab.com/3d-models/conveyor-belt-modular-assets-18eeb4f4814f4a818f9f1b78fb3f8c62
