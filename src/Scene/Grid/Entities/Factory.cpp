@@ -108,8 +108,8 @@ void cpp_conv::Factory::Draw(RenderContext& kRenderContext) const
         kRenderContext,
         pTile.get(),
         {
-            m_position.m_x * cpp_conv::renderer::c_gridScale,
-            m_position.m_y * cpp_conv::renderer::c_gridScale,
+            (float)m_position.m_x * cpp_conv::renderer::c_gridScale,
+            (float)m_position.m_y * cpp_conv::renderer::c_gridScale,
             cpp_conv::rotationFromDirection(m_direction)
         },
         { 0xFFFFFF00 });

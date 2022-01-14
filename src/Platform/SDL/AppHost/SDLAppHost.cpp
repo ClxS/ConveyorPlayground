@@ -28,7 +28,7 @@ void createWindow()
         exit(1);
     }
 
-    cpp_conv::apphost::App.window = SDL_CreateWindow("Cpp Conveyor", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, windowFlags);
+    cpp_conv::apphost::App.window = SDL_CreateWindow("Cpp Conveyor", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1200, 1000, windowFlags);
 
     if (!cpp_conv::apphost::App.window)
     {
@@ -45,7 +45,7 @@ void createWindow()
         printf("Failed to create renderer: %s\n", SDL_GetError());
         exit(1);
     }
-}
+} 
 
 #ifdef __cplusplus
 extern "C"

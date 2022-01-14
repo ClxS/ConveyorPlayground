@@ -14,6 +14,7 @@
 #include "ResourceManager.h"
 #include "TileAsset.h"
 #include "WorldMap.h"
+#include "Direction.h"
 
 template <class RandomAccessIterator, class URNG>
 void shuffle(RandomAccessIterator first, RandomAccessIterator last, URNG&& g)
@@ -25,7 +26,7 @@ void shuffle(RandomAccessIterator first, RandomAccessIterator last, URNG&& g)
     }
 }
 
-std::tuple<int, Vector3> GetUndergroundLength(const cpp_conv::WorldMap& map, cpp_conv::Entity* pStart, Direction direction)
+std::tuple<int, Vector3> GetUndergroundLength(const cpp_conv::WorldMap& map, const cpp_conv::Entity* pStart, Direction direction)
 {
     Vector3 kTargetPosition;
     int iTargetUnderground = -1;
@@ -154,13 +155,26 @@ void cpp_conv::Underground::Draw(RenderContext& kRenderContext) const
         return;
     }
 
+    int iUndergroundLength;
+    Vector3 undergroundEnd;
+
+    std::tie(iUndergroundLength, undergroundEnd) = GetUndergroundLength(kRenderContext.m_rMap, this, m_direction);
+
+    Transform2D::Rotation eDirection = cpp_conv::rotationFromDirection(m_direction);
+    if (iUndergroundLength == -1)
+    {
+        eDirection = cpp_conv::rotationFromDirection(
+            cpp_conv::direction::Rotate90DegreeClockwise(
+                cpp_conv::direction::Rotate90DegreeClockwise(m_direction)));
+    }
+
     cpp_conv::renderer::renderAsset(
         kRenderContext,
         pTile.get(),
         {
-            m_position.m_x * cpp_conv::renderer::c_gridScale,
-            m_position.m_y * cpp_conv::renderer::c_gridScale,
-            cpp_conv::rotationFromDirection(m_direction)
+            (float)m_position.m_x * cpp_conv::renderer::c_gridScale,
+            (float)m_position.m_y * cpp_conv::renderer::c_gridScale,
+            eDirection
         },
         { 0xFF0000FF });
 }

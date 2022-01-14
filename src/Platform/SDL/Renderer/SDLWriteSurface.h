@@ -16,7 +16,10 @@ namespace cpp_conv::renderer
                         uint16_t uiWidth,
                         uint16_t uiHeight,
                         bool bClearOnPresent)
-        {
+            : m_uiWidth(uiWidth)
+            , m_uiHeight(uiHeight)
+            , m_bClearOnPresent(true)
+        { 
         }
 
         void Initialize() {}

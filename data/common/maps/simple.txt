@@ -1,1 +1,7 @@
-A>>S
+
+ AAA         DDD
+ AAA>v     v<DDD
+ AAA v CCC v DDDS
+     v CCC v
+     vYCCCTv
+     >>>S<<<

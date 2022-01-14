@@ -148,7 +148,7 @@ void cpp_conv::game::run()
 
     WorldMap worldMap;
     {
-        AssetPtr<Map> map = resource_manager::loadAssetUncached<Map>(registry::data::MapBig);
+        AssetPtr<Map> map = resource_manager::loadAssetUncached<Map>(registry::data::MapSimple);
         if (!map)
         {
             return;
@@ -175,15 +175,16 @@ void cpp_conv::game::run()
     {
         { 0, 0, 0, 0 },
         0,
+        0,
         worldMap,
         nullptr,
-        0.8f
+        1.0f
     };
 
     cpp_conv::renderer::SwapChain swapChain(kRenderContext, iWidth, iHeight);
     cpp_conv::renderer::init(kRenderContext, swapChain);
 
-    cpp_conv::FrameLimiter frameLimter(500);
+    cpp_conv::FrameLimiter frameLimter(1);
     std::queue<cpp_conv::commands::CommandType> commands;
 
     cpp_conv::ui::initializeGuiSystem(1920, 1080);
@@ -210,7 +211,7 @@ void cpp_conv::game::run()
                 swapChain.ResizeBuffers(kRenderContext, iNewWidth, iNewHeight);
                 fCurrentZoom = kRenderContext.m_fZoom;
             }
-            }());
+            }()); 
 
         PROFILE(UpdateCamera, updateCamera(kSceneContext, kRenderContext));
         PROFILE(Render, cpp_conv::renderer::render(kSceneContext, kRenderContext));

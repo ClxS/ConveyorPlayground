@@ -6,12 +6,23 @@
 
 #include "RenderableAsset.h"
 
+struct SDL_Texture;
+
 namespace cpp_conv::resources
 {
-    class SDLTileAsset : public RenderableAsset
+    class SDLTile2DAsset : public RenderableAsset
     {
+    public:
+        SDLTile2DAsset(SDL_Texture* pTexture)
+            : m_pTexture(pTexture)
+        {
+        }
 
+        SDL_Texture* GetTexture() const { return m_pTexture; }
+
+    private:
+        SDL_Texture* m_pTexture;
     };
 
-    using TileAsset = SDLTileAsset;
+    using TileAsset = SDLTile2DAsset;
 }

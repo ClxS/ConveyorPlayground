@@ -38,17 +38,19 @@ namespace cpp_conv::resources::registry
 
     inline static const std::filesystem::path c_szAssetPaths[] =
     {
-        P("platform/assets/ConveyorStraight", c_assetExtension),
+        P("platform/assets/conveyors/ConveyorStraight", c_assetExtension),
+        P("platform/assets/conveyors/ConveyorStraightEnd", c_assetExtension),
 
-        P("platform/assets/ConveyorCornerClockwise", c_assetExtension),
-        P("platform/assets/ConveyorCornerAntiClockwise", c_assetExtension),
+        P("platform/assets/conveyors/ConveyorCornerClockwise", c_assetExtension),
+        P("platform/assets/conveyors/ConveyorCornerAntiClockwise", c_assetExtension),
 
         P("platform/assets/Player", c_assetExtension),
-        P("platform/assets/Junction", c_assetExtension),
-        P("platform/assets/Tunnel", c_assetExtension),
+        P("platform/assets/conveyors/Junction", c_assetExtension),
+        P("platform/assets/conveyors/Tunnel", c_assetExtension),
         P("platform/assets/Storage", c_assetExtension),
-        P("platform/assets/StairsUp", c_assetExtension),
-        P("platform/assets/StairsDown", c_assetExtension),
+        P("platform/assets/conveyors/StairsUp", c_assetExtension),
+        P("platform/assets/conveyors/StairsDown", c_assetExtension),
+        P("platform/assets/background_repeating", c_assetExtension),
     };
 
     inline static const std::filesystem::path c_szDataPaths[] =
@@ -124,15 +126,17 @@ namespace cpp_conv::resources::registry
     namespace visual
     {
         constexpr RegistryId Conveyor_Straight = { 0, 0 };
-        constexpr RegistryId Conveyor_CornerClockwise = { 1, 0 };
-        constexpr RegistryId Conveyor_CornerAntiClockwise = { 2, 0 };
+        constexpr RegistryId Conveyor_Straight_End = { 1, 0 };
+        constexpr RegistryId Conveyor_CornerClockwise = { 2, 0 };
+        constexpr RegistryId Conveyor_CornerAntiClockwise = { 3, 0 };
 
-        constexpr RegistryId Player = { 3, 0 };
-        constexpr RegistryId Junction = { 4, 0 };
-        constexpr RegistryId Tunnel = { 5, 0 };
-        constexpr RegistryId Storage = { 6, 0 };
-        constexpr RegistryId StairsUp = { 7, 0 };
-        constexpr RegistryId StairsDown = { 8, 0 };
+        constexpr RegistryId Player = { 4, 0 };
+        constexpr RegistryId Junction = { 5, 0 };
+        constexpr RegistryId Tunnel = { 6, 0 };
+        constexpr RegistryId Storage = { 7, 0 };
+        constexpr RegistryId StairsUp = { 8, 0 };
+        constexpr RegistryId StairsDown = { 9, 0 };
+        constexpr RegistryId BackgroundRepeating = { 10, 0 };
 
         constexpr RegistryId IronOre = { 0, 2 };
         constexpr RegistryId CopperOre = { 1, 2 };

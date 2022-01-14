@@ -14,29 +14,32 @@ namespace cpp_conv
 		};
 
 		Transform2D()
-			: m_x(0)
-			, m_y(0)
+			: m_x(0.0f)
+			, m_y(0.0f)
 			, m_rotation(Rotation::DegZero)
-		{
+            , m_bFillScreen(false)
+        {
 		}
 
-		Transform2D(int x, int y)
+		Transform2D(float x, float y, bool bRepeating = false)
 			: m_x(x)
 			, m_y(y)
 			, m_rotation(Rotation::DegZero)
-		{
+            , m_bFillScreen(bRepeating)
+        {
 		}
 
-		Transform2D(int x, int y, Rotation rotation)
+		Transform2D(float x, float y, Rotation rotation, bool bRepeating = false)
 			: m_x(x)
 			, m_y(y)
 			, m_rotation(rotation)
+            , m_bFillScreen(bRepeating)
 		{
 		}
 
-		int m_x;
-
-		int m_y;
+		float m_x;
+        float m_y;
+        bool m_bFillScreen;
 		
 		Rotation m_rotation;
 	};

@@ -62,8 +62,8 @@ void cpp_conv::Stairs::Draw(RenderContext& kRenderContext) const
         kRenderContext,
         pTile.get(),
         {
-            m_position.m_x * cpp_conv::renderer::c_gridScale,
-            m_position.m_y * cpp_conv::renderer::c_gridScale,
+            (float)m_position.m_x * cpp_conv::renderer::c_gridScale,
+            (float)m_position.m_y * cpp_conv::renderer::c_gridScale,
             cpp_conv::Transform2D::Rotation::DegZero
         },
         { 0xFFFF00FF });

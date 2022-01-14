@@ -34,6 +34,8 @@ namespace cpp_conv
         virtual const char* GetName() const = 0;
         virtual std::string GetDescription() const = 0;
 
+        virtual uint32_t GetDrawPassCount() const { return 1; }
+
         Vector3 m_position;
         Vector3 m_size;
         const EntityKind m_eEntityKind;

@@ -1,11 +1,14 @@
-﻿#include "TextTileRenderHandler.h"
+#include "TextTileRenderHandler.h"
 #include "RenderContext.h"
 #include "RenderableAsset.h"
 #include "Transform2D.h"
 #include "Renderer.h"
 #include "TextTileAsset.h"
 #include "ConsoleWriteUtility.h"
+#include "SelfRegistration.h"
 #include <utility>
+
+#undef max
 
 wchar_t rotateCharIfAllowed(wchar_t input, int cycle)
 {
@@ -32,7 +35,7 @@ void tileRenderer(cpp_conv::RenderContext& kContext, const cpp_conv::resources::
     int maxWidth = 0;
     for (int iRow = 0; iRow < (*vData).size(); ++iRow)
     {
-        maxWidth = max(maxWidth, (int)((*vData)[iRow].size()));
+        maxWidth = std::max(maxWidth, (int)((*vData)[iRow].size()));
     }
 
     for (int iRow = 0; iRow < (*vData).size(); ++iRow)
@@ -63,7 +66,4 @@ void tileRenderer(cpp_conv::RenderContext& kContext, const cpp_conv::resources::
     }
 }
 
-void cpp_conv::renderer::registerTileRenderHandler()
-{
-    cpp_conv::renderer::registerTypeHandler<cpp_conv::resources::TextTileAsset>(&tileRenderer);
-}
+REGISTER_RENDER_HANDLER(cpp_conv::resources::TextTileAsset, tileRenderer);

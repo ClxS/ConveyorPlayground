@@ -13,6 +13,7 @@
 #include "AssetPtr.h"
 #include <map>
 #include "DataId.h"
+#include "Matrix.h"
 
 cpp_conv::Colour GetColourFromId(int id)
 {
@@ -50,6 +51,9 @@ void DrawConveyorItem(
         return;
     }
 
+    int xOffset = 0;
+    int yOffset = 0;
+
     // TODO[CJones] Normalize this
     if (bIsCorner)
     {
@@ -58,20 +62,20 @@ void DrawConveyorItem(
             switch (direction)
             {
             case Direction::Left:
-                x += cpp_conv::c_conveyorChannelSlots - iChannelSlot - 1;
-                y += cpp_conv::c_conveyorChannels - iChannelIdx;
+                xOffset = cpp_conv::c_conveyorChannelSlots - iChannelSlot - 1;
+                yOffset = cpp_conv::c_conveyorChannels - iChannelIdx;
                 break;
             case Direction::Up:
-                x += cpp_conv::c_conveyorChannels - iChannelIdx;
-                y += 1 + iChannelSlot + 1;
+                xOffset = cpp_conv::c_conveyorChannels - iChannelIdx;
+                yOffset = 1 + iChannelSlot + 1;
                 break;
             case Direction::Right:
-                x += 1 + iChannelSlot + 1;
-                y += 1 + iChannelIdx;
+                xOffset = 1 + iChannelSlot + 1;
+                yOffset = 1 + iChannelIdx;
                 break;
             case Direction::Down:
-                x += 1 + iChannelIdx;
-                y += cpp_conv::c_conveyorChannelSlots - iChannelSlot - 1;
+                xOffset = 1 + iChannelIdx;
+                yOffset = cpp_conv::c_conveyorChannelSlots - iChannelSlot - 1;
                 break;
             }
         }
@@ -80,20 +84,20 @@ void DrawConveyorItem(
             switch (direction)
             {
             case Direction::Left:
-                x += cpp_conv::c_conveyorChannelSlots - iChannelSlot + (iChannelSlot > 0 ? 1 : 0);;
-                y += cpp_conv::c_conveyorChannels - iChannelIdx + (iChannelSlot == 0 ? (cornerSourceDirection == Direction::Up ? -1 : 1) : 0);
+                xOffset = cpp_conv::c_conveyorChannelSlots - iChannelSlot + (iChannelSlot > 0 ? 1 : 0);;
+                yOffset = cpp_conv::c_conveyorChannels - iChannelIdx + (iChannelSlot == 0 ? (cornerSourceDirection == Direction::Up ? -1 : 1) : 0);
                 break;
             case Direction::Right:
-                x += 1 + iChannelSlot + (iChannelSlot > 0 ? -1 : 0);
-                y += 1 + iChannelIdx + (iChannelSlot == 0 ? (cornerSourceDirection == Direction::Up ? -1 : 1) : 0);
+                xOffset = 1 + iChannelSlot + (iChannelSlot > 0 ? -1 : 0);
+                yOffset = 1 + iChannelIdx + (iChannelSlot == 0 ? (cornerSourceDirection == Direction::Up ? -1 : 1) : 0);
                 break;
             case Direction::Up:
-                x += cpp_conv::c_conveyorChannels - iChannelIdx + (iChannelSlot == 0 ? (cornerSourceDirection == Direction::Left ? 1 : -1) : 0);
-                y += 1 + iChannelSlot + (iChannelSlot > 0 ? -1 : 0);
+                xOffset = cpp_conv::c_conveyorChannels - iChannelIdx + (iChannelSlot == 0 ? (cornerSourceDirection == Direction::Left ? 1 : -1) : 0);
+                yOffset = 1 + iChannelSlot + (iChannelSlot > 0 ? -1 : 0);
                 break;
             case Direction::Down:
-                x += 1 + iChannelIdx + (iChannelSlot == 0 ? (cornerSourceDirection == Direction::Left ? 1 : -1) : 0);
-                y += cpp_conv::c_conveyorChannelSlots - iChannelSlot + (iChannelSlot > 0 ? 1 : 0);;
+                xOffset = 1 + iChannelIdx + (iChannelSlot == 0 ? (cornerSourceDirection == Direction::Left ? 1 : -1) : 0);
+                yOffset = cpp_conv::c_conveyorChannelSlots - iChannelSlot + (iChannelSlot > 0 ? 1 : 0);;
                 break;
             }
         }
@@ -103,25 +107,28 @@ void DrawConveyorItem(
         switch (direction)
         {
         case Direction::Left:
-            x += cpp_conv::c_conveyorChannelSlots - iChannelSlot;
-            y += cpp_conv::c_conveyorChannels - iChannelIdx;
+            xOffset = cpp_conv::c_conveyorChannelSlots - iChannelSlot;
+            yOffset = cpp_conv::c_conveyorChannels - iChannelIdx;
             break;
         case Direction::Up:
-            x += cpp_conv::c_conveyorChannels - iChannelIdx;
-            y += 1 + iChannelSlot;
+            xOffset = cpp_conv::c_conveyorChannels - iChannelIdx;
+            yOffset = 1 + iChannelSlot;
             break;
         case Direction::Right:
-            x += 1 + iChannelSlot;
-            y += 1 + iChannelIdx;
+            xOffset = 1 + iChannelSlot;
+            yOffset = 1 + iChannelIdx;
             break;
         case Direction::Down:
-            x += 1 + iChannelIdx;
-            y += cpp_conv::c_conveyorChannelSlots - iChannelSlot;
+            xOffset = 1 + iChannelIdx;
+            yOffset = cpp_conv::c_conveyorChannelSlots - iChannelSlot;
             break;
         }
     }
 
-    cpp_conv::renderer::renderAsset(kContext, pTile.get(), { x, y }, { colour.m_value | 0xFF000000 });
+    x += cpp_conv::renderer::c_gridScale * ((xOffset - 1) * 0.5f);
+    y += cpp_conv::renderer::c_gridScale * ((yOffset - 1) * 0.5f);
+
+    cpp_conv::renderer::renderAsset(kContext, pTile.get(), { (float)x, (float)y }, { colour.m_value | 0xFF000000 });
 }
 
 void DrawConveyor(
@@ -140,7 +147,16 @@ void DrawConveyor(
 
     if (!bIsCorner)
     {
-        pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Conveyor_Straight);        
+        auto pEntity = kContext.m_rMap.GetEntity(cpp_conv::grid::GetForwardPosition(rConveyor.m_position, direction));
+
+        if (pEntity && pEntity->SupportsInsertion())
+        {
+            pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Conveyor_Straight);
+        }
+        else
+        {
+            pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Conveyor_Straight_End);
+        }
     }
     else
     {
@@ -154,7 +170,7 @@ void DrawConveyor(
         }        
     }   
 
-    transform = { x, y, cpp_conv::rotationFromDirection(direction) };
+    transform = { (float)x, (float)y, cpp_conv::rotationFromDirection(direction) };
     if (pTile)
     {
         cpp_conv::renderer::renderAsset(kContext, pTile.get(), transform, colour);
@@ -207,8 +223,8 @@ void cpp_conv::Conveyor::Draw(RenderContext& kContext) const
     PROFILE_FUNC();
     Colour colour = GetColourFromId(m_pSequenceId);
 
-    int conveyorX = m_position.m_x * 3;
-    int conveyorY = m_position.m_y * 3;
+    int conveyorX = m_position.m_x * 4;
+    int conveyorY = m_position.m_y * 4;
 
     bool bIsCorner = cpp_conv::targeting_util::IsCornerConveyor(kContext.m_rMap, *this);
 
@@ -216,47 +232,57 @@ void cpp_conv::Conveyor::Draw(RenderContext& kContext) const
     Direction eCornerDirection;
     std::tie(iInnerMostChannel, eCornerDirection) = GetInnerMostCornerChannel(kContext.m_rMap, *this);
 
-    DrawConveyor(
-        kContext,
-        *this,
-        conveyorX,
-        conveyorY,
-        bIsCorner,
-        m_direction,
-        eCornerDirection,
-        colour);
-;
-    for (int iChannelIdx = 0; iChannelIdx < c_conveyorChannels; ++iChannelIdx)
+    switch (kContext.m_uiCurrentDrawPass)
     {
-        int iChannelLength = cpp_conv::c_conveyorChannelSlots;
-        if (bIsCorner)
+    case 0:
+    {
+        DrawConveyor(
+            kContext,
+            *this,
+            conveyorX,
+            conveyorY,
+            bIsCorner,
+            m_direction,
+            eCornerDirection,
+            colour);
+        break;
+    }
+    case 1:
+    {
+        for (int iChannelIdx = 0; iChannelIdx < c_conveyorChannels; ++iChannelIdx)
         {
-            iChannelLength += iInnerMostChannel == iChannelIdx ? -1 : 1;
-        }
-
-        for (int iChannelSlot = 0; iChannelSlot < iChannelLength; ++iChannelSlot)
-        {
-            if (!m_pChannels[iChannelIdx].m_pItems[iChannelSlot].IsEmpty())
+            int iChannelLength = cpp_conv::c_conveyorChannelSlots;
+            if (bIsCorner)
             {
-                cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> pItem = cpp_conv::resources::getItemDefinition(m_pChannels[iChannelIdx].m_pItems[iChannelSlot]);
-                if (pItem)
+                iChannelLength += iInnerMostChannel == iChannelIdx ? -1 : 1;
+            }
+
+            for (int iChannelSlot = 0; iChannelSlot < iChannelLength; ++iChannelSlot)
+            {
+                if (!m_pChannels[iChannelIdx].m_pItems[iChannelSlot].IsEmpty())
                 {
-                    DrawConveyorItem(
-                        kContext,
-                        pItem->GetTile(),
-                        conveyorX,
-                        conveyorY,
-                        iChannelIdx,
-                        iChannelSlot,
-                        bIsCorner,
-                        iInnerMostChannel == iChannelIdx,
-                        m_direction,
-                        eCornerDirection,
-                        colour,
-                        true);
+                    cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> pItem = cpp_conv::resources::getItemDefinition(m_pChannels[iChannelIdx].m_pItems[iChannelSlot]);
+                    if (pItem)
+                    {
+                        DrawConveyorItem(
+                            kContext,
+                            pItem->GetTile(),
+                            conveyorX,
+                            conveyorY,
+                            iChannelIdx,
+                            iChannelSlot,
+                            bIsCorner,
+                            iInnerMostChannel == iChannelIdx,
+                            m_direction,
+                            eCornerDirection,
+                            colour,
+                            true);
+                    }
                 }
             }
         }
+        break;
+    }
     }
 }
 

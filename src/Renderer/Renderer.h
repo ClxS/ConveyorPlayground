@@ -12,7 +12,7 @@ namespace cpp_conv
 
 namespace cpp_conv::renderer
 {
-    constexpr int c_gridScale = 3;
+    constexpr int c_gridScale = 4;
 
     class SwapChain;
 
@@ -34,4 +34,5 @@ namespace cpp_conv::renderer
     {
         registerTypeHandler(typeid(TType), fHandler);
     }
+    void drawBackground(const SceneContext& kSceneContext, RenderContext& kContext);
 };

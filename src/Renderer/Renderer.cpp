@@ -42,7 +42,6 @@ void cpp_conv::renderer::init(cpp_conv::RenderContext& kContext, cpp_conv::rende
     rSwapChain.Initialize(kContext, kArgs);
     kContext.m_cameraQuad = { 0, 0, rSwapChain.GetWriteSurface().GetWidth(), rSwapChain.GetWriteSurface().GetHeight() };
     kContext.m_surface = &rSwapChain.GetWriteSurface();
-    cpp_conv::renderer::registerTileRenderHandler();
 }
 
 void drawPlayer(const cpp_conv::SceneContext& kSceneContext, cpp_conv::RenderContext& kRenderContext)
@@ -57,36 +56,54 @@ void drawPlayer(const cpp_conv::SceneContext& kSceneContext, cpp_conv::RenderCon
         kRenderContext,
         pTile.get(),
         {
-            kSceneContext.m_player.m_x * cpp_conv::renderer::c_gridScale,
-            kSceneContext.m_player.m_y * cpp_conv::renderer::c_gridScale,
+            (float)kSceneContext.m_player.m_x * cpp_conv::renderer::c_gridScale,
+            (float)kSceneContext.m_player.m_y * cpp_conv::renderer::c_gridScale,
             cpp_conv::Transform2D::Rotation::DegZero
         },
         { 0xFFFFFFFF });
 }
 
 void cpp_conv::renderer::render(const SceneContext& kSceneContext, RenderContext& kContext)
-{ 
-    kContext.m_iCurrentLayer = kSceneContext.m_player.m_depth;
+{
+    drawBackground(kSceneContext, kContext);
+
+    uint32_t uiPassCount = 0;
     for (auto pEntity : kSceneContext.m_rMap.GetConveyors())
     {
-        if ((pEntity->m_position.m_depth + pEntity->m_size.m_depth - 1) < kSceneContext.m_player.m_depth
-            || pEntity->m_position.m_depth > kSceneContext.m_player.m_depth)
-        {
-            continue;
-        }
-
-        pEntity->Draw(kContext);
+        uiPassCount = std::max(uiPassCount, pEntity->GetDrawPassCount());
     }
-
     for (auto pEntity : kSceneContext.m_rMap.GetOtherEntities())
     {
-        if ((pEntity->m_position.m_depth + pEntity->m_size.m_depth - 1) < kSceneContext.m_player.m_depth
-            || pEntity->m_position.m_depth > kSceneContext.m_player.m_depth)
-        {
-            continue;
-        }
+        uiPassCount = std::max(uiPassCount, pEntity->GetDrawPassCount());
+    }
 
-        pEntity->Draw(kContext);
+    kContext.m_iCurrentLayer = kSceneContext.m_player.m_depth;
+    for (uint32_t uiPass = 0; uiPass < uiPassCount; uiPass++)
+    {
+        kContext.m_uiCurrentDrawPass = uiPass;
+        for (auto pEntity : kSceneContext.m_rMap.GetConveyors())
+        {
+            if (pEntity->GetDrawPassCount() < (uiPass + 1) ||
+                (pEntity->m_position.m_depth + pEntity->m_size.m_depth - 1) < kSceneContext.m_player.m_depth
+                || pEntity->m_position.m_depth > kSceneContext.m_player.m_depth)
+            {
+                continue;
+            }
+
+            pEntity->Draw(kContext);
+        } 
+
+        for (auto pEntity : kSceneContext.m_rMap.GetOtherEntities())
+        {
+            if (pEntity->GetDrawPassCount() < (uiPass + 1) ||
+                (pEntity->m_position.m_depth + pEntity->m_size.m_depth - 1) < kSceneContext.m_player.m_depth
+                || pEntity->m_position.m_depth > kSceneContext.m_player.m_depth)
+            {
+                continue;
+            }
+
+            pEntity->Draw(kContext);
+        }
     }
 
     drawPlayer(kSceneContext, kContext);
@@ -113,4 +130,25 @@ void cpp_conv::renderer::registerTypeHandler(const std::type_info& type, std::fu
 {
     std::lock_guard<std::mutex> lock(getStateMutex());
     g_typeHandlers[type.hash_code()] = new std::function<void(cpp_conv::RenderContext&, const resources::RenderableAsset*, cpp_conv::Transform2D, cpp_conv::Colour)>(fHandler);
+}
+
+void cpp_conv::renderer::drawBackground(const SceneContext& kSceneContext, RenderContext& kContext)
+{
+    auto pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(
+        cpp_conv::resources::registry::visual::BackgroundRepeating);
+    if (!pTile)
+    {
+        return;
+    }
+
+    cpp_conv::renderer::renderAsset(
+        kContext,
+        pTile.get(),
+        {
+            (float)kSceneContext.m_player.m_x * cpp_conv::renderer::c_gridScale,
+            (float)kSceneContext.m_player.m_y * cpp_conv::renderer::c_gridScale,
+            cpp_conv::Transform2D::Rotation::DegZero,
+            true
+        },
+        { 0xFFFFFFFF });
 }

@@ -35,4 +35,5 @@
 x64
 
 build
+sdlPrivate
 !premake5.exe

@@ -6,5 +6,4 @@
 
 namespace cpp_conv::renderer
 {
-    void registerTileRenderHandler();
 }
