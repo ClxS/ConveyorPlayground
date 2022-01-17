@@ -15,7 +15,7 @@ namespace cpp_conv
         void Tick(const SceneContext& kContext) override;
         void Draw(RenderContext& kRenderContext) const override;
         bool SupportsInsertion() const override { return true; }
-        bool TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel) override;
+        bool TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel = 0, int iSourceSlot = 0) override;
 
         bool SupportsProvidingItem() const override { return true; }
         bool TryGrab(const SceneContext& kContext, bool bSingle, std::tuple<ItemId, uint32_t>& outItem) override;

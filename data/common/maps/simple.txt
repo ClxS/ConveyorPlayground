@@ -1,11 +1,5 @@
- v<<<<<<
- v     ^
- v AAA ^
- v AAA>^
- v AAA 
- v
- >>>>>>>>v
-         v
-      ^  v
-      ^<<<
-      
+     >>>>v
+AAA  ^v<<v
+AAA>>^>S^v
+AAA  >>>^v
+     ^<<<<

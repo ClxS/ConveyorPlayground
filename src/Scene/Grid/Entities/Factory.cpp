@@ -131,7 +131,7 @@ std::string cpp_conv::Factory::GetDescription() const
     return std::format("Producing {}", pRecipe->GetName());
 }
 
-bool cpp_conv::Factory::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel)
+bool cpp_conv::Factory::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel, int iSourceLane)
 {
     if (pSourceEntity.m_eEntityKind != EntityKind::Inserter)
     {

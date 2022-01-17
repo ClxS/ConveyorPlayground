@@ -24,7 +24,7 @@ namespace cpp_conv
         virtual void Tick(const SceneContext& kContext) = 0;
         virtual void Draw(RenderContext& kContext) const = 0;
         virtual bool SupportsInsertion() const { return false; }
-        virtual bool TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel) { return false; }
+        virtual bool TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel = 0, int iSourceSlot = 0) { return false; }
 
         virtual bool SupportsProvidingItem() const { return false; }
         virtual bool TryGrab(const SceneContext& kContext, bool bSingle, std::tuple<ItemId, uint32_t>& outItem) { return false; }

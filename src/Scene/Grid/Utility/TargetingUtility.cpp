@@ -109,7 +109,7 @@ cpp_conv::Conveyor::Channel* cpp_conv::targeting_util::GetTargetChannel(const cp
     return nullptr;
 }
 
-int cpp_conv::targeting_util::GetChannelTargetSlot(const cpp_conv::WorldMap& map, const cpp_conv::Entity& sourceNode, cpp_conv::Conveyor& targetNode, int iSourceChannel)
+int cpp_conv::targeting_util::GetChannelTargetSlot(const cpp_conv::WorldMap& map, const cpp_conv::Entity& sourceNode, const cpp_conv::Conveyor& targetNode, int iSourceChannel)
 {
     Direction eSourceDirection = sourceNode.GetDirection();
     if (eSourceDirection == targetNode.m_direction)
@@ -140,7 +140,7 @@ int cpp_conv::targeting_util::GetChannelTargetSlot(const cpp_conv::WorldMap& map
     return result;
 }
 
-Vector2F cpp_conv::targeting_util::GetRenderPosition(const cpp_conv::WorldMap& map, const cpp_conv::Conveyor& conveyor, ConveyorSlot slot)
+Vector2F cpp_conv::targeting_util::GetRenderPosition(const cpp_conv::WorldMap& map, const cpp_conv::Conveyor& conveyor, ConveyorSlot slot, bool bAnimate, float fLerpFactor, Vector2F previousPosition)
 {
     // This method translates the current direction in Right-facing space, determines the offsets, then rotates the offsets back to their original
     // direction-facing space.
@@ -165,14 +165,14 @@ Vector2F cpp_conv::targeting_util::GetRenderPosition(const cpp_conv::WorldMap& m
             {
                 switch (slot.m_Channel)
                 {
-                case 0: position = { 1.0f, 2.0f }; break;
-                case 1: position = { 1.0f, 1.0f }; break;
-                case 2: position = { 2.0f, 1.0f }; break;
+                    case 0: position = { 1.0f, 2.0f }; break;
+                    case 1: position = { 1.2f, 1.2f }; break;
+                    case 2: position = { 2.0f, 1.0f }; break;
                 }
             }
             else
             {
-                position = { 1.0f, 1.0f };
+                position = { 2.0f, 2.0f };
             }
         }
         else
@@ -185,9 +185,9 @@ Vector2F cpp_conv::targeting_util::GetRenderPosition(const cpp_conv::WorldMap& m
             {
                 switch (slot.m_Channel)
                 {
-                case 0: position = { 1.0f, 1.0f }; break;
-                case 1: position = { 1.0f, 2.0f }; break;
-                case 2: position = { 2.0f, 2.0f }; break;
+                    case 0: position = { 1.0f, 1.0f }; break;
+                    case 1: position = { 1.2f, 1.8f }; break;
+                    case 2: position = { 2.0f, 2.0f }; break;
                 }
             }
         }
@@ -197,12 +197,19 @@ Vector2F cpp_conv::targeting_util::GetRenderPosition(const cpp_conv::WorldMap& m
         position = { 1.0f + slot.m_Channel, 1.0f + slot.m_Lane };        
     }
 
+
     constexpr float c_fBlockSize = 4;
     Vector2F blockSize(c_fBlockSize, c_fBlockSize);
     Rotation backToOrigin = (Rotation)((4 - stepsRequired) % 4);
     position = position.Rotate(backToOrigin, blockSize);
 
     Vector2F offset = position * 0.5f * c_fBlockSize - Vector2F(1.0f, 1.0f) - (cpp_conv::renderer::c_gridScale / c_fBlockSize);
-    return (Vector2F((float)conveyor.m_position.GetX(), (float)conveyor.m_position.GetY()) * blockSize) + offset;
 
+    Vector2F end = (Vector2F((float)conveyor.m_position.GetX(), (float)conveyor.m_position.GetY()) * blockSize) + offset;
+    if (!bAnimate)
+    {
+        return end;
+    }
+
+    return previousPosition + ((end - previousPosition) * fLerpFactor);
 }

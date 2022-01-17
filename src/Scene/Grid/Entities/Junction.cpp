@@ -101,7 +101,7 @@ void cpp_conv::Junction::Draw(RenderContext& kRenderContext) const
         { 0xFFFF00FF });
 }
 
-bool cpp_conv::Junction::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel)
+bool cpp_conv::Junction::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel, int iSourceLane)
 {
     if (!m_pItem.IsEmpty())
     {

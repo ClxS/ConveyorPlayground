@@ -35,7 +35,7 @@ void cpp_conv::Storage::Draw(RenderContext& kRenderContext) const
         { 0xFFFFFF00 });
 }
 
-bool cpp_conv::Storage::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel)
+bool cpp_conv::Storage::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel, int iSourceLane)
 {
     return m_itemContainer.TryInsert(pItem);
 }
