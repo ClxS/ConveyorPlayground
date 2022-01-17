@@ -1,18 +1,11 @@
 #pragma once
 #include "Enums.h"
+#include "Rotation.h"
 
 namespace cpp_conv
 {
 	struct Transform2D
 	{
-		enum class Rotation
-		{
-			DegZero	= 0,
-			Deg90   = 1,
-			Deg180  = 2,
-			Deg270  = 3,
-		};
-
 		Transform2D()
 			: m_x(0.0f)
 			, m_y(0.0f)
@@ -44,20 +37,20 @@ namespace cpp_conv
 		Rotation m_rotation;
 	};
 
-	inline Transform2D::Rotation rotationFromDirection(Direction direction)
+	inline Rotation rotationFromDirection(Direction direction)
 	{
 		// This engine uses right-based assets. Up/Down are inverted as we use a top major positioning system
 		switch (direction)
 		{
 		default:
 		case Direction::Right:
-			return cpp_conv::Transform2D::Rotation::DegZero;
+			return Rotation::DegZero;
 		case Direction::Up:
-			return cpp_conv::Transform2D::Rotation::Deg90;
+			return Rotation::Deg90;
 		case Direction::Left:
-			return cpp_conv::Transform2D::Rotation::Deg180;
+			return Rotation::Deg180;
 		case Direction::Down:
-			return cpp_conv::Transform2D::Rotation::Deg270;
+			return Rotation::Deg270;
 		}
 	}
 }

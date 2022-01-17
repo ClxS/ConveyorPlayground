@@ -44,16 +44,16 @@ void tileRenderer(
         float angle = 0.0f;
         switch (kTransform.m_rotation)
         {
-        case cpp_conv::Transform2D::Rotation::DegZero:
+        case Rotation::DegZero:
             angle = 0.0f;
             break;
-        case cpp_conv::Transform2D::Rotation::Deg90:
+        case Rotation::Deg90:
             angle = 90.0f;
             break;
-        case cpp_conv::Transform2D::Rotation::Deg180:
+        case Rotation::Deg180:
             angle = 180.0f;
             break;
-        case cpp_conv::Transform2D::Rotation::Deg270:
+        case Rotation::Deg270:
             angle = 270.0f;
             break;
         default:

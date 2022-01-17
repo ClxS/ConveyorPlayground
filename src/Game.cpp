@@ -37,8 +37,8 @@ namespace
     {
         constexpr int c_iPadding = 3 * cpp_conv::renderer::c_gridScale;
         constexpr int c_iPlayerSize = cpp_conv::renderer::c_gridScale;
-        int playerX = kContext.m_player.m_x * cpp_conv::renderer::c_gridScale;
-        int playerY = kContext.m_player.m_y * cpp_conv::renderer::c_gridScale;
+        int playerX = kContext.m_player.GetX() * cpp_conv::renderer::c_gridScale;
+        int playerY = kContext.m_player.GetY() * cpp_conv::renderer::c_gridScale;
 
         if (playerX < kRenderContext.m_cameraQuad.GetLeft() + c_iPadding)
         {
@@ -122,7 +122,7 @@ void updateUI(cpp_conv::SceneContext& kSceneContext, cpp_conv::RenderContext& kR
             }
         ui::endPanel();
         ui::panel("Footer", ui::Align::Bottom, 0, 3_Lines, false);
-            ui::text(std::format("Current Pos: {}, {}. Floor: {}", kSceneContext.m_player.m_x, kSceneContext.m_player.m_y, kSceneContext.m_player.m_depth));
+            ui::text(std::format("Current Pos: {}, {}. Floor: {}", kSceneContext.m_player.GetX(), kSceneContext.m_player.GetY(), kSceneContext.m_player.GetZ()));
             auto playerEntity = kSceneContext.m_rMap.GetEntity(kSceneContext.m_player);
             if (playerEntity)
             {
@@ -160,7 +160,7 @@ void cpp_conv::game::run()
     std::vector<cpp_conv::Sequence> sequences = cpp_conv::InitializeSequences(worldMap, worldMap.GetConveyors());
     cpp_conv::SceneContext kSceneContext =
     { 
-        { 0, 0 },
+        {},
         worldMap,
         sequences,
         { std::chrono::high_resolution_clock::now() },

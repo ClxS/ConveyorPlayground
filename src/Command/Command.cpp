@@ -12,7 +12,7 @@ constexpr auto debounceTime = std::chrono::milliseconds(250);
 
 void tryUpdatePlayer(cpp_conv::SceneContext& kContext, Vector3 newPosition)
 {
-    if (newPosition.m_depth < 0 || newPosition.m_depth >= cpp_conv::WorldMap::c_uiMaximumLevel)
+    if (newPosition.GetZ() < 0 || newPosition.GetZ() >= cpp_conv::WorldMap::c_uiMaximumLevel)
     {
         return;
     }
@@ -39,7 +39,7 @@ void tryPlaceEntity(cpp_conv::SceneContext& kContext, EntityKind eKind, Directio
     }
     case EntityKind::Stairs:
     {
-        Vector3 position = { kContext.m_player.m_x, kContext.m_player.m_y, bModifier ? kContext.m_player.m_depth : (kContext.m_player.m_depth - 1) };
+        Vector3 position = { kContext.m_player.GetX(), kContext.m_player.GetY(), bModifier ? kContext.m_player.GetZ() : (kContext.m_player.GetZ() - 1)};
         cpp_conv::Stairs* pStairs = new cpp_conv::Stairs(position, { 1, 1, 2 }, eDirection, bModifier);
         if (!kContext.m_rMap.PlaceEntity(position, pStairs))
         {
@@ -67,22 +67,22 @@ void cpp_conv::command::processCommands(SceneContext& kContext, RenderContext& k
         switch (command)
         {
         case cpp_conv::commands::CommandType::MoveUp:
-            tryUpdatePlayer(kContext, { kContext.m_player.m_x, kContext.m_player.m_y + 1, kContext.m_player.m_depth });
+            tryUpdatePlayer(kContext, { kContext.m_player.GetX(), kContext.m_player.GetY() + 1, kContext.m_player.GetZ() });
             break;
         case cpp_conv::commands::CommandType::MoveDown:
-            tryUpdatePlayer(kContext, { kContext.m_player.m_x, kContext.m_player.m_y - 1, kContext.m_player.m_depth });
+            tryUpdatePlayer(kContext, { kContext.m_player.GetX(), kContext.m_player.GetY() - 1, kContext.m_player.GetZ() });
             break;
         case cpp_conv::commands::CommandType::MoveLeft:
-            tryUpdatePlayer(kContext, { kContext.m_player.m_x - 1, kContext.m_player.m_y, kContext.m_player.m_depth });
+            tryUpdatePlayer(kContext, { kContext.m_player.GetX() - 1, kContext.m_player.GetY(), kContext.m_player.GetZ() });
             break;
         case cpp_conv::commands::CommandType::MoveRight:
-            tryUpdatePlayer(kContext, { kContext.m_player.m_x + 1, kContext.m_player.m_y, kContext.m_player.m_depth });
+            tryUpdatePlayer(kContext, { kContext.m_player.GetX() + 1, kContext.m_player.GetY(), kContext.m_player.GetZ() });
             break;
         case cpp_conv::commands::CommandType::MoveFloorDown:
-            tryUpdatePlayer(kContext, { kContext.m_player.m_x, kContext.m_player.m_y, kContext.m_player.m_depth - 1 });
+            tryUpdatePlayer(kContext, { kContext.m_player.GetX(), kContext.m_player.GetY(), kContext.m_player.GetZ() - 1 });
             break;
         case cpp_conv::commands::CommandType::MoveFloorUp:
-            tryUpdatePlayer(kContext, { kContext.m_player.m_x, kContext.m_player.m_y, kContext.m_player.m_depth + 1 });
+            tryUpdatePlayer(kContext, { kContext.m_player.GetX(), kContext.m_player.GetY(), kContext.m_player.GetZ() + 1 });
             break;        
        /* case cpp_conv::commands::CommandType::PlaceStairsDown:
             tryPlaceEntity(kContext, EntityKind::Stairs, Direction::Right, false);

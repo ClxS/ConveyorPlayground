@@ -94,9 +94,9 @@ void cpp_conv::Junction::Draw(RenderContext& kRenderContext) const
         kRenderContext,
         pTile.get(),
         {
-            (float)m_position.m_x * cpp_conv::renderer::c_gridScale,
-            (float)m_position.m_y * cpp_conv::renderer::c_gridScale,
-            cpp_conv::Transform2D::Rotation::DegZero
+            (float)m_position.GetX() * cpp_conv::renderer::c_gridScale,
+            (float)m_position.GetY() * cpp_conv::renderer::c_gridScale,
+            Rotation::DegZero
         },
         { 0xFFFF00FF });
 }

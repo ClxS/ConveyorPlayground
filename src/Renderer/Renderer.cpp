@@ -56,9 +56,9 @@ void drawPlayer(const cpp_conv::SceneContext& kSceneContext, cpp_conv::RenderCon
         kRenderContext,
         pTile.get(),
         {
-            (float)kSceneContext.m_player.m_x * cpp_conv::renderer::c_gridScale,
-            (float)kSceneContext.m_player.m_y * cpp_conv::renderer::c_gridScale,
-            cpp_conv::Transform2D::Rotation::DegZero
+            (float)kSceneContext.m_player.GetX() * cpp_conv::renderer::c_gridScale,
+            (float)kSceneContext.m_player.GetY() * cpp_conv::renderer::c_gridScale,
+            Rotation::DegZero
         },
         { 0xFFFFFFFF });
 }
@@ -77,15 +77,15 @@ void cpp_conv::renderer::render(const SceneContext& kSceneContext, RenderContext
         uiPassCount = std::max(uiPassCount, pEntity->GetDrawPassCount());
     }
 
-    kContext.m_iCurrentLayer = kSceneContext.m_player.m_depth;
+    kContext.m_iCurrentLayer = kSceneContext.m_player.GetZ();
     for (uint32_t uiPass = 0; uiPass < uiPassCount; uiPass++)
     {
         kContext.m_uiCurrentDrawPass = uiPass;
         for (auto pEntity : kSceneContext.m_rMap.GetConveyors())
         {
             if (pEntity->GetDrawPassCount() < (uiPass + 1) ||
-                (pEntity->m_position.m_depth + pEntity->m_size.m_depth - 1) < kSceneContext.m_player.m_depth
-                || pEntity->m_position.m_depth > kSceneContext.m_player.m_depth)
+                (pEntity->m_position.GetZ() + pEntity->m_size.GetZ() - 1) < kSceneContext.m_player.GetZ()
+                || pEntity->m_position.GetZ() > kSceneContext.m_player.GetZ())
             {
                 continue;
             }
@@ -96,8 +96,8 @@ void cpp_conv::renderer::render(const SceneContext& kSceneContext, RenderContext
         for (auto pEntity : kSceneContext.m_rMap.GetOtherEntities())
         {
             if (pEntity->GetDrawPassCount() < (uiPass + 1) ||
-                (pEntity->m_position.m_depth + pEntity->m_size.m_depth - 1) < kSceneContext.m_player.m_depth
-                || pEntity->m_position.m_depth > kSceneContext.m_player.m_depth)
+                (pEntity->m_position.GetZ() + pEntity->m_size.GetZ() - 1) < kSceneContext.m_player.GetZ()
+                || pEntity->m_position.GetZ() > kSceneContext.m_player.GetZ())
             {
                 continue;
             }
@@ -145,9 +145,9 @@ void cpp_conv::renderer::drawBackground(const SceneContext& kSceneContext, Rende
         kContext,
         pTile.get(),
         {
-            (float)kSceneContext.m_player.m_x * cpp_conv::renderer::c_gridScale,
-            (float)kSceneContext.m_player.m_y * cpp_conv::renderer::c_gridScale,
-            cpp_conv::Transform2D::Rotation::DegZero,
+            (float)kSceneContext.m_player.GetX() * cpp_conv::renderer::c_gridScale,
+            (float)kSceneContext.m_player.GetY() * cpp_conv::renderer::c_gridScale,
+            Rotation::DegZero,
             true
         },
         { 0xFFFFFFFF });

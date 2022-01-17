@@ -160,7 +160,7 @@ void cpp_conv::Underground::Draw(RenderContext& kRenderContext) const
 
     std::tie(iUndergroundLength, undergroundEnd) = GetUndergroundLength(kRenderContext.m_rMap, this, m_direction);
 
-    Transform2D::Rotation eDirection = cpp_conv::rotationFromDirection(m_direction);
+    Rotation eDirection = cpp_conv::rotationFromDirection(m_direction);
     if (iUndergroundLength == -1)
     {
         eDirection = cpp_conv::rotationFromDirection(
@@ -172,8 +172,8 @@ void cpp_conv::Underground::Draw(RenderContext& kRenderContext) const
         kRenderContext,
         pTile.get(),
         {
-            (float)m_position.m_x * cpp_conv::renderer::c_gridScale,
-            (float)m_position.m_y * cpp_conv::renderer::c_gridScale,
+            (float)m_position.GetX() * cpp_conv::renderer::c_gridScale,
+            (float)m_position.GetY() * cpp_conv::renderer::c_gridScale,
             eDirection
         },
         { 0xFF0000FF });

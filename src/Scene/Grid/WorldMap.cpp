@@ -46,12 +46,12 @@ const cpp_conv::Entity* cpp_conv::WorldMap::Cell::GetEntity(CellCoordinate coord
         return nullptr;
     }
 
-    if (!HasFloor(coord.m_Depth))
+    if (!HasFloor(coord.m_depth))
     {
         return nullptr;
     }
 
-    const EntityGrid& rFloor = GetFloor(coord.m_Depth);
+    const EntityGrid& rFloor = GetFloor(coord.m_depth);
     return rFloor[coord.m_CellSlotY][coord.m_CellSlotX].get();
 }
 
@@ -67,12 +67,12 @@ bool cpp_conv::WorldMap::Cell::SetEntity(CellCoordinate coord, Entity* pEntity)
         return false;
     }
 
-    if (!CreateFloor(coord.m_Depth))
+    if (!CreateFloor(coord.m_depth))
     {
         return false;
     }
 
-    EntityGrid& rFloor = GetFloor(coord.m_Depth);
+    EntityGrid& rFloor = GetFloor(coord.m_depth);
     if (rFloor[coord.m_CellSlotY][coord.m_CellSlotX])
     {
         return false;
@@ -85,22 +85,22 @@ bool cpp_conv::WorldMap::Cell::SetEntity(CellCoordinate coord, Entity* pEntity)
 cpp_conv::WorldMap::CellCoordinate cpp_conv::WorldMap::ToCellSpace(Vector3 position)
 {
     constexpr int32_t worldToGridSpaceValue = (c_uiMaximumMapSize / 2) * c_uiCellSize;
-    constexpr Vector3 worldToGridSpaceTransform = { worldToGridSpaceValue, worldToGridSpaceValue, 0 };
+    Vector3 worldToGridSpaceTransform = { worldToGridSpaceValue, worldToGridSpaceValue, 0 };
     position += worldToGridSpaceTransform;
 
     constexpr int32_t axisSize = c_uiMaximumMapSize * c_uiCellSize;
-    if (position.m_x < 0 || position.m_y < 0 || position.m_x >= axisSize || position.m_y >= axisSize)
+    if (position.GetX() < 0 || position.GetY() < 0 || position.GetX() >= axisSize || position.GetY() >= axisSize)
     {
         return { -1, -1, -1, -1 };
     }
 
-    int32_t iHorizontalCell = position.m_x / c_uiCellSize;
-    int32_t iHorizontalSlot = position.m_x % c_uiCellSize;
+    int32_t iHorizontalCell = position.GetX() / c_uiCellSize;
+    int32_t iHorizontalSlot = position.GetX() % c_uiCellSize;
 
-    int32_t iVerticalCell = position.m_y / c_uiCellSize;
-    int32_t iVerticalSlot = position.m_y % c_uiCellSize;
+    int32_t iVerticalCell = position.GetY() / c_uiCellSize;
+    int32_t iVerticalSlot = position.GetY() % c_uiCellSize;
 
-    return { iHorizontalCell, iVerticalCell, iHorizontalSlot, iVerticalSlot, position.m_depth };
+    return { iHorizontalCell, iVerticalCell, iHorizontalSlot, iVerticalSlot, position.GetZ() };
 }
 
 const cpp_conv::Entity* cpp_conv::WorldMap::GetEntity(Vector3 position) const
@@ -162,11 +162,11 @@ bool cpp_conv::WorldMap::PlaceEntity(Vector3 position, Entity* pEntity)
         return false;
     }
 
-    for (int32_t iXPosition = position.m_x; iXPosition < (position.m_x + pEntity->m_size.m_x); ++iXPosition)
+    for (int32_t iXPosition = position.GetX(); iXPosition < (position.GetX() + pEntity->m_size.GetX()); ++iXPosition)
     {
-        for (int32_t iYPosition = position.m_y; iYPosition < (position.m_y + pEntity->m_size.m_y); ++iYPosition)
+        for (int32_t iYPosition = position.GetY(); iYPosition < (position.GetY() + pEntity->m_size.GetY()); ++iYPosition)
         {
-            for (int32_t iDepthPosition = position.m_depth; iDepthPosition < (position.m_depth + pEntity->m_size.m_depth); ++iDepthPosition)
+            for (int32_t iDepthPosition = position.GetZ(); iDepthPosition < (position.GetZ() + pEntity->m_size.GetZ()); ++iDepthPosition)
             {
                 CellCoordinate coord = ToCellSpace({ iXPosition, iYPosition, iDepthPosition });
                 assert(!coord.IsInvalid());
@@ -193,11 +193,11 @@ bool cpp_conv::WorldMap::PlaceEntity(Vector3 position, Entity* pEntity)
 
 bool cpp_conv::WorldMap::ValidateCanPlaceEntity(Vector3 position, Entity* pEntity) const
 {
-    for (int32_t iXPosition = position.m_x; iXPosition < (position.m_x + pEntity->m_size.m_x); ++iXPosition)
+    for (int32_t iXPosition = position.GetX(); iXPosition < (position.GetX() + pEntity->m_size.GetX()); ++iXPosition)
     {
-        for (int32_t iYPosition = position.m_y; iYPosition < (position.m_y + pEntity->m_size.m_y); ++iYPosition)
+        for (int32_t iYPosition = position.GetY(); iYPosition < (position.GetY() + pEntity->m_size.GetY()); ++iYPosition)
         {
-            for (int32_t iDepthPosition = position.m_depth; iDepthPosition < (position.m_depth + pEntity->m_size.m_depth); ++iDepthPosition)
+            for (int32_t iDepthPosition = position.GetZ(); iDepthPosition < (position.GetZ() + pEntity->m_size.GetZ()); ++iDepthPosition)
             {
                 Vector3 checkPosition = { iXPosition, iYPosition, iDepthPosition };
                 CellCoordinate coord = ToCellSpace(checkPosition);

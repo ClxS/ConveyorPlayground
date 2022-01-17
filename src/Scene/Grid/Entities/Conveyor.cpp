@@ -32,6 +32,7 @@ cpp_conv::Colour GetColourFromId(int id)
 
 void DrawConveyorItem(
     cpp_conv::RenderContext& kContext,
+    const cpp_conv::Conveyor& rConveyor,
     cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> pTile,
     int x,
     int y,
@@ -50,85 +51,10 @@ void DrawConveyorItem(
     {
         return;
     }
+     
+    Vector2F position = cpp_conv::targeting_util::GetRenderPosition(kContext.m_rMap, rConveyor, { iChannelIdx, iChannelSlot });
 
-    int xOffset = 0;
-    int yOffset = 0;
-
-    // TODO[CJones] Normalize this
-    if (bIsCorner)
-    {
-        if (bIsInnerMostChannel)
-        {
-            switch (direction)
-            {
-            case Direction::Left:
-                xOffset = cpp_conv::c_conveyorChannelSlots - iChannelSlot - 1;
-                yOffset = cpp_conv::c_conveyorChannels - iChannelIdx;
-                break;
-            case Direction::Up:
-                xOffset = cpp_conv::c_conveyorChannels - iChannelIdx;
-                yOffset = 1 + iChannelSlot + 1;
-                break;
-            case Direction::Right:
-                xOffset = 1 + iChannelSlot + 1;
-                yOffset = 1 + iChannelIdx;
-                break;
-            case Direction::Down:
-                xOffset = 1 + iChannelIdx;
-                yOffset = cpp_conv::c_conveyorChannelSlots - iChannelSlot - 1;
-                break;
-            }
-        }
-        else
-        {
-            switch (direction)
-            {
-            case Direction::Left:
-                xOffset = cpp_conv::c_conveyorChannelSlots - iChannelSlot + (iChannelSlot > 0 ? 1 : 0);;
-                yOffset = cpp_conv::c_conveyorChannels - iChannelIdx + (iChannelSlot == 0 ? (cornerSourceDirection == Direction::Up ? -1 : 1) : 0);
-                break;
-            case Direction::Right:
-                xOffset = 1 + iChannelSlot + (iChannelSlot > 0 ? -1 : 0);
-                yOffset = 1 + iChannelIdx + (iChannelSlot == 0 ? (cornerSourceDirection == Direction::Up ? -1 : 1) : 0);
-                break;
-            case Direction::Up:
-                xOffset = cpp_conv::c_conveyorChannels - iChannelIdx + (iChannelSlot == 0 ? (cornerSourceDirection == Direction::Left ? 1 : -1) : 0);
-                yOffset = 1 + iChannelSlot + (iChannelSlot > 0 ? -1 : 0);
-                break;
-            case Direction::Down:
-                xOffset = 1 + iChannelIdx + (iChannelSlot == 0 ? (cornerSourceDirection == Direction::Left ? 1 : -1) : 0);
-                yOffset = cpp_conv::c_conveyorChannelSlots - iChannelSlot + (iChannelSlot > 0 ? 1 : 0);;
-                break;
-            }
-        }
-    }
-    else
-    {
-        switch (direction)
-        {
-        case Direction::Left:
-            xOffset = cpp_conv::c_conveyorChannelSlots - iChannelSlot;
-            yOffset = cpp_conv::c_conveyorChannels - iChannelIdx;
-            break;
-        case Direction::Up:
-            xOffset = cpp_conv::c_conveyorChannels - iChannelIdx;
-            yOffset = 1 + iChannelSlot;
-            break;
-        case Direction::Right:
-            xOffset = 1 + iChannelSlot;
-            yOffset = 1 + iChannelIdx;
-            break;
-        case Direction::Down:
-            xOffset = 1 + iChannelIdx;
-            yOffset = cpp_conv::c_conveyorChannelSlots - iChannelSlot;
-            break;
-        }
-    }
-
-    x += cpp_conv::renderer::c_gridScale * ((xOffset - 1) * 0.5f);
-    y += cpp_conv::renderer::c_gridScale * ((yOffset - 1) * 0.5f);
-
-    cpp_conv::renderer::renderAsset(kContext, pTile.get(), { (float)x, (float)y }, { colour.m_value | 0xFF000000 });
+    cpp_conv::renderer::renderAsset(kContext, pTile.get(), { position.GetX(), position.GetY() }, { colour.m_value | 0xFF000000 });
 }
 
 void DrawConveyor(
@@ -223,8 +149,8 @@ void cpp_conv::Conveyor::Draw(RenderContext& kContext) const
     PROFILE_FUNC();
     Colour colour = GetColourFromId(m_pSequenceId);
 
-    int conveyorX = m_position.m_x * 4;
-    int conveyorY = m_position.m_y * 4;
+    int conveyorX = m_position.GetX() * 4;
+    int conveyorY = m_position.GetY() * 4;
 
     bool bIsCorner = cpp_conv::targeting_util::IsCornerConveyor(kContext.m_rMap, *this);
 
@@ -266,6 +192,7 @@ void cpp_conv::Conveyor::Draw(RenderContext& kContext) const
                     {
                         DrawConveyorItem(
                             kContext,
+                            *this,
                             pItem->GetTile(),
                             conveyorX,
                             conveyorY,

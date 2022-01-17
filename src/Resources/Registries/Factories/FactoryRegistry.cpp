@@ -37,7 +37,7 @@ cpp_conv::resources::ResourceAsset* factoryAssetHandler(cpp_conv::resources::res
 {
     const char* pStrData = reinterpret_cast<const char*>(rData.m_pData);
 
-    std::string copy(pStrData, rData.m_uiSize / sizeof(char));
+    std::string copy(pStrData, (const unsigned int)(rData.m_uiSize / sizeof(char)));
     std::istringstream ss(copy);
 
     std::string id;
@@ -59,7 +59,7 @@ cpp_conv::resources::ResourceAsset* factoryAssetHandler(cpp_conv::resources::res
         case 2:
         { 
             std::istringstream tmp(token);
-            tmp >> size.m_x >> size.m_y >> size.m_depth;
+            tmp >> size;
             break;
         }
         case 3: rate = std::stoi(token); break;
@@ -71,7 +71,7 @@ cpp_conv::resources::ResourceAsset* factoryAssetHandler(cpp_conv::resources::res
             if (hasPipe)
             {
                 bHasOwnOutputPipe = true;
-                tmp >> outputPipe.m_x >> outputPipe.m_y >> outputPipe.m_depth;
+                tmp >> outputPipe;
             }
             else
             {

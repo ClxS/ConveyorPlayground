@@ -139,3 +139,70 @@ int cpp_conv::targeting_util::GetChannelTargetSlot(const cpp_conv::WorldMap& map
 
     return result;
 }
+
+Vector2F cpp_conv::targeting_util::GetRenderPosition(const cpp_conv::WorldMap& map, const cpp_conv::Conveyor& conveyor, ConveyorSlot slot)
+{
+    // This method translates the current direction in Right-facing space, determines the offsets, then rotates the offsets back to their original
+    // direction-facing space.
+
+    Direction eDirection = conveyor.GetDirection();
+    int stepsRequired = 0;
+    while (eDirection != Direction::Right)
+    {
+        eDirection = cpp_conv::direction::Rotate90DegreeClockwise(eDirection);
+        stepsRequired++;
+    }
+
+    bool bIsCorner = cpp_conv::targeting_util::IsCornerConveyor(map, conveyor);
+    bool bIsClockwiseConveyor = cpp_conv::targeting_util::IsClockwiseCorner(map, conveyor);
+
+    Vector2F position;
+    if (bIsCorner)
+    {
+        if (bIsClockwiseConveyor)
+        {
+            if (slot.m_Lane == 0)
+            {
+                switch (slot.m_Channel)
+                {
+                case 0: position = { 1.0f, 2.0f }; break;
+                case 1: position = { 1.0f, 1.0f }; break;
+                case 2: position = { 2.0f, 1.0f }; break;
+                }
+            }
+            else
+            {
+                position = { 1.0f, 1.0f };
+            }
+        }
+        else
+        { 
+            if (slot.m_Lane == 0)
+            {
+                position = { 2.0f, 1.0f };
+            }
+            else
+            {
+                switch (slot.m_Channel)
+                {
+                case 0: position = { 1.0f, 1.0f }; break;
+                case 1: position = { 1.0f, 2.0f }; break;
+                case 2: position = { 2.0f, 2.0f }; break;
+                }
+            }
+        }
+    }
+    else
+    {
+        position = { 1.0f + slot.m_Channel, 1.0f + slot.m_Lane };        
+    }
+
+    constexpr float c_fBlockSize = 4;
+    Vector2F blockSize(c_fBlockSize, c_fBlockSize);
+    Rotation backToOrigin = (Rotation)((4 - stepsRequired) % 4);
+    position = position.Rotate(backToOrigin, blockSize);
+
+    Vector2F offset = position * 0.5f * c_fBlockSize - Vector2F(1.0f, 1.0f) - (cpp_conv::renderer::c_gridScale / c_fBlockSize);
+    return (Vector2F((float)conveyor.m_position.GetX(), (float)conveyor.m_position.GetY()) * blockSize) + offset;
+
+}

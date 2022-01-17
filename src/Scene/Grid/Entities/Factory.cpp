@@ -108,8 +108,8 @@ void cpp_conv::Factory::Draw(RenderContext& kRenderContext) const
         kRenderContext,
         pTile.get(),
         {
-            (float)m_position.m_x * cpp_conv::renderer::c_gridScale,
-            (float)m_position.m_y * cpp_conv::renderer::c_gridScale,
+            (float)m_position.GetX() * cpp_conv::renderer::c_gridScale,
+            (float)m_position.GetY() * cpp_conv::renderer::c_gridScale,
             cpp_conv::rotationFromDirection(m_direction)
         },
         { 0xFFFFFF00 });
@@ -202,7 +202,7 @@ void cpp_conv::Factory::RunOutputCycle(const SceneContext& kContext, const cpp_c
         return;
     }
 
-    Vector3 pipe = cpp_conv::direction::RotateVector(m_direction, pFactory->GetOutputPipe(), m_size);
+    Vector3 pipe = { pFactory->GetOutputPipe().GetXY().Rotate(cpp_conv::rotationFromDirection(m_direction), m_size.GetXY()), pFactory->GetOutputPipe().GetZ() };
     pipe += m_position;
 
     cpp_conv::Entity* pEntity = kContext.m_rMap.GetEntity(cpp_conv::grid::GetForwardPosition(pipe, m_direction));

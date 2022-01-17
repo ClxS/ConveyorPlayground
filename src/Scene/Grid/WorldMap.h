@@ -25,7 +25,7 @@ namespace cpp_conv
             int32_t m_CellY;
             int32_t m_CellSlotX;
             int32_t m_CellSlotY;
-            int32_t m_Depth;
+            int32_t m_depth;
 
             bool IsInvalid() const
             {
@@ -34,7 +34,7 @@ namespace cpp_conv
                     m_CellX >= c_uiMaximumMapSize || m_CellY >= c_uiMaximumMapSize ||
                     m_CellSlotX < 0 || m_CellSlotY < 0 ||
                     m_CellSlotX >= c_uiCellSize || m_CellSlotY >= c_uiCellSize ||
-                    m_Depth < 0 || m_Depth >= c_uiMaximumLevel;
+                    m_depth < 0 || m_depth >= c_uiMaximumLevel;
             }
         };
 
