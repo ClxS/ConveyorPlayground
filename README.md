@@ -18,7 +18,7 @@ Currently I only target Windows. More platforms might come at some point.
 
 These images show how the project evolved over time.
 
-## Transit Smmothing
+## Transit Smoothing
 ![SmootheAnim](https://user-images.githubusercontent.com/15245663/149839578-2708252b-d873-45b9-9942-28b5c6c9ea16.gif)
 
 ## Move to SDL
