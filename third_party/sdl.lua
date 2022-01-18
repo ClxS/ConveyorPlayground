@@ -32,11 +32,13 @@ project "SDL"
 			"SDL/src/thread/generic/*",
 			"SDL/src/video/yuv2rgb/*",
 			"SDL/src/video/dummy/*",
-		}
-
+		}		
 		removefiles {
 			"**winrt.h",
 			"**winrt.cpp",
+		}
+		defines {
+			'HAVE_LIBC',
 		}
 		flags { "MultiProcessorCompile" }
 	filter {}
