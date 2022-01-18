@@ -124,11 +124,7 @@ void cpp_conv::WorldMap::Consume(cpp_conv::resources::AssetPtr<cpp_conv::resourc
 {
     for (Conveyor* pConveyor : map->GetConveyors())
     {
-        if (PlaceEntity(pConveyor->m_position, pConveyor))
-        {
-            m_vConveyors.push_back(pConveyor);
-        }
-        else
+        if (!PlaceEntity(pConveyor->m_position, pConveyor))
         {
             delete pConveyor;
         }
@@ -136,11 +132,7 @@ void cpp_conv::WorldMap::Consume(cpp_conv::resources::AssetPtr<cpp_conv::resourc
      
     for (Entity* pEntity : map->GetOtherEntities())
     {
-        if (PlaceEntity(pEntity->m_position, pEntity))
-        {
-            m_vOtherEntities.push_back(pEntity);
-        }
-        else
+        if (!PlaceEntity(pEntity->m_position, pEntity))
         {
             delete pEntity;
         }

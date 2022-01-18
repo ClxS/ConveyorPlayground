@@ -91,7 +91,7 @@ void cpp_conv::renderer::render(const SceneContext& kSceneContext, RenderContext
             }
 
             pEntity->Draw(kContext);
-        } 
+        }
 
         for (auto pEntity : kSceneContext.m_rMap.GetOtherEntities())
         {

@@ -1,5 +1,5 @@
-     >>>>v
-AAA  ^v<<v
-AAA>>^>S^v
-AAA  >>>^v
-     ^<<<<
+  >
+ AAA
+^AAAv
+ AAAv
+ < v

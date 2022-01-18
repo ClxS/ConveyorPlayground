@@ -36,6 +36,9 @@ namespace cpp_conv
         const char* GetName() const override { return "Factory"; }
         std::string GetDescription() const override;
 
+        bool HasOutputPipe() const { return m_bHasOutputPipe; }
+        Vector3 GetOutputPipe() const { return m_OutputPipe; }
+
     private:
         bool ProduceItems();
         void RunProductionCycle(const cpp_conv::FactoryDefinition* pFactory);
@@ -51,6 +54,9 @@ namespace cpp_conv
 
         uint64_t m_uiRemainingCurrentProductionEffort;
         uint64_t m_uiTick;
+
+        Vector3 m_OutputPipe;
+        bool m_bHasOutputPipe;
 
         bool m_bIsRecipeDemandSatisfied;
     };

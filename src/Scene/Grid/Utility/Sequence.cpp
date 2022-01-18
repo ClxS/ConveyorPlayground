@@ -118,13 +118,13 @@ const Conveyor* cpp_conv::TraceTailConveyor(const cpp_conv::WorldMap& map, const
 
     while (true)
     {
-        const Conveyor* pTargetConveyor = cpp_conv::targeting_util::FindNextTailConveyor(map, *pCurrentConveyor);
-        if (!pTargetConveyor || pTargetConveyor == &searchStart || pTargetConveyor == &head)
+        const Entity* pTargetConveyor = cpp_conv::targeting_util::FindNextTailConveyor(map, *pCurrentConveyor);
+        if (!pTargetConveyor || pTargetConveyor->m_eEntityKind != EntityKind::Conveyor || pTargetConveyor == &searchStart || pTargetConveyor == &head)
         {
             break;
         }
 
-        pCurrentConveyor = pTargetConveyor;
+        pCurrentConveyor = reinterpret_cast<const Conveyor*>(pTargetConveyor);
     }
 
     return pCurrentConveyor;
@@ -205,21 +205,21 @@ bool cpp_conv::IsCircular(const cpp_conv::WorldMap& map, std::vector<Sequence>& 
 std::tuple<int, Direction> cpp_conv::GetInnerMostCornerChannel(const cpp_conv::WorldMap& map, const Conveyor& rConveyor)
 {
     PROFILE_FUNC();
-    const Conveyor* pBackConverter = cpp_conv::targeting_util::FindNextTailConveyor(map, rConveyor);
-    if (pBackConverter == nullptr || pBackConverter->m_direction == rConveyor.m_direction)
+    const Entity* pBackConverter = cpp_conv::targeting_util::FindNextTailConveyor(map, rConveyor);
+    if (pBackConverter == nullptr || pBackConverter->GetDirection() == rConveyor.m_direction)
     {
         return std::make_tuple(-1, Direction::Up);
     }
-
+     
     Direction selfDirection = rConveyor.m_direction;
-    Direction backDirection = pBackConverter->m_direction;
+    Direction backDirection = pBackConverter->GetDirection();
     while (selfDirection != Direction::Up)
     {
         selfDirection = cpp_conv::direction::Rotate90DegreeClockwise(selfDirection);
         backDirection = cpp_conv::direction::Rotate90DegreeClockwise(backDirection);
     }
 
-    return std::make_tuple(backDirection == Direction::Right ? 1 : 0, pBackConverter->m_direction);
+    return std::make_tuple(backDirection == Direction::Right ? 1 : 0, pBackConverter->GetDirection());
 }
 
 void cpp_conv::Sequence::Tick(SceneContext& kContext)

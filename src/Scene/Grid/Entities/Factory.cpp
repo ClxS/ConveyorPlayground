@@ -37,8 +37,10 @@ cpp_conv::Factory::Factory(Vector3 position, Direction direction, FactoryId fact
     {
         return;
     }
-
+     
     m_size = pFactory->GetSize();
+    m_OutputPipe = pFactory->GetOutputPipe();
+    m_bHasOutputPipe = pFactory->HasOwnOutputPipe();
 }
 
 bool cpp_conv::Factory::IsReadyToProduce() const

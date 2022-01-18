@@ -94,7 +94,7 @@ void DrawConveyor(
         }
     }
     else
-    {
+    { 
         if (cpp_conv::targeting_util::IsClockwiseCorner(kContext.m_rMap, rConveyor))
         {
             pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Conveyor_CornerClockwise);

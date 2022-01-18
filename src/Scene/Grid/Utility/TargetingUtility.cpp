@@ -4,8 +4,9 @@
 #include "Conveyor.h"
 #include "EntityGrid.h"
 #include "Direction.h"
+#include "Factory.h"
 
-const cpp_conv::Conveyor* cpp_conv::targeting_util::FindNextTailConveyor(const cpp_conv::WorldMap& map, const cpp_conv::Conveyor& rCurrentConveyor)
+const cpp_conv::Entity* cpp_conv::targeting_util::FindNextTailConveyor(const cpp_conv::WorldMap& map, const cpp_conv::Conveyor& rCurrentConveyor)
 {
     static RelativeDirection directionPriority[] =
     {
@@ -14,23 +15,55 @@ const cpp_conv::Conveyor* cpp_conv::targeting_util::FindNextTailConveyor(const c
         RelativeDirection::Left,
     };
 
-    const cpp_conv::Conveyor* vPotentialNeighbours[4];
-    vPotentialNeighbours[(int)RelativeDirection::Backwards] = map.GetEntity<cpp_conv::Conveyor>(cpp_conv::grid::GetBackwardsPosition(rCurrentConveyor), EntityKind::Conveyor);
-    vPotentialNeighbours[(int)RelativeDirection::Right] = map.GetEntity<cpp_conv::Conveyor>(cpp_conv::grid::GetRightPosition(rCurrentConveyor), EntityKind::Conveyor);
-    vPotentialNeighbours[(int)RelativeDirection::Left] = map.GetEntity<cpp_conv::Conveyor>(cpp_conv::grid::GetLeftPosition(rCurrentConveyor), EntityKind::Conveyor);
+    Vector3 vPositions[4];
+    vPositions[(int)RelativeDirection::Backwards] = cpp_conv::grid::GetBackwardsPosition(rCurrentConveyor);
+    vPositions[(int)RelativeDirection::Right] = cpp_conv::grid::GetRightPosition(rCurrentConveyor);
+    vPositions[(int)RelativeDirection::Left] = cpp_conv::grid::GetLeftPosition(rCurrentConveyor);
 
-    const cpp_conv::Conveyor* pTargetConveyor = nullptr;
+    const cpp_conv::Entity* vPotentialNeighbours[4];
+    vPotentialNeighbours[(int)RelativeDirection::Backwards] = map.GetEntity(vPositions[(int)RelativeDirection::Backwards]);
+    vPotentialNeighbours[(int)RelativeDirection::Right] = map.GetEntity(vPositions[(int)RelativeDirection::Right]);
+    vPotentialNeighbours[(int)RelativeDirection::Left] = map.GetEntity(vPositions[(int)RelativeDirection::Left]);
+     
+    const cpp_conv::Entity* pTargetConveyor = nullptr;
     for (auto direction : directionPriority)
     {
-        const cpp_conv::Conveyor* pDirectionEntity = vPotentialNeighbours[(int)direction];
-        if (pDirectionEntity == nullptr || pDirectionEntity->m_eEntityKind != EntityKind::Conveyor)
+        const cpp_conv::Entity* pDirectionEntity = vPotentialNeighbours[(int)direction];
+        if (pDirectionEntity == nullptr)
         {
             continue;
         }
 
-        if (cpp_conv::grid::GetForwardPosition(*pDirectionEntity) == rCurrentConveyor.m_position)
+        switch (pDirectionEntity->m_eEntityKind)
         {
-            pTargetConveyor = pDirectionEntity;
+            case EntityKind::Stairs:
+            case EntityKind::Underground:
+            case EntityKind::Conveyor:
+                if (cpp_conv::grid::GetForwardPosition(*pDirectionEntity) == rCurrentConveyor.m_position)
+                {
+                    pTargetConveyor = pDirectionEntity;
+                }
+                break;
+            case EntityKind::Junction:
+                pTargetConveyor = pDirectionEntity;
+                break;
+            case EntityKind::Producer:
+            {
+                const Factory* pFactory = reinterpret_cast<const Factory*>(pDirectionEntity);
+                if (pFactory->HasOutputPipe() && vPositions[(int)direction] == pFactory->m_position + pFactory->GetOutputPipe())
+                {
+                    pTargetConveyor = pDirectionEntity;
+                }
+                break;
+            }
+            case EntityKind::MAX:
+                break;
+            default:
+                continue;
+        }
+
+        if (pTargetConveyor)
+        {
             break;
         }
     }
@@ -41,33 +74,51 @@ const cpp_conv::Conveyor* cpp_conv::targeting_util::FindNextTailConveyor(const c
 bool cpp_conv::targeting_util::IsCornerConveyor(const cpp_conv::WorldMap& map, const cpp_conv::Conveyor& rConveyor)
 {
     PROFILE_FUNC();
-    const cpp_conv::Conveyor* pBackConverter = cpp_conv::targeting_util::FindNextTailConveyor(map, rConveyor);
+    const cpp_conv::Entity* pBackConverter = cpp_conv::targeting_util::FindNextTailConveyor(map, rConveyor);
     if (pBackConverter == nullptr)
     {
         return false;
     }
 
-    return pBackConverter->m_direction != rConveyor.m_direction;
-}
+    return pBackConverter->GetDirection() != rConveyor.GetDirection() || pBackConverter->m_eEntityKind == EntityKind::Junction;
+} 
 
 bool cpp_conv::targeting_util::IsClockwiseCorner(const cpp_conv::WorldMap& map, const cpp_conv::Conveyor& rConveyor)
 {
     PROFILE_FUNC();
-    const cpp_conv::Conveyor* pBackConverter = cpp_conv::targeting_util::FindNextTailConveyor(map, rConveyor);
-    if (pBackConverter == nullptr || pBackConverter->m_direction == rConveyor.m_direction)
+    const cpp_conv::Entity* pBackConverter = cpp_conv::targeting_util::FindNextTailConveyor(map, rConveyor);
+    if (pBackConverter == nullptr)
     {
         return false;
     }
 
-    Direction selfDirection = rConveyor.m_direction;
-    Direction backDirection = pBackConverter->m_direction;
-    while (selfDirection != Direction::Up)
+    if (pBackConverter->m_eEntityKind != EntityKind::Junction)
     {
-        selfDirection = cpp_conv::direction::Rotate90DegreeClockwise(selfDirection);
-        backDirection = cpp_conv::direction::Rotate90DegreeClockwise(backDirection);
-    }
+        if (pBackConverter->GetDirection() == rConveyor.m_direction)
+        {
+            return false;
+        }
+        Direction selfDirection = rConveyor.m_direction;
+        Direction backDirection = pBackConverter->GetDirection();
+        while (selfDirection != Direction::Up)
+        {
+            selfDirection = cpp_conv::direction::Rotate90DegreeClockwise(selfDirection);
+            backDirection = cpp_conv::direction::Rotate90DegreeClockwise(backDirection);
+        }
 
-    return backDirection == Direction::Right;
+        return backDirection == Direction::Right;
+    }
+    else
+    {
+        Vector2 offset = { 0, 0 };
+        switch (rConveyor.m_direction)
+        {
+            case Direction::Up: return rConveyor.m_position.GetX() > pBackConverter->m_position.GetX();
+            case Direction::Down:return rConveyor.m_position.GetX() < pBackConverter->m_position.GetX();
+            case Direction::Left:return rConveyor.m_position.GetY() > pBackConverter->m_position.GetY();
+            case Direction::Right:return rConveyor.m_position.GetY() < pBackConverter->m_position.GetY();
+        }
+    }
 }
 
 cpp_conv::Conveyor::Channel* cpp_conv::targeting_util::GetTargetChannel(const cpp_conv::WorldMap& map, const cpp_conv::Entity& sourceNode, cpp_conv::Conveyor& targetNode, int iSourceChannel)
