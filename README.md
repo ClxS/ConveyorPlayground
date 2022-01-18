@@ -1,6 +1,6 @@
 # ConveyorPlayground
 
-Discrete positioning based console driven Factorio-inspired Conveyor System.
+Discrete positioning based ~~console driven~~ Conveyor System.
 
 Basic proof of concept thrown together in a couple of hours. Code is messy and not suitable for use!
 
@@ -17,9 +17,6 @@ Currently I only target Windows. More platforms might come at some point.
 # Screenshots
 
 These images show how the project evolved over time.
-
-## Move to SDL
-![sdl](https://user-images.githubusercontent.com/15245663/149590905-4c6f757f-2685-4a05-b5cb-f84c416cf221.gif)
 
 ## Placement UI
 ![placementui](https://user-images.githubusercontent.com/15245663/149207828-56ef8805-4a4f-43f1-a8de-b9935d307683.gif)
