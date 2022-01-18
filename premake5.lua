@@ -57,7 +57,7 @@ project "CppConveyor"
 		}
 		includedirs {
 			"third_party/SDL/include",
-			"third_party/SDLImage",
+			"third_party/SDL_Image",
 		}
 		links {
 			"SDL",

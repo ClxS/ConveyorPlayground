@@ -8,12 +8,12 @@ project "SDLImage"
 			'LOAD_BMP',
 		}
 		includedirs {
-			"SDLImage",
+			"SDL_Image",
 			"SDL/include",
 		}
 		files {
-			"SDLImage/*.c",
-			"SDLImage/*.h",
+			"SDL_Image/*.c",
+			"SDL_Image/*.h",
 		}
 		flags { "MultiProcessorCompile" }
 	filter {}
