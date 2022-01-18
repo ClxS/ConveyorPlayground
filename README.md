@@ -1,6 +1,6 @@
 # ConveyorPlayground
 
-Discrete positioning based ~~console driven~~ Factorio-inspired Conveyor System.
+Discrete positioning based ~~console driven~~ Conveyor System.
 
 Basic proof of concept thrown together in a couple of hours. Code is messy and not suitable for use!
 
