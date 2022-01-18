@@ -58,10 +58,12 @@ project "CppConveyor"
 		includedirs {
 			"third_party/SDL/include",
 			"third_party/SDL_Image",
+			"third_party/imgui",
 		}
 		links {
 			"SDL",
 			"SDLImage",
+			"imgui",
 		}
 	filter {}
 	includedirs {
@@ -80,3 +82,4 @@ project "CppConveyor"
 
 dofile('third_party/sdl.lua')
 dofile('third_party/sdlimage.lua')
+dofile('third_party/imgui.lua')

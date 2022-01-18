@@ -2,8 +2,6 @@ project "SDLImage"
 	kind "None"
 	filter {"platforms:SDL"}
 		kind "StaticLib"
-		links {
-		}
 		defines {
 			'LOAD_BMP',
 		}
