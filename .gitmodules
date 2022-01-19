@@ -3,13 +3,13 @@
 	url = https://github.com/ClxS/SDL
 [submodule "third_party/SDL_image"]
 	path = third_party/SDL_image
-	url = https://github.com/libsdl-org/SDL_image.git
+	url = https://github.com/ClxS/SDL_image.git
 [submodule "third_party/imgui"]
 	path = third_party/imgui
-	url = https://github.com/ocornut/imgui.git
+	url = https://github.com/ClxS/imgui.git
 [submodule "third_party/zlib"]
 	path = third_party/zlib
-	url = https://github.com/madler/zlib.git
+	url = https://github.com/ClxS/zlib.git
 [submodule "third_party/SDL_mixer"]
 	path = third_party/SDL_mixer
-	url = https://github.com/libsdl-org/SDL_mixer.git
+	url = https://github.com/ClxS/SDL_mixer.git
