@@ -8,6 +8,8 @@
 #include <Windows.h>
 #endif
 
+#define NEEDS_LOCKS 0
+
 namespace
 {
     std::mutex& getStateMutex()
@@ -21,14 +23,19 @@ std::unordered_map<const char*, std::chrono::nanoseconds> nameTimings;
 
 void cpp_conv::profiler::registerTime(const char* szName, std::chrono::nanoseconds duration)
 {
+#if NEEDS_LOCKS
     std::lock_guard<std::mutex> lock(getStateMutex());
+#endif
     nameTimings.try_emplace(szName, 0);
     nameTimings[szName] += duration;
 }
 
 void cpp_conv::profiler::logAndReset(int factor)
 {
+#if NEEDS_LOCKS
     std::lock_guard<std::mutex> lock(getStateMutex());
+#endif
+
     std::chrono::nanoseconds totalDuration = {};
     std::vector<std::pair<const char*, std::chrono::nanoseconds>> sortableTimings;
 

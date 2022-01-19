@@ -296,6 +296,12 @@ void cpp_conv::Conveyor::AssessPosition(const cpp_conv::WorldMap& map)
 
     for (int iLane = 0; iLane < (int)m_pChannels.size(); iLane++)
     {
+        m_pChannels[iLane].m_LaneLength = 2;
+        if (m_bIsCorner)
+        {
+            m_pChannels[iLane].m_LaneLength += GetInnerMostChannel() == iLane ? -1 : 1;
+        }
+
         for (int iSlot = 0; iSlot < (int)m_pChannels[iLane].m_pSlots.size(); iSlot++)
         {
             m_pChannels[iLane].m_pSlots[iSlot].m_VisualPosition = cpp_conv::targeting_util::GetRenderPosition(map, *this, { iLane, iSlot });

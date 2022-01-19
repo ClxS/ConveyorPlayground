@@ -35,6 +35,8 @@ namespace cpp_conv
             Channel(int channelLane); 
 
             const int m_ChannelLane;
+
+            int m_LaneLength;
             std::array<Lane, c_conveyorChannelSlots + 1> m_pSlots;
             std::array<ItemInstance, c_conveyorChannelSlots + 1> m_pPendingItems;
         };

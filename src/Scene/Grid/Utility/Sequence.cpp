@@ -233,14 +233,8 @@ void cpp_conv::Sequence::Tick(SceneContext& kContext)
     {
         cpp_conv::Conveyor* pNode = m_pNodes[i];
         bool bIsCornerConveyor = pNode->IsCorner();
-        for (int iChannelIdx = 0; iChannelIdx < cpp_conv::c_conveyorChannels; iChannelIdx++)
-        { 
-            int iChannelLength = cpp_conv::c_conveyorChannelSlots;
-            if (bIsCornerConveyor)
-            {
-                iChannelLength += pNode->GetInnerMostChannel() == iChannelIdx ? -1 : 1;
-            }
-             
+        for (cpp_conv::Conveyor::Channel& rChannel : pNode->m_pChannels)
+        {             
             cpp_conv::Entity* pForwardEntity = nullptr;
             if (i < m_pNodes.size() - 1)
             {
@@ -251,12 +245,12 @@ void cpp_conv::Sequence::Tick(SceneContext& kContext)
                 pForwardEntity = kContext.m_rMap.GetEntity(cpp_conv::grid::GetForwardPosition(*pNode));
             }
 
-            ItemInstance& frontMostItem = pNode->m_pChannels[iChannelIdx].m_pSlots[iChannelLength - 1].m_Item;
+            ItemInstance& frontMostItem = rChannel.m_pSlots[rChannel.m_LaneLength - 1].m_Item;
             if (!frontMostItem.IsEmpty() && frontMostItem.m_CurrentTick >= frontMostItem.m_TargetTick)
             {
                 if (pNode == GetHeadConveyor())
                 {
-                    if (pForwardEntity && pForwardEntity->SupportsInsertion() && pForwardEntity->TryInsert(kContext, *pNode, frontMostItem.m_Item, iChannelIdx))
+                    if (pForwardEntity && pForwardEntity->SupportsInsertion() && pForwardEntity->TryInsert(kContext, *pNode, frontMostItem.m_Item, rChannel.m_ChannelLane))
                     {
                         frontMostItem = ItemInstance::Empty();
                     }
@@ -264,38 +258,39 @@ void cpp_conv::Sequence::Tick(SceneContext& kContext)
                 else
                 {
                     cpp_conv::Conveyor* pForwardNode = reinterpret_cast<cpp_conv::Conveyor*>(pForwardEntity);
-                    ItemInstance& forwardTargetItem = pForwardNode->m_pChannels[iChannelIdx].m_pSlots[0].m_Item;
-                    ItemInstance& forwardPendingItem = pForwardNode->m_pChannels[iChannelIdx].m_pPendingItems[0];
+                    cpp_conv::Conveyor::Channel& forwardChannel = pForwardNode->m_pChannels[rChannel.m_ChannelLane];
+                    ItemInstance& forwardTargetItem = forwardChannel.m_pSlots[0].m_Item;
+                    ItemInstance& forwardPendingItem = forwardChannel.m_pPendingItems[0];
                     if (forwardTargetItem.IsEmpty() && forwardPendingItem.IsEmpty())
                     {
                         pForwardNode->AddItemToSlot(
                             kContext.m_rMap,
-                            &pForwardNode->m_pChannels[iChannelIdx],
+                            &forwardChannel,
                             0,
                             frontMostItem.m_Item,
                             *pNode,
-                            iChannelIdx,
-                            iChannelLength - 1);
+                            rChannel.m_ChannelLane,
+                            rChannel.m_LaneLength - 1);
                         frontMostItem = ItemInstance::Empty();
                     }
                 }
             }
 
             // Move inner items forwards
-            for (int iChannelSlot = iChannelLength - 2; iChannelSlot >= 0; iChannelSlot--)
+            for (int iChannelSlot = rChannel.m_LaneLength - 2; iChannelSlot >= 0; iChannelSlot--)
             {
-                ItemInstance& currentItem = pNode->m_pChannels[iChannelIdx].m_pSlots[iChannelSlot].m_Item;
+                ItemInstance& currentItem = rChannel.m_pSlots[iChannelSlot].m_Item;
                 if (currentItem.m_CurrentTick < currentItem.m_TargetTick)
                 {
                     continue;
                 }
 
-                ItemInstance& forwardTargetItem = pNode->m_pChannels[iChannelIdx].m_pSlots[iChannelSlot + 1].m_Item;
-                ItemInstance& forwardPendingItem = pNode->m_pChannels[iChannelIdx].m_pSlots[iChannelSlot + 1].m_Item;
+                ItemInstance& forwardTargetItem = rChannel.m_pSlots[iChannelSlot + 1].m_Item;
+                ItemInstance& forwardPendingItem = rChannel.m_pSlots[iChannelSlot + 1].m_Item;
                  
                 if (!currentItem.IsEmpty() && forwardTargetItem.IsEmpty() && forwardPendingItem.IsEmpty())
                 {
-                    pNode->AddItemToSlot(kContext.m_rMap, &pNode->m_pChannels[iChannelIdx], iChannelSlot + 1, currentItem.m_Item, *pNode, iChannelIdx, iChannelSlot);
+                    pNode->AddItemToSlot(kContext.m_rMap, &rChannel, iChannelSlot + 1, currentItem.m_Item, *pNode, rChannel.m_ChannelLane, iChannelSlot);
                     currentItem = ItemInstance::Empty();
                 }
             }
