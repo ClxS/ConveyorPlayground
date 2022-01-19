@@ -11,6 +11,7 @@
 #include <iostream>
 #include "SelfRegistration.h"
 #include "DataId.h"
+#include "Profiler.h"
 
 using RegistryId = cpp_conv::resources::registry::RegistryId;
 std::vector<cpp_conv::resources::AssetPtr<cpp_conv::FactoryDefinition>> g_vFactories;
@@ -99,6 +100,7 @@ cpp_conv::resources::ResourceAsset* factoryAssetHandler(cpp_conv::resources::res
 
 const cpp_conv::resources::AssetPtr<cpp_conv::FactoryDefinition> cpp_conv::resources::getFactoryDefinition(cpp_conv::FactoryId id)
 {
+    PROFILE_FUNC();
     for (auto item : g_vFactories)
     {
         if (item->GetInternalId() == id)

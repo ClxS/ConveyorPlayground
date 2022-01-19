@@ -68,14 +68,16 @@ void cpp_conv::renderer::render(const SceneContext& kSceneContext, RenderContext
     drawBackground(kSceneContext, kContext);
 
     uint32_t uiPassCount = 0;
-    for (auto pEntity : kSceneContext.m_rMap.GetConveyors())
-    {
-        uiPassCount = std::max(uiPassCount, pEntity->GetDrawPassCount());
-    }
-    for (auto pEntity : kSceneContext.m_rMap.GetOtherEntities())
-    {
-        uiPassCount = std::max(uiPassCount, pEntity->GetDrawPassCount());
-    }
+    PROFILE(CountDrawPass,
+        for (auto pEntity : kSceneContext.m_rMap.GetConveyors())
+        {
+            uiPassCount = std::max(uiPassCount, pEntity->GetDrawPassCount());
+        }
+        for (auto pEntity : kSceneContext.m_rMap.GetOtherEntities())
+        {
+            uiPassCount = std::max(uiPassCount, pEntity->GetDrawPassCount());
+        }
+    )
 
     kContext.m_iCurrentLayer = kSceneContext.m_player.GetZ();
     for (uint32_t uiPass = 0; uiPass < uiPassCount; uiPass++)
@@ -134,6 +136,7 @@ void cpp_conv::renderer::registerTypeHandler(const std::type_info& type, std::fu
 
 void cpp_conv::renderer::drawBackground(const SceneContext& kSceneContext, RenderContext& kContext)
 {
+    PROFILE_FUNC();
     auto pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(
         cpp_conv::resources::registry::visual::BackgroundRepeating);
     if (!pTile)

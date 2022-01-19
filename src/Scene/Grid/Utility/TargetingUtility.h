@@ -29,4 +29,11 @@ namespace cpp_conv::targeting_util
         bool bAnimate = false,
         float fLerpFactor = 1.0f,
         Vector2F previousPosition = {});
+
+    Vector2F GetRenderPosition(
+        const cpp_conv::WorldMap& map,
+        const cpp_conv::Conveyor& conveyor,
+        Vector2F renderPosition,
+        float fLerpFactor,
+        Vector2F previousPosition);
 }

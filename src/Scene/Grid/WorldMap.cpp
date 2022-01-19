@@ -180,6 +180,36 @@ bool cpp_conv::WorldMap::PlaceEntity(Vector3 position, Entity* pEntity)
         m_vOtherEntities.push_back(pEntity);
     }
 
+    for (int y = position.GetY() - 1; y <= position.GetY() + pEntity->m_size.GetY(); y++)
+    {
+        for (int x = position.GetX() - 1; x <= position.GetX() + pEntity->m_size.GetX(); x++)
+        {
+            for (int z = position.GetZ() - 1; z <= position.GetZ() + pEntity->m_size.GetZ(); z++)
+            {
+                CellCoordinate coord = ToCellSpace({ x, y, z });
+                if (coord.IsInvalid())
+                {
+                    continue;
+                }
+
+                Cell* pCell = GetOrCreateCell(coord);
+                if (!pCell)
+                {
+                    continue;
+                }
+
+                Entity* pEntity = pCell->GetEntity(coord);
+                if (!pEntity || pEntity->m_eEntityKind != EntityKind::Conveyor)
+                {
+                    continue;
+                }
+
+                Conveyor* pConveyor = reinterpret_cast<Conveyor*>(pEntity);
+                pConveyor->AssessPosition(*this);
+            }
+        }
+    }
+
     return true;
 }
 

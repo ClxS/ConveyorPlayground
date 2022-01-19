@@ -25,7 +25,7 @@ void cpp_conv::FrameLimiter::Start()
 
 void cpp_conv::FrameLimiter::Limit()
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(14));
+    //std::this_thread::sleep_for(std::chrono::milliseconds(14));
     std::this_thread::sleep_until(m_nextFrameTime);
     m_nextFrameTime += m_targetFrameRate;
 } 

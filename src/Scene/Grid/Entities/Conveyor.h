@@ -7,6 +7,8 @@
 #include "Enums.h"
 #include "DataId.h"
 #include "ItemInstance.h"
+#include "AssetPtr.h"
+#include "TileAsset.h"
 
 namespace cpp_conv { class WorldMap; }
 
@@ -22,12 +24,18 @@ namespace cpp_conv
     class Conveyor : public Entity
     {
     public:
+        struct Lane
+        {
+            ItemInstance m_Item;
+            Vector2F m_VisualPosition;
+        };
+
         struct Channel
         {
             Channel(int channelLane); 
 
             const int m_ChannelLane;
-            std::array<ItemInstance, c_conveyorChannelSlots + 1> m_pItems;
+            std::array<Lane, c_conveyorChannelSlots + 1> m_pSlots;
             std::array<ItemInstance, c_conveyorChannelSlots + 1> m_pPendingItems;
         };
 
@@ -54,14 +62,30 @@ namespace cpp_conv
 
         virtual uint32_t GetDrawPassCount() const { return 2; }
 
+        void AssessPosition(const cpp_conv::WorldMap& map);
+
+        bool IsCorner() const { return m_bIsCorner; }
+        bool IsClockwiseCorner() const { return m_bIsClockwise; }
+        bool IsCapped() const { return m_bIsCapped; }
+        int GetInnerMostChannel() const { return m_iInnerMostChannel; }
+        Direction GetCornerDirection() const { return m_eCornerDirection; }
+
+        cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> GetTile() const { return m_pTile; }
+
         static_assert(c_conveyorChannels >= 1, "Conveyors must have at least once channel");
         static_assert(c_conveyorChannelSlots >= 1, "Conveyors channels must have at least once slot");
-
     private:
         friend class Sequence;
 
         uint32_t m_uiCurrentTick = 0;
-        uint32_t m_uiMoveTick = 40;
+        uint32_t m_uiMoveTick = 10;
+
+        bool m_bIsCorner;
+        bool m_bIsClockwise;
+        bool m_bIsCapped;
+        int m_iInnerMostChannel;
+        Direction m_eCornerDirection;
+        cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> m_pTile;
 
         void AddItemToSlot(const cpp_conv::WorldMap& map, Channel* pTargetChannel, int forwardTargetItemSlot, const ItemId pItem, const Entity& pSourceEntity, int iSourceChannel, int iSourceSlot);
     };

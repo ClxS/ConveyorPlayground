@@ -10,6 +10,7 @@
 #include <iostream>
 #include "SelfRegistration.h"
 #include "DataId.h"
+#include "Profiler.h"
 
 using RegistryId = cpp_conv::resources::registry::RegistryId;
 std::vector<cpp_conv::resources::AssetPtr<cpp_conv::RecipeDefinition>> g_vItems;
@@ -82,6 +83,7 @@ namespace
 
 const cpp_conv::resources::AssetPtr<cpp_conv::RecipeDefinition> cpp_conv::resources::getRecipeDefinition(cpp_conv::RecipeId id)
 {
+    PROFILE_FUNC();
     for (auto item : g_vItems)
     {
         if (item->GetInternalId() == id)

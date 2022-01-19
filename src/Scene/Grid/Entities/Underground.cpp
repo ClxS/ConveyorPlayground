@@ -102,7 +102,7 @@ void cpp_conv::Underground::Tick(const SceneContext& kContext)
             int iChannelLength = cpp_conv::c_conveyorChannelSlots;
 
             cpp_conv::Entity* pForwardEntity = bIsHead ? pExitEntity : &m_arrInternalConveyors[i + 1];
-            ItemInstance& frontMostItem = pNode->m_pChannels[iChannelIdx].m_pItems[iChannelLength - 1];
+            ItemInstance& frontMostItem = pNode->m_pChannels[iChannelIdx].m_pSlots[iChannelLength - 1].m_Item;
             if (!frontMostItem.IsEmpty())
             {
                 if (bIsHead)
@@ -115,7 +115,7 @@ void cpp_conv::Underground::Tick(const SceneContext& kContext)
                 else
                 {
                     cpp_conv::Conveyor* pForwardNode = reinterpret_cast<cpp_conv::Conveyor*>(pForwardEntity);
-                    ItemInstance& forwardTargetItem = pForwardNode->m_pChannels[iChannelIdx].m_pItems[0];
+                    ItemInstance& forwardTargetItem = pForwardNode->m_pChannels[iChannelIdx].m_pSlots[0].m_Item;
                     ItemInstance& forwardPendingItem = pForwardNode->m_pChannels[iChannelIdx].m_pPendingItems[0];
                     if (forwardTargetItem.IsEmpty() && forwardPendingItem.IsEmpty())
                     {
@@ -128,9 +128,9 @@ void cpp_conv::Underground::Tick(const SceneContext& kContext)
             // Move inner items forwards
             for (int iChannelSlot = iChannelLength - 2; iChannelSlot >= 0; iChannelSlot--)
             {
-                ItemInstance& currentItem = pNode->m_pChannels[iChannelIdx].m_pItems[iChannelSlot];
-                ItemInstance& forwardTargetItem = pNode->m_pChannels[iChannelIdx].m_pItems[iChannelSlot + 1];
-                ItemInstance& forwardPendingItem = pNode->m_pChannels[iChannelIdx].m_pItems[iChannelSlot + 1];
+                ItemInstance& currentItem = pNode->m_pChannels[iChannelIdx].m_pSlots[iChannelSlot].m_Item;
+                ItemInstance& forwardTargetItem = pNode->m_pChannels[iChannelIdx].m_pSlots[iChannelSlot + 1].m_Item;
+                ItemInstance& forwardPendingItem = pNode->m_pChannels[iChannelIdx].m_pSlots[iChannelSlot + 1].m_Item;
 
                 if (!currentItem.IsEmpty() && forwardTargetItem.IsEmpty() && forwardPendingItem.IsEmpty())
                 {
@@ -182,8 +182,8 @@ void cpp_conv::Underground::Draw(RenderContext& kRenderContext) const
 bool cpp_conv::Underground::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel, int iSourceLane)
 {
     bool bProduced = false;
-    ItemInstance& forwardTargetItem = m_arrInternalConveyors[0].m_pChannels[iSourceChannel].m_pItems[0];
-    ItemInstance& forwardPendingItem = m_arrInternalConveyors[0].m_pChannels[iSourceChannel].m_pItems[0];
+    ItemInstance& forwardTargetItem = m_arrInternalConveyors[0].m_pChannels[iSourceChannel].m_pSlots[0].m_Item;
+    ItemInstance& forwardPendingItem = m_arrInternalConveyors[0].m_pChannels[iSourceChannel].m_pSlots[0].m_Item;
     if (forwardTargetItem.IsEmpty() && forwardPendingItem.IsEmpty())
     {
         forwardPendingItem = { pItem, 0.0f, 0.0f, 0, 0, false };

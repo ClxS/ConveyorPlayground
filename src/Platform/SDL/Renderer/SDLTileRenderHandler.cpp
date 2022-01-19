@@ -8,6 +8,7 @@
 
 #include <SDL.h>
 #include <SDL_render.h>
+#include "Profiler.h"
 
 void tileRenderer(
     cpp_conv::RenderContext& kContext,
@@ -15,6 +16,7 @@ void tileRenderer(
     const cpp_conv::Transform2D& kTransform,
     cpp_conv::Colour kColourOverride)
 {
+    PROFILE_FUNC();
     SDL_Rect dest = {};
     const auto pTile = reinterpret_cast<const cpp_conv::resources::SDLTile2DAsset*>(pAsset);
     SDL_Texture* pTexture = pTile->GetTexture();

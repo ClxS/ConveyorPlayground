@@ -193,6 +193,7 @@ int cpp_conv::targeting_util::GetChannelTargetSlot(const cpp_conv::WorldMap& map
 
 Vector2F cpp_conv::targeting_util::GetRenderPosition(const cpp_conv::WorldMap& map, const cpp_conv::Conveyor& conveyor, ConveyorSlot slot, bool bAnimate, float fLerpFactor, Vector2F previousPosition)
 {
+    PROFILE_FUNC();
     // This method translates the current direction in Right-facing space, determines the offsets, then rotates the offsets back to their original
     // direction-facing space.
 
@@ -263,4 +264,15 @@ Vector2F cpp_conv::targeting_util::GetRenderPosition(const cpp_conv::WorldMap& m
     }
 
     return previousPosition + ((end - previousPosition) * fLerpFactor);
+}
+
+Vector2F cpp_conv::targeting_util::GetRenderPosition(
+    const cpp_conv::WorldMap& map,
+    const cpp_conv::Conveyor& conveyor,
+    Vector2F renderPosition,
+    float fLerpFactor,
+    Vector2F previousPosition)
+{
+    PROFILE_FUNC();  
+    return previousPosition + ((renderPosition - previousPosition) * fLerpFactor);
 }

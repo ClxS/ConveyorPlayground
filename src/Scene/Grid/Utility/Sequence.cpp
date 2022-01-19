@@ -233,21 +233,17 @@ void cpp_conv::Sequence::Tick(SceneContext& kContext)
     std::reverse(sequencePoints.begin(), sequencePoints.end());
     for (cpp_conv::Conveyor* pNode : sequencePoints)
     {
-        bool bIsCornerConveyor = cpp_conv::targeting_util::IsCornerConveyor(kContext.m_rMap, *pNode);
-        int iInnerMostChannel;
-        Direction eCornerDirection;
-        std::tie(iInnerMostChannel, eCornerDirection) = GetInnerMostCornerChannel(kContext.m_rMap, *pNode);
-
+        bool bIsCornerConveyor = pNode->IsCorner();
         for (int iChannelIdx = 0; iChannelIdx < cpp_conv::c_conveyorChannels; iChannelIdx++)
-        {
+        { 
             int iChannelLength = cpp_conv::c_conveyorChannelSlots;
             if (bIsCornerConveyor)
             {
-                iChannelLength += iInnerMostChannel == iChannelIdx ? -1 : 1;
+                iChannelLength += pNode->GetInnerMostChannel() == iChannelIdx ? -1 : 1;
             }
-
+             
             cpp_conv::Entity* pForwardEntity = kContext.m_rMap.GetEntity(cpp_conv::grid::GetForwardPosition(*pNode));
-            ItemInstance& frontMostItem = pNode->m_pChannels[iChannelIdx].m_pItems[iChannelLength - 1];
+            ItemInstance& frontMostItem = pNode->m_pChannels[iChannelIdx].m_pSlots[iChannelLength - 1].m_Item;
             if (!frontMostItem.IsEmpty() && frontMostItem.m_CurrentTick >= frontMostItem.m_TargetTick)
             {
                 if (pNode == GetHeadConveyor())
@@ -260,7 +256,7 @@ void cpp_conv::Sequence::Tick(SceneContext& kContext)
                 else
                 {
                     cpp_conv::Conveyor* pForwardNode = reinterpret_cast<cpp_conv::Conveyor*>(pForwardEntity);
-                    ItemInstance& forwardTargetItem = pForwardNode->m_pChannels[iChannelIdx].m_pItems[0];
+                    ItemInstance& forwardTargetItem = pForwardNode->m_pChannels[iChannelIdx].m_pSlots[0].m_Item;
                     ItemInstance& forwardPendingItem = pForwardNode->m_pChannels[iChannelIdx].m_pPendingItems[0];
                     if (forwardTargetItem.IsEmpty() && forwardPendingItem.IsEmpty())
                     {
@@ -280,14 +276,14 @@ void cpp_conv::Sequence::Tick(SceneContext& kContext)
             // Move inner items forwards
             for (int iChannelSlot = iChannelLength - 2; iChannelSlot >= 0; iChannelSlot--)
             {
-                ItemInstance& currentItem = pNode->m_pChannels[iChannelIdx].m_pItems[iChannelSlot];
+                ItemInstance& currentItem = pNode->m_pChannels[iChannelIdx].m_pSlots[iChannelSlot].m_Item;
                 if (currentItem.m_CurrentTick < currentItem.m_TargetTick)
                 {
                     continue;
                 }
 
-                ItemInstance& forwardTargetItem = pNode->m_pChannels[iChannelIdx].m_pItems[iChannelSlot + 1];
-                ItemInstance& forwardPendingItem = pNode->m_pChannels[iChannelIdx].m_pItems[iChannelSlot + 1];
+                ItemInstance& forwardTargetItem = pNode->m_pChannels[iChannelIdx].m_pSlots[iChannelSlot + 1].m_Item;
+                ItemInstance& forwardPendingItem = pNode->m_pChannels[iChannelIdx].m_pSlots[iChannelSlot + 1].m_Item;
                  
                 if (!currentItem.IsEmpty() && forwardTargetItem.IsEmpty() && forwardPendingItem.IsEmpty())
                 {

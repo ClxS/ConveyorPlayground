@@ -10,6 +10,7 @@
 #include <iostream>
 #include "SelfRegistration.h"
 #include "DataId.h"
+#include "Profiler.h"
 
 using RegistryId = cpp_conv::resources::registry::RegistryId;
 std::vector<cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition>> g_vItems;
@@ -60,6 +61,7 @@ cpp_conv::resources::ResourceAsset* itemAssetHandler(cpp_conv::resources::resour
 
 const cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> cpp_conv::resources::getItemDefinition(cpp_conv::ItemId id)
 {
+    PROFILE_FUNC();
     for (auto item : g_vItems)
     {
         if (item->GetInternalId() == id)

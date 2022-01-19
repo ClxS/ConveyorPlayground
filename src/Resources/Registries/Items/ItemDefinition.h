@@ -29,5 +29,7 @@ namespace cpp_conv
         cpp_conv::ItemId m_internalId;
         cpp_conv::resources::registry::RegistryId m_registryId;
         std::string m_strName;
+
+        mutable cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> m_pTile;
     };
 }

@@ -37,6 +37,7 @@ void createWindow()
     }
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+    SDL_SetHint(SDL_HINT_RENDER_BATCHING, "1");
 
     cpp_conv::apphost::App.renderer = SDL_CreateRenderer(cpp_conv::apphost::App.window, -1, rendererFlags);
 

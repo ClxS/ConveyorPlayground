@@ -68,7 +68,7 @@ namespace
 void cpp_conv::game::run()
 {
     srand((unsigned int)time(NULL));
-
+     
     int iWidth, iHeight;
     std::tie(iWidth, iHeight) = cpp_conv::apphost::getAppDimensions();
 
@@ -106,7 +106,7 @@ void cpp_conv::game::run()
         0,
         worldMap,
         nullptr,
-        1.0f
+        0.5f
     };
 
     cpp_conv::renderer::SwapChain swapChain(kRenderContext, iWidth, iHeight);
