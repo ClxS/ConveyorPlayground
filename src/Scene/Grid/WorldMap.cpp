@@ -103,7 +103,7 @@ cpp_conv::WorldMap::CellCoordinate cpp_conv::WorldMap::ToCellSpace(Vector3 posit
     return { iHorizontalCell, iVerticalCell, iHorizontalSlot, iVerticalSlot, position.GetZ() };
 }
 
-const cpp_conv::Entity* cpp_conv::WorldMap::GetEntity(Vector3 position) const
+cpp_conv::Entity* cpp_conv::WorldMap::GetEntity(Vector3 position) const
 {
     CellCoordinate coord = ToCellSpace(position);
     if (coord.IsInvalid())
@@ -140,11 +140,6 @@ void cpp_conv::WorldMap::Consume(cpp_conv::resources::AssetPtr<cpp_conv::resourc
 
     map->GetConveyors().clear();
     map->GetOtherEntities().clear();
-}
-
-cpp_conv::Entity* cpp_conv::WorldMap::GetEntity(Vector3 position)
-{
-    return const_cast<cpp_conv::Entity*>(const_cast<const cpp_conv::WorldMap*>(this)->GetEntity(position));
 }
 
 bool cpp_conv::WorldMap::PlaceEntity(Vector3 position, Entity* pEntity)

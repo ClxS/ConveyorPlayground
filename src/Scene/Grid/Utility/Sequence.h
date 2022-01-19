@@ -50,10 +50,11 @@ namespace cpp_conv
     class Sequence
     {
     public:
-        Sequence(const Conveyor* pHead, const Conveyor* pTail, int iSequenceId)
+        Sequence(const Conveyor* pHead, const Conveyor* pTail, std::vector<Conveyor*> nodes, int iSequenceId)
             : m_pHeadConveyor(pHead)
             , m_pTailConveyor(pTail)
             , m_iSequenceId(iSequenceId)
+            , m_pNodes(std::move(nodes))
         {
         }
 
@@ -62,9 +63,9 @@ namespace cpp_conv
         const Conveyor* GetHeadConveyor() const { return m_pHeadConveyor; }
         const Conveyor* GetTailConveyor() const { return m_pTailConveyor; }
 
-        SequenceIterator IterateSequence(cpp_conv::WorldMap& map)
+        const std::vector<Conveyor*>& GetNodes()
         {
-            return SequenceIterator(*this, map);
+            return m_pNodes;
         }
 
         int GetSequenceId() const
@@ -76,10 +77,11 @@ namespace cpp_conv
         const Conveyor* m_pHeadConveyor;
         const Conveyor* m_pTailConveyor;
         int m_iSequenceId;
+        std::vector<Conveyor*> m_pNodes;
     };
 
-    const Conveyor* TraceHeadConveyor(const WorldMap& map, const Conveyor& searchStart);
-    const Conveyor* TraceTailConveyor(const WorldMap& map, const Conveyor& searchStart, const Conveyor& head);
+    Conveyor* TraceHeadConveyor(WorldMap& map, Conveyor& searchStart);
+    const Conveyor* TraceTailConveyor(WorldMap& map, Conveyor& searchStart, Conveyor& head, std::vector<Conveyor*>& vOutConveyors);
 
     std::vector<Sequence> InitializeSequences(WorldMap& map, const std::vector<Conveyor*>& conveyors);
 

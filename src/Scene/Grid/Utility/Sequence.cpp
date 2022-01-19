@@ -56,7 +56,7 @@ SequenceIterator::IterateNode SequenceIterator::end()
     return { const_cast<Conveyor*>(m_sequence.GetHeadConveyor()), m_sequence.GetHeadConveyor(), m_rMap, true };
 }
 
-const Conveyor* cpp_conv::TraceHeadConveyor(const cpp_conv::WorldMap& map, const Conveyor& searchStart)
+Conveyor* cpp_conv::TraceHeadConveyor(cpp_conv::WorldMap& map, Conveyor& searchStart)
 {
     static RelativeDirection directionPriority[] =
     {
@@ -65,11 +65,11 @@ const Conveyor* cpp_conv::TraceHeadConveyor(const cpp_conv::WorldMap& map, const
         RelativeDirection::Left,
     };
 
-    const Conveyor* pCurrentConveyor = map.GetEntity<Conveyor>(searchStart.m_position, EntityKind::Conveyor);
+    Conveyor* pCurrentConveyor = map.GetEntity<Conveyor>(searchStart.m_position, EntityKind::Conveyor);
     while (true)
     {
         Vector3 forwardPosition = grid::GetForwardPosition(*pCurrentConveyor);
-        const Entity* pTargetConveyor = map.GetEntity<Conveyor>(forwardPosition, EntityKind::Conveyor);
+        Entity* pTargetConveyor = map.GetEntity<Conveyor>(forwardPosition, EntityKind::Conveyor);
         if (pTargetConveyor == nullptr)
         {
             break;
@@ -104,29 +104,33 @@ const Conveyor* cpp_conv::TraceHeadConveyor(const cpp_conv::WorldMap& map, const
             break;
         }
 
-        pCurrentConveyor = reinterpret_cast<const Conveyor*>(pTargetConveyor);
+        pCurrentConveyor = reinterpret_cast<Conveyor*>(pTargetConveyor);
     }
 
     return pCurrentConveyor;
 }
 
-const Conveyor* cpp_conv::TraceTailConveyor(const cpp_conv::WorldMap& map, const Conveyor& searchStart, const Conveyor& head)
+const Conveyor* cpp_conv::TraceTailConveyor(cpp_conv::WorldMap& map, Conveyor& searchStart, Conveyor& head, std::vector<Conveyor*>& vOutConveyors)
 {
-    const Conveyor* pCurrentConveyor = map.GetEntity<Conveyor>(searchStart.m_position, EntityKind::Conveyor);
+    Conveyor* pCurrentConveyor = map.GetEntity<Conveyor>(searchStart.m_position, EntityKind::Conveyor);
 
     assert(pCurrentConveyor != nullptr); // If it is null here, we are misusing this method.
 
+    vOutConveyors.push_back(&head);
     while (true)
     {
-        const Entity* pTargetConveyor = cpp_conv::targeting_util::FindNextTailConveyor(map, *pCurrentConveyor);
+        vOutConveyors.push_back(pCurrentConveyor);
+
+        Entity* pTargetConveyor = cpp_conv::targeting_util::FindNextTailConveyor(map, *pCurrentConveyor);
         if (!pTargetConveyor || pTargetConveyor->m_eEntityKind != EntityKind::Conveyor || pTargetConveyor == &searchStart || pTargetConveyor == &head)
         {
             break;
         }
 
-        pCurrentConveyor = reinterpret_cast<const Conveyor*>(pTargetConveyor);
+        pCurrentConveyor = reinterpret_cast<Conveyor*>(pTargetConveyor);
     }
 
+    std::reverse(vOutConveyors.begin(), vOutConveyors.end());
     return pCurrentConveyor;
 }
 
@@ -144,15 +148,16 @@ std::vector<Sequence> cpp_conv::InitializeSequences(cpp_conv::WorldMap& map, con
         }
 
         iId++;
-        const Conveyor* pHeadConveyor = TraceHeadConveyor(map, *conveyor);
-        const Conveyor* pTailConveyor = TraceTailConveyor(map, *conveyor, *pHeadConveyor);
+        std::vector<Conveyor*> vConveyors;
+        Conveyor* pHeadConveyor = TraceHeadConveyor(map, *conveyor);
+        const Conveyor* pTailConveyor = TraceTailConveyor(map, *conveyor, *pHeadConveyor, vConveyors);
 
-        vSequences.emplace_back(pHeadConveyor, pTailConveyor, iId);
+        vSequences.emplace_back(pHeadConveyor, pTailConveyor, vConveyors, iId);
         Sequence& sequence = vSequences.back();
-        for (auto& rNode : sequence.IterateSequence(map))
+        for (auto& rNode : vConveyors)
         {
-            rNode.m_pSequenceId = iId;
-            alreadyProcessedConveyors.insert(&rNode);
+            rNode->m_pSequenceId = iId;
+            alreadyProcessedConveyors.insert(rNode);
         }
     }
 
@@ -224,15 +229,9 @@ std::tuple<int, Direction> cpp_conv::GetInnerMostCornerChannel(const cpp_conv::W
 
 void cpp_conv::Sequence::Tick(SceneContext& kContext)
 {
-    std::vector<cpp_conv::Conveyor*> sequencePoints;
-    for (auto& rNode : IterateSequence(kContext.m_rMap))
+    for(int i = 0; i < m_pNodes.size(); i++)
     {
-        sequencePoints.push_back(&rNode);
-    }
-
-    std::reverse(sequencePoints.begin(), sequencePoints.end());
-    for (cpp_conv::Conveyor* pNode : sequencePoints)
-    {
+        cpp_conv::Conveyor* pNode = m_pNodes[i];
         bool bIsCornerConveyor = pNode->IsCorner();
         for (int iChannelIdx = 0; iChannelIdx < cpp_conv::c_conveyorChannels; iChannelIdx++)
         { 
@@ -242,7 +241,16 @@ void cpp_conv::Sequence::Tick(SceneContext& kContext)
                 iChannelLength += pNode->GetInnerMostChannel() == iChannelIdx ? -1 : 1;
             }
              
-            cpp_conv::Entity* pForwardEntity = kContext.m_rMap.GetEntity(cpp_conv::grid::GetForwardPosition(*pNode));
+            cpp_conv::Entity* pForwardEntity = nullptr;
+            if (i < m_pNodes.size() - 1)
+            {
+                pForwardEntity = m_pNodes[i + 1];
+            }
+            else
+            {
+                pForwardEntity = kContext.m_rMap.GetEntity(cpp_conv::grid::GetForwardPosition(*pNode));
+            }
+
             ItemInstance& frontMostItem = pNode->m_pChannels[iChannelIdx].m_pSlots[iChannelLength - 1].m_Item;
             if (!frontMostItem.IsEmpty() && frontMostItem.m_CurrentTick >= frontMostItem.m_TargetTick)
             {

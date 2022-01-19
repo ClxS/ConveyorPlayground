@@ -56,8 +56,7 @@ namespace cpp_conv
         };
 
     public:
-        Entity* GetEntity(Vector3 position);
-        const Entity* GetEntity(Vector3 position) const;
+        Entity* GetEntity(Vector3 position) const;
 
         bool PlaceEntity(Vector3 position, Entity* pEntity);
 

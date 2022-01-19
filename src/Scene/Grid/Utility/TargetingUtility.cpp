@@ -6,7 +6,7 @@
 #include "Direction.h"
 #include "Factory.h"
 
-const cpp_conv::Entity* cpp_conv::targeting_util::FindNextTailConveyor(const cpp_conv::WorldMap& map, const cpp_conv::Conveyor& rCurrentConveyor)
+cpp_conv::Entity* cpp_conv::targeting_util::FindNextTailConveyor(const cpp_conv::WorldMap& map, const cpp_conv::Conveyor& rCurrentConveyor)
 {
     static RelativeDirection directionPriority[] =
     {
@@ -20,15 +20,15 @@ const cpp_conv::Entity* cpp_conv::targeting_util::FindNextTailConveyor(const cpp
     vPositions[(int)RelativeDirection::Right] = cpp_conv::grid::GetRightPosition(rCurrentConveyor);
     vPositions[(int)RelativeDirection::Left] = cpp_conv::grid::GetLeftPosition(rCurrentConveyor);
 
-    const cpp_conv::Entity* vPotentialNeighbours[4];
+    cpp_conv::Entity* vPotentialNeighbours[4];
     vPotentialNeighbours[(int)RelativeDirection::Backwards] = map.GetEntity(vPositions[(int)RelativeDirection::Backwards]);
     vPotentialNeighbours[(int)RelativeDirection::Right] = map.GetEntity(vPositions[(int)RelativeDirection::Right]);
     vPotentialNeighbours[(int)RelativeDirection::Left] = map.GetEntity(vPositions[(int)RelativeDirection::Left]);
      
-    const cpp_conv::Entity* pTargetConveyor = nullptr;
+    cpp_conv::Entity* pTargetConveyor = nullptr;
     for (auto direction : directionPriority)
     {
-        const cpp_conv::Entity* pDirectionEntity = vPotentialNeighbours[(int)direction];
+        cpp_conv::Entity* pDirectionEntity = vPotentialNeighbours[(int)direction];
         if (pDirectionEntity == nullptr)
         {
             continue;
@@ -49,7 +49,7 @@ const cpp_conv::Entity* cpp_conv::targeting_util::FindNextTailConveyor(const cpp
                 break;
             case EntityKind::Producer:
             {
-                const Factory* pFactory = reinterpret_cast<const Factory*>(pDirectionEntity);
+                Factory* pFactory = reinterpret_cast<Factory*>(pDirectionEntity);
                 if (pFactory->HasOutputPipe() && vPositions[(int)direction] == pFactory->m_position + pFactory->GetOutputPipe())
                 {
                     pTargetConveyor = pDirectionEntity;
