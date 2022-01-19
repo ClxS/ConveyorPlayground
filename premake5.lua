@@ -7,6 +7,14 @@ workspace "CppConveyor"
 		architecture "x86_64"
 	filter{}
 
+
+    filter { "configurations:Release" }
+   		optimize "Full"
+		flags "NoRuntimeChecks"
+		inlining "Auto"
+		intrinsics "on"
+	filter{}
+
 project "CppConveyor"
 	location "build/CppConveyor"
 	language "C++"
