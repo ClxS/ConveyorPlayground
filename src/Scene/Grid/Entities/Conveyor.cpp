@@ -15,6 +15,7 @@
 #include "DataId.h"
 #include "Matrix.h"
 #include "ItemInstance.h"
+#include "TileRenderHandler.h"
 
 cpp_conv::Colour GetColourFromId(int id)
 {
@@ -58,7 +59,7 @@ void DrawConveyorItem(
             previousPosition);
     }
 
-    cpp_conv::renderer::renderAsset(kContext, pTile.get(), { position.GetX(), position.GetY() });
+    tileRenderer(kContext, pTile.get(), { position.GetX(), position.GetY() });
 }
  
 void DrawConveyor(
@@ -74,7 +75,7 @@ void DrawConveyor(
     auto pTile = rConveyor.GetTile();
     if (pTile)
     {
-        cpp_conv::renderer::renderAsset(kContext, pTile.get(), transform);
+        tileRenderer(kContext, pTile.get(), transform);
     }
 }
 

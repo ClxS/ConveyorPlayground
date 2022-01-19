@@ -74,7 +74,7 @@ namespace cpp_conv
 
         static_assert(c_conveyorChannels >= 1, "Conveyors must have at least once channel");
         static_assert(c_conveyorChannelSlots >= 1, "Conveyors channels must have at least once slot");
-    private:
+    private: 
         friend class Sequence;
 
         uint32_t m_uiCurrentTick = 0;
