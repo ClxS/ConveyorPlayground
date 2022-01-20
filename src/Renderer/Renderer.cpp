@@ -40,7 +40,6 @@ void cpp_conv::renderer::init(cpp_conv::RenderContext& kContext, cpp_conv::rende
 {    
     ScreenBufferInitArgs kArgs = { };
     rSwapChain.Initialize(kContext, kArgs);
-    kContext.m_cameraQuad = { 0, 0, rSwapChain.GetWriteSurface().GetWidth(), rSwapChain.GetWriteSurface().GetHeight() };
     kContext.m_surface = &rSwapChain.GetWriteSurface();
 }
 

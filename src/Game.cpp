@@ -35,7 +35,7 @@ namespace
 {
     void updateCamera(cpp_conv::SceneContext& kContext, cpp_conv::RenderContext& kRenderContext)
     {
-        constexpr int c_iPadding = 3 * cpp_conv::renderer::c_gridScale;
+        /*constexpr int c_iPadding = 3 * cpp_conv::renderer::c_gridScale;
         constexpr int c_iPlayerSize = cpp_conv::renderer::c_gridScale;
         int playerX = kContext.m_player.GetX() * cpp_conv::renderer::c_gridScale;
         int playerY = kContext.m_player.GetY() * cpp_conv::renderer::c_gridScale;
@@ -61,7 +61,7 @@ namespace
         }
 
         kRenderContext.m_cameraQuad.m_x = std::max(kRenderContext.m_cameraQuad.m_x, 0);
-        kRenderContext.m_cameraQuad.m_y = std::max(kRenderContext.m_cameraQuad.m_y, 0);
+        kRenderContext.m_cameraQuad.m_y = std::max(kRenderContext.m_cameraQuad.m_y, 0);*/
     }
 }
 
@@ -111,7 +111,7 @@ void cpp_conv::game::run()
 
     cpp_conv::RenderContext kRenderContext =
     {
-        { 0, 0, 0, 0 },
+        { 0, 0 },
         0,
         { 0xFFFFFFFF },
         0,
@@ -132,7 +132,7 @@ void cpp_conv::game::run()
     float fCurrentZoom = kRenderContext.m_fZoom;
     while (true) 
     {
-        PROFILE(Input, cpp_conv::input::receiveInput(commands));
+        PROFILE(Input, cpp_conv::input::receiveInput(kSceneContext, kRenderContext, commands));
         PROFILE(CommandProcess, cpp_conv::command::processCommands(kSceneContext, kRenderContext, commands));
         PROFILE(Simulation, cpp_conv::simulation::simulate(kSceneContext));
         PROFILE(ResizeSwap, [&]() {
@@ -142,13 +142,8 @@ void cpp_conv::game::run()
             if (swapChain.RequiresResize(kRenderContext, iNewWidth, iNewHeight))
             {
                 swapChain.ResizeBuffers(kRenderContext, iNewWidth, iNewHeight);
-                kRenderContext.m_cameraQuad.m_uiWidth = swapChain.GetWriteSurface().GetWidth();
-                kRenderContext.m_cameraQuad.m_uiHeight = swapChain.GetWriteSurface().GetHeight();
-            }
-            else if (fCurrentZoom != kRenderContext.m_fZoom)
-            {
-                swapChain.ResizeBuffers(kRenderContext, iNewWidth, iNewHeight);
-                fCurrentZoom = kRenderContext.m_fZoom;
+                /*kRenderContext.m_cameraQuad.m_uiWidth = swapChain.GetWriteSurface().GetWidth();
+                kRenderContext.m_cameraQuad.m_uiHeight = swapChain.GetWriteSurface().GetHeight();*/
             }
             }()); 
 

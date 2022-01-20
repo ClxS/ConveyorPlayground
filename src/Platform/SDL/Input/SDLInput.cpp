@@ -5,10 +5,21 @@
 #include "SDL_events.h"
 
 #include <backends/imgui_impl_sdl.h>
+#include "Vector3.h"
+#include "RenderContext.h"
 
-void cpp_conv::input::receiveInput(std::queue<cpp_conv::commands::CommandType>& commands)
+void cpp_conv::input::receiveInput(cpp_conv::SceneContext& kContext, cpp_conv::RenderContext& kRenderContext, std::queue<cpp_conv::commands::CommandType>& commands)
 {
     SDL_Event event;
+    // TODO Consider DPI here
+    constexpr int c_iDragPanDistance = 5;
+
+    static bool bLeftMouseDown = false;
+    static bool bMiddleMouseDown = false;
+    static bool bRightMouseDown = false;
+    static Vector2 vMouseDownPos = {};
+    static bool bIsPanActive = {};
+        
 
     while (SDL_PollEvent(&event))
     {
@@ -32,6 +43,55 @@ void cpp_conv::input::receiveInput(std::queue<cpp_conv::commands::CommandType>& 
                     break;
                 default:
                     break;
+            }
+            break;
+        case SDL_MOUSEBUTTONDOWN:
+            switch (event.button.button)
+            {
+                case SDL_BUTTON_LEFT: bLeftMouseDown = true; vMouseDownPos = { event.button.x, event.button.y }; break;
+                case SDL_BUTTON_MIDDLE: bMiddleMouseDown = true; break;
+                case SDL_BUTTON_RIGHT: bRightMouseDown = true; break;
+            }
+            break;
+        case SDL_MOUSEBUTTONUP:
+            switch (event.button.button)
+            {
+                case SDL_BUTTON_LEFT: bLeftMouseDown = false; bIsPanActive = false;  break;
+                case SDL_BUTTON_MIDDLE: bMiddleMouseDown = false; break;
+                case SDL_BUTTON_RIGHT: bRightMouseDown = false; break;
+            }
+            break;
+        case SDL_MOUSEMOTION:
+            if (bLeftMouseDown)
+            {
+                Vector2 vCurrentPosition = { event.motion.x, event.motion.y };
+                if (!bIsPanActive)
+                {
+                    Vector2 vRelMovement = (vMouseDownPos - vCurrentPosition).Abs();
+                    if (vRelMovement.GetX() > c_iDragPanDistance || vRelMovement.GetY() > c_iDragPanDistance)
+                    {
+                        bIsPanActive = true;
+                    }
+                }
+
+                if (bIsPanActive)
+                {
+                    Vector2F vRelative = { (float)event.motion.xrel, (float)event.motion.yrel };
+                    kRenderContext.m_CameraPosition += (vRelative );
+                }
+            }
+
+            break;
+        case SDL_MOUSEWHEEL:
+            if (event.wheel.y > 0) // scroll up
+            {
+                kRenderContext.m_fZoom *= 1.1f;
+                kRenderContext.m_fZoom = std::min(kRenderContext.m_fZoom, 2.0f);
+            }
+            else if (event.wheel.y < 0) // scroll down
+            {
+                kRenderContext.m_fZoom *= 0.9f;
+                kRenderContext.m_fZoom = std::max(kRenderContext.m_fZoom, 0.25f);
             }
             break;
         default:

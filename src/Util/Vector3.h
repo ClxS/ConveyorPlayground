@@ -72,6 +72,17 @@ struct Vector
         return out;
     }
 
+    TCrtp operator/(const TType& other) const
+    {
+        TCrtp out;
+        for (int32_t i = 0; i < TLength; ++i)
+        {
+            out.m_Data[i] = m_Data[i] / other;
+        }
+
+        return out;
+    }
+
     TCrtp operator+(const TType& other) const
     {
         TCrtp out;
@@ -137,6 +148,17 @@ struct Vector
         }
 
         return os;
+    }
+
+    TCrtp Abs()
+    {
+        TCrtp out = {};
+        for (int32_t i = 0; i < TLength; ++i)
+        {
+            out.m_Data[i] = std::abs(m_Data[i]);
+        }
+
+        return out;
     }
 };
 

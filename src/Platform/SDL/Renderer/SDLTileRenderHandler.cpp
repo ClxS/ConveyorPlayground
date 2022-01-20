@@ -30,12 +30,18 @@ void tileRenderer(
         int windowWidth, windowHeight;
         SDL_GetWindowSize(cpp_conv::apphost::App.window, &windowWidth, &windowHeight);
         SDL_QueryTexture(pTexture, NULL, NULL, &dest.w, &dest.h);
-        for (int y = 0; y < windowHeight; y += dest.h * kContext.m_fZoom)
+
+        int screenCameraX = (int)(kContext.m_CameraPosition.GetX());
+        int screenCameraY = (int)(kContext.m_CameraPosition.GetY());
+        dest.w *= kContext.m_fZoom;
+        dest.h *= kContext.m_fZoom;
+        for (int y = -dest.h + (screenCameraY % dest.h); y < windowHeight; y += dest.h)
         {
-            for (int x = 0; x < windowWidth; x += dest.w * kContext.m_fZoom)
+            for (int x = -dest.w + (screenCameraX % dest.w); x < windowWidth; x += dest.w)
             {
                 dest.x = x;
                 dest.y = y;
+
 
                 SDL_RenderCopy(cpp_conv::apphost::App.renderer, pTexture, NULL, &dest);
             }
@@ -62,8 +68,8 @@ void tileRenderer(
             break;
         }
 
-        dest.x = (int)(kTransform.m_x * 16 * kContext.m_fZoom);
-        dest.y = (int)(kTransform.m_y * 16 * kContext.m_fZoom);
+        dest.x = (int)(kTransform.m_x * 16 * kContext.m_fZoom) + kContext.m_CameraPosition.GetX();
+        dest.y = (int)(kTransform.m_y * 16 * kContext.m_fZoom) + kContext.m_CameraPosition.GetY();
         SDL_QueryTexture(pTexture, NULL, NULL, &dest.w, &dest.h);
         SDL_Point rotatePivot = { dest.w * kContext.m_fZoom / 2, dest.h * kContext.m_fZoom / 2 };
 

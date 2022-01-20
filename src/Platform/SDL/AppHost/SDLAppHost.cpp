@@ -36,6 +36,7 @@ void createWindow()
         exit(1);
     }
 
+    SDL_SetRelativeMouseMode(SDL_TRUE);
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
     SDL_SetHint(SDL_HINT_RENDER_BATCHING, "1");
 

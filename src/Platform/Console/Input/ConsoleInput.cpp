@@ -4,10 +4,11 @@
 #include "RenderContext.h"
 #include "SwapChain.h"
 #include "AppHost.h"
+#include "SceneContext.h"
 
 #define VK_V 0x0056
 
-void cpp_conv::input::receiveInput(std::queue<cpp_conv::commands::CommandType>& commands)
+void cpp_conv::input::receiveInput(cpp_conv::SceneContext& kContext, cpp_conv::RenderContext& kRenderContext, std::queue<cpp_conv::commands::CommandType>& commands)
 {
     DWORD dwPendingEvents;
 
