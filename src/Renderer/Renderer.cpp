@@ -79,34 +79,37 @@ void cpp_conv::renderer::render(const SceneContext& kSceneContext, RenderContext
         }
     )
 
-    kContext.m_iCurrentLayer = kSceneContext.m_player.GetZ();
-    for (uint32_t uiPass = 0; uiPass < uiPassCount; uiPass++)
-    {
-        kContext.m_uiCurrentDrawPass = uiPass;
-        for (auto pEntity : kSceneContext.m_rMap.GetConveyors())
+        for (kContext.m_iCurrentLayer = 0; kContext.m_iCurrentLayer <= kSceneContext.m_player.GetZ(); kContext.m_iCurrentLayer++)
         {
-            if (pEntity->GetDrawPassCount() < (uiPass + 1) ||
-                (pEntity->m_position.GetZ() + pEntity->m_size.GetZ() - 1) < kSceneContext.m_player.GetZ()
-                || pEntity->m_position.GetZ() > kSceneContext.m_player.GetZ())
+            kContext.m_LayerColour = { 0xFFFFFFFF };
+            kContext.m_LayerColour.m_argb.m_a = (uint8_t)(std::pow(0.5F, kSceneContext.m_player.GetZ() - kContext.m_iCurrentLayer) * 0xFF);
+
+            for (uint32_t uiPass = 0; uiPass < uiPassCount; uiPass++)
             {
-                continue;
+                kContext.m_uiCurrentDrawPass = uiPass;
+                for (auto pEntity : kSceneContext.m_rMap.GetConveyors())
+                {
+                    if (pEntity->GetDrawPassCount() < (uiPass + 1) ||
+                        (pEntity->m_position.GetZ() + pEntity->m_size.GetZ() - 1) < kContext.m_iCurrentLayer || pEntity->m_position.GetZ() > kContext.m_iCurrentLayer)
+                    {
+                        continue;
+                    }
+
+                    pEntity->Draw(kContext);
+                }
+
+                for (auto pEntity : kSceneContext.m_rMap.GetOtherEntities())
+                {
+                    if (pEntity->GetDrawPassCount() < (uiPass + 1) ||
+                        (pEntity->m_position.GetZ() + pEntity->m_size.GetZ() - 1) < kContext.m_iCurrentLayer || pEntity->m_position.GetZ() > kContext.m_iCurrentLayer)
+                    {
+                        continue;
+                    }
+
+                    pEntity->Draw(kContext);
+                }
             }
-
-            pEntity->Draw(kContext);
         }
-
-        for (auto pEntity : kSceneContext.m_rMap.GetOtherEntities())
-        {
-            if (pEntity->GetDrawPassCount() < (uiPass + 1) ||
-                (pEntity->m_position.GetZ() + pEntity->m_size.GetZ() - 1) < kSceneContext.m_player.GetZ()
-                || pEntity->m_position.GetZ() > kSceneContext.m_player.GetZ())
-            {
-                continue;
-            }
-
-            pEntity->Draw(kContext);
-        }
-    }
 
     drawPlayer(kSceneContext, kContext);
 }

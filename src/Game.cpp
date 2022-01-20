@@ -77,9 +77,17 @@ void cpp_conv::game::run()
     WorldMap worldMap;
     {
         AssetPtr<Map> map = resource_manager::loadAssetUncached<Map>(registry::data::MapSimple);
-        if (!map)
+        worldMap.Consume(map);
+
+        map = resource_manager::loadAssetUncached<Map>(registry::data::MapSimpleUpper);
+        for (auto& pEntity : map->GetConveyors())
         {
-            return;
+            pEntity->m_position.SetZ(1);
+        }
+
+        for (auto& pEntity : map->GetOtherEntities())
+        {
+            pEntity->m_position.SetZ(1);
         }
 
         worldMap.Consume(map);
@@ -103,10 +111,11 @@ void cpp_conv::game::run()
     {
         { 0, 0, 0, 0 },
         0,
+        { 0xFFFFFFFF },
         0,
         worldMap,
         nullptr,
-        0.5f
+        0.8f
     };
 
     cpp_conv::renderer::SwapChain swapChain(kRenderContext, iWidth, iHeight);
@@ -144,7 +153,7 @@ void cpp_conv::game::run()
         PROFILE(UpdateCamera, updateCamera(kSceneContext, kRenderContext));
 
         PROFILE(Render, cpp_conv::renderer::render(kSceneContext, kRenderContext));
-        PROFILE(DrawUI, cpp_conv::ui::drawUI(kSceneContext, kRenderContext));
+        //PROFILE(DrawUI, cpp_conv::ui::drawUI(kSceneContext, kRenderContext));
         PROFILE(Present, swapChain.SwapAndPresent());
 
         PROFILE(FrameCapSleep, frameLimter.Limit());

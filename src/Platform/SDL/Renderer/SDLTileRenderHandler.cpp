@@ -69,6 +69,8 @@ void tileRenderer(
 
         dest.w *= kContext.m_fZoom;
         dest.h *= kContext.m_fZoom;
+
+        SDL_SetTextureAlphaMod(pTexture, kContext.m_LayerColour.m_argb.m_a);
         SDL_RenderCopyEx(cpp_conv::apphost::App.renderer, pTexture, NULL, &dest, angle, &rotatePivot, SDL_RendererFlip::SDL_FLIP_NONE);
     }
 }

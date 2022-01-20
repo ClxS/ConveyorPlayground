@@ -12,6 +12,8 @@ namespace cpp_conv
     {
         Quad m_cameraQuad;
         int32_t m_iCurrentLayer;
+        Colour m_LayerColour;
+
         uint32_t m_uiCurrentDrawPass;
         cpp_conv::WorldMap& m_rMap;
         class cpp_conv::renderer::WriteSurface* m_surface;
