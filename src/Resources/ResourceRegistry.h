@@ -57,7 +57,9 @@ namespace cpp_conv::resources::registry
     {
         P("maps/circle", c_dataExtension),
         P("maps/simple", c_dataExtension),
-        P("maps/simpleUpper", c_dataExtension),
+        P("maps/simple1", c_dataExtension),
+        P("maps/simple2", c_dataExtension),
+        P("maps/simple3", c_dataExtension),
         P("maps/bigmap", c_dataExtension),
     };
 
@@ -148,7 +150,9 @@ namespace cpp_conv::resources::registry
     {
         constexpr RegistryId MapCircle = { 0, 1 };
         constexpr RegistryId MapSimple = { 1, 1 };
-        constexpr RegistryId MapSimpleUpper = { 2, 1 };
-        constexpr RegistryId MapBig = { 3, 1 };
+        constexpr RegistryId MapSimple1 = { 2, 1 };
+        constexpr RegistryId MapSimple2 = { 3, 1 };
+        constexpr RegistryId MapSimple3 = { 4, 1 };
+        constexpr RegistryId MapBig = { 5, 1 };
     }
 }

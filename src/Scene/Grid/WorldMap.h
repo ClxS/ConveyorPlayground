@@ -16,7 +16,7 @@ namespace cpp_conv
     public:
         static inline constexpr uint32_t c_uiMaximumMapSize = 128;
         static inline constexpr uint32_t c_uiCellSize = 64;
-        static inline constexpr uint32_t c_uiMaximumLevel = 2;
+        static inline constexpr uint32_t c_uiMaximumLevel = 4;
 
     private:
         struct CellCoordinate

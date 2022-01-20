@@ -79,17 +79,19 @@ void cpp_conv::game::run()
         AssetPtr<Map> map = resource_manager::loadAssetUncached<Map>(registry::data::MapSimple);
         worldMap.Consume(map);
 
-        map = resource_manager::loadAssetUncached<Map>(registry::data::MapSimpleUpper);
-        for (auto& pEntity : map->GetConveyors())
-        {
-            pEntity->m_position.SetZ(1);
-        }
+        map = resource_manager::loadAssetUncached<Map>(registry::data::MapSimple1);
+        for (auto& pEntity : map->GetConveyors()) { pEntity->m_position.SetZ(1); }
+        for (auto& pEntity : map->GetOtherEntities()) { pEntity->m_position.SetZ(1); }
+        worldMap.Consume(map);
 
-        for (auto& pEntity : map->GetOtherEntities())
-        {
-            pEntity->m_position.SetZ(1);
-        }
+        map = resource_manager::loadAssetUncached<Map>(registry::data::MapSimple2);
+        for (auto& pEntity : map->GetConveyors()) { pEntity->m_position.SetZ(2); }
+        for (auto& pEntity : map->GetOtherEntities()) { pEntity->m_position.SetZ(2); }
+        worldMap.Consume(map);
 
+        map = resource_manager::loadAssetUncached<Map>(registry::data::MapSimple3);
+        for (auto& pEntity : map->GetConveyors()) { pEntity->m_position.SetZ(3); }
+        for (auto& pEntity : map->GetOtherEntities()) { pEntity->m_position.SetZ(3); }
         worldMap.Consume(map);
     }
 
