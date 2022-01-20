@@ -78,6 +78,10 @@ namespace cpp_conv
         const Conveyor* m_pTailConveyor;
         int m_iSequenceId;
         std::vector<Conveyor*> m_pNodes;
+
+        void TickNode(cpp_conv::SceneContext& kContext, cpp_conv::Conveyor* pNode, cpp_conv::Entity* pForwardEntity);
+        void MoveItemToForwardsNode(cpp_conv::SceneContext& kContext, cpp_conv::Conveyor* pNode, cpp_conv::Entity* pForwardEntity, cpp_conv::Conveyor::Channel& rChannel, ItemInstance& frontMostItem);
+        void MoveLanesForwards(cpp_conv::SceneContext& kContext, cpp_conv::Conveyor* pNode, cpp_conv::Conveyor::Channel& rChannel);
     };
 
     Conveyor* TraceHeadConveyor(WorldMap& map, Conveyor& searchStart);
