@@ -33,6 +33,9 @@ void cpp_conv::ui::drawUI(SceneContext& kSceneContext, RenderContext& kRenderCon
 
     if (ImGui::Begin("Hello, world!", 0, flags))
     {
+        ImGui::Text(std::format("Position: {}, {}", kSceneContext.m_player.GetX(), kSceneContext.m_player.GetY()).c_str());
+        ImGui::Text(std::format("Current Floor: {}", kSceneContext.m_player.GetZ()).c_str());
+
         ImGui::Text("Item Type (NUM 1-9)");
 
         for (int32_t i = 0; i < (int32_t)EntityKind::MAX; ++i)

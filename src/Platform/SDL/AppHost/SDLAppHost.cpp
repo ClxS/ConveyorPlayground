@@ -20,7 +20,7 @@ void createWindow()
 
     rendererFlags = SDL_RENDERER_ACCELERATED;
 
-    windowFlags = SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_VULKAN;
+    windowFlags = 0;
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {

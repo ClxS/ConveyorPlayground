@@ -18,7 +18,22 @@ void cpp_conv::input::receiveInput(std::queue<cpp_conv::commands::CommandType>& 
         case SDL_QUIT:
             exit(0);
             break;
-
+        case SDL_KEYDOWN:
+            switch (event.key.keysym.sym)
+            {
+                case SDLK_PAGEUP:
+                    commands.push(cpp_conv::commands::CommandType::MoveFloorUp);
+                    break;
+                case SDLK_PAGEDOWN:
+                    commands.push(cpp_conv::commands::CommandType::MoveFloorDown);
+                    break;
+                case SDLK_ESCAPE:
+                    exit(0);
+                    break;
+                default:
+                    break;
+            }
+            break;
         default:
             break;
         }

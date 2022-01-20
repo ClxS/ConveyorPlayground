@@ -96,6 +96,8 @@ cpp_conv::Conveyor::Conveyor(Vector3 position, Vector3 size, Direction direction
 
 void cpp_conv::Conveyor::Tick(const SceneContext& kContext)
 {
+    m_bHasWork = false;
+
     bool bIsCornerConveyor = IsCorner();
     for (int iChannelIdx = 0; iChannelIdx < cpp_conv::c_conveyorChannels; iChannelIdx++)
     {
@@ -121,6 +123,11 @@ void cpp_conv::Conveyor::Tick(const SceneContext& kContext)
                 if (rItem.m_CurrentTick < rChannel.m_pSlots[iChannelSlot].m_Item.m_TargetTick)
                 {
                     ++rItem.m_CurrentTick;
+                }
+
+                if (rItem.m_CurrentTick >= rChannel.m_pSlots[iChannelSlot].m_Item.m_TargetTick)
+                {
+                    m_bHasWork = true;
                 }
             }
         }

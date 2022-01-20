@@ -81,6 +81,7 @@ namespace cpp_conv
 
         uint32_t m_uiCurrentTick = 0;
         uint32_t m_uiMoveTick = 10;
+        bool m_bHasWork = false;
 
         bool m_bIsCorner;
         bool m_bIsClockwise;

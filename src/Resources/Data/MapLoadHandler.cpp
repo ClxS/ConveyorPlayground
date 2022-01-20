@@ -14,6 +14,7 @@
 #include <iostream>
 #include "SelfRegistration.h"
 #include "Inserter.h"
+#include "Stairs.h"
 
 cpp_conv::resources::ResourceAsset* mapAssetHandler(cpp_conv::resources::resource_manager::FileData& rData)
 {
@@ -48,6 +49,7 @@ cpp_conv::resources::ResourceAsset* mapAssetHandler(cpp_conv::resources::resourc
             case 'C': pEntity = new cpp_conv::Factory({ (int32_t)iCol, iRow, 0 }, Direction::Right, cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_SMELTER")); break;
             case 'J': pEntity = new cpp_conv::Junction({ (int32_t)iCol, iRow, 0 }, size1x1); break;
             case 'S': pEntity = new cpp_conv::Storage({ (int32_t)iCol, iRow, 0 }, size1x1, 16, 256); break;
+            case '@': pEntity = new cpp_conv::Stairs({ (int32_t)iCol, iRow, 0 }, { 1, 1, 2 }, Direction::Right, true); break;
             case 'u': pEntity = new cpp_conv::Underground({ (int32_t)iCol, iRow, 0 }, size1x1, Direction::Down); break;
             case 'y': pEntity = new cpp_conv::Underground({ (int32_t)iCol, iRow, 0 }, size1x1, Direction::Up); break;
             case 'i': pEntity = new cpp_conv::Underground({ (int32_t)iCol, iRow, 0 }, size1x1, Direction::Left); break;
