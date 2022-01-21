@@ -76,8 +76,13 @@ void tileRenderer(
         dest.w *= kContext.m_fZoom;
         dest.h *= kContext.m_fZoom;
 
-        SDL_SetTextureAlphaMod(pTexture, kContext.m_LayerColour.m_argb.m_a);
-        SDL_RenderCopyEx(cpp_conv::apphost::App.renderer, pTexture, NULL, &dest, angle, &rotatePivot, SDL_RendererFlip::SDL_FLIP_NONE);
+        int windowWidth, windowHeight;
+        SDL_GetWindowSize(cpp_conv::apphost::App.window, &windowWidth, &windowHeight);
+        if ((dest.x + dest.w >= 0 || dest.x <= windowWidth) && (dest.y + dest.h >= 0 || dest.y <= windowHeight))
+        {
+            SDL_SetTextureAlphaMod(pTexture, kContext.m_LayerColour.m_argb.m_a);
+            SDL_RenderCopyEx(cpp_conv::apphost::App.renderer, pTexture, NULL, &dest, angle, &rotatePivot, SDL_RendererFlip::SDL_FLIP_NONE);
+        }
     }
 }
 
