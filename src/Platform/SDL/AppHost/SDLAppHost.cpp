@@ -4,6 +4,8 @@
 #include "SDL.h"
 #include "SDLAppHost.h"
 
+#define WINDOWED 1
+
 namespace cpp_conv::apphost
 {
     cpp_conv::apphost::SdlContext App;
@@ -11,7 +13,10 @@ namespace cpp_conv::apphost
 
 std::tuple<int, int> cpp_conv::apphost::getAppDimensions()
 {
-    return std::make_tuple(1, 1);
+    int width, height;
+    SDL_GetWindowSize(cpp_conv::apphost::App.window, &width, &height);
+
+    return std::make_tuple(width, height);
 }
 
 void createWindow()
@@ -20,7 +25,6 @@ void createWindow()
 
     rendererFlags = SDL_RENDERER_ACCELERATED;
 
-    windowFlags = 0;
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
@@ -28,7 +32,13 @@ void createWindow()
         exit(1);
     }
 
+    #if WINDOWED
+    windowFlags = 0;
+    cpp_conv::apphost::App.window = SDL_CreateWindow("Cpp Conveyor", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 2560, 1080, windowFlags);
+    #else
+    windowFlags = 0;
     cpp_conv::apphost::App.window = SDL_CreateWindow("Cpp Conveyor", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1200, 1000, windowFlags);
+    #endif
 
     if (!cpp_conv::apphost::App.window)
     {
