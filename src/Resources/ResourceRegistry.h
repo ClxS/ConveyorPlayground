@@ -61,6 +61,7 @@ namespace cpp_conv::resources::registry
         P("maps/simple2", c_dataExtension),
         P("maps/simple3", c_dataExtension),
         P("maps/bigmap", c_dataExtension),
+        P("maps/bigsimple", c_dataExtension),
     };
 
     inline static const std::filesystem::path c_szItemsPaths[] =
@@ -154,5 +155,6 @@ namespace cpp_conv::resources::registry
         constexpr RegistryId MapSimple2 = { 3, 1 };
         constexpr RegistryId MapSimple3 = { 4, 1 };
         constexpr RegistryId MapBig = { 5, 1 };
+        constexpr RegistryId MapBigSimple = { 6, 1 };
     }
 }

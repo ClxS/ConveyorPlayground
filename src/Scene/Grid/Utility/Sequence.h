@@ -73,6 +73,7 @@ namespace cpp_conv
             return m_iSequenceId;
         }
 
+        inline static constexpr uint32_t c_uiMaxSequenceLength = 32;
     private:
         const Conveyor* m_pHeadConveyor;
         const Conveyor* m_pTailConveyor;

@@ -18,7 +18,6 @@ namespace cpp_conv
         static inline constexpr uint32_t c_uiCellSize = 64;
         static inline constexpr uint32_t c_uiMaximumLevel = 4;
 
-    private:
         struct CellCoordinate
         {
             int32_t m_CellX;
@@ -45,6 +44,7 @@ namespace cpp_conv
             using CellFloors = std::array<std::unique_ptr<EntityGrid>, c_uiMaximumLevel>;
 
             CellFloors m_CellGrid;
+            bool m_bHasFloors = false;
 
             bool HasFloor(uint32_t uiFloor) const;
             bool CreateFloor(uint32_t uiFloor);
@@ -56,7 +56,10 @@ namespace cpp_conv
         };
 
     public:
+        static CellCoordinate ToCellSpace(Vector3 position);
+
         Entity* GetEntity(Vector3 position) const;
+        Cell* GetCell(CellCoordinate coord) const;
 
         bool PlaceEntity(Vector3 position, Entity* pEntity);
 
@@ -75,8 +78,6 @@ namespace cpp_conv
         using WorldMapRow = std::array<CellPtr, c_uiMaximumMapSize>;
         using WorldMapStore = std::array<WorldMapRow, c_uiMaximumMapSize>;
 
-        static CellCoordinate ToCellSpace(Vector3 position);
-        Cell* GetCell(CellCoordinate coord) const;
         Cell* GetOrCreateCell(CellCoordinate coord);
         bool ValidateCanPlaceEntity(Vector3 position, Entity* pEntity) const;
 

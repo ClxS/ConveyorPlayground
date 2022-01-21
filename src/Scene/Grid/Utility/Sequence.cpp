@@ -120,6 +120,11 @@ const Conveyor* cpp_conv::TraceTailConveyor(cpp_conv::WorldMap& map, Conveyor& s
     {
         vOutConveyors.push_back(pCurrentConveyor);
 
+        //if (vOutConveyors.size() >= Sequence::c_uiMaxSequenceLength)
+        {
+            //break;
+        }
+
         Entity* pTargetConveyor = cpp_conv::targeting_util::FindNextTailConveyor(map, *pCurrentConveyor);
         if (!pTargetConveyor || pTargetConveyor->m_eEntityKind != EntityKind::Conveyor || pTargetConveyor == &searchStart || pTargetConveyor == &head)
         {

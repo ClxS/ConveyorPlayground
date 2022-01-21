@@ -30,6 +30,7 @@ bool cpp_conv::WorldMap::Cell::CreateFloor(uint32_t uiFloor)
         return false;
     }
 
+    m_bHasFloors = true;
     if (m_CellGrid[uiFloor] != nullptr)
     {
         return true;
