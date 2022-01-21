@@ -25,6 +25,7 @@
 #include <queue>
 #include <chrono>
 #include "WorldMap.h"
+#include "Factory.h"
 
 #undef max
 #undef min
@@ -65,6 +66,44 @@ namespace
     }
 }
 
+void CreateMillionTileMap(cpp_conv::WorldMap& worldMap)
+{
+    worldMap.PlaceEntity({ 0, 0, 0 }, new cpp_conv::Factory({ (int32_t)0, 0, 0 }, Direction::Right, cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_MINE")));
+    int count = 0;
+    for (int y = 1; y < 31 * 64; y += 2)
+    {
+        if (y == 1)
+        {
+            worldMap.PlaceEntity({ 3, y, 0 }, new cpp_conv::Conveyor({ 3, y, 0 }, { 1, 1, 1 }, Direction::Right));
+            worldMap.PlaceEntity({ 3, y + 1, 0 }, new cpp_conv::Conveyor({ 3, y + 1, 0 }, { 1, 1, 1 }, Direction::Up));
+            count += 2;
+        }
+        else
+        {
+            worldMap.PlaceEntity({ 3, y, 0 }, new cpp_conv::Conveyor({ 3, y, 0 }, { 1, 1, 1 }, Direction::Right));
+            worldMap.PlaceEntity({ 3, y + 1, 0 }, new cpp_conv::Conveyor({ 3, y + 1, 0 }, { 1, 1, 1 }, Direction::Up));
+            count += 2;
+        }
+
+        const int width = 31 * 64 - 1;
+        for (int x = 4; x < width; x++)
+        {
+            worldMap.PlaceEntity({ x, y, 0 }, new cpp_conv::Conveyor({ x, y, 0 }, { 1, 1, 1 }, Direction::Right));
+            worldMap.PlaceEntity({ x, y + 1, 0 }, new cpp_conv::Conveyor({ x, y + 1, 0 }, { 1, 1, 1 }, Direction::Left));
+            count += 2;
+
+            if (count >= 1000000)
+            {
+                return;
+            }
+        }
+
+        worldMap.PlaceEntity({ width, y, 0 }, new cpp_conv::Conveyor({ width, y, 0 }, { 1, 1, 1 }, Direction::Up));
+        worldMap.PlaceEntity({ width, y + 1, 0 }, new cpp_conv::Conveyor({ width, y + 1, 0 }, { 1, 1, 1 }, Direction::Left));
+        count += 2;
+    }
+}
+
 void cpp_conv::game::run()
 {
     srand((unsigned int)time(NULL));
@@ -76,10 +115,11 @@ void cpp_conv::game::run()
 
     WorldMap worldMap;
     {
-        AssetPtr<Map> map = resource_manager::loadAssetUncached<Map>(registry::data::MapSimple);
-        worldMap.Consume(map);
+        CreateMillionTileMap(worldMap);
+        //AssetPtr<Map> map = resource_manager::loadAssetUncached<Map>(registry::data::MapBigSimple);
+        //worldMap.Consume(map);
 
-        map = resource_manager::loadAssetUncached<Map>(registry::data::MapSimple1);
+        /*map = resource_manager::loadAssetUncached<Map>(registry::data::MapSimple1);
         for (auto& pEntity : map->GetConveyors()) { pEntity->m_position.SetZ(1); }
         for (auto& pEntity : map->GetOtherEntities()) { pEntity->m_position.SetZ(1); }
         worldMap.Consume(map);
@@ -92,7 +132,7 @@ void cpp_conv::game::run()
         map = resource_manager::loadAssetUncached<Map>(registry::data::MapSimple3);
         for (auto& pEntity : map->GetConveyors()) { pEntity->m_position.SetZ(3); }
         for (auto& pEntity : map->GetOtherEntities()) { pEntity->m_position.SetZ(3); }
-        worldMap.Consume(map);
+        worldMap.Consume(map);*/
     }
 
     std::vector<cpp_conv::Sequence> sequences = cpp_conv::InitializeSequences(worldMap, worldMap.GetConveyors());
@@ -150,13 +190,14 @@ void cpp_conv::game::run()
         PROFILE(UpdateCamera, updateCamera(kSceneContext, kRenderContext));
 
         PROFILE(Render, cpp_conv::renderer::render(kSceneContext, kRenderContext));
-        //PROFILE(DrawUI, cpp_conv::ui::drawUI(kSceneContext, kRenderContext));
+        PROFILE(DrawUI, cpp_conv::ui::drawUI(kSceneContext, kRenderContext));
         PROFILE(Present, swapChain.SwapAndPresent());
 
-        PROFILE(FrameCapSleep, frameLimter.Limit());
+        //PROFILE(FrameCapSleep, frameLimter.Limit());
         PROFILE(UpdatePersistence, cpp_conv::resources::resource_manager::updatePersistenceStore());
         frameLimter.EndFrame();
     }
 
     cpp_conv::ui::shutdown();
 }
+
