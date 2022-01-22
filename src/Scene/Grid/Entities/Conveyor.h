@@ -44,7 +44,6 @@ namespace cpp_conv
         Conveyor(Vector3 position, Vector3 size, Direction direction, ItemId pItem = {});
 
         Direction m_direction;
-        int m_pSequenceId;
 
         std::array<Channel, c_conveyorChannels> m_pChannels;
 
@@ -72,15 +71,28 @@ namespace cpp_conv
         int GetInnerMostChannel() const { return m_iInnerMostChannel; }
         Direction GetCornerDirection() const { return m_eCornerDirection; }
 
+        bool IsPartOfASequence() const { return m_pSequence != nullptr; }
+
+        void SetSequence(Sequence* pSequence, uint8_t position);
+        void ClearSequence();
+
+        uint64_t CountItemsOnBelt();
+
         cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> GetTile() const { return m_pTile; }
 
         static_assert(c_conveyorChannels >= 1, "Conveyors must have at least once channel");
         static_assert(c_conveyorChannelSlots >= 1, "Conveyors channels must have at least once slot");
-    private: 
+    private:
+        bool HasItemInSlot(int lane, int slot);
+        void PlaceItemInSlot(int lane, int slot, const ItemId pItem);
+
         friend class Sequence;
 
+        Sequence* m_pSequence = nullptr;
+        uint8_t m_uiSequenceIndex;
+
         uint32_t m_uiCurrentTick = 0;
-        uint32_t m_uiMoveTick = 10;
+        uint32_t m_uiMoveTick = 0;
         bool m_bHasWork = false;
 
         bool m_bIsCorner;
@@ -91,5 +103,6 @@ namespace cpp_conv
         cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> m_pTile;
 
         void AddItemToSlot(const cpp_conv::WorldMap& map, Channel* pTargetChannel, int forwardTargetItemSlot, const ItemId pItem, const Entity& pSourceEntity, int iSourceChannel, int iSourceSlot);
+        bool TryPeakItemInSlot(int lane, int slot, const ItemInstance*& rItem) const;
     };
 }

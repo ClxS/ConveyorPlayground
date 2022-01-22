@@ -16,6 +16,7 @@
 #include "Matrix.h"
 #include "ItemInstance.h"
 #include "TileRenderHandler.h"
+#include <assert.h>
 
 cpp_conv::Colour GetColourFromId(int id)
 {
@@ -59,7 +60,7 @@ void DrawConveyorItem(
             previousPosition);
     }
 
-    tileRenderer(kContext, pTile.get(), { position.GetX(), position.GetY() });
+    tileRenderer(kContext, pTile.get(), { position.GetX(), position.GetY() }, { 0xFFFFFFFF }, true);
 }
  
 void DrawConveyor(
@@ -89,14 +90,21 @@ cpp_conv::Conveyor::Channel::Channel(int channelLane)
 cpp_conv::Conveyor::Conveyor(Vector3 position, Vector3 size, Direction direction, ItemId pItem)
     : Entity(position, size, EntityKind::Conveyor)
     , m_direction(direction)
-    , m_pSequenceId(0)
+    , m_pSequence(nullptr)
+    , m_uiSequenceIndex(0)
     , m_pChannels({ 0, 1 })
 {
 }
 
 void cpp_conv::Conveyor::Tick(const SceneContext& kContext)
 {
-    m_bHasWork = false;
+    m_uiCurrentTick++;
+    if (m_uiCurrentTick < m_uiMoveTick)
+    {
+        return;
+    }
+
+    m_uiCurrentTick = 0;
 
     bool bIsCornerConveyor = IsCorner();
     for (int iChannelIdx = 0; iChannelIdx < cpp_conv::c_conveyorChannels; iChannelIdx++)
@@ -109,6 +117,17 @@ void cpp_conv::Conveyor::Tick(const SceneContext& kContext)
             iChannelLength += m_iInnerMostChannel == iChannelIdx ? -1 : 1;
         }
 
+
+        ItemInstance& rLeadingItem = rChannel.m_pSlots[iChannelLength - 1].m_Item;
+        if (!rLeadingItem.IsEmpty())
+        {
+            cpp_conv::Entity* pForwardEntity = kContext.m_rMap.GetEntity(grid::GetForwardPosition(*this));
+            if (pForwardEntity && pForwardEntity->SupportsInsertion() && pForwardEntity->TryInsert(kContext, *this, rLeadingItem.m_Item, iChannelIdx, iChannelLength - 1))
+            {
+                rLeadingItem = ItemInstance::Empty();
+            }
+        }
+
         for (int iChannelSlot = 0; iChannelSlot <= iChannelLength - 1; iChannelSlot++)
         { 
             if (!rChannel.m_pPendingItems[iChannelSlot].IsEmpty())
@@ -116,19 +135,17 @@ void cpp_conv::Conveyor::Tick(const SceneContext& kContext)
                 rChannel.m_pSlots[iChannelSlot].m_Item = rChannel.m_pPendingItems[iChannelSlot];
                 rChannel.m_pPendingItems[iChannelSlot] = ItemInstance::Empty();
             }
+        }
 
-            if (!rChannel.m_pSlots[iChannelSlot].m_Item.IsEmpty())
+        for (int iChannelSlot = rChannel.m_LaneLength - 2; iChannelSlot >= 0; iChannelSlot--)
+        {
+            ItemInstance& currentItem = rChannel.m_pSlots[iChannelSlot].m_Item;
+            ItemInstance& forwardTargetItem = rChannel.m_pSlots[iChannelSlot + 1].m_Item;
+            ItemInstance& forwardPendingItem = rChannel.m_pSlots[iChannelSlot + 1].m_Item;
+            if (!currentItem.IsEmpty() && forwardTargetItem.IsEmpty() && forwardPendingItem.IsEmpty())
             {
-                ItemInstance& rItem = rChannel.m_pSlots[iChannelSlot].m_Item;
-                if (rItem.m_CurrentTick < rChannel.m_pSlots[iChannelSlot].m_Item.m_TargetTick)
-                {
-                    ++rItem.m_CurrentTick;
-                }
-
-                if (rItem.m_CurrentTick >= rChannel.m_pSlots[iChannelSlot].m_Item.m_TargetTick)
-                {
-                    m_bHasWork = true;
-                }
+                AddItemToSlot(kContext.m_rMap, &rChannel, iChannelSlot + 1, currentItem.m_Item, *this, rChannel.m_ChannelLane, iChannelSlot);
+                currentItem = ItemInstance::Empty();
             }
         }
     }
@@ -160,16 +177,17 @@ void cpp_conv::Conveyor::Draw(RenderContext& kContext) const
     case 1:
     {
         PROFILE_SCOPE(Conveyor_Pass1);
-        for (auto& rChannel : m_pChannels)
+        for (int uiChannel = 0; uiChannel < c_conveyorChannels; uiChannel++)
         {
-            for (auto& rSlot : rChannel.m_pSlots)
+            for (int uiSlot = 0; uiSlot < c_conveyorChannelSlots; uiSlot++)
             {
-                if (rSlot.m_Item.IsEmpty())
+                const ItemInstance* pItemInstance;
+                if (!TryPeakItemInSlot(uiChannel, uiSlot, pItemInstance))
                 {
                     continue;
                 }
 
-                cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> pItem = cpp_conv::resources::getItemDefinition(rSlot.m_Item.m_Item);
+                cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> pItem = cpp_conv::resources::getItemDefinition(pItemInstance->m_Item);
                 if (!pItem)
                 {
                     continue;
@@ -179,10 +197,11 @@ void cpp_conv::Conveyor::Draw(RenderContext& kContext) const
                     kContext,
                     *this,
                     pItem->GetTile(),
-                    rSlot.m_VisualPosition,
-                    rSlot.m_Item);
+                    m_pChannels[uiChannel].m_pSlots[uiSlot].m_VisualPosition,
+                    *pItemInstance);
             }
         }
+
         break;
     }
     }
@@ -198,11 +217,7 @@ bool cpp_conv::Conveyor::TryInsert(const SceneContext& kContext, const Entity& p
 
     int forwardTargetItemSlot = cpp_conv::targeting_util::GetChannelTargetSlot(kContext.m_rMap, pSourceEntity, *this, iSourceChannel);
 
-    ItemInstance& forwardTargetItem = pTargetChannel->m_pSlots[forwardTargetItemSlot].m_Item;
-    ItemInstance& forwardPendingItem = pTargetChannel->m_pPendingItems[forwardTargetItemSlot];
-
-    // Following node is empty, we can just move there
-    if (!forwardTargetItem.IsEmpty() || !forwardPendingItem.IsEmpty())
+    if (HasItemInSlot(pTargetChannel->m_ChannelLane, forwardTargetItemSlot))
     {
         return false;
     }
@@ -339,6 +354,71 @@ void cpp_conv::Conveyor::AssessPosition(const cpp_conv::WorldMap& map)
     }
 }
 
+void cpp_conv::Conveyor::SetSequence(Sequence* pSequence, uint8_t sequenceIndex)
+{
+    m_pSequence = pSequence;
+    m_uiSequenceIndex = sequenceIndex;
+}
+
+void cpp_conv::Conveyor::ClearSequence()
+{
+    m_pSequence = nullptr;
+    m_uiSequenceIndex = 0;
+}
+
+uint64_t cpp_conv::Conveyor::CountItemsOnBelt()
+{
+    uint64_t uiCount = 0;
+    for (int iLane = 0; iLane < (int)m_pChannels.size(); iLane++)
+    {
+        for (int iSlot = 0; iSlot < (int)m_pChannels[iLane].m_pSlots.size(); iSlot++)
+        {
+            if (!m_pChannels[iLane].m_pSlots[iSlot].m_Item.IsEmpty())
+            {
+                uiCount++;
+            }
+        }
+    }
+
+    return uiCount;
+}
+
+bool cpp_conv::Conveyor::HasItemInSlot(int lane, int slot)
+{
+    if (IsPartOfASequence())
+    {
+        return m_pSequence->HasItemInSlot(m_uiSequenceIndex, lane, slot);
+    }
+
+    cpp_conv::Conveyor::Channel& rTargetChannel = m_pChannels[lane];
+    ItemInstance& forwardTargetItem = rTargetChannel.m_pSlots[slot].m_Item;
+    ItemInstance& forwardPendingItem = rTargetChannel.m_pPendingItems[slot];
+
+    return (!forwardTargetItem.IsEmpty() || !forwardPendingItem.IsEmpty());
+}
+
+void cpp_conv::Conveyor::PlaceItemInSlot(int lane, int slot, const ItemId pItem)
+{
+    assert(!HasItemInSlot(lane, slot));
+
+    if (IsPartOfASequence())
+    {
+        m_pSequence->AddItemInSlot(m_uiSequenceIndex, lane, slot);
+        return;
+    }
+
+    ItemInstance& forwardTargetItem = m_pChannels[lane].m_pPendingItems[slot];
+    if (m_eEntityKind != EntityKind::Conveyor)
+    {
+        forwardTargetItem = { pItem, 0, 0, 0, m_uiMoveTick, false };
+        return;
+    }
+
+    //Vector2F position = reinterpret_cast<const Conveyor*>(&pSourceEntity)->m_pChannels[iSourceChannel].m_pSlots[iSourceLane].m_VisualPosition;
+    //forwardTargetItem = { pItem, position.GetX(), position.GetY(), 0, m_uiMoveTick, true };
+    forwardTargetItem = { pItem, 0, 0, 0, m_uiMoveTick, false };
+}
+
 void cpp_conv::Conveyor::AddItemToSlot(
     const cpp_conv::WorldMap& map,
     cpp_conv::Conveyor::Channel* pTargetChannel,
@@ -348,13 +428,21 @@ void cpp_conv::Conveyor::AddItemToSlot(
     int iSourceChannel,
     int iSourceLane)
 {
-    ItemInstance& forwardTargetItem = pTargetChannel->m_pPendingItems[forwardTargetItemSlot];
-    if (pSourceEntity.m_eEntityKind != EntityKind::Conveyor)
+    PlaceItemInSlot(pTargetChannel->m_ChannelLane, forwardTargetItemSlot, pItem);
+}
+
+bool cpp_conv::Conveyor::TryPeakItemInSlot(int lane, int slot, const ItemInstance*& pItem) const
+{
+    if (IsPartOfASequence())
     {
-        forwardTargetItem = { pItem, 0, 0, 0, m_uiMoveTick, false };
-        return;
+        return m_pSequence->TryPeakItemInSlot(m_uiSequenceIndex, lane, slot, pItem);
     }
 
-    Vector2F position = reinterpret_cast<const Conveyor*>(&pSourceEntity)->m_pChannels[iSourceChannel].m_pSlots[iSourceLane].m_VisualPosition;
-    forwardTargetItem = { pItem, position.GetX(), position.GetY(), 0, m_uiMoveTick, true };
+    if (m_pChannels[lane].m_pSlots[slot].m_Item.IsEmpty())
+    {
+        return false;
+    }
+
+    pItem = &m_pChannels[lane].m_pSlots[slot].m_Item;
+    return true;
 }

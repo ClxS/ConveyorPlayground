@@ -14,7 +14,8 @@ void tileRenderer(
     cpp_conv::RenderContext& kContext,
     const cpp_conv::resources::RenderableAsset* pAsset,
     const cpp_conv::Transform2D& kTransform,
-    cpp_conv::Colour kColourOverride)
+    cpp_conv::Colour kColourOverride,
+    bool bTrack)
 {
     PROFILE_FUNC();
     SDL_Rect dest = {};
@@ -44,6 +45,10 @@ void tileRenderer(
 
 
                 SDL_RenderCopy(cpp_conv::apphost::App.renderer, pTexture, NULL, &dest);
+                if (bTrack)
+                {
+                    ++kContext.m_uiDrawnItems;
+                }
             }
         }
     }
@@ -82,6 +87,11 @@ void tileRenderer(
         {
             SDL_SetTextureAlphaMod(pTexture, kContext.m_LayerColour.m_argb.m_a);
             SDL_RenderCopyEx(cpp_conv::apphost::App.renderer, pTexture, NULL, &dest, angle, &rotatePivot, SDL_RendererFlip::SDL_FLIP_NONE);
+
+            if (bTrack)
+            {
+                ++kContext.m_uiDrawnItems;
+            }
         }
     }
 }

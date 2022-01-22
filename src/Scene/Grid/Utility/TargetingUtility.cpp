@@ -119,6 +119,8 @@ bool cpp_conv::targeting_util::IsClockwiseCorner(const cpp_conv::WorldMap& map, 
             case Direction::Right:return rConveyor.m_position.GetY() < pBackConverter->m_position.GetY();
         }
     }
+
+    return false;
 }
 
 cpp_conv::Conveyor::Channel* cpp_conv::targeting_util::GetTargetChannel(const cpp_conv::WorldMap& map, const cpp_conv::Entity& sourceNode, cpp_conv::Conveyor& targetNode, int iSourceChannel)

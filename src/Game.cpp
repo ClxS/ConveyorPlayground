@@ -85,7 +85,8 @@ void CreateMillionTileMap(cpp_conv::WorldMap& worldMap)
             count += 2;
         }
 
-        const int width = 31 * 64 - 1;
+        const int width = 250;
+        //const int width = 31 * 64 - 1;
         for (int x = 4; x < width; x++)
         {
             worldMap.PlaceEntity({ x, y, 0 }, new cpp_conv::Conveyor({ x, y, 0 }, { 1, 1, 1 }, Direction::Right));
@@ -116,7 +117,7 @@ void cpp_conv::game::run()
     WorldMap worldMap;
     {
         CreateMillionTileMap(worldMap);
-        //AssetPtr<Map> map = resource_manager::loadAssetUncached<Map>(registry::data::MapBigSimple);
+        //AssetPtr<Map> map = resource_manager::loadAssetUncached<Map>(registry::data::MapSimple);
         //worldMap.Consume(map);
 
         /*map = resource_manager::loadAssetUncached<Map>(registry::data::MapSimple1);
@@ -135,7 +136,7 @@ void cpp_conv::game::run()
         worldMap.Consume(map);*/
     }
 
-    std::vector<cpp_conv::Sequence> sequences = cpp_conv::InitializeSequences(worldMap, worldMap.GetConveyors());
+    std::vector<cpp_conv::Sequence*> sequences = cpp_conv::InitializeSequences(worldMap, worldMap.GetConveyors());
     cpp_conv::SceneContext kSceneContext =
     { 
         {},
@@ -172,6 +173,8 @@ void cpp_conv::game::run()
     float fCurrentZoom = kRenderContext.m_fZoom;
     while (true) 
     {
+        kRenderContext.m_uiDrawnItems = 0;
+
         PROFILE(Input, cpp_conv::input::receiveInput(kSceneContext, kRenderContext, commands));
         PROFILE(CommandProcess, cpp_conv::command::processCommands(kSceneContext, kRenderContext, commands));
         PROFILE(Simulation, cpp_conv::simulation::simulate(kSceneContext));

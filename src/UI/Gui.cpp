@@ -6,6 +6,7 @@
 #include "RenderContext.h"
 #include "Profiler.h"
 #include "SceneContext.h"
+#include "Conveyor.h"
 
 void cpp_conv::ui::drawUI(SceneContext& kSceneContext, RenderContext& kRenderContext)
 {
@@ -29,11 +30,27 @@ void cpp_conv::ui::drawUI(SceneContext& kSceneContext, RenderContext& kRenderCon
 
     ImGuiWindowFlags flags = 0;
 
+    uint64_t uiItemCount = 0;
+    for (auto& sequence : kSceneContext.m_sequences)
+    {
+        uiItemCount += sequence->CountItemsOnBelt();
+    }
+
+    for (cpp_conv::Conveyor* pConveyor : kSceneContext.m_rMap.GetConveyors())
+    {
+        if (!pConveyor->IsPartOfASequence())
+        {
+            uiItemCount += pConveyor->CountItemsOnBelt();
+        }
+    }
+
     ImGui::SetNextWindowPos({ 0, 0 });
     if (ImGui::Begin("Hello, world!", 0, flags))
     {
         ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         ImGui::Text(std::format("Entites in world: {} Conveyors, {} Others", kSceneContext.m_rMap.GetConveyors().size(), kSceneContext.m_rMap.GetOtherEntities().size()).c_str());
+        ImGui::Text(std::format("Items in World: {}", uiItemCount).c_str());
+        ImGui::Text(std::format("Drawn items: {}", kRenderContext.m_uiDrawnItems).c_str());
 
         ImGui::Text(std::format("Position: {}, {}", kSceneContext.m_player.GetX(), kSceneContext.m_player.GetY()).c_str());
         ImGui::Text(std::format("Current Floor: {}", kSceneContext.m_player.GetZ()).c_str());
