@@ -93,7 +93,7 @@ void CreateMillionTileMap(cpp_conv::WorldMap& worldMap)
             worldMap.PlaceEntity({ x, y + 1, 0 }, new cpp_conv::Conveyor({ x, y + 1, 0 }, { 1, 1, 1 }, Direction::Left));
             count += 2;
 
-            if (count >= 1000000)
+            if (count >= 1000)
             {
                 return;
             }
@@ -116,9 +116,10 @@ void cpp_conv::game::run()
 
     WorldMap worldMap;
     {
-        CreateMillionTileMap(worldMap);
-        //AssetPtr<Map> map = resource_manager::loadAssetUncached<Map>(registry::data::MapSimple);
-        //worldMap.Consume(map);
+        //CreateMillionTileMap(worldMap);
+
+        AssetPtr<Map> map = resource_manager::loadAssetUncached<Map>(registry::data::MapSimple);
+        worldMap.Consume(map);
 
         /*map = resource_manager::loadAssetUncached<Map>(registry::data::MapSimple1);
         for (auto& pEntity : map->GetConveyors()) { pEntity->m_position.SetZ(1); }
@@ -134,6 +135,8 @@ void cpp_conv::game::run()
         for (auto& pEntity : map->GetConveyors()) { pEntity->m_position.SetZ(3); }
         for (auto& pEntity : map->GetOtherEntities()) { pEntity->m_position.SetZ(3); }
         worldMap.Consume(map);*/
+
+        worldMap.PopulateCorners();
     }
 
     std::vector<cpp_conv::Sequence*> sequences = cpp_conv::InitializeSequences(worldMap, worldMap.GetConveyors());
@@ -169,6 +172,7 @@ void cpp_conv::game::run()
 
     cpp_conv::ui::initializeGuiSystem();
 
+
     frameLimter.Start();
     float fCurrentZoom = kRenderContext.m_fZoom;
     while (true) 
@@ -196,7 +200,7 @@ void cpp_conv::game::run()
         PROFILE(DrawUI, cpp_conv::ui::drawUI(kSceneContext, kRenderContext));
         PROFILE(Present, swapChain.SwapAndPresent());
 
-        //PROFILE(FrameCapSleep, frameLimter.Limit());
+        PROFILE(FrameCapSleep, frameLimter.Limit());
         PROFILE(UpdatePersistence, cpp_conv::resources::resource_manager::updatePersistenceStore());
         frameLimter.EndFrame();
     }

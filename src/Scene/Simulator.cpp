@@ -14,11 +14,8 @@ void cpp_conv::simulation::simulate(SceneContext& kContext)
         pProducer->Tick(kContext);
     }
     
-    for (cpp_conv::Conveyor* pConveyor : kContext.m_rMap.GetConveyors())
+    for (cpp_conv::Conveyor* pConveyor : kContext.m_rMap.GetCornerConveyors())
     {
-        if (!pConveyor->IsPartOfASequence())
-        {
-            pConveyor->Tick(kContext);
-        }
+        pConveyor->Tick(kContext);
     }
 }

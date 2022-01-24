@@ -143,6 +143,17 @@ void cpp_conv::WorldMap::Consume(cpp_conv::resources::AssetPtr<cpp_conv::resourc
     map->GetOtherEntities().clear();
 }
 
+void cpp_conv::WorldMap::PopulateCorners()
+{
+    for (auto pConveyor : m_vConveyors)
+    {
+        if (pConveyor->IsCorner())
+        {
+            m_vCornerConveyors.push_back(pConveyor);
+        }
+    } 
+}
+
 bool cpp_conv::WorldMap::PlaceEntity(Vector3 position, Entity* pEntity)
 {
     if (!ValidateCanPlaceEntity(position, pEntity))

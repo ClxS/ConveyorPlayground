@@ -182,7 +182,7 @@ int cpp_conv::targeting_util::GetChannelTargetSlot(const cpp_conv::WorldMap& map
     case Direction::Up: result = targetNode.m_direction == Direction::Left ? iSourceChannel : cpp_conv::c_conveyorChannels - 1 - iSourceChannel; break;
     case Direction::Down: result = targetNode.m_direction == Direction::Left ? cpp_conv::c_conveyorChannels - 1 - iSourceChannel : iSourceChannel; break;
     case Direction::Left: result = targetNode.m_direction == Direction::Up ? iSourceChannel : cpp_conv::c_conveyorChannels - 1 - iSourceChannel; break;
-    case Direction::Right: result = targetNode.m_direction == Direction::Up ? cpp_conv::c_conveyorChannels - 1 - iSourceChannel : iSourceChannel; break;
+    case Direction::Right: result = targetNode.m_direction == Direction::Up ? iSourceChannel : cpp_conv::c_conveyorChannels - 1 - iSourceChannel; break;
     }
 
     if (cpp_conv::targeting_util::IsCornerConveyor(map, targetNode))
