@@ -144,7 +144,7 @@ void cpp_conv::Conveyor::Tick(const SceneContext& kContext)
             ItemInstance& forwardPendingItem = rChannel.m_pSlots[iChannelSlot + 1].m_Item;
             if (!currentItem.IsEmpty() && forwardTargetItem.IsEmpty() && forwardPendingItem.IsEmpty())
             {
-                AddItemToSlot(kContext.m_rMap, &rChannel, iChannelSlot + 1, currentItem.m_Item, *this, rChannel.m_ChannelLane, iChannelSlot);
+                PlaceItemInSlot(rChannel.m_ChannelLane, iChannelSlot + 1, currentItem.m_Item, true);
                 currentItem = ItemInstance::Empty();
             }
         }
@@ -179,7 +179,13 @@ void cpp_conv::Conveyor::Draw(RenderContext& kContext) const
         PROFILE_SCOPE(Conveyor_Pass1);
         for (int uiChannel = 0; uiChannel < c_conveyorChannels; uiChannel++)
         {
-            for (int uiSlot = 0; uiSlot < c_conveyorChannelSlots; uiSlot++)
+            int iChannelLength = cpp_conv::c_conveyorChannelSlots;
+            if (m_bIsCorner)
+            {
+                iChannelLength += m_iInnerMostChannel == uiChannel ? -1 : 1;
+            }
+
+            for (int uiSlot = 0; uiSlot < iChannelLength; uiSlot++)
             {
                 const ItemInstance* pItemInstance;
                 if (!TryPeakItemInSlot(uiChannel, uiSlot, pItemInstance))
@@ -397,7 +403,7 @@ bool cpp_conv::Conveyor::HasItemInSlot(int lane, int slot)
     return (!forwardTargetItem.IsEmpty() || !forwardPendingItem.IsEmpty());
 }
 
-void cpp_conv::Conveyor::PlaceItemInSlot(int lane, int slot, const ItemId pItem)
+void cpp_conv::Conveyor::PlaceItemInSlot(int lane, int slot, const ItemId pItem, bool bDirectItemSet)
 {
     assert(!HasItemInSlot(lane, slot));
 
@@ -407,7 +413,7 @@ void cpp_conv::Conveyor::PlaceItemInSlot(int lane, int slot, const ItemId pItem)
         return;
     }
 
-    ItemInstance& forwardTargetItem = m_pChannels[lane].m_pPendingItems[slot];
+    ItemInstance& forwardTargetItem = (bDirectItemSet ? m_pChannels[lane].m_pSlots[slot].m_Item : m_pChannels[lane].m_pPendingItems[slot]);
     if (m_eEntityKind != EntityKind::Conveyor)
     {
         forwardTargetItem = { pItem, 0, 0, 0, m_uiMoveTick, false };
