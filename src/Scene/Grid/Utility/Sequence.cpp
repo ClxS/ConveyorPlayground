@@ -185,6 +185,14 @@ int First0Bit(uint64_t i)
 
 void cpp_conv::Sequence::Tick(SceneContext& kContext)
 {
+    m_pHeadConveyor->m_uiCurrentTick++;
+    if (m_pHeadConveyor->m_uiCurrentTick < m_pHeadConveyor->m_uiMoveTick)
+    {
+        return;
+    } 
+
+    m_pHeadConveyor->m_uiCurrentTick = 0;
+
     for (uint8_t uiLane = 0; uiLane < c_conveyorChannels; uiLane++)
     {
         bool bIsLeadItemFull = (m_Lanes[uiLane] & 0b1) == 1;

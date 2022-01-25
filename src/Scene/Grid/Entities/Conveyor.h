@@ -92,7 +92,7 @@ namespace cpp_conv
         uint8_t m_uiSequenceIndex;
 
         uint32_t m_uiCurrentTick = 0;
-        uint32_t m_uiMoveTick = 0;
+        uint32_t m_uiMoveTick = 10;
         bool m_bHasWork = false;
 
         bool m_bIsCorner;

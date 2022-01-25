@@ -16,7 +16,7 @@ namespace cpp_conv
     class Sequence
     {
     public:
-        Sequence(const Conveyor* pHead, uint8_t uiLength)
+        Sequence(Conveyor* pHead, uint8_t uiLength)
             : m_Lanes{ 0, 0 }
             , m_pHeadConveyor(pHead)
             , m_Length(uiLength)
@@ -37,7 +37,7 @@ namespace cpp_conv
 
         std::array<uint64_t, c_conveyorChannels> m_Lanes;
 
-        const Conveyor* m_pHeadConveyor;
+        Conveyor* m_pHeadConveyor;
         const uint8_t m_Length;
     };
 
