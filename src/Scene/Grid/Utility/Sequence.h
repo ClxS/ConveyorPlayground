@@ -18,12 +18,14 @@ namespace cpp_conv
     public:
         Sequence(Conveyor* pHead, uint8_t uiLength)
             : m_Lanes{ 0, 0 }
+            , m_PendingLanes{ 0, 0 }
             , m_pHeadConveyor(pHead)
             , m_Length(uiLength)
         {
         }
 
         void Tick(SceneContext& kContext);
+        void Realize();
 
         const Conveyor* GetHeadConveyor() const { return m_pHeadConveyor; }
 
@@ -36,6 +38,7 @@ namespace cpp_conv
         friend class Conveyor;
 
         std::array<uint64_t, c_conveyorChannels> m_Lanes;
+        std::array<uint64_t, c_conveyorChannels> m_PendingLanes;
 
         Conveyor* m_pHeadConveyor;
         const uint8_t m_Length;

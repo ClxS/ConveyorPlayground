@@ -220,19 +220,30 @@ void cpp_conv::Sequence::Tick(SceneContext& kContext)
     }
 }
 
+
+void Sequence::Realize()
+{
+    for (uint8_t uiLane = 0; uiLane < c_conveyorChannels; uiLane++)
+    {
+        m_Lanes[uiLane] |= m_PendingLanes[uiLane];
+        m_PendingLanes[uiLane] = 0;
+    }
+}
+
 uint64_t Sequence::CountItemsOnBelt()
 {
     return std::popcount(m_Lanes[0]) + std::popcount(m_Lanes[1]);
 }
 
 void Sequence::AddItemInSlot(uint8_t m_uiSequenceIndex, int lane, int slot)
-{
-    m_Lanes[lane] |= 1ULL << (m_Length * 2 - m_uiSequenceIndex * 2 - slot - 1);
+{ 
+    m_PendingLanes[lane] |= 1ULL << (m_Length * 2 - m_uiSequenceIndex * 2 - slot - 1);
 } 
 
 bool Sequence::HasItemInSlot(uint8_t m_uiSequenceIndex, int lane, int slot) const
 {
-    return ((m_Lanes[lane] >> (m_Length * 2 - m_uiSequenceIndex * 2 - slot - 1)) & 0b1) == 1;
+    bool bMainLane = ((m_Lanes[lane] >> (m_Length * 2 - m_uiSequenceIndex * 2 - slot - 1)) & 0b1) == 1;
+    return bMainLane || ((m_PendingLanes[lane] >> (m_Length * 2 - m_uiSequenceIndex * 2 - slot - 1)) & 0b1) == 1;
 }
 
 bool Sequence::TryPeakItemInSlot(uint8_t m_uiSequenceIndex, int lane, int slot, const ItemInstance*& pItem)

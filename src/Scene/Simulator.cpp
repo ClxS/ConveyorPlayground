@@ -18,4 +18,14 @@ void cpp_conv::simulation::simulate(SceneContext& kContext)
     {
         pConveyor->Tick(kContext);
     }
+
+    for (auto& sequence : kContext.m_sequences)
+    {
+        sequence->Realize();
+    }
+
+    for (cpp_conv::Conveyor* pConveyor : kContext.m_rMap.GetCornerConveyors())
+    {
+        pConveyor->Realize();
+    }
 }

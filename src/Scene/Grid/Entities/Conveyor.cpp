@@ -105,18 +105,15 @@ void cpp_conv::Conveyor::Tick(const SceneContext& kContext)
     }
 
     m_uiCurrentTick = 0;
-
-    bool bIsCornerConveyor = IsCorner();
     for (int iChannelIdx = 0; iChannelIdx < cpp_conv::c_conveyorChannels; iChannelIdx++)
     {
         cpp_conv::Conveyor::Channel& rChannel = m_pChannels[iChannelIdx];
 
         int iChannelLength = cpp_conv::c_conveyorChannelSlots;
-        if (bIsCornerConveyor)
+        if (m_bIsCorner)
         {
             iChannelLength += m_iInnerMostChannel == iChannelIdx ? -1 : 1;
         }
-
 
         ItemInstance& rLeadingItem = rChannel.m_pSlots[iChannelLength - 1].m_Item;
         if (!rLeadingItem.IsEmpty())
@@ -125,15 +122,6 @@ void cpp_conv::Conveyor::Tick(const SceneContext& kContext)
             if (pForwardEntity && pForwardEntity->SupportsInsertion() && pForwardEntity->TryInsert(kContext, *this, rLeadingItem.m_Item, iChannelIdx, iChannelLength - 1))
             {
                 rLeadingItem = ItemInstance::Empty();
-            }
-        }
-
-        for (int iChannelSlot = 0; iChannelSlot <= iChannelLength - 1; iChannelSlot++)
-        { 
-            if (!rChannel.m_pPendingItems[iChannelSlot].IsEmpty())
-            {
-                rChannel.m_pSlots[iChannelSlot].m_Item = rChannel.m_pPendingItems[iChannelSlot];
-                rChannel.m_pPendingItems[iChannelSlot] = ItemInstance::Empty();
             }
         }
 
@@ -146,6 +134,28 @@ void cpp_conv::Conveyor::Tick(const SceneContext& kContext)
             {
                 PlaceItemInSlot(rChannel.m_ChannelLane, iChannelSlot + 1, currentItem.m_Item, true);
                 currentItem = ItemInstance::Empty();
+            }
+        }
+    }
+}
+
+void cpp_conv::Conveyor::Realize()
+{
+    for (int iChannelIdx = 0; iChannelIdx < cpp_conv::c_conveyorChannels; iChannelIdx++)
+    {
+        cpp_conv::Conveyor::Channel& rChannel = m_pChannels[iChannelIdx];
+        int iChannelLength = cpp_conv::c_conveyorChannelSlots;
+        if (m_bIsCorner)
+        {
+            iChannelLength += m_iInnerMostChannel == iChannelIdx ? -1 : 1;
+        }
+
+        for (int iChannelSlot = 0; iChannelSlot <= iChannelLength - 1; iChannelSlot++)
+        {
+            if (!rChannel.m_pPendingItems[iChannelSlot].IsEmpty())
+            {
+                rChannel.m_pSlots[iChannelSlot].m_Item = rChannel.m_pPendingItems[iChannelSlot];
+                rChannel.m_pPendingItems[iChannelSlot] = ItemInstance::Empty();
             }
         }
     }

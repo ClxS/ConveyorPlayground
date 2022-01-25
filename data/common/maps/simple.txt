@@ -1,6 +1,6 @@
        
-  AAA  v<<
-  AAA>>v ^
-  AAA  >>^
+  AAAv<<
+  AAAv ^
+  AAA>>^
        
 

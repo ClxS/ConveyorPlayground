@@ -48,6 +48,8 @@ namespace cpp_conv
         std::array<Channel, c_conveyorChannels> m_pChannels;
 
         void Tick(const SceneContext& kContext) override;
+        void Realize();
+
         void Draw(RenderContext& kContext) const override;
         bool SupportsInsertion() const override { return true; }
         bool TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel, int iSourceSlot) override;
