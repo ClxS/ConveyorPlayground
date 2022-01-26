@@ -105,6 +105,6 @@ namespace cpp_conv
         cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> m_pTile;
 
         void AddItemToSlot(const cpp_conv::WorldMap& map, Channel* pTargetChannel, int forwardTargetItemSlot, const ItemId pItem, const Entity& pSourceEntity, int iSourceChannel, int iSourceSlot);
-        bool TryPeakItemInSlot(int lane, int slot, const ItemInstance*& rItem) const;
+        bool TryPeakItemInSlot(int lane, int slot, ItemInstance& rItem) const;
     };
 }

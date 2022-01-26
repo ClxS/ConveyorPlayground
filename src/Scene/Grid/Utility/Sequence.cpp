@@ -134,7 +134,16 @@ std::vector<Sequence*> cpp_conv::InitializeSequences(cpp_conv::WorldMap& map, co
             }
 
             std::vector<Conveyor*> vSequenceConveyors(chunk_begin, chunk_end);
-            vSequences.push_back(new Sequence(vSequenceConveyors[vSequenceConveyors.size() - 1], (uint8_t)vSequenceConveyors.size()));
+            pTailConveyor = vSequenceConveyors.front();
+
+            vSequences.push_back(new Sequence(
+                vSequenceConveyors[vSequenceConveyors.size() - 1],
+                (uint8_t)vSequenceConveyors.size(),
+                pTailConveyor->m_pChannels[0].m_pSlots[0].m_VisualPosition,
+                pTailConveyor->m_pChannels[1].m_pSlots[0].m_VisualPosition,
+                pTailConveyor->m_pChannels[0].m_pSlots[1].m_VisualPosition - pTailConveyor->m_pChannels[0].m_pSlots[0].m_VisualPosition
+            ));
+
             Sequence* sequence = vSequences.back();
             for(int i = 0; i < vSequenceConveyors.size(); ++i)
             {
@@ -191,6 +200,8 @@ void cpp_conv::Sequence::Tick(SceneContext& kContext)
         return;
     } 
 
+    m_LanesRealizedMovements[0] = 0;
+    m_LanesRealizedMovements[1] = 0;
     m_pHeadConveyor->m_uiCurrentTick = 0;
 
     for (uint8_t uiLane = 0; uiLane < c_conveyorChannels; uiLane++)
@@ -200,7 +211,7 @@ void cpp_conv::Sequence::Tick(SceneContext& kContext)
         {
             if (MoveItemToForwardsNode(kContext, *m_pHeadConveyor, (int)uiLane))
             {
-                m_Lanes[uiLane] &= ~0b1;
+                m_PendingClears[uiLane] = 0b1;
                 bIsLeadItemFull = false;
             }
         }
@@ -209,13 +220,15 @@ void cpp_conv::Sequence::Tick(SceneContext& kContext)
         {
             std::bitset<64> x(m_Lanes[uiLane]);
             uint64_t uiMaxMask = (1ULL << First0Bit(m_Lanes[uiLane])) - 1ULL;
-            m_Lanes[uiLane] >>= 1;
-            m_Lanes[uiLane] |= uiMaxMask;
+            m_PendingClears[uiLane] = ~uiMaxMask;
+            m_PendingMoves[uiLane] = m_Lanes[uiLane] >> 1;
+            m_PendingMoves[uiLane] &= ~uiMaxMask;
             std::bitset<64> x2(m_Lanes[uiLane]);
         }
         else
         {
-            m_Lanes[uiLane] >>= 1;
+            m_PendingClears[uiLane] = m_Lanes[uiLane];
+            m_PendingMoves[uiLane] |= m_Lanes[uiLane] >> 1;
         }
     }
 }
@@ -225,8 +238,11 @@ void Sequence::Realize()
 {
     for (uint8_t uiLane = 0; uiLane < c_conveyorChannels; uiLane++)
     {
-        m_Lanes[uiLane] |= m_PendingLanes[uiLane];
-        m_PendingLanes[uiLane] = 0;
+        m_Lanes[uiLane] &= ~m_PendingClears[uiLane];
+        m_Lanes[uiLane] |= m_PendingMoves[uiLane];
+        m_LanesRealizedMovements[uiLane] |= m_PendingMoves[uiLane];
+        m_PendingClears[uiLane] = 0;
+        m_PendingMoves[uiLane] = 0;
     }
 }
 
@@ -235,27 +251,33 @@ uint64_t Sequence::CountItemsOnBelt()
     return std::popcount(m_Lanes[0]) + std::popcount(m_Lanes[1]);
 }
 
-void Sequence::AddItemInSlot(uint8_t m_uiSequenceIndex, int lane, int slot)
+void Sequence::AddItemInSlot(uint8_t uiSequenceIndex, int lane, int slot)
 { 
-    m_PendingLanes[lane] |= 1ULL << (m_Length * 2 - m_uiSequenceIndex * 2 - slot - 1);
+    m_PendingMoves[lane] |= 1ULL << (m_Length * 2 - uiSequenceIndex * 2 - slot - 1);
 } 
 
-bool Sequence::HasItemInSlot(uint8_t m_uiSequenceIndex, int lane, int slot) const
+bool Sequence::HasItemInSlot(uint8_t uiSequenceIndex, int lane, int slot) const
 {
-    bool bMainLane = ((m_Lanes[lane] >> (m_Length * 2 - m_uiSequenceIndex * 2 - slot - 1)) & 0b1) == 1;
-    return bMainLane || ((m_PendingLanes[lane] >> (m_Length * 2 - m_uiSequenceIndex * 2 - slot - 1)) & 0b1) == 1;
+    bool bMainLane = ((m_Lanes[lane] >> (m_Length * 2 - uiSequenceIndex * 2 - slot - 1)) & 0b1) == 1;
+    return bMainLane || ((m_PendingMoves[lane] >> (m_Length * 2 - uiSequenceIndex * 2 - slot - 1)) & 0b1) == 1;
 }
 
-bool Sequence::TryPeakItemInSlot(uint8_t m_uiSequenceIndex, int lane, int slot, const ItemInstance*& pItem)
+bool Sequence::DidItemMoveLastSimulation(uint8_t uiSequenceIndex, int lane, int slot) const
 {
-    if (!HasItemInSlot(m_uiSequenceIndex, lane, slot))
+    return ((m_LanesRealizedMovements[lane] >> (m_Length * 2 - uiSequenceIndex * 2 - slot - 1)) & 0b1) == 1;
+}
+
+bool Sequence::TryPeakItemInSlot(uint8_t uiSequenceIndex, int lane, int slot, ItemInstance& pItem)
+{
+    if (!HasItemInSlot(uiSequenceIndex, lane, slot))
     {
         return false;
     }
 
-    static ItemId s_Item = cpp_conv::ItemId::FromStringId("ITEM_COPPER_ORE");
-    static ItemInstance s_Instance = { s_Item, 0.0f, 0.0f, 0, 0, false };
+    LaneVisual& visual = m_ConveyorVisualOffsets[lane];
+    Vector2F startPosition = visual.m_Origin + visual.m_UnitDirection * ((uiSequenceIndex * 2) + slot - 1);
 
-    pItem = &s_Instance;
+    static ItemId s_Item = cpp_conv::ItemId::FromStringId("ITEM_COPPER_ORE");
+    pItem = { s_Item, startPosition.GetX(), startPosition.GetY(), DidItemMoveLastSimulation(uiSequenceIndex, lane, slot)};
     return true;
 }

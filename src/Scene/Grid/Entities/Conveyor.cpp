@@ -38,18 +38,20 @@ void DrawConveyorItem(
     const cpp_conv::Conveyor& rConveyor,
     cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> pTile,
     Vector2F position,
+    uint32_t uiCurrentTick,
+    uint32_t uiMoveTick,
     const cpp_conv::ItemInstance& item)
 {
     PROFILE_FUNC();
 
     float fLerpFactor = 1.0f;
     Vector2F previousPosition = {};
-    if (item.m_bShouldAnimate && item.m_TargetTick != 0)
+    if (item.m_bShouldAnimate && uiMoveTick != 0)
     {
-        fLerpFactor = item.m_CurrentTick / (float)item.m_TargetTick;
+        fLerpFactor = uiCurrentTick / (float)uiMoveTick;
         previousPosition = { item.m_PreviousX, item.m_PreviousY };
     }
-     
+
     if (item.m_bShouldAnimate)
     {
         position = cpp_conv::targeting_util::GetRenderPosition(
@@ -197,16 +199,24 @@ void cpp_conv::Conveyor::Draw(RenderContext& kContext) const
 
             for (int uiSlot = 0; uiSlot < iChannelLength; uiSlot++)
             {
-                const ItemInstance* pItemInstance;
-                if (!TryPeakItemInSlot(uiChannel, uiSlot, pItemInstance))
+                ItemInstance itemInstance;
+                if (!TryPeakItemInSlot(uiChannel, uiSlot, itemInstance))
                 {
                     continue;
                 }
 
-                cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> pItem = cpp_conv::resources::getItemDefinition(pItemInstance->m_Item);
+                cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> pItem = cpp_conv::resources::getItemDefinition(itemInstance.m_Item);
                 if (!pItem)
                 {
                     continue;
+                }
+
+                uint32_t uiCurrentTick = m_uiCurrentTick;
+                uint32_t uiMoveTick = m_uiMoveTick;
+                if (IsPartOfASequence())
+                {
+                    uiCurrentTick = m_pSequence->GetCurrentTick();
+                    uiMoveTick = m_pSequence->GetMoveTick();
                 }
 
                 DrawConveyorItem(
@@ -214,7 +224,9 @@ void cpp_conv::Conveyor::Draw(RenderContext& kContext) const
                     *this,
                     pItem->GetTile(),
                     m_pChannels[uiChannel].m_pSlots[uiSlot].m_VisualPosition,
-                    *pItemInstance);
+                    uiCurrentTick,
+                    uiMoveTick,
+                    itemInstance);
             }
         }
 
@@ -426,13 +438,13 @@ void cpp_conv::Conveyor::PlaceItemInSlot(int lane, int slot, const ItemId pItem,
     ItemInstance& forwardTargetItem = (bDirectItemSet ? m_pChannels[lane].m_pSlots[slot].m_Item : m_pChannels[lane].m_pPendingItems[slot]);
     if (m_eEntityKind != EntityKind::Conveyor)
     {
-        forwardTargetItem = { pItem, 0, 0, 0, m_uiMoveTick, false };
+        forwardTargetItem = { pItem, 0, 0, false };
         return;
     }
 
     //Vector2F position = reinterpret_cast<const Conveyor*>(&pSourceEntity)->m_pChannels[iSourceChannel].m_pSlots[iSourceLane].m_VisualPosition;
     //forwardTargetItem = { pItem, position.GetX(), position.GetY(), 0, m_uiMoveTick, true };
-    forwardTargetItem = { pItem, 0, 0, 0, m_uiMoveTick, false };
+    forwardTargetItem = { pItem, 0, 0, false };
 }
 
 void cpp_conv::Conveyor::AddItemToSlot(
@@ -447,7 +459,7 @@ void cpp_conv::Conveyor::AddItemToSlot(
     PlaceItemInSlot(pTargetChannel->m_ChannelLane, forwardTargetItemSlot, pItem);
 }
 
-bool cpp_conv::Conveyor::TryPeakItemInSlot(int lane, int slot, const ItemInstance*& pItem) const
+bool cpp_conv::Conveyor::TryPeakItemInSlot(int lane, int slot, ItemInstance& pItem) const
 {
     if (IsPartOfASequence())
     {
@@ -459,6 +471,6 @@ bool cpp_conv::Conveyor::TryPeakItemInSlot(int lane, int slot, const ItemInstanc
         return false;
     }
 
-    pItem = &m_pChannels[lane].m_pSlots[slot].m_Item;
+    pItem = m_pChannels[lane].m_pSlots[slot].m_Item;
     return true;
 }

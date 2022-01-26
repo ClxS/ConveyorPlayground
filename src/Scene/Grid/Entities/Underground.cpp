@@ -186,9 +186,9 @@ bool cpp_conv::Underground::TryInsert(const SceneContext& kContext, const Entity
     ItemInstance& forwardPendingItem = m_arrInternalConveyors[0].m_pChannels[iSourceChannel].m_pSlots[0].m_Item;
     if (forwardTargetItem.IsEmpty() && forwardPendingItem.IsEmpty())
     {
-        forwardPendingItem = { pItem, 0.0f, 0.0f, 0, 0, false };
+        forwardPendingItem = { pItem, 0.0f, 0.0f, false };
         return true;
-    }
+    } 
 
     return false;
 }
