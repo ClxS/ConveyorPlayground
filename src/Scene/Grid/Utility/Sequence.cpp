@@ -195,48 +195,48 @@ void cpp_conv::Sequence::Tick(SceneContext& kContext)
         return;
     }
 
-    m_LanesRealizedMovements[0] = 0;
-    m_LanesRealizedMovements[1] = 0;
+    m_RealizedState.m_RealizedMovements[0] = 0;
+    m_RealizedState.m_RealizedMovements[1] = 0;
     m_pHeadConveyor->m_uiCurrentTick = 0;
 
     for (uint8_t uiLane = 0; uiLane < c_conveyorChannels; uiLane++)
     {
-        bool bIsLeadItemFull = (m_Lanes[uiLane] & 0b1) == 1;
+        bool bIsLeadItemFull = (m_RealizedState.m_Lanes[uiLane] & 0b1) == 1;
         if (bIsLeadItemFull)
         {
             if (MoveItemToForwardsNode(kContext, *m_pHeadConveyor, (int)uiLane))
             {
-                m_PendingClears[uiLane] = 0b1;
+                m_PendingState.m_PendingClears[uiLane] = 0b1;
                 bIsLeadItemFull = false;
             }
         }
 
         if (bIsLeadItemFull)
         {
-            uint64_t uiMaxMask = (1ULL << std::countr_one(m_Lanes[uiLane])) - 1ULL;
-            m_PendingClears[uiLane] = ~uiMaxMask;
+            uint64_t uiMaxMask = (1ULL << std::countr_one(m_RealizedState.m_Lanes[uiLane])) - 1ULL;
+            m_PendingState.m_PendingClears[uiLane] = ~uiMaxMask;
 
-            uint64_t uiNewPositions = m_Lanes[uiLane] >> 1;
-            uint64_t uiOverlaps = uiNewPositions & m_PendingMoves[uiLane];
+            uint64_t uiNewPositions = m_RealizedState.m_Lanes[uiLane] >> 1;
+            uint64_t uiOverlaps = uiNewPositions & m_PendingState.m_PendingMoves[uiLane];
             if (uiOverlaps == 0)
             {
-                m_PendingMoves[uiLane] |= m_Lanes[uiLane] >> 1;
-                m_PendingMoves[uiLane] &= ~uiMaxMask;
+                m_PendingState.m_PendingMoves[uiLane] |= m_RealizedState.m_Lanes[uiLane] >> 1;
+                m_PendingState.m_PendingMoves[uiLane] &= ~uiMaxMask;
             }
         }
         else
         {
-            uint64_t uiNewPositions = m_Lanes[uiLane] >> 1;
-            uint64_t uiOverlaps = uiNewPositions & m_PendingMoves[uiLane];
+            uint64_t uiNewPositions = m_RealizedState.m_Lanes[uiLane] >> 1;
+            uint64_t uiOverlaps = uiNewPositions & m_PendingState.m_PendingMoves[uiLane];
             if (uiOverlaps == 0)
             {
                 // No mid-insert collision fast path
-                m_PendingClears[uiLane] = m_Lanes[uiLane];
-                m_PendingMoves[uiLane] |= uiNewPositions;
+                m_PendingState.m_PendingClears[uiLane] = m_RealizedState.m_Lanes[uiLane];
+                m_PendingState.m_PendingMoves[uiLane] |= uiNewPositions;
             }
             else
             {
-                m_PendingClears[uiLane] = m_Lanes[uiLane];
+                m_PendingState.m_PendingClears[uiLane] = m_RealizedState.m_Lanes[uiLane];
                 do 
                 {
                     // Determine save area
@@ -252,10 +252,10 @@ void cpp_conv::Sequence::Tick(SceneContext& kContext)
 
                     // Perform safe move area
                     {
-                        m_PendingMoves[uiLane] |= uiNewPositions & safeRegionMask;
+                        m_PendingState.m_PendingMoves[uiLane] |= uiNewPositions & safeRegionMask;
 
                         // We can't clear our the original position
-                        m_PendingClears[uiLane] &= ~(1ULL << uiCollisionBit);
+                        m_PendingState.m_PendingClears[uiLane] &= ~(1ULL << uiCollisionBit);
 
                         // Zero out the safe region so we know what remains
                         uiNewPositions &= ~safeRegionMask;
@@ -267,8 +267,8 @@ void cpp_conv::Sequence::Tick(SceneContext& kContext)
                         uint64_t uiNextMovableBit = std::countr_zero(uiOverlaps);
                         uint64_t uiClearRange = (1ULL << uiNextMovableBit) & ~safeRegionMask;
 
-                        m_PendingClears[uiLane] &= ~uiClearRange;
-                        m_PendingMoves[uiLane] &= ~uiClearRange;
+                        m_PendingState.m_PendingClears[uiLane] &= ~uiClearRange;
+                        m_PendingState.m_PendingMoves[uiLane] &= ~uiClearRange;
                     }
                 }
                 while (uiOverlaps != 0);
@@ -277,38 +277,37 @@ void cpp_conv::Sequence::Tick(SceneContext& kContext)
     }
 }
 
-
 void Sequence::Realize()
 {
     for (uint8_t uiLane = 0; uiLane < c_conveyorChannels; uiLane++)
     {
-        m_Lanes[uiLane] &= ~m_PendingClears[uiLane];
-        m_Lanes[uiLane] |= m_PendingMoves[uiLane];
-        m_LanesRealizedMovements[uiLane] |= m_PendingMoves[uiLane];
-        m_PendingClears[uiLane] = 0;
-        m_PendingMoves[uiLane] = 0;
+        m_RealizedState.m_Lanes[uiLane] &= ~m_PendingState.m_PendingClears[uiLane];
+        m_RealizedState.m_Lanes[uiLane] |= m_PendingState.m_PendingMoves[uiLane];
+        m_RealizedState.m_RealizedMovements[uiLane] |= m_PendingState.m_PendingMoves[uiLane];
+        m_PendingState.m_PendingClears[uiLane] = 0;
+        m_PendingState.m_PendingMoves[uiLane] = 0;
     }
 }
 
 uint64_t Sequence::CountItemsOnBelt()
 {
-    return std::popcount(m_Lanes[0]) + std::popcount(m_Lanes[1]);
+    return std::popcount(m_RealizedState.m_Lanes[0]) + std::popcount(m_RealizedState.m_Lanes[1]);
 }
 
 void Sequence::AddItemInSlot(uint8_t uiSequenceIndex, int lane, int slot)
 { 
-    m_PendingMoves[lane] |= 1ULL << (m_Length * 2 - uiSequenceIndex * 2 - slot - 1);
+    m_PendingState.m_PendingMoves[lane] |= 1ULL << (m_Length * 2 - uiSequenceIndex * 2 - slot - 1);
 } 
 
 bool Sequence::HasItemInSlot(uint8_t uiSequenceIndex, int lane, int slot) const
 {
-    bool bMainLane = ((m_Lanes[lane] >> (m_Length * 2 - uiSequenceIndex * 2 - slot - 1)) & 0b1) == 1;
-    return bMainLane || ((m_PendingMoves[lane] >> (m_Length * 2 - uiSequenceIndex * 2 - slot - 1)) & 0b1) == 1;
+    bool bMainLane = ((m_RealizedState.m_Lanes[lane] >> (m_Length * 2 - uiSequenceIndex * 2 - slot - 1)) & 0b1) == 1;
+    return bMainLane || ((m_PendingState.m_PendingMoves[lane] >> (m_Length * 2 - uiSequenceIndex * 2 - slot - 1)) & 0b1) == 1;
 }
 
 bool Sequence::DidItemMoveLastSimulation(uint8_t uiSequenceIndex, int lane, int slot) const
 {
-    return ((m_LanesRealizedMovements[lane] >> (m_Length * 2 - uiSequenceIndex * 2 - slot - 1)) & 0b1) == 1;
+    return ((m_RealizedState.m_RealizedMovements[lane] >> (m_Length * 2 - uiSequenceIndex * 2 - slot - 1)) & 0b1) == 1;
 }
 
 bool Sequence::TryPeakItemInSlot(uint8_t uiSequenceIndex, int lane, int slot, ItemInstance& pItem)
@@ -318,10 +317,10 @@ bool Sequence::TryPeakItemInSlot(uint8_t uiSequenceIndex, int lane, int slot, It
         return false;
     }
 
-    LaneVisual& visual = m_ConveyorVisualOffsets[lane];
+    LaneVisual& visual = m_InitializationState.m_ConveyorVisualOffsets[lane];
     Vector2F startPosition = visual.m_Origin + visual.m_UnitDirection * ((uiSequenceIndex * 2) + slot - 1);
 
     static ItemId s_Item = cpp_conv::ItemId::FromStringId("ITEM_COPPER_ORE");
-    pItem = { s_Item, startPosition.GetX(), startPosition.GetY(), DidItemMoveLastSimulation(uiSequenceIndex, lane, slot)};
+    pItem = { s_Item, startPosition.GetX(), startPosition.GetY(), DidItemMoveLastSimulation(uiSequenceIndex, lane, slot) };
     return true;
 }

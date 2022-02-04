@@ -4,6 +4,7 @@
 #include "vector_set.h"
 #include "Conveyor.h"
 #include "EntityGrid.h"
+#include "FixedCircularBuffer.h"
 
 namespace cpp_conv { class WorldMap; }
 
@@ -17,10 +18,9 @@ namespace cpp_conv
     {
     public:
         Sequence(Conveyor* pHead, uint8_t uiLength, Vector2F laneOnePosition, Vector2F laneTwoPosition, Vector2F unitDirection)
-            : m_Lanes{ 0, 0 }
-            , m_PendingMoves{ 0, 0 }
-            , m_LanesRealizedMovements{ 0, 0 }
-            , m_ConveyorVisualOffsets{ LaneVisual(laneOnePosition, unitDirection), LaneVisual(laneTwoPosition, unitDirection) }
+            : m_InitializationState{ { LaneVisual(laneOnePosition, unitDirection), LaneVisual(laneTwoPosition, unitDirection) } }
+            , m_RealizedState{ {0, 0}, {0, 0} }
+            , m_PendingState{ {0, 0}, {0, 0} }
             , m_pHeadConveyor(pHead)
             , m_Length(uiLength)
         {
@@ -54,12 +54,31 @@ namespace cpp_conv
             Vector2F m_UnitDirection;
         };
 
-        std::array<uint64_t, c_conveyorChannels> m_Lanes;
-        std::array<uint64_t, c_conveyorChannels> m_PendingMoves;
-        std::array<uint64_t, c_conveyorChannels> m_PendingClears;
-        std::array<uint64_t, c_conveyorChannels> m_LanesRealizedMovements;
+        struct PositionVisualOverride
+        {
+            Vector2F m_Position;
+            bool m_bIsSet;
+        };
 
-        std::array<LaneVisual, c_conveyorChannels> m_ConveyorVisualOffsets;
+        struct
+        {
+            std::array<LaneVisual, c_conveyorChannels> m_ConveyorVisualOffsets;
+        }
+        m_InitializationState;
+
+        struct
+        {
+            std::array<uint64_t, c_conveyorChannels> m_Lanes;
+            std::array<uint64_t, c_conveyorChannels> m_RealizedMovements;
+        }
+        m_RealizedState;
+
+        struct
+        {
+            std::array<uint64_t, c_conveyorChannels> m_PendingMoves;
+            std::array<uint64_t, c_conveyorChannels> m_PendingClears;
+        }
+        m_PendingState;
 
         Conveyor* m_pHeadConveyor;
         const uint8_t m_Length;
