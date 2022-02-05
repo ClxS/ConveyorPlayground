@@ -72,7 +72,7 @@ void cpp_conv::renderer::render(const SceneContext& kSceneContext, RenderContext
     std::tie(width, height) = cpp_conv::apphost::getAppDimensions();
 
     Vector2F startCellPosition = kContext.m_CameraPosition / kContext.m_fZoom * -1.0f / 64;
-    Vector2F endCellPosition = (kContext.m_CameraPosition / kContext.m_fZoom * -1.0f + Vector2F(width, height) / kContext.m_fZoom) / 64;
+    Vector2F endCellPosition = (kContext.m_CameraPosition / kContext.m_fZoom * -1.0f + Vector2F((float)width, (float)height) / kContext.m_fZoom) / 64;
     WorldMap::CellCoordinate startCoord = WorldMap::ToCellSpace({ (int)startCellPosition.GetX(), (int)startCellPosition.GetY(), 0 });
     WorldMap::CellCoordinate endCoord = WorldMap::ToCellSpace({ (int)std::ceil(endCellPosition.GetX()), (int)std::ceil(endCellPosition.GetY()), 0 });
     
