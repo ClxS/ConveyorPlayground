@@ -16,11 +16,12 @@
 #include "Inserter.h"
 #include "Stairs.h"
 
-cpp_conv::resources::ResourceAsset* mapAssetHandler(cpp_conv::resources::resource_manager::FileData& rData)
+cpp_conv::resources::ResourceAsset* mapAssetHandler(const cpp_conv::resources::resource_manager::FileData& rData)
 {
     const char* pStrData = reinterpret_cast<const char*>(rData.m_pData);
 
-    std::istringstream ss(pStrData);
+    std::string_view pTruncatedData = std::string_view(pStrData, static_cast<uint32_t>(rData.m_uiSize));
+    std::istringstream ss = std::istringstream(std::string(pTruncatedData));
     std::string strLine;
 
     auto pMap = new cpp_conv::resources::Map();
@@ -54,7 +55,7 @@ cpp_conv::resources::ResourceAsset* mapAssetHandler(cpp_conv::resources::resourc
             case 'y': pEntity = new cpp_conv::Underground({ (int32_t)iCol, iRow, 0 }, size1x1, Direction::Up); break;
             case 'i': pEntity = new cpp_conv::Underground({ (int32_t)iCol, iRow, 0 }, size1x1, Direction::Left); break;
             case 'o': pEntity = new cpp_conv::Underground({ (int32_t)iCol, iRow, 0 }, size1x1, Direction::Right); break;
-            } 
+            }
 
             if (pEntity)
             {
