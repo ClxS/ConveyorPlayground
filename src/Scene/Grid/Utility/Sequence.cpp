@@ -188,7 +188,7 @@ bool MoveItemToForwardsNode(const cpp_conv::SceneContext& kContext, const cpp_co
     return (pForwardEntity && pForwardEntity->SupportsInsertion() && pForwardEntity->TryInsert(kContext, pNode, Entity::InsertInfo(s_Item, static_cast<uint8_t>(lane))));
 }
 
-void cpp_conv::Sequence::Tick(SceneContext& kContext)
+void Sequence::Tick(const SceneContext& kContext)
 {
     m_pHeadConveyor->m_uiCurrentTick++;
     if (m_pHeadConveyor->m_uiCurrentTick < m_pHeadConveyor->m_uiMoveTick)
@@ -196,50 +196,52 @@ void cpp_conv::Sequence::Tick(SceneContext& kContext)
         return;
     }
 
-    m_RealizedState.m_RealizedMovements[0] = 0;
-    m_RealizedState.m_RealizedMovements[1] = 0;
-    m_RealizedState.m_HasOverridePosition[0] = 0;
     m_pHeadConveyor->m_uiCurrentTick = 0;
 
     for (uint8_t uiLane = 0; uiLane < c_conveyorChannels; uiLane++)
     {
-        bool bIsLeadItemFull = (m_RealizedState.m_Lanes[uiLane] & 0b1) == 1;
+        RealizedState& realizedState = m_RealizedStates[uiLane];
+        PendingState& pendingState = m_PendingStates[uiLane];
+        realizedState.m_RealizedMovements = 0;
+        realizedState.m_HasOverridePosition = 0;
+
+        bool bIsLeadItemFull = (realizedState.m_Lanes & 0b1) == 1;
         if (bIsLeadItemFull)
         {
             if (MoveItemToForwardsNode(kContext, *m_pHeadConveyor, (int)uiLane))
             {
-                m_PendingState.m_PendingClears[uiLane] = 0b1;
-                m_RealizedState.m_Items[uiLane].Pop();
+                pendingState.m_PendingClears = 0b1;
+                realizedState.m_Items.Pop();
                 bIsLeadItemFull = false;
             }
         }
 
         if (bIsLeadItemFull)
         {
-            const uint64_t uiMaxMask = (1ULL << std::countr_one(m_RealizedState.m_Lanes[uiLane])) - 1ULL;
-            m_PendingState.m_PendingClears[uiLane] = ~uiMaxMask;
+            const uint64_t uiMaxMask = (1ULL << std::countr_one(realizedState.m_Lanes)) - 1ULL;
+            pendingState.m_PendingClears = ~uiMaxMask;
 
-            const uint64_t uiNewPositions = m_RealizedState.m_Lanes[uiLane] >> 1;
-            const uint64_t uiOverlaps = uiNewPositions & m_PendingState.m_PendingMoves[uiLane];
+            const uint64_t uiNewPositions = realizedState.m_Lanes >> 1;
+            const uint64_t uiOverlaps = uiNewPositions & pendingState.m_PendingMoves;
             if (uiOverlaps == 0)
             {
-                m_PendingState.m_PendingMoves[uiLane] |= m_RealizedState.m_Lanes[uiLane] >> 1;
-                m_PendingState.m_PendingMoves[uiLane] &= ~uiMaxMask;
+                pendingState.m_PendingMoves |= realizedState.m_Lanes >> 1;
+                pendingState.m_PendingMoves &= ~uiMaxMask;
             }
         }
         else
         {
-            uint64_t uiNewPositions = m_RealizedState.m_Lanes[uiLane] >> 1;
-            uint64_t uiOverlaps = uiNewPositions & m_PendingState.m_PendingMoves[uiLane];
+            uint64_t uiNewPositions = realizedState.m_Lanes >> 1;
+            uint64_t uiOverlaps = uiNewPositions & pendingState.m_PendingMoves;
             if (uiOverlaps == 0)
             {
                 // No mid-insert collision fast path
-                m_PendingState.m_PendingClears[uiLane] = m_RealizedState.m_Lanes[uiLane];
-                m_PendingState.m_PendingMoves[uiLane] |= uiNewPositions;
+                pendingState.m_PendingClears = realizedState.m_Lanes;
+                pendingState.m_PendingMoves |= uiNewPositions;
             }
             else
             {
-                m_PendingState.m_PendingClears[uiLane] = m_RealizedState.m_Lanes[uiLane];
+                pendingState.m_PendingClears = realizedState.m_Lanes;
                 do
                 {
                     // Determine save area
@@ -255,10 +257,10 @@ void cpp_conv::Sequence::Tick(SceneContext& kContext)
 
                     // Perform safe move area
                     {
-                        m_PendingState.m_PendingMoves[uiLane] |= uiNewPositions & safeRegionMask;
+                        pendingState.m_PendingMoves |= uiNewPositions & safeRegionMask;
 
                         // We can't clear our the original position
-                        m_PendingState.m_PendingClears[uiLane] &= ~(1ULL << uiCollisionBit);
+                        pendingState.m_PendingClears &= ~(1ULL << uiCollisionBit);
 
                         // Zero out the safe region so we know what remains
                         uiNewPositions &= ~safeRegionMask;
@@ -270,8 +272,8 @@ void cpp_conv::Sequence::Tick(SceneContext& kContext)
                         const uint64_t uiNextMovableBit = std::countr_zero(uiOverlaps);
                         const uint64_t uiClearRange = (1ULL << uiNextMovableBit) & ~safeRegionMask;
 
-                        m_PendingState.m_PendingClears[uiLane] &= ~uiClearRange;
-                        m_PendingState.m_PendingMoves[uiLane] &= ~uiClearRange;
+                        pendingState.m_PendingClears &= ~uiClearRange;
+                        pendingState.m_PendingMoves &= ~uiClearRange;
                     }
                 }
                 while (uiOverlaps != 0);
@@ -284,61 +286,66 @@ void Sequence::Realize()
 {
     for (uint8_t uiLane = 0; uiLane < c_conveyorChannels; uiLane++)
     {
-        m_RealizedState.m_Lanes[uiLane] &= ~m_PendingState.m_PendingClears[uiLane];
-        m_RealizedState.m_Lanes[uiLane] |= m_PendingState.m_PendingMoves[uiLane];
-        m_RealizedState.m_RealizedMovements[uiLane] |= m_PendingState.m_PendingMoves[uiLane];
-        m_PendingState.m_PendingClears[uiLane] = 0;
-        m_PendingState.m_PendingMoves[uiLane] = 0;
+        RealizedState& realizedState = m_RealizedStates[uiLane];
+        PendingState& pendingState = m_PendingStates[uiLane];
 
-        uint64_t uiInsertions = m_PendingState.m_PendingInsertions[uiLane];
-        m_PendingState.m_PendingInsertions[uiLane] = 0;
-        m_RealizedState.m_HasOverridePosition[uiLane] = 0;
+        realizedState.m_Lanes &= ~pendingState.m_PendingClears;
+        realizedState.m_Lanes |= pendingState.m_PendingMoves;
+        realizedState.m_RealizedMovements |= pendingState.m_PendingMoves;
+        pendingState.m_PendingClears = 0;
+        pendingState.m_PendingMoves = 0;
+
+        uint64_t uiInsertions = pendingState.m_PendingInsertions;
+        pendingState.m_PendingInsertions = 0;
+        realizedState.m_HasOverridePosition = 0;
 
          while (uiInsertions != 0)
         {
             const uint32_t uiCurrentInsertIndex = 1U << std::countr_zero(uiInsertions);
-             m_RealizedState.m_HasOverridePosition[uiLane] |= uiCurrentInsertIndex;
+             realizedState.m_HasOverridePosition |= uiCurrentInsertIndex;
 
             const uint32_t uiEarlierItemsMask = uiCurrentInsertIndex - 1;
             uiInsertions &= ~uiCurrentInsertIndex;
-            const uint64_t previousItemCount = std::popcount(m_RealizedState.m_Lanes[uiLane] & uiEarlierItemsMask);
-            m_RealizedState.m_Items[uiLane].Insert(previousItemCount, m_PendingState.m_NewItems[uiLane].Pop());
+            const uint64_t previousItemCount = std::popcount(realizedState.m_Lanes & uiEarlierItemsMask);
+            realizedState.m_Items.Insert(previousItemCount, pendingState.m_NewItems.Pop());
         }
     }
 }
 
 uint64_t Sequence::CountItemsOnBelt() const
 {
-    return std::popcount(m_RealizedState.m_Lanes[0]) + std::popcount(m_RealizedState.m_Lanes[1]);
+    return std::popcount(m_RealizedStates[0].m_Lanes) + std::popcount(m_RealizedStates[1].m_Lanes);
 }
 
 void Sequence::AddItemInSlot(const uint8_t uiSequenceIndex, const int lane, const int slot, ItemId item, const Vector2F* origin)
 {
+    PendingState& pendingState = m_PendingStates[lane];
+
     const uint64_t uiSetMask = 1ULL << (m_Length * 2 - uiSequenceIndex * 2 - slot - 1);
-    m_PendingState.m_PendingInsertions[lane] |= uiSetMask;
-    m_PendingState.m_PendingMoves[lane] |= uiSetMask;
+    pendingState.m_PendingInsertions |= uiSetMask;
+    pendingState.m_PendingMoves |= uiSetMask;
 
     // Gets all bits below the current insertion point
-    const uint64_t uiPreviousInsertMask = m_PendingState.m_PendingInsertions[lane] & (uiSetMask - 1);
+    const uint64_t uiPreviousInsertMask = pendingState.m_PendingInsertions & (uiSetMask - 1);
     const int uiPreviousCount = std::popcount(uiPreviousInsertMask);
     if (origin == nullptr)
     {
-        m_PendingState.m_NewItems[lane].Insert(uiPreviousCount, SlotItem(item));
+        pendingState.m_NewItems.Insert(uiPreviousCount, SlotItem(item));
     }
     else
     {
-        m_PendingState.m_NewItems[lane].Insert(uiPreviousCount, SlotItem(item, *origin));
+        pendingState.m_NewItems.Insert(uiPreviousCount, SlotItem(item, *origin));
     }
 }
 
 bool Sequence::HasItemInSlot(const uint8_t uiSequenceIndex, const int lane, const int slot) const
 {
-    return (((m_RealizedState.m_Lanes[lane] | m_PendingState.m_PendingMoves[lane]) >> (m_Length * 2 - uiSequenceIndex * 2 - slot - 1)) & 0b1) == 1;
+    return (((m_RealizedStates[lane].m_Lanes | m_PendingStates[lane].m_PendingMoves) >> (m_Length * 2 - uiSequenceIndex * 2 - slot - 1)) & 0b1) == 1;
 }
 
 bool Sequence::DidItemMoveLastSimulation(const uint8_t uiSequenceIndex, const int lane, const int slot) const
 {
-    return ((m_RealizedState.m_RealizedMovements[lane] >> (m_Length * 2 - uiSequenceIndex * 2 - slot - 1)) & 0b1) == 1;
+    return ((m_RealizedStates[lane].m_RealizedMovements >> (m_Length * 2 - uiSequenceIndex * 2 - slot - 1)) & 0b1) == 1;
 }
 
 bool Sequence::TryPeakItemInSlot(const uint8_t uiSequenceIndex, const int lane, const int slot, ItemInstance& pItem) const

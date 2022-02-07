@@ -18,14 +18,14 @@ namespace cpp_conv
     public:
         Sequence(Conveyor* pHead, const uint8_t uiLength, const Vector2F laneOnePosition, const Vector2F laneTwoPosition, const Vector2F unitDirection)
             : m_InitializationState{ { LaneVisual(laneOnePosition, unitDirection), LaneVisual(laneTwoPosition, unitDirection) } }
-            , m_RealizedState{ {0, 0}, {0, 0}, {0, 0}, { 64, 64 } }
-            , m_PendingState{ {0, 0}, {0, 0}, {0, 0}, { 64, 64 } }
+            , m_RealizedStates { RealizedState(64), RealizedState(64) }
+            , m_PendingStates{ PendingState(64), PendingState(64) }
             , m_pHeadConveyor(pHead)
             , m_Length(uiLength)
         {
         }
 
-        void Tick(SceneContext& kContext);
+        void Tick(const SceneContext& kContext);
         void Realize();
 
         [[nodiscard]] const Conveyor* GetHeadConveyor() const { return m_pHeadConveyor; }
@@ -87,23 +87,29 @@ namespace cpp_conv
         }
         m_InitializationState;
 
-        struct
+        struct RealizedState
         {
-            std::array<uint64_t, c_conveyorChannels> m_Lanes;
-            std::array<uint64_t, c_conveyorChannels> m_RealizedMovements;
-            std::array<uint64_t, c_conveyorChannels> m_HasOverridePosition;
-            std::array<FixedCircularBuffer<SlotItem>, c_conveyorChannels> m_Items;
-        }
-        m_RealizedState;
+            explicit RealizedState(const uint32_t uiConveyorLength) : m_Items{(uiConveyorLength)}
+            {}
 
-        struct
+            uint64_t m_Lanes = {};
+            uint64_t m_RealizedMovements = {};
+            uint64_t m_HasOverridePosition = {};
+            FixedCircularBuffer<SlotItem> m_Items;
+        };
+        struct PendingState
         {
-            std::array<uint64_t, c_conveyorChannels> m_PendingInsertions;
-            std::array<uint64_t, c_conveyorChannels> m_PendingMoves;
-            std::array<uint64_t, c_conveyorChannels> m_PendingClears;
-            std::array<FixedCircularBuffer<SlotItem>, c_conveyorChannels> m_NewItems;
-        }
-        m_PendingState;
+            explicit PendingState(const uint32_t uiConveyorLength) : m_NewItems{(uiConveyorLength)}
+            {}
+
+            uint64_t m_PendingInsertions = {};
+            uint64_t m_PendingMoves = {};
+            uint64_t m_PendingClears = {};
+            FixedCircularBuffer<SlotItem> m_NewItems;
+        };
+
+        std::array<RealizedState, c_conveyorChannels> m_RealizedStates;
+        std::array<PendingState, c_conveyorChannels> m_PendingStates;
 
         Conveyor* m_pHeadConveyor;
         const uint8_t m_Length;
