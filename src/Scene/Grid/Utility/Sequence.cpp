@@ -24,7 +24,7 @@ Conveyor* cpp_conv::TraceHeadConveyor(cpp_conv::WorldMap& map, Conveyor& searchS
 
     Conveyor* pCurrentConveyor = map.GetEntity<Conveyor>(searchStart.m_position, EntityKind::Conveyor);
     while (true)
-    { 
+    {
         Vector3 forwardPosition = grid::GetForwardPosition(*pCurrentConveyor);
         Conveyor* pTargetConveyor = map.GetEntity<Conveyor>(forwardPosition, EntityKind::Conveyor);
         if (pTargetConveyor == nullptr || pTargetConveyor->IsCorner())
@@ -112,13 +112,12 @@ std::vector<Sequence*> cpp_conv::InitializeSequences(cpp_conv::WorldMap& map, co
             conveyor->ClearSequence();
             continue;
         }
-         
+
         std::vector<Conveyor*> vConveyors;
         Conveyor* pHeadConveyor = TraceHeadConveyor(map, *conveyor);
         const Conveyor* pTailConveyor = TraceTailConveyor(map, *pHeadConveyor, *pHeadConveyor, vConveyors);
 
-        auto begin = vConveyors.begin();
-        auto end = vConveyors.end();
+        const auto end = vConveyors.end();
         std::vector<Conveyor*>::iterator chunk_begin;
         std::vector<Conveyor*>::iterator chunk_end;
         chunk_end = chunk_begin = vConveyors.begin();
@@ -145,7 +144,7 @@ std::vector<Sequence*> cpp_conv::InitializeSequences(cpp_conv::WorldMap& map, co
             ));
 
             Sequence* sequence = vSequences.back();
-            for(int i = 0; i < vSequenceConveyors.size(); ++i)
+            for(size_t i = 0; i < vSequenceConveyors.size(); ++i)
             {
                 vSequenceConveyors[i]->SetSequence(sequence, i);
                 alreadyProcessedConveyors.insert(vSequenceConveyors[i]);
@@ -153,7 +152,7 @@ std::vector<Sequence*> cpp_conv::InitializeSequences(cpp_conv::WorldMap& map, co
 
             chunk_begin = chunk_end;
         }
-        while (std::distance(chunk_begin, end) > 0);        
+        while (std::distance(chunk_begin, end) > 0);
     }
 
     return vSequences;
@@ -167,7 +166,7 @@ std::tuple<int, Direction> cpp_conv::GetInnerMostCornerChannel(const cpp_conv::W
     {
         return std::make_tuple(-1, Direction::Up);
     }
-     
+
     Direction selfDirection = rConveyor.m_direction;
     Direction backDirection = pBackConverter->GetDirection();
     while (selfDirection != Direction::Up)
@@ -207,6 +206,7 @@ void cpp_conv::Sequence::Tick(SceneContext& kContext)
             if (MoveItemToForwardsNode(kContext, *m_pHeadConveyor, (int)uiLane))
             {
                 m_PendingState.m_PendingClears[uiLane] = 0b1;
+                m_RealizedState.m_Items[uiLane].Pop();
                 bIsLeadItemFull = false;
             }
         }
@@ -237,7 +237,7 @@ void cpp_conv::Sequence::Tick(SceneContext& kContext)
             else
             {
                 m_PendingState.m_PendingClears[uiLane] = m_RealizedState.m_Lanes[uiLane];
-                do 
+                do
                 {
                     // Determine save area
                     uint64_t uiCollisionBit;
@@ -261,7 +261,7 @@ void cpp_conv::Sequence::Tick(SceneContext& kContext)
                         uiNewPositions &= ~safeRegionMask;
                     }
 
-                    // 
+                    //
                     {
                         // We can't move anything else until the following 0 bit
                         uint64_t uiNextMovableBit = std::countr_zero(uiOverlaps);
@@ -286,6 +286,18 @@ void Sequence::Realize()
         m_RealizedState.m_RealizedMovements[uiLane] |= m_PendingState.m_PendingMoves[uiLane];
         m_PendingState.m_PendingClears[uiLane] = 0;
         m_PendingState.m_PendingMoves[uiLane] = 0;
+
+        uint64_t uiInsertions = m_PendingState.m_pPendingInsertions[uiLane];
+        m_PendingState.m_pPendingInsertions[uiLane] = 0;
+
+         while (uiInsertions != 0)
+        {
+            const uint32_t uiCurrentInsertIndex = 1U << std::countr_zero(uiInsertions);
+            const uint32_t uiEarlierItemsMask = uiCurrentInsertIndex - 1;
+            uiInsertions &= ~uiCurrentInsertIndex;
+            const uint64_t previousItemCount = std::popcount(m_RealizedState.m_Lanes[uiLane] & uiEarlierItemsMask);
+            m_RealizedState.m_Items[uiLane].Insert(previousItemCount, m_PendingState.m_NewItems[uiLane].Pop());
+        }
     }
 }
 
@@ -294,15 +306,28 @@ uint64_t Sequence::CountItemsOnBelt()
     return std::popcount(m_RealizedState.m_Lanes[0]) + std::popcount(m_RealizedState.m_Lanes[1]);
 }
 
-void Sequence::AddItemInSlot(uint8_t uiSequenceIndex, int lane, int slot)
-{ 
-    m_PendingState.m_PendingMoves[lane] |= 1ULL << (m_Length * 2 - uiSequenceIndex * 2 - slot - 1);
-} 
+void Sequence::AddItemInSlot(uint8_t uiSequenceIndex, int lane, int slot, ItemId item, const Vector2F* origin)
+{
+    uint64_t uiSetMask = 1ULL << (m_Length * 2 - uiSequenceIndex * 2 - slot - 1);
+    m_PendingState.m_pPendingInsertions[lane] |= uiSetMask;
+    m_PendingState.m_PendingMoves[lane] |= uiSetMask;
+
+    // Gets all bits below the current insertion point
+    uint64_t uiPreviousInsertMask = m_PendingState.m_pPendingInsertions[lane] & (uiSetMask - 1);
+    uint8_t uiPreviousCount = std::popcount(uiPreviousInsertMask);
+    if (origin == nullptr)
+    {
+        m_PendingState.m_NewItems[lane].Insert(uiPreviousCount, { item });
+    }
+    else
+    {
+        m_PendingState.m_NewItems[lane].Insert(uiPreviousCount, { item, *origin });
+    }
+}
 
 bool Sequence::HasItemInSlot(uint8_t uiSequenceIndex, int lane, int slot) const
 {
-    bool bMainLane = ((m_RealizedState.m_Lanes[lane] >> (m_Length * 2 - uiSequenceIndex * 2 - slot - 1)) & 0b1) == 1;
-    return bMainLane || ((m_PendingState.m_PendingMoves[lane] >> (m_Length * 2 - uiSequenceIndex * 2 - slot - 1)) & 0b1) == 1;
+    return (((m_RealizedState.m_Lanes[lane] | m_PendingState.m_PendingMoves[lane]) >> (m_Length * 2 - uiSequenceIndex * 2 - slot - 1)) & 0b1) == 1;
 }
 
 bool Sequence::DidItemMoveLastSimulation(uint8_t uiSequenceIndex, int lane, int slot) const

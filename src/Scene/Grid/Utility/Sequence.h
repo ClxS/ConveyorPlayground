@@ -19,21 +19,21 @@ namespace cpp_conv
     public:
         Sequence(Conveyor* pHead, uint8_t uiLength, Vector2F laneOnePosition, Vector2F laneTwoPosition, Vector2F unitDirection)
             : m_InitializationState{ { LaneVisual(laneOnePosition, unitDirection), LaneVisual(laneTwoPosition, unitDirection) } }
-            , m_RealizedState{ {0, 0}, {0, 0} }
-            , m_PendingState{ {0, 0}, {0, 0} }
+            , m_RealizedState{ {0, 0}, {0, 0}, { 64, 64 } }
+            , m_PendingState{ {0, 0}, {0, 0}, {0, 0}, { 64, 64 } }
             , m_pHeadConveyor(pHead)
             , m_Length(uiLength)
         {
-        } 
+        }
 
         void Tick(SceneContext& kContext);
         void Realize();
 
         const Conveyor* GetHeadConveyor() const { return m_pHeadConveyor; }
-         
+
         inline static constexpr uint32_t c_uiMaxSequenceLength = 32;
         bool HasItemInSlot(uint8_t uiSequenceIndex, int lane, int slot) const;
-        void AddItemInSlot(uint8_t uiSequenceIndex, int lane, int slot);
+        void AddItemInSlot(uint8_t uiSequenceIndex, int lane, int slot, ItemId item, const Vector2F* origin = nullptr);
         bool DidItemMoveLastSimulation(uint8_t uiSequenceIndex, int lane, int slot) const;
         bool TryPeakItemInSlot(uint8_t uiSequenceIndex, int lane, int slot, ItemInstance& pItem);
         uint64_t CountItemsOnBelt();
@@ -53,11 +53,40 @@ namespace cpp_conv
             Vector2F m_Origin;
             Vector2F m_UnitDirection;
         };
-
-        struct PositionVisualOverride
+        struct SlotItem
         {
-            Vector2F m_Position;
-            bool m_bIsSet;
+            static inline constexpr uint64_t c_uiUnsetPosition = 0xFFFFFFFFFFFFFFFF;
+
+            ItemId m_Item;
+            union {
+                Vector2F m_Position;
+                uint64_t m_Flag;
+            };
+
+            // Test assumptions about the above
+            static_assert(sizeof(Vector2F) == sizeof(uint64_t), "Vector2F is not expected size");
+
+            SlotItem()
+                : m_Item(ItemId::Empty())
+            {
+                m_Flag = c_uiUnsetPosition;
+            }
+
+            SlotItem(ItemId uiItemId)
+                : m_Item(uiItemId)
+            {
+                m_Flag = c_uiUnsetPosition;
+            }
+
+            SlotItem(ItemId uiItemId, Vector2F position)
+                : m_Item(uiItemId)
+            {
+                m_Position = position;
+            }
+
+            bool HasItem() const { return m_Item.IsValid(); }
+
+            bool HasPosition() const { return m_Flag != c_uiUnsetPosition; }
         };
 
         struct
@@ -70,13 +99,16 @@ namespace cpp_conv
         {
             std::array<uint64_t, c_conveyorChannels> m_Lanes;
             std::array<uint64_t, c_conveyorChannels> m_RealizedMovements;
+            std::array<FixedCircularBuffer<SlotItem>, c_conveyorChannels> m_Items;
         }
         m_RealizedState;
 
         struct
         {
+            std::array<uint64_t, c_conveyorChannels> m_pPendingInsertions;
             std::array<uint64_t, c_conveyorChannels> m_PendingMoves;
             std::array<uint64_t, c_conveyorChannels> m_PendingClears;
+            std::array<FixedCircularBuffer<SlotItem>, c_conveyorChannels> m_NewItems;
         }
         m_PendingState;
 

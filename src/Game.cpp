@@ -108,7 +108,7 @@ void CreateMillionTileMap(cpp_conv::WorldMap& worldMap)
 void cpp_conv::game::run()
 {
     srand((unsigned int)time(NULL));
-     
+
     int iWidth, iHeight;
     std::tie(iWidth, iHeight) = cpp_conv::apphost::getAppDimensions();
 

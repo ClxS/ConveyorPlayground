@@ -431,7 +431,7 @@ void cpp_conv::Conveyor::PlaceItemInSlot(int lane, int slot, const ItemId pItem,
 
     if (IsPartOfASequence())
     {
-        m_pSequence->AddItemInSlot(m_uiSequenceIndex, lane, slot);
+        m_pSequence->AddItemInSlot(m_uiSequenceIndex, lane, slot, pItem, nullptr);
         return;
     }
 
