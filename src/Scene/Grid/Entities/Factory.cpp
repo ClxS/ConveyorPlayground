@@ -37,7 +37,7 @@ cpp_conv::Factory::Factory(Vector3 position, Direction direction, FactoryId fact
     {
         return;
     }
-     
+
     m_size = pFactory->GetSize();
     m_OutputPipe = pFactory->GetOutputPipe();
     m_bHasOutputPipe = pFactory->HasOwnOutputPipe();
@@ -133,7 +133,7 @@ std::string cpp_conv::Factory::GetDescription() const
     return std::format("Producing {}", pRecipe->GetName());
 }
 
-bool cpp_conv::Factory::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel, int iSourceLane)
+bool cpp_conv::Factory::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, const InsertInfo insertInfo)
 {
     if (pSourceEntity.m_eEntityKind != EntityKind::Inserter)
     {
@@ -147,9 +147,9 @@ bool cpp_conv::Factory::TryInsert(const SceneContext& kContext, const Entity& pS
     }
 
     bool bIsRequirement = false;
-    for (auto& rItem : pRecipe->GetInputItems())
+    for (const auto& [item, count] : pRecipe->GetInputItems())
     {
-        if (rItem.m_idItem == pItem)
+        if (item == insertInfo.GetItem())
         {
             bIsRequirement = true;
             break;
@@ -161,7 +161,7 @@ bool cpp_conv::Factory::TryInsert(const SceneContext& kContext, const Entity& pS
         return false;
     }
 
-    return m_inputItems.TryInsert(pItem);
+    return m_inputItems.TryInsert(insertInfo.GetItem());
 }
 
 void cpp_conv::Factory::RunProductionCycle(const cpp_conv::FactoryDefinition* pFactory)
@@ -219,7 +219,7 @@ void cpp_conv::Factory::RunOutputCycle(const SceneContext& kContext, const cpp_c
     {
         for (uint32_t i = 0; i < itItems->m_pCount; ++i)
         {
-            if (!pEntity->TryInsert(kContext, *this, itItems->m_pItem, (m_uiTick + i) % cpp_conv::c_conveyorChannels))
+            if (!pEntity->TryInsert(kContext, *this, InsertInfo(itItems->m_pItem, (m_uiTick + i) % c_conveyorChannels)))
             {
                 break;
             }

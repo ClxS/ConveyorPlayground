@@ -5,7 +5,7 @@
 #include "Renderer.h"
 #include "RenderContext.h"
 
-#include <algorithm> 
+#include <algorithm>
 #include <array>
 #include <random>
 #include <chrono>
@@ -61,13 +61,13 @@ void cpp_conv::Junction::Tick(const SceneContext& kContext)
 
         if (pEntity == nullptr || !pEntity->SupportsInsertion())
         {
-            continue;  
+            continue;
         }
 
         bool bFound = false;
         for (int iExitChannel = 0; iExitChannel < cpp_conv::c_conveyorChannels; ++iExitChannel)
         {
-            if (pEntity->TryInsert(kContext, *this, m_pItem, iExitChannel))
+            if (pEntity->TryInsert(kContext, *this, InsertInfo(m_pItem, iExitChannel)))
             {
                 m_pItem = cpp_conv::ItemIds::None;
                 bFound = true;
@@ -94,20 +94,20 @@ void cpp_conv::Junction::Draw(RenderContext& kRenderContext) const
         kRenderContext,
         pTile.get(),
         {
-            (float)m_position.GetX() * cpp_conv::renderer::c_gridScale,
-            (float)m_position.GetY() * cpp_conv::renderer::c_gridScale,
+            static_cast<float>(m_position.GetX()) * cpp_conv::renderer::c_gridScale,
+            static_cast<float>(m_position.GetY()) * cpp_conv::renderer::c_gridScale,
             Rotation::DegZero
         },
         { 0xFFFF00FF });
 }
 
-bool cpp_conv::Junction::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel, int iSourceLane)
+bool cpp_conv::Junction::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, const InsertInfo insertInfo)
 {
     if (!m_pItem.IsEmpty())
     {
         return false;
     }
 
-    m_pItem = pItem;
+    m_pItem = insertInfo.GetItem();
     return true;
 }

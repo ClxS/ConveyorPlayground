@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include "vector_set.h"
 #include "Conveyor.h"
 #include "EntityGrid.h"
 #include "FixedCircularBuffer.h"
@@ -17,9 +16,9 @@ namespace cpp_conv
     class Sequence
     {
     public:
-        Sequence(Conveyor* pHead, uint8_t uiLength, Vector2F laneOnePosition, Vector2F laneTwoPosition, Vector2F unitDirection)
+        Sequence(Conveyor* pHead, const uint8_t uiLength, const Vector2F laneOnePosition, const Vector2F laneTwoPosition, const Vector2F unitDirection)
             : m_InitializationState{ { LaneVisual(laneOnePosition, unitDirection), LaneVisual(laneTwoPosition, unitDirection) } }
-            , m_RealizedState{ {0, 0}, {0, 0}, { 64, 64 } }
+            , m_RealizedState{ {0, 0}, {0, 0}, {0, 0}, { 64, 64 } }
             , m_PendingState{ {0, 0}, {0, 0}, {0, 0}, { 64, 64 } }
             , m_pHeadConveyor(pHead)
             , m_Length(uiLength)
@@ -29,22 +28,22 @@ namespace cpp_conv
         void Tick(SceneContext& kContext);
         void Realize();
 
-        const Conveyor* GetHeadConveyor() const { return m_pHeadConveyor; }
+        [[nodiscard]] const Conveyor* GetHeadConveyor() const { return m_pHeadConveyor; }
 
         inline static constexpr uint32_t c_uiMaxSequenceLength = 32;
-        bool HasItemInSlot(uint8_t uiSequenceIndex, int lane, int slot) const;
+        [[nodiscard]] bool HasItemInSlot(uint8_t uiSequenceIndex, int lane, int slot) const;
         void AddItemInSlot(uint8_t uiSequenceIndex, int lane, int slot, ItemId item, const Vector2F* origin = nullptr);
-        bool DidItemMoveLastSimulation(uint8_t uiSequenceIndex, int lane, int slot) const;
-        bool TryPeakItemInSlot(uint8_t uiSequenceIndex, int lane, int slot, ItemInstance& pItem);
-        uint64_t CountItemsOnBelt();
+        [[nodiscard]] bool DidItemMoveLastSimulation(uint8_t uiSequenceIndex, int lane, int slot) const;
+        bool TryPeakItemInSlot(uint8_t uiSequenceIndex, int lane, int slot, ItemInstance& pItem) const;
+        [[nodiscard]] uint64_t CountItemsOnBelt() const;
 
-        uint32_t GetMoveTick() const { return m_pHeadConveyor->m_uiMoveTick; }
-        uint32_t GetCurrentTick() const { return m_pHeadConveyor->m_uiCurrentTick; }
+        [[nodiscard]] uint32_t GetMoveTick() const { return m_pHeadConveyor->m_uiMoveTick; }
+        [[nodiscard]] uint32_t GetCurrentTick() const { return m_pHeadConveyor->m_uiCurrentTick; }
     private:
         friend class Conveyor;
         struct LaneVisual
         {
-            LaneVisual(Vector2F origin, Vector2F direction)
+            LaneVisual(const Vector2F origin, const Vector2F direction)
                 : m_Origin(origin)
                 , m_UnitDirection(direction)
             {
@@ -55,12 +54,9 @@ namespace cpp_conv
         };
         struct SlotItem
         {
-            static inline constexpr uint64_t c_uiUnsetPosition = 0xFFFFFFFFFFFFFFFF;
-
             ItemId m_Item;
             union {
-                Vector2F m_Position;
-                uint64_t m_Flag;
+                Vector2F m_Position{};
             };
 
             // Test assumptions about the above
@@ -69,24 +65,20 @@ namespace cpp_conv
             SlotItem()
                 : m_Item(ItemId::Empty())
             {
-                m_Flag = c_uiUnsetPosition;
             }
 
-            SlotItem(ItemId uiItemId)
+            explicit SlotItem(const ItemId uiItemId)
                 : m_Item(uiItemId)
             {
-                m_Flag = c_uiUnsetPosition;
             }
 
-            SlotItem(ItemId uiItemId, Vector2F position)
+            explicit SlotItem(const ItemId uiItemId, const Vector2F position)
                 : m_Item(uiItemId)
             {
                 m_Position = position;
             }
 
-            bool HasItem() const { return m_Item.IsValid(); }
-
-            bool HasPosition() const { return m_Flag != c_uiUnsetPosition; }
+            [[nodiscard]] bool HasItem() const { return m_Item.IsValid(); }
         };
 
         struct
@@ -99,13 +91,14 @@ namespace cpp_conv
         {
             std::array<uint64_t, c_conveyorChannels> m_Lanes;
             std::array<uint64_t, c_conveyorChannels> m_RealizedMovements;
+            std::array<uint64_t, c_conveyorChannels> m_HasOverridePosition;
             std::array<FixedCircularBuffer<SlotItem>, c_conveyorChannels> m_Items;
         }
         m_RealizedState;
 
         struct
         {
-            std::array<uint64_t, c_conveyorChannels> m_pPendingInsertions;
+            std::array<uint64_t, c_conveyorChannels> m_PendingInsertions;
             std::array<uint64_t, c_conveyorChannels> m_PendingMoves;
             std::array<uint64_t, c_conveyorChannels> m_PendingClears;
             std::array<FixedCircularBuffer<SlotItem>, c_conveyorChannels> m_NewItems;

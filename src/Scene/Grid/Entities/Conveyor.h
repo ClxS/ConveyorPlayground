@@ -32,7 +32,7 @@ namespace cpp_conv
 
         struct Channel
         {
-            Channel(int channelLane); 
+            Channel(int channelLane);
 
             const int m_ChannelLane;
 
@@ -52,7 +52,7 @@ namespace cpp_conv
 
         void Draw(RenderContext& kContext) const override;
         bool SupportsInsertion() const override { return true; }
-        bool TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel, int iSourceSlot) override;
+        bool TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, InsertInfo insertInfo) override;
 
         bool SupportsProvidingItem() const override { return true; }
         bool TryGrab(const SceneContext& kContext, bool bSingle, std::tuple<ItemId, uint32_t>& outItem) override;
@@ -104,7 +104,6 @@ namespace cpp_conv
         Direction m_eCornerDirection;
         cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> m_pTile;
 
-        void AddItemToSlot(const cpp_conv::WorldMap& map, Channel* pTargetChannel, int forwardTargetItemSlot, const ItemId pItem, const Entity& pSourceEntity, int iSourceChannel, int iSourceSlot);
         bool TryPeakItemInSlot(int lane, int slot, ItemInstance& rItem) const;
     };
 }

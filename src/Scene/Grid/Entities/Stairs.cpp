@@ -5,7 +5,7 @@
 #include "Renderer.h"
 #include "RenderContext.h"
 
-#include <algorithm> 
+#include <algorithm>
 #include <array>
 #include <random>
 #include <chrono>
@@ -40,7 +40,7 @@ void cpp_conv::Stairs::Tick(const SceneContext& kContext)
         return;
     }
 
-    if (pTarget->TryInsert(kContext, *this, m_pItem, 0))
+    if (pTarget->TryInsert(kContext, *this, InsertInfo(m_pItem)))
     {
         m_pItem = cpp_conv::ItemIds::None;
     }
@@ -69,7 +69,7 @@ void cpp_conv::Stairs::Draw(RenderContext& kRenderContext) const
         { 0xFFFF00FF });
 }
 
-bool cpp_conv::Stairs::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel, int iSourceLane)
+bool cpp_conv::Stairs::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, const InsertInfo insertInfo)
 {
     if (m_bIsUp && pSourceEntity.m_position.GetZ() != m_position.GetZ())
     {
@@ -93,6 +93,6 @@ bool cpp_conv::Stairs::TryInsert(const SceneContext& kContext, const Entity& pSo
         return false;
     }
 
-    m_pItem = pItem;
+    m_pItem = insertInfo.GetItem();
     return true;
 }

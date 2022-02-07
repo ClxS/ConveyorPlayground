@@ -11,6 +11,8 @@
 #include <xutility>
 #include <bitset>
 #include <bit>
+
+#include "vector_set.h"
 using namespace cpp_conv;
 
 Conveyor* cpp_conv::TraceHeadConveyor(cpp_conv::WorldMap& map, Conveyor& searchStart)
@@ -90,7 +92,7 @@ const Conveyor* cpp_conv::TraceTailConveyor(cpp_conv::WorldMap& map, Conveyor& s
         pCurrentConveyor = reinterpret_cast<Conveyor*>(pTargetConveyor);
     }
 
-    std::reverse(vOutConveyors.begin(), vOutConveyors.end());
+    std::ranges::reverse(vOutConveyors);
     return pCurrentConveyor;
 }
 
@@ -146,7 +148,7 @@ std::vector<Sequence*> cpp_conv::InitializeSequences(cpp_conv::WorldMap& map, co
             Sequence* sequence = vSequences.back();
             for(size_t i = 0; i < vSequenceConveyors.size(); ++i)
             {
-                vSequenceConveyors[i]->SetSequence(sequence, i);
+                vSequenceConveyors[i]->SetSequence(sequence, static_cast<uint8_t>(i));
                 alreadyProcessedConveyors.insert(vSequenceConveyors[i]);
             }
 
@@ -178,12 +180,12 @@ std::tuple<int, Direction> cpp_conv::GetInnerMostCornerChannel(const cpp_conv::W
     return std::make_tuple(backDirection == Direction::Right ? 1 : 0, pBackConverter->GetDirection());
 }
 
-bool MoveItemToForwardsNode(cpp_conv::SceneContext& kContext, const cpp_conv::Conveyor& pNode, int lane)
+bool MoveItemToForwardsNode(const cpp_conv::SceneContext& kContext, const cpp_conv::Conveyor& pNode, int lane)
 {
     static ItemId s_Item = cpp_conv::ItemId::FromStringId("ITEM_COPPER_ORE");
 
     cpp_conv::Entity* pForwardEntity = kContext.m_rMap.GetEntity(grid::GetForwardPosition(pNode));
-    return (pForwardEntity && pForwardEntity->SupportsInsertion() && pForwardEntity->TryInsert(kContext, pNode, s_Item, lane));
+    return (pForwardEntity && pForwardEntity->SupportsInsertion() && pForwardEntity->TryInsert(kContext, pNode, Entity::InsertInfo(s_Item, static_cast<uint8_t>(lane))));
 }
 
 void cpp_conv::Sequence::Tick(SceneContext& kContext)
@@ -196,6 +198,7 @@ void cpp_conv::Sequence::Tick(SceneContext& kContext)
 
     m_RealizedState.m_RealizedMovements[0] = 0;
     m_RealizedState.m_RealizedMovements[1] = 0;
+    m_RealizedState.m_HasOverridePosition[0] = 0;
     m_pHeadConveyor->m_uiCurrentTick = 0;
 
     for (uint8_t uiLane = 0; uiLane < c_conveyorChannels; uiLane++)
@@ -213,11 +216,11 @@ void cpp_conv::Sequence::Tick(SceneContext& kContext)
 
         if (bIsLeadItemFull)
         {
-            uint64_t uiMaxMask = (1ULL << std::countr_one(m_RealizedState.m_Lanes[uiLane])) - 1ULL;
+            const uint64_t uiMaxMask = (1ULL << std::countr_one(m_RealizedState.m_Lanes[uiLane])) - 1ULL;
             m_PendingState.m_PendingClears[uiLane] = ~uiMaxMask;
 
-            uint64_t uiNewPositions = m_RealizedState.m_Lanes[uiLane] >> 1;
-            uint64_t uiOverlaps = uiNewPositions & m_PendingState.m_PendingMoves[uiLane];
+            const uint64_t uiNewPositions = m_RealizedState.m_Lanes[uiLane] >> 1;
+            const uint64_t uiOverlaps = uiNewPositions & m_PendingState.m_PendingMoves[uiLane];
             if (uiOverlaps == 0)
             {
                 m_PendingState.m_PendingMoves[uiLane] |= m_RealizedState.m_Lanes[uiLane] >> 1;
@@ -264,8 +267,8 @@ void cpp_conv::Sequence::Tick(SceneContext& kContext)
                     //
                     {
                         // We can't move anything else until the following 0 bit
-                        uint64_t uiNextMovableBit = std::countr_zero(uiOverlaps);
-                        uint64_t uiClearRange = (1ULL << uiNextMovableBit) & ~safeRegionMask;
+                        const uint64_t uiNextMovableBit = std::countr_zero(uiOverlaps);
+                        const uint64_t uiClearRange = (1ULL << uiNextMovableBit) & ~safeRegionMask;
 
                         m_PendingState.m_PendingClears[uiLane] &= ~uiClearRange;
                         m_PendingState.m_PendingMoves[uiLane] &= ~uiClearRange;
@@ -287,12 +290,15 @@ void Sequence::Realize()
         m_PendingState.m_PendingClears[uiLane] = 0;
         m_PendingState.m_PendingMoves[uiLane] = 0;
 
-        uint64_t uiInsertions = m_PendingState.m_pPendingInsertions[uiLane];
-        m_PendingState.m_pPendingInsertions[uiLane] = 0;
+        uint64_t uiInsertions = m_PendingState.m_PendingInsertions[uiLane];
+        m_PendingState.m_PendingInsertions[uiLane] = 0;
+        m_RealizedState.m_HasOverridePosition[uiLane] = 0;
 
          while (uiInsertions != 0)
         {
             const uint32_t uiCurrentInsertIndex = 1U << std::countr_zero(uiInsertions);
+             m_RealizedState.m_HasOverridePosition[uiLane] |= uiCurrentInsertIndex;
+
             const uint32_t uiEarlierItemsMask = uiCurrentInsertIndex - 1;
             uiInsertions &= ~uiCurrentInsertIndex;
             const uint64_t previousItemCount = std::popcount(m_RealizedState.m_Lanes[uiLane] & uiEarlierItemsMask);
@@ -301,51 +307,51 @@ void Sequence::Realize()
     }
 }
 
-uint64_t Sequence::CountItemsOnBelt()
+uint64_t Sequence::CountItemsOnBelt() const
 {
     return std::popcount(m_RealizedState.m_Lanes[0]) + std::popcount(m_RealizedState.m_Lanes[1]);
 }
 
-void Sequence::AddItemInSlot(uint8_t uiSequenceIndex, int lane, int slot, ItemId item, const Vector2F* origin)
+void Sequence::AddItemInSlot(const uint8_t uiSequenceIndex, const int lane, const int slot, ItemId item, const Vector2F* origin)
 {
-    uint64_t uiSetMask = 1ULL << (m_Length * 2 - uiSequenceIndex * 2 - slot - 1);
-    m_PendingState.m_pPendingInsertions[lane] |= uiSetMask;
+    const uint64_t uiSetMask = 1ULL << (m_Length * 2 - uiSequenceIndex * 2 - slot - 1);
+    m_PendingState.m_PendingInsertions[lane] |= uiSetMask;
     m_PendingState.m_PendingMoves[lane] |= uiSetMask;
 
     // Gets all bits below the current insertion point
-    uint64_t uiPreviousInsertMask = m_PendingState.m_pPendingInsertions[lane] & (uiSetMask - 1);
-    uint8_t uiPreviousCount = std::popcount(uiPreviousInsertMask);
+    const uint64_t uiPreviousInsertMask = m_PendingState.m_PendingInsertions[lane] & (uiSetMask - 1);
+    const int uiPreviousCount = std::popcount(uiPreviousInsertMask);
     if (origin == nullptr)
     {
-        m_PendingState.m_NewItems[lane].Insert(uiPreviousCount, { item });
+        m_PendingState.m_NewItems[lane].Insert(uiPreviousCount, SlotItem(item));
     }
     else
     {
-        m_PendingState.m_NewItems[lane].Insert(uiPreviousCount, { item, *origin });
+        m_PendingState.m_NewItems[lane].Insert(uiPreviousCount, SlotItem(item, *origin));
     }
 }
 
-bool Sequence::HasItemInSlot(uint8_t uiSequenceIndex, int lane, int slot) const
+bool Sequence::HasItemInSlot(const uint8_t uiSequenceIndex, const int lane, const int slot) const
 {
     return (((m_RealizedState.m_Lanes[lane] | m_PendingState.m_PendingMoves[lane]) >> (m_Length * 2 - uiSequenceIndex * 2 - slot - 1)) & 0b1) == 1;
 }
 
-bool Sequence::DidItemMoveLastSimulation(uint8_t uiSequenceIndex, int lane, int slot) const
+bool Sequence::DidItemMoveLastSimulation(const uint8_t uiSequenceIndex, const int lane, const int slot) const
 {
     return ((m_RealizedState.m_RealizedMovements[lane] >> (m_Length * 2 - uiSequenceIndex * 2 - slot - 1)) & 0b1) == 1;
 }
 
-bool Sequence::TryPeakItemInSlot(uint8_t uiSequenceIndex, int lane, int slot, ItemInstance& pItem)
+bool Sequence::TryPeakItemInSlot(const uint8_t uiSequenceIndex, const int lane, const int slot, ItemInstance& pItem) const
 {
     if (!HasItemInSlot(uiSequenceIndex, lane, slot))
     {
         return false;
     }
 
-    LaneVisual& visual = m_InitializationState.m_ConveyorVisualOffsets[lane];
-    Vector2F startPosition = visual.m_Origin + visual.m_UnitDirection * ((uiSequenceIndex * 2) + slot - 1);
+    const LaneVisual& visual = m_InitializationState.m_ConveyorVisualOffsets[lane];
+    const Vector2F startPosition = visual.m_Origin + visual.m_UnitDirection * ((uiSequenceIndex * 2) + slot - 1);
 
-    static ItemId s_Item = cpp_conv::ItemId::FromStringId("ITEM_COPPER_ORE");
-    pItem = { s_Item, startPosition.GetX(), startPosition.GetY(), DidItemMoveLastSimulation(uiSequenceIndex, lane, slot) };
+    static ItemId s_item = cpp_conv::ItemId::FromStringId("ITEM_COPPER_ORE");
+    pItem = { s_item, startPosition.GetX(), startPosition.GetY(), DidItemMoveLastSimulation(uiSequenceIndex, lane, slot) };
     return true;
 }

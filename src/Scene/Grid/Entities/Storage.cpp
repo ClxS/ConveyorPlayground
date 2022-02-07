@@ -35,9 +35,9 @@ void cpp_conv::Storage::Draw(RenderContext& kRenderContext) const
         { 0xFFFFFF00 });
 }
 
-bool cpp_conv::Storage::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel, int iSourceLane)
+bool cpp_conv::Storage::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, const InsertInfo insertInfo)
 {
-    return m_itemContainer.TryInsert(pItem);
+    return m_itemContainer.TryInsert(insertInfo.GetItem());
 }
 
 bool cpp_conv::Storage::TryGrab(const SceneContext& kContext, bool bSingle, std::tuple<ItemId, uint32_t>& outItem)
