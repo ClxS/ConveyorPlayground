@@ -180,10 +180,11 @@ std::tuple<int, Direction> cpp_conv::GetInnerMostCornerChannel(const cpp_conv::W
     return std::make_tuple(backDirection == Direction::Right ? 1 : 0, pBackConverter->GetDirection());
 }
 
-bool MoveItemToForwardsNode(const cpp_conv::SceneContext& kContext, const cpp_conv::Conveyor& pNode, int lane)
+bool Sequence::MoveItemToForwardsNode(const cpp_conv::SceneContext& kContext, const cpp_conv::Conveyor& pNode, int lane) const
 {
     static ItemId s_Item = cpp_conv::ItemId::FromStringId("ITEM_COPPER_ORE");
 
+    Vector2F startPosition = GetSlotPosition(0, lane, 1);
     cpp_conv::Entity* pForwardEntity = kContext.m_rMap.GetEntity(grid::GetForwardPosition(pNode));
     return (pForwardEntity && pForwardEntity->SupportsInsertion() && pForwardEntity->TryInsert(kContext, pNode, Entity::InsertInfo(s_Item, static_cast<uint8_t>(lane))));
 }
@@ -299,15 +300,19 @@ void Sequence::Realize()
         pendingState.m_PendingInsertions = 0;
         realizedState.m_HasOverridePosition = 0;
 
-         while (uiInsertions != 0)
+        while (uiInsertions != 0)
         {
+            const SlotItem item = pendingState.m_NewItems.Pop();
             const uint32_t uiCurrentInsertIndex = 1U << std::countr_zero(uiInsertions);
-             realizedState.m_HasOverridePosition |= uiCurrentInsertIndex;
+            if (item.m_bHasPosition)
+            {
+                realizedState.m_HasOverridePosition |= uiCurrentInsertIndex;
+            }
 
             const uint32_t uiEarlierItemsMask = uiCurrentInsertIndex - 1;
             uiInsertions &= ~uiCurrentInsertIndex;
             const uint64_t previousItemCount = std::popcount(realizedState.m_Lanes & uiEarlierItemsMask);
-            realizedState.m_Items.Insert(previousItemCount, pendingState.m_NewItems.Pop());
+            realizedState.m_Items.Insert(previousItemCount, item);
         }
     }
 }
@@ -348,6 +353,12 @@ bool Sequence::DidItemMoveLastSimulation(const uint8_t uiSequenceIndex, const in
     return ((m_RealizedStates[lane].m_RealizedMovements >> (m_Length * 2 - uiSequenceIndex * 2 - slot - 1)) & 0b1) == 1;
 }
 
+Vector2F Sequence::GetSlotPosition(const uint8_t uiSequenceIndex, const int lane, const int slot) const
+{
+    const LaneVisual& visual = m_InitializationState.m_ConveyorVisualOffsets[lane];
+    return visual.m_Origin + visual.m_UnitDirection * ((uiSequenceIndex * 2) + slot);
+}
+
 bool Sequence::TryPeakItemInSlot(const uint8_t uiSequenceIndex, const int lane, const int slot, ItemInstance& pItem) const
 {
     if (!HasItemInSlot(uiSequenceIndex, lane, slot))
@@ -355,10 +366,29 @@ bool Sequence::TryPeakItemInSlot(const uint8_t uiSequenceIndex, const int lane, 
         return false;
     }
 
-    const LaneVisual& visual = m_InitializationState.m_ConveyorVisualOffsets[lane];
-    const Vector2F startPosition = visual.m_Origin + visual.m_UnitDirection * ((uiSequenceIndex * 2) + slot - 1);
+    const RealizedState& realizedState = m_RealizedStates[lane];
+    const uint64_t uiSetMask = 1ULL << (m_Length * 2 - uiSequenceIndex * 2 - slot - 1);
+    const uint64_t uiPreviousInsertMask = realizedState.m_Lanes & (uiSetMask - 1);
+    const int uiPreviousCount = std::popcount(uiPreviousInsertMask);
+    const SlotItem item = realizedState.m_Items.Peek(uiPreviousCount);
 
-    static ItemId s_item = cpp_conv::ItemId::FromStringId("ITEM_COPPER_ORE");
-    pItem = { s_item, startPosition.GetX(), startPosition.GetY(), DidItemMoveLastSimulation(uiSequenceIndex, lane, slot) };
+    if (!item.HasItem())
+    {
+        return false;
+    }
+
+    Vector2F startPosition;
+    const bool bHasOverridePosition = ((realizedState.m_HasOverridePosition >> (m_Length * 2 - uiSequenceIndex * 2 - slot - 1)) & 0b1) == 1;
+
+    if (bHasOverridePosition)
+    {
+        startPosition = item.m_Position;
+    }
+    else
+    {
+        startPosition = GetSlotPosition(uiSequenceIndex, lane, slot - 1);
+    }
+
+    pItem = { item.m_Item, startPosition.GetX(), startPosition.GetY(), DidItemMoveLastSimulation(uiSequenceIndex, lane, slot) };
     return true;
 }

@@ -86,7 +86,7 @@ namespace cpp_conv
         static_assert(c_conveyorChannelSlots >= 1, "Conveyors channels must have at least once slot");
     private:
         bool HasItemInSlot(int lane, int slot);
-        void PlaceItemInSlot(int lane, int slot, const ItemId pItem, bool bDirectItemSet = false);
+        void PlaceItemInSlot(int lane, int slot, InsertInfo insertInfo, bool bDirectItemSet = false);
 
         friend class Sequence;
 

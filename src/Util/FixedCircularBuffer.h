@@ -69,7 +69,7 @@ namespace cpp_conv
             IncrementAppendPosition();
         }
 
-		constexpr const T& Peek(int index = 0) const 
+        [[nodiscard]] constexpr const T& Peek(const int index = 0) const
 		{
 			assert(m_uiSize > 0);
 			return m_vData[(m_uiConsumePivot + index) % m_uiCapacity];
@@ -127,6 +127,8 @@ namespace cpp_conv
             m_vData[m_uiCapacity - 1] = m_vData[0];
             std::memmove(&m_vData[0], &m_vData[1], sizeof(T) * postPivotMove);
         }
+
+        return value;
     }
 
 }

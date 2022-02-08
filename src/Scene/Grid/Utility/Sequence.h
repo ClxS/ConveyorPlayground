@@ -34,11 +34,16 @@ namespace cpp_conv
         [[nodiscard]] bool HasItemInSlot(uint8_t uiSequenceIndex, int lane, int slot) const;
         void AddItemInSlot(uint8_t uiSequenceIndex, int lane, int slot, ItemId item, const Vector2F* origin = nullptr);
         [[nodiscard]] bool DidItemMoveLastSimulation(uint8_t uiSequenceIndex, int lane, int slot) const;
+        [[nodiscard]] Vector2F GetSlotPosition(uint8_t uiSequenceIndex, const int lane, int slot) const;
         bool TryPeakItemInSlot(uint8_t uiSequenceIndex, int lane, int slot, ItemInstance& pItem) const;
         [[nodiscard]] uint64_t CountItemsOnBelt() const;
 
         [[nodiscard]] uint32_t GetMoveTick() const { return m_pHeadConveyor->m_uiMoveTick; }
         [[nodiscard]] uint32_t GetCurrentTick() const { return m_pHeadConveyor->m_uiCurrentTick; }
+
+    private:
+        bool MoveItemToForwardsNode(const cpp_conv::SceneContext& kContext, const cpp_conv::Conveyor& pNode, int lane) const;
+
     private:
         friend class Conveyor;
         struct LaneVisual
@@ -55,9 +60,8 @@ namespace cpp_conv
         struct SlotItem
         {
             ItemId m_Item;
-            union {
-                Vector2F m_Position{};
-            };
+            Vector2F m_Position{};
+            bool m_bHasPosition = false;
 
             // Test assumptions about the above
             static_assert(sizeof(Vector2F) == sizeof(uint64_t), "Vector2F is not expected size");
@@ -74,8 +78,9 @@ namespace cpp_conv
 
             explicit SlotItem(const ItemId uiItemId, const Vector2F position)
                 : m_Item(uiItemId)
+                , m_Position(position)
+                , m_bHasPosition{true}
             {
-                m_Position = position;
             }
 
             [[nodiscard]] bool HasItem() const { return m_Item.IsValid(); }
