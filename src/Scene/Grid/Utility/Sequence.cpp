@@ -15,7 +15,7 @@
 #include "vector_set.h"
 using namespace cpp_conv;
 
-Conveyor* cpp_conv::TraceHeadConveyor(cpp_conv::WorldMap& map, Conveyor& searchStart)
+Conveyor* cpp_conv::TraceHeadConveyor(WorldMap& map, Conveyor& searchStart)
 {
     static RelativeDirection directionPriority[] =
     {
@@ -69,7 +69,7 @@ Conveyor* cpp_conv::TraceHeadConveyor(cpp_conv::WorldMap& map, Conveyor& searchS
     return pCurrentConveyor;
 }
 
-const Conveyor* cpp_conv::TraceTailConveyor(cpp_conv::WorldMap& map, Conveyor& searchStart, Conveyor& head, std::vector<Conveyor*>& vOutConveyors)
+const Conveyor* cpp_conv::TraceTailConveyor(WorldMap& map, Conveyor& searchStart, Conveyor& head, std::vector<Conveyor*>& vOutConveyors)
 {
     Conveyor* pCurrentConveyor = map.GetEntity<Conveyor>(searchStart.m_position, EntityKind::Conveyor);
 
@@ -79,7 +79,7 @@ const Conveyor* cpp_conv::TraceTailConveyor(cpp_conv::WorldMap& map, Conveyor& s
     {
         vOutConveyors.push_back(pCurrentConveyor);
 
-        Entity* pTargetConveyor = cpp_conv::targeting_util::FindNextTailConveyor(map, *pCurrentConveyor);
+        Entity* pTargetConveyor = targeting_util::FindNextTailConveyor(map, *pCurrentConveyor);
         if (!pTargetConveyor ||
             pTargetConveyor->m_eEntityKind != EntityKind::Conveyor ||
             reinterpret_cast<Conveyor*>(pTargetConveyor)->IsCorner() ||
@@ -96,7 +96,7 @@ const Conveyor* cpp_conv::TraceTailConveyor(cpp_conv::WorldMap& map, Conveyor& s
     return pCurrentConveyor;
 }
 
-std::vector<Sequence*> cpp_conv::InitializeSequences(cpp_conv::WorldMap& map, const std::vector<Conveyor*>& conveyors)
+std::vector<Sequence*> cpp_conv::InitializeSequences(WorldMap& map, const std::vector<Conveyor*>& conveyors)
 {
     std::vector<Sequence*> vSequences;
     cpp_conveyor::vector_set<const Conveyor*> alreadyProcessedConveyors(conveyors.size());
@@ -160,10 +160,10 @@ std::vector<Sequence*> cpp_conv::InitializeSequences(cpp_conv::WorldMap& map, co
     return vSequences;
 }
 
-std::tuple<int, Direction> cpp_conv::GetInnerMostCornerChannel(const cpp_conv::WorldMap& map, const Conveyor& rConveyor)
+std::tuple<int, Direction> cpp_conv::GetInnerMostCornerChannel(const WorldMap& map, const Conveyor& rConveyor)
 {
     PROFILE_FUNC();
-    const Entity* pBackConverter = cpp_conv::targeting_util::FindNextTailConveyor(map, rConveyor);
+    const Entity* pBackConverter = targeting_util::FindNextTailConveyor(map, rConveyor);
     if (pBackConverter == nullptr || pBackConverter->GetDirection() == rConveyor.m_direction)
     {
         return std::make_tuple(-1, Direction::Up);
@@ -173,20 +173,19 @@ std::tuple<int, Direction> cpp_conv::GetInnerMostCornerChannel(const cpp_conv::W
     Direction backDirection = pBackConverter->GetDirection();
     while (selfDirection != Direction::Up)
     {
-        selfDirection = cpp_conv::direction::Rotate90DegreeClockwise(selfDirection);
-        backDirection = cpp_conv::direction::Rotate90DegreeClockwise(backDirection);
+        selfDirection = direction::Rotate90DegreeClockwise(selfDirection);
+        backDirection = direction::Rotate90DegreeClockwise(backDirection);
     }
 
     return std::make_tuple(backDirection == Direction::Right ? 1 : 0, pBackConverter->GetDirection());
 }
 
-bool Sequence::MoveItemToForwardsNode(const cpp_conv::SceneContext& kContext, const cpp_conv::Conveyor& pNode, int lane) const
+bool Sequence::MoveItemToForwardsNode(const SceneContext& kContext, const Conveyor& pNode, const int lane) const
 {
-    static ItemId s_Item = cpp_conv::ItemId::FromStringId("ITEM_COPPER_ORE");
-
-    Vector2F startPosition = GetSlotPosition(0, lane, 1);
-    cpp_conv::Entity* pForwardEntity = kContext.m_rMap.GetEntity(grid::GetForwardPosition(pNode));
-    return (pForwardEntity && pForwardEntity->SupportsInsertion() && pForwardEntity->TryInsert(kContext, pNode, Entity::InsertInfo(s_Item, static_cast<uint8_t>(lane))));
+    const SlotItem item = m_RealizedStates[lane].m_Items.Peek();
+    const Vector2F startPosition = GetSlotPosition(0, lane, 1);
+    Entity* pForwardEntity = kContext.m_rMap.GetEntity(grid::GetForwardPosition(pNode));
+    return (item.HasItem() && pForwardEntity && pForwardEntity->SupportsInsertion() && pForwardEntity->TryInsert(kContext, pNode, Entity::InsertInfo(item.m_Item, static_cast<uint8_t>(lane), startPosition)));
 }
 
 void Sequence::Tick(const SceneContext& kContext)
@@ -298,7 +297,6 @@ void Sequence::Realize()
 
         uint64_t uiInsertions = pendingState.m_PendingInsertions;
         pendingState.m_PendingInsertions = 0;
-        realizedState.m_HasOverridePosition = 0;
 
         while (uiInsertions != 0)
         {
