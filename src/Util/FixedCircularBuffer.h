@@ -36,6 +36,8 @@ namespace cpp_conv
 
         T Remove(int index = 0);
 
+	    [[nodiscard]] uint32_t GetSize() const { return m_uiSize; }
+
         constexpr void Insert(uint64_t uiIndex, T item)
         {
             assert(uiIndex >= 0);

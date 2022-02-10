@@ -18,8 +18,8 @@ namespace cpp_conv
     public:
         Sequence(Conveyor* pHead, const uint8_t uiLength, const Vector2F laneOnePosition, const Vector2F laneTwoPosition, const Vector2F unitDirection)
             : m_InitializationState{ { LaneVisual(laneOnePosition, unitDirection), LaneVisual(laneTwoPosition, unitDirection) } }
-            , m_RealizedStates { RealizedState(64), RealizedState(64) }
-            , m_PendingStates{ PendingState(64), PendingState(64) }
+            , m_RealizedStates { RealizedState(uiLength * 2), RealizedState(uiLength * 2) }
+            , m_PendingStates{ PendingState(uiLength * 2), PendingState(uiLength * 2) }
             , m_pHeadConveyor(pHead)
             , m_Length(uiLength)
         {

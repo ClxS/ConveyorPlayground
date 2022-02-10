@@ -133,6 +133,10 @@ void cpp_conv::Conveyor::Tick(const SceneContext& kContext)
             {
                 rLeadingItem = ItemInstance::Empty();
             }
+            else
+            {
+                rLeadingItem.m_bShouldAnimate = false;
+            }
         }
 
         for (int iChannelSlot = rChannel.m_LaneLength - 2; iChannelSlot >= 0; iChannelSlot--)
@@ -140,10 +144,17 @@ void cpp_conv::Conveyor::Tick(const SceneContext& kContext)
             ItemInstance& currentItem = rChannel.m_pSlots[iChannelSlot].m_Item;
             ItemInstance& forwardTargetItem = rChannel.m_pSlots[iChannelSlot + 1].m_Item;
             ItemInstance& forwardPendingItem = rChannel.m_pSlots[iChannelSlot + 1].m_Item;
-            if (!currentItem.IsEmpty() && forwardTargetItem.IsEmpty() && forwardPendingItem.IsEmpty())
+            if (!currentItem.IsEmpty())
             {
-                PlaceItemInSlot(rChannel.m_ChannelLane, iChannelSlot + 1, InsertInfo(currentItem.m_Item), true);
-                currentItem = ItemInstance::Empty();
+                if (forwardTargetItem.IsEmpty() && forwardPendingItem.IsEmpty())
+                {
+                    PlaceItemInSlot(rChannel.m_ChannelLane, iChannelSlot + 1, InsertInfo(currentItem.m_Item, iChannelSlot, rChannel.m_pSlots[iChannelSlot].m_VisualPosition), true);
+                    currentItem = ItemInstance::Empty();
+                }
+                else
+                {
+                    currentItem.m_bShouldAnimate = false;
+                }
             }
         }
     }
@@ -457,9 +468,14 @@ void cpp_conv::Conveyor::PlaceItemInSlot(int lane, int slot, const InsertInfo in
         return;
     }
 
-    //Vector2F position = reinterpret_cast<const Conveyor*>(&pSourceEntity)->m_pChannels[iSourceChannel].m_pSlots[iSourceLane].m_VisualPosition;
-    //forwardTargetItem = { pItem, position.GetX(), position.GetY(), 0, m_uiMoveTick, true };
-    forwardTargetItem = { insertInfo.GetItem(), 0, 0, false };
+    if (insertInfo.HasOriginPosition())
+    {
+        forwardTargetItem = { insertInfo.GetItem(), insertInfo.GetOriginPosition().GetX(), insertInfo.GetOriginPosition().GetY(), true };
+    }
+    else
+    {
+        forwardTargetItem = { insertInfo.GetItem(), 0, 0, false };
+    }
 }
 
 bool cpp_conv::Conveyor::TryPeakItemInSlot(int lane, int slot, ItemInstance& pItem) const

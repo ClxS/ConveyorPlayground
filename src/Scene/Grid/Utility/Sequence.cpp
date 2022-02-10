@@ -1,3 +1,5 @@
+#define USE_VALIDATION_CHECKS
+
 #include "Sequence.h"
 
 #include "TargetingUtility.h"
@@ -183,7 +185,7 @@ std::tuple<int, Direction> cpp_conv::GetInnerMostCornerChannel(const WorldMap& m
 bool Sequence::MoveItemToForwardsNode(const SceneContext& kContext, const Conveyor& pNode, const int lane) const
 {
     const SlotItem item = m_RealizedStates[lane].m_Items.Peek();
-    const Vector2F startPosition = GetSlotPosition(0, lane, 1);
+    const Vector2F startPosition = GetSlotPosition(m_Length - 1, lane, 1);
     Entity* pForwardEntity = kContext.m_rMap.GetEntity(grid::GetForwardPosition(pNode));
     return (item.HasItem() && pForwardEntity && pForwardEntity->SupportsInsertion() && pForwardEntity->TryInsert(kContext, pNode, Entity::InsertInfo(item.m_Item, static_cast<uint8_t>(lane), startPosition)));
 }
@@ -197,86 +199,103 @@ void Sequence::Tick(const SceneContext& kContext)
     }
 
     m_pHeadConveyor->m_uiCurrentTick = 0;
-
     for (uint8_t uiLane = 0; uiLane < c_conveyorChannels; uiLane++)
     {
         RealizedState& realizedState = m_RealizedStates[uiLane];
         PendingState& pendingState = m_PendingStates[uiLane];
         realizedState.m_RealizedMovements = 0;
         realizedState.m_HasOverridePosition = 0;
+        pendingState.m_PendingClears = 0;
 
         bool bIsLeadItemFull = (realizedState.m_Lanes & 0b1) == 1;
         if (bIsLeadItemFull)
         {
+            if (this->m_Length == 3)
+            {
+                int i = 0;
+                i++;
+            }
+
             if (MoveItemToForwardsNode(kContext, *m_pHeadConveyor, (int)uiLane))
             {
-                pendingState.m_PendingClears = 0b1;
+                pendingState.m_PendingClears |= 0b1;
                 realizedState.m_Items.Pop();
                 bIsLeadItemFull = false;
             }
         }
 
-        if (bIsLeadItemFull)
+        const uint64_t uiNewPositions = realizedState.m_Lanes >> 1;
+        uint64_t uiOverlaps = uiNewPositions & pendingState.m_PendingMoves;
+        if (uiOverlaps == 0)
         {
-            const uint64_t uiMaxMask = (1ULL << std::countr_one(realizedState.m_Lanes)) - 1ULL;
-            pendingState.m_PendingClears = ~uiMaxMask;
-
-            const uint64_t uiNewPositions = realizedState.m_Lanes >> 1;
-            const uint64_t uiOverlaps = uiNewPositions & pendingState.m_PendingMoves;
-            if (uiOverlaps == 0)
+            if (bIsLeadItemFull)
             {
+                const uint64_t uiMaxMask = (1ULL << std::countr_one(realizedState.m_Lanes)) - 1ULL;
+                pendingState.m_PendingClears = ~uiMaxMask;
+
                 pendingState.m_PendingMoves |= realizedState.m_Lanes >> 1;
                 pendingState.m_PendingMoves &= ~uiMaxMask;
             }
-        }
-        else
-        {
-            uint64_t uiNewPositions = realizedState.m_Lanes >> 1;
-            uint64_t uiOverlaps = uiNewPositions & pendingState.m_PendingMoves;
-            if (uiOverlaps == 0)
+            else
             {
                 // No mid-insert collision fast path
                 pendingState.m_PendingClears = realizedState.m_Lanes;
                 pendingState.m_PendingMoves |= uiNewPositions;
             }
-            else
+        }
+        else
+        {
+            uint64_t uiMoveCandidates = realizedState.m_Lanes;
+            if (bIsLeadItemFull)
             {
-                pendingState.m_PendingClears = realizedState.m_Lanes;
-                do
+                const uint64_t uiMaxMask = (1ULL << std::countr_one(realizedState.m_Lanes)) - 1ULL;
+                pendingState.m_PendingClears &= ~uiMaxMask;
+                uiMoveCandidates &= ~uiMaxMask;
+            }
+
+            do
+            {
+                // Determine save area
+                uint64_t uiCollisionBit;
+                uint64_t safeRegionMask;
                 {
-                    // Determine save area
-                    uint64_t uiCollisionBit;
-                    uint64_t safeRegionMask;
-                    {
-                        uiCollisionBit = std::countr_zero(uiOverlaps);
-                        uiOverlaps &= ~(1ULL << uiCollisionBit);
+                    uiCollisionBit = std::countr_zero(uiOverlaps);
+                    uiOverlaps &= ~(1ULL << uiCollisionBit);
 
-                        // Everything below our collision bit is safe to move
-                        safeRegionMask = (1ULL << uiCollisionBit) - 1;
-                    }
-
-                    // Perform safe move area
-                    {
-                        pendingState.m_PendingMoves |= uiNewPositions & safeRegionMask;
-
-                        // We can't clear our the original position
-                        pendingState.m_PendingClears &= ~(1ULL << uiCollisionBit);
-
-                        // Zero out the safe region so we know what remains
-                        uiNewPositions &= ~safeRegionMask;
-                    }
-
-                    //
-                    {
-                        // We can't move anything else until the following 0 bit
-                        const uint64_t uiNextMovableBit = std::countr_zero(uiOverlaps);
-                        const uint64_t uiClearRange = (1ULL << uiNextMovableBit) & ~safeRegionMask;
-
-                        pendingState.m_PendingClears &= ~uiClearRange;
-                        pendingState.m_PendingMoves &= ~uiClearRange;
-                    }
+                    // Everything below our collision bit is safe to move
+                    safeRegionMask = (1ULL << uiCollisionBit) - 1;
                 }
-                while (uiOverlaps != 0);
+
+                // Perform safe move area
+                // E.g, if we had a safe region of 0b0111
+                // And move candidates 0b1010
+                // Pending moves  would be OR 0b0101
+                // Pending clears would be OR 0b0010
+                // We do not clear the 4th slot as that is our collision bit - we know a new entry is in that position
+                {
+                    pendingState.m_PendingMoves |= (uiMoveCandidates >> 1) & safeRegionMask;
+                    pendingState.m_PendingClears |= (uiMoveCandidates) & (((safeRegionMask << 1) | 0b1));
+                    pendingState.m_PendingClears &= ~(1ULL << uiCollisionBit);
+
+                    uiMoveCandidates &= ~((safeRegionMask << 1) | 0b1);
+                    uiMoveCandidates &= ~(1ULL << uiCollisionBit);
+                }
+
+                //
+                {
+                    // We can't move anything else until the following 0 bit
+                    const uint64_t uiConsecutiveCollisions = std::countr_one(uiMoveCandidates >> (uiCollisionBit + 1));
+                    const uint64_t uiClearRange = (1ULL << uiConsecutiveCollisions) - 1;
+
+                    uiMoveCandidates = (uiMoveCandidates >> (uiCollisionBit + 1) & ~uiClearRange) << (uiCollisionBit + 1);
+                }
+            }
+            while (uiOverlaps != 0);
+
+            if (uiMoveCandidates != 0)
+            {
+                pendingState.m_PendingClears |= uiMoveCandidates;
+                pendingState.m_PendingMoves |= (uiMoveCandidates >> 1);
             }
         }
     }
@@ -312,6 +331,10 @@ void Sequence::Realize()
             const uint64_t previousItemCount = std::popcount(realizedState.m_Lanes & uiEarlierItemsMask);
             realizedState.m_Items.Insert(previousItemCount, item);
         }
+
+#ifdef USE_VALIDATION_CHECKS
+        assert(std::popcount(realizedState.m_Lanes) == realizedState.m_Items.GetSize());
+#endif
     }
 }
 
@@ -325,6 +348,9 @@ void Sequence::AddItemInSlot(const uint8_t uiSequenceIndex, const int lane, cons
     PendingState& pendingState = m_PendingStates[lane];
 
     const uint64_t uiSetMask = 1ULL << (m_Length * 2 - uiSequenceIndex * 2 - slot - 1);
+    assert((pendingState.m_PendingMoves & uiSetMask) == 0);
+    assert((pendingState.m_PendingInsertions & uiSetMask) == 0);
+
     pendingState.m_PendingInsertions |= uiSetMask;
     pendingState.m_PendingMoves |= uiSetMask;
 
