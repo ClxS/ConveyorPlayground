@@ -21,6 +21,7 @@ namespace cpp_conv
     struct NAME##Id\
     {\
         uint64_t m_uiItemId;\
+        static ItemId Empty() { return {0}; }\
         bool IsValid() const { return m_uiItemId != 0; }\
         bool IsEmpty() const { return m_uiItemId == 0; }\
         bool operator==(NAME##Id other) const\

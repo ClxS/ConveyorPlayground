@@ -71,7 +71,10 @@ namespace cpp_conv
 
         void Consume(cpp_conv::resources::AssetPtr<cpp_conv::resources::Map> map);
 
+        void PopulateCorners();
+
         const std::vector<cpp_conv::Conveyor*> GetConveyors() const { return m_vConveyors; }
+        const std::vector<cpp_conv::Conveyor*> GetCornerConveyors() const { return m_vCornerConveyors; }
         const std::vector<cpp_conv::Entity*> GetOtherEntities() const { return m_vOtherEntities; }
     private:
         using CellPtr = std::unique_ptr<Cell>;
@@ -81,8 +84,11 @@ namespace cpp_conv
         Cell* GetOrCreateCell(CellCoordinate coord);
         bool ValidateCanPlaceEntity(Vector3 position, Entity* pEntity) const;
 
+         bool m_bSuppressAssess = false;
+
         WorldMapStore m_WorldMap;
         std::vector<cpp_conv::Conveyor*> m_vConveyors;
+        std::vector<cpp_conv::Conveyor*> m_vCornerConveyors;
         std::vector<cpp_conv::Entity*> m_vOtherEntities;
     };
 

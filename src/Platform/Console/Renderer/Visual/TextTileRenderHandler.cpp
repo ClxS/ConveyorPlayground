@@ -27,7 +27,9 @@ wchar_t rotateCharIfAllowed(wchar_t input, int cycle)
     }
 }
 
-void tileRenderer(cpp_conv::RenderContext& kContext, const cpp_conv::resources::RenderableAsset* pAsset, const cpp_conv::Transform2D& kTransform, cpp_conv::Colour kColourOverride)
+void tileRenderer(cpp_conv::RenderContext& kContext, const cpp_conv::resources::RenderableAsset* pAsset,
+                  const cpp_conv::Transform2D& kTransform, cpp_conv::Colour kColourOverride,
+                  bool bTrack)
 {
     const cpp_conv::resources::TextTileAsset* pTile = reinterpret_cast<const cpp_conv::resources::TextTileAsset*>(pAsset);
     const std::vector<std::wstring>* vData = &pTile->GetData();

@@ -1,3 +1,5 @@
+#define USE_VALIDATION_CHECKS
+
 #include "Sequence.h"
 
 #include "TargetingUtility.h"
@@ -8,55 +10,14 @@
 #include "Profiler.h"
 #include "WorldMap.h"
 #include <cassert>
+#include <xutility>
+#include <bitset>
+#include <bit>
 
+#include "vector_set.h"
 using namespace cpp_conv;
-using cpp_conv::SequenceIterator;
 
-SequenceIterator::IterateNode::IterateNode(Conveyor* pCurrent, const Conveyor* pEnd, cpp_conv::WorldMap& map, bool bEndSentinel)
-    : m_pCurrent(pCurrent)
-    , m_pEnd(pEnd)
-    , m_rMap(map)
-    , m_bEndSentinel(bEndSentinel)
-{
-}
-
-SequenceIterator::IterateNode& SequenceIterator::IterateNode::operator++()
-{
-    if (m_pCurrent == m_pEnd)
-    {
-        m_bEndSentinel = true;
-    }
-    else
-    {
-        m_pCurrent = m_rMap.GetEntity<Conveyor>(grid::GetForwardPosition(*m_pCurrent), EntityKind::Conveyor);
-    }
-
-    return *this;
-}
-
-SequenceIterator::IterateNode SequenceIterator::IterateNode::operator++(int)
-{
-    IterateNode tmp = *this; ++(*this);
-    return tmp;
-}
-
-SequenceIterator::SequenceIterator(Sequence& sequence, cpp_conv::WorldMap& map)
-    : m_sequence(sequence)
-    , m_rMap(map)
-{
-}
-
-SequenceIterator::IterateNode SequenceIterator::begin()
-{
-    return { const_cast<Conveyor*>(m_sequence.GetTailConveyor()), m_sequence.GetHeadConveyor(), m_rMap, false };
-}
-
-SequenceIterator::IterateNode SequenceIterator::end()
-{
-    return { const_cast<Conveyor*>(m_sequence.GetHeadConveyor()), m_sequence.GetHeadConveyor(), m_rMap, true };
-}
-
-Conveyor* cpp_conv::TraceHeadConveyor(cpp_conv::WorldMap& map, Conveyor& searchStart)
+Conveyor* cpp_conv::TraceHeadConveyor(WorldMap& map, Conveyor& searchStart)
 {
     static RelativeDirection directionPriority[] =
     {
@@ -69,8 +30,8 @@ Conveyor* cpp_conv::TraceHeadConveyor(cpp_conv::WorldMap& map, Conveyor& searchS
     while (true)
     {
         Vector3 forwardPosition = grid::GetForwardPosition(*pCurrentConveyor);
-        Entity* pTargetConveyor = map.GetEntity<Conveyor>(forwardPosition, EntityKind::Conveyor);
-        if (pTargetConveyor == nullptr)
+        Conveyor* pTargetConveyor = map.GetEntity<Conveyor>(forwardPosition, EntityKind::Conveyor);
+        if (pTargetConveyor == nullptr || pTargetConveyor->IsCorner())
         {
             break;
         }
@@ -90,7 +51,7 @@ Conveyor* cpp_conv::TraceHeadConveyor(cpp_conv::WorldMap& map, Conveyor& searchS
 
             if (pDirectionEntity == pCurrentConveyor)
             {
-                break;
+                continue;
             }
 
             if (grid::GetForwardPosition(*pDirectionEntity) == forwardPosition)
@@ -99,7 +60,7 @@ Conveyor* cpp_conv::TraceHeadConveyor(cpp_conv::WorldMap& map, Conveyor& searchS
             }
         }
 
-        if (pTargetConveyor == &searchStart)
+        if (pTargetConveyor == &searchStart || pTargetConveyor->IsCorner())
         {
             break;
         }
@@ -110,7 +71,7 @@ Conveyor* cpp_conv::TraceHeadConveyor(cpp_conv::WorldMap& map, Conveyor& searchS
     return pCurrentConveyor;
 }
 
-const Conveyor* cpp_conv::TraceTailConveyor(cpp_conv::WorldMap& map, Conveyor& searchStart, Conveyor& head, std::vector<Conveyor*>& vOutConveyors)
+const Conveyor* cpp_conv::TraceTailConveyor(WorldMap& map, Conveyor& searchStart, Conveyor& head, std::vector<Conveyor*>& vOutConveyors)
 {
     Conveyor* pCurrentConveyor = map.GetEntity<Conveyor>(searchStart.m_position, EntityKind::Conveyor);
 
@@ -120,13 +81,13 @@ const Conveyor* cpp_conv::TraceTailConveyor(cpp_conv::WorldMap& map, Conveyor& s
     {
         vOutConveyors.push_back(pCurrentConveyor);
 
-        //if (vOutConveyors.size() >= Sequence::c_uiMaxSequenceLength)
-        {
-            //break;
-        }
-
-        Entity* pTargetConveyor = cpp_conv::targeting_util::FindNextTailConveyor(map, *pCurrentConveyor);
-        if (!pTargetConveyor || pTargetConveyor->m_eEntityKind != EntityKind::Conveyor || pTargetConveyor == &searchStart || pTargetConveyor == &head)
+        RelativeDirection direction;
+        Entity* pTargetConveyor = targeting_util::FindNextTailConveyor(map, *pCurrentConveyor, direction);
+        if (!pTargetConveyor ||
+            pTargetConveyor->m_eEntityKind != EntityKind::Conveyor ||
+            reinterpret_cast<Conveyor*>(pTargetConveyor)->IsCorner() ||
+            pTargetConveyor == &searchStart ||
+            pTargetConveyor == &head)
         {
             break;
         }
@@ -134,13 +95,13 @@ const Conveyor* cpp_conv::TraceTailConveyor(cpp_conv::WorldMap& map, Conveyor& s
         pCurrentConveyor = reinterpret_cast<Conveyor*>(pTargetConveyor);
     }
 
-    std::reverse(vOutConveyors.begin(), vOutConveyors.end());
+    std::ranges::reverse(vOutConveyors);
     return pCurrentConveyor;
 }
 
-std::vector<Sequence> cpp_conv::InitializeSequences(cpp_conv::WorldMap& map, const std::vector<Conveyor*>& conveyors)
+std::vector<Sequence*> cpp_conv::InitializeSequences(WorldMap& map, const std::vector<Conveyor*>& conveyors)
 {
-    std::vector<Sequence> vSequences;
+    std::vector<Sequence*> vSequences;
     cpp_conveyor::vector_set<const Conveyor*> alreadyProcessedConveyors(conveyors.size());
 
     int iId = 0;
@@ -150,173 +111,310 @@ std::vector<Sequence> cpp_conv::InitializeSequences(cpp_conv::WorldMap& map, con
         {
             continue;
         }
-         
-        iId++;
+
+        if (conveyor->IsCorner())
+        {
+            conveyor->ClearSequence();
+            continue;
+        }
+
         std::vector<Conveyor*> vConveyors;
         Conveyor* pHeadConveyor = TraceHeadConveyor(map, *conveyor);
         const Conveyor* pTailConveyor = TraceTailConveyor(map, *pHeadConveyor, *pHeadConveyor, vConveyors);
 
-        vSequences.emplace_back(pHeadConveyor, pTailConveyor, vConveyors, iId);
-        Sequence& sequence = vSequences.back();
-        for (auto& rNode : vConveyors)
+        const auto end = vConveyors.end();
+        std::vector<Conveyor*>::iterator chunk_begin;
+        std::vector<Conveyor*>::iterator chunk_end;
+        chunk_end = chunk_begin = vConveyors.begin();
+        do
         {
-            rNode->m_pSequenceId = iId;
-            alreadyProcessedConveyors.insert(rNode);
+            if (std::distance(chunk_end, end) < Sequence::c_uiMaxSequenceLength)
+            {
+                chunk_end = end;
+            }
+            else
+            {
+                std::advance(chunk_end, Sequence::c_uiMaxSequenceLength);
+            }
+
+            std::vector<Conveyor*> vSequenceConveyors(chunk_begin, chunk_end);
+            pTailConveyor = vSequenceConveyors.front();
+
+            vSequences.push_back(new Sequence(
+                vSequenceConveyors[vSequenceConveyors.size() - 1],
+                (uint8_t)vSequenceConveyors.size(),
+                pTailConveyor->m_pChannels[0].m_pSlots[0].m_VisualPosition,
+                pTailConveyor->m_pChannels[1].m_pSlots[0].m_VisualPosition,
+                pTailConveyor->m_pChannels[0].m_pSlots[1].m_VisualPosition - pTailConveyor->m_pChannels[0].m_pSlots[0].m_VisualPosition
+            ));
+
+            Sequence* sequence = vSequences.back();
+            for(size_t i = 0; i < vSequenceConveyors.size(); ++i)
+            {
+                vSequenceConveyors[i]->SetSequence(sequence, static_cast<uint8_t>(i));
+                alreadyProcessedConveyors.insert(vSequenceConveyors[i]);
+            }
+
+            chunk_begin = chunk_end;
         }
+        while (std::distance(chunk_begin, end) > 0);
     }
 
     return vSequences;
 }
 
-bool cpp_conv::IsCircular(const cpp_conv::WorldMap& map, std::vector<Sequence>& sequences, Sequence* pStartSequence)
-{
-    Sequence* pCurrentSequence = pStartSequence;
-    int checkedDepth = 0;
-    while (true)
-    {
-        checkedDepth++;
-        if (checkedDepth > c_maxCircularCheckDepth)
-        {
-            return false;
-        }
-
-        const Conveyor* pHead = pCurrentSequence->GetHeadConveyor();
-        const Entity* pForwardEntity = map.GetEntity(grid::GetForwardPosition(*pHead));
-        if (pForwardEntity->m_eEntityKind != EntityKind::Conveyor)
-        {
-            return false;
-        }
-
-        Sequence* pNextSequence = nullptr;
-        for (auto& sequence : sequences)
-        {
-            if (sequence.GetTailConveyor() == pForwardEntity)
-            {
-                pNextSequence = &sequence;
-                break;
-            }
-        }
-
-        if (pNextSequence == nullptr)
-        {
-            return false;
-        }
-
-        if (pNextSequence == pStartSequence)
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-std::tuple<int, Direction> cpp_conv::GetInnerMostCornerChannel(const cpp_conv::WorldMap& map, const Conveyor& rConveyor)
+std::tuple<int, Direction> cpp_conv::GetInnerMostCornerChannel(const WorldMap& map, const Conveyor& rConveyor)
 {
     PROFILE_FUNC();
-    const Entity* pBackConverter = cpp_conv::targeting_util::FindNextTailConveyor(map, rConveyor);
+    RelativeDirection direction;
+    const Entity* pBackConverter = targeting_util::FindNextTailConveyor(map, rConveyor, direction);
     if (pBackConverter == nullptr || pBackConverter->GetDirection() == rConveyor.m_direction)
     {
         return std::make_tuple(-1, Direction::Up);
     }
-     
+
     Direction selfDirection = rConveyor.m_direction;
     Direction backDirection = pBackConverter->GetDirection();
     while (selfDirection != Direction::Up)
     {
-        selfDirection = cpp_conv::direction::Rotate90DegreeClockwise(selfDirection);
-        backDirection = cpp_conv::direction::Rotate90DegreeClockwise(backDirection);
+        selfDirection = direction::Rotate90DegreeClockwise(selfDirection);
+        backDirection = direction::Rotate90DegreeClockwise(backDirection);
     }
 
     return std::make_tuple(backDirection == Direction::Right ? 1 : 0, pBackConverter->GetDirection());
 }
 
-void Sequence::MoveItemToForwardsNode(cpp_conv::SceneContext& kContext, cpp_conv::Conveyor* pNode, cpp_conv::Entity* pForwardEntity, cpp_conv::Conveyor::Channel& rChannel, ItemInstance& frontMostItem)
+bool Sequence::MoveItemToForwardsNode(const SceneContext& kContext, const Conveyor& pNode, const int lane) const
 {
-    if (pNode == GetHeadConveyor())
-    {
-        if (pForwardEntity && pForwardEntity->SupportsInsertion() && pForwardEntity->TryInsert(kContext, *pNode, frontMostItem.m_Item, rChannel.m_ChannelLane))
-        {
-            frontMostItem = ItemInstance::Empty();
-        }
-    }
-    else
-    {
-        cpp_conv::Conveyor* pForwardNode = reinterpret_cast<cpp_conv::Conveyor*>(pForwardEntity);
-        cpp_conv::Conveyor::Channel& forwardChannel = pForwardNode->m_pChannels[rChannel.m_ChannelLane];
-        ItemInstance& forwardTargetItem = forwardChannel.m_pSlots[0].m_Item;
-        ItemInstance& forwardPendingItem = forwardChannel.m_pPendingItems[0];
-        if (forwardTargetItem.IsEmpty() && forwardPendingItem.IsEmpty())
-        {
-            pForwardNode->AddItemToSlot(
-                kContext.m_rMap,
-                &forwardChannel,
-                0,
-                frontMostItem.m_Item,
-                *pNode,
-                rChannel.m_ChannelLane,
-                rChannel.m_LaneLength - 1);
-            frontMostItem = ItemInstance::Empty();
-        }
-    }
+    const SlotItem item = m_RealizedStates[lane].m_Items.Peek();
+    const Vector2F startPosition = GetSlotPosition(m_Length - 1, lane, 1);
+    Entity* pForwardEntity = kContext.m_rMap.GetEntity(grid::GetForwardPosition(pNode));
+    return (item.HasItem() && pForwardEntity && pForwardEntity->SupportsInsertion() && pForwardEntity->TryInsert(kContext, pNode, Entity::InsertInfo(item.m_Item, static_cast<uint8_t>(lane), startPosition)));
 }
 
-void Sequence::MoveLanesForwards(cpp_conv::SceneContext& kContext, cpp_conv::Conveyor* pNode, cpp_conv::Conveyor::Channel& rChannel)
+void Sequence::Tick(const SceneContext& kContext)
 {
-    for (int iChannelSlot = rChannel.m_LaneLength - 2; iChannelSlot >= 0; iChannelSlot--)
-    {
-        ItemInstance& currentItem = rChannel.m_pSlots[iChannelSlot].m_Item;
-        if (currentItem.m_CurrentTick < currentItem.m_TargetTick)
-        {
-            continue;
-        }
-
-        ItemInstance& forwardTargetItem = rChannel.m_pSlots[iChannelSlot + 1].m_Item;
-        ItemInstance& forwardPendingItem = rChannel.m_pSlots[iChannelSlot + 1].m_Item;
-
-        if (!currentItem.IsEmpty() && forwardTargetItem.IsEmpty() && forwardPendingItem.IsEmpty())
-        {
-            pNode->AddItemToSlot(kContext.m_rMap, &rChannel, iChannelSlot + 1, currentItem.m_Item, *pNode, rChannel.m_ChannelLane, iChannelSlot);
-            currentItem = ItemInstance::Empty();
-        }
-    }
-}
-
-__declspec(noinline) void cpp_conv::Sequence::TickNode(cpp_conv::SceneContext& kContext, cpp_conv::Conveyor* pNode, cpp_conv::Entity* pForwardEntity)
-{
-    if (!pNode->m_bHasWork)
+    m_pHeadConveyor->m_uiCurrentTick++;
+    if (m_pHeadConveyor->m_uiCurrentTick < m_pHeadConveyor->m_uiMoveTick)
     {
         return;
     }
 
-    bool bIsCornerConveyor = pNode->IsCorner();
-    for (cpp_conv::Conveyor::Channel& rChannel : pNode->m_pChannels)
+    m_pHeadConveyor->m_uiCurrentTick = 0;
+    for (uint8_t uiLane = 0; uiLane < c_conveyorChannels; uiLane++)
     {
-        ItemInstance& frontMostItem = rChannel.m_pSlots[rChannel.m_LaneLength - 1].m_Item;
-        if (!frontMostItem.IsEmpty() && frontMostItem.m_CurrentTick >= frontMostItem.m_TargetTick)
+        RealizedState& realizedState = m_RealizedStates[uiLane];
+        PendingState& pendingState = m_PendingStates[uiLane];
+        realizedState.m_RealizedMovements = 0;
+        realizedState.m_HasOverridePosition = 0;
+        pendingState.m_PendingClears = 0;
+
+        bool bIsLeadItemFull = (realizedState.m_Lanes & 0b1) == 1;
+        if (bIsLeadItemFull)
         {
-            MoveItemToForwardsNode(kContext, pNode, pForwardEntity, rChannel, frontMostItem);
+            if (this->m_Length == 3)
+            {
+                int i = 0;
+                i++;
+            }
+
+            if (MoveItemToForwardsNode(kContext, *m_pHeadConveyor, (int)uiLane))
+            {
+                pendingState.m_PendingClears |= 0b1;
+                realizedState.m_Items.Pop();
+                bIsLeadItemFull = false;
+            }
         }
 
-        MoveLanesForwards(kContext, pNode, rChannel);        
-    }
-}
-
-void cpp_conv::Sequence::Tick(SceneContext& kContext)
-{
-    for(int i = 0; i < m_pNodes.size(); i++)
-    {
-        cpp_conv::Conveyor* pNode = m_pNodes[i];
-        cpp_conv::Entity* pForwardEntity = nullptr;
-        if (i < m_pNodes.size() - 1)
+        const uint64_t uiNewPositions = realizedState.m_Lanes >> 1;
+        uint64_t uiOverlaps = uiNewPositions & pendingState.m_PendingMoves;
+        if (uiOverlaps == 0)
         {
-            pForwardEntity = m_pNodes[i + 1];
+            if (bIsLeadItemFull)
+            {
+                const uint64_t uiMaxMask = (1ULL << std::countr_one(realizedState.m_Lanes)) - 1ULL;
+                pendingState.m_PendingClears = ~uiMaxMask;
+
+                pendingState.m_PendingMoves |= realizedState.m_Lanes >> 1;
+                pendingState.m_PendingMoves &= ~uiMaxMask;
+            }
+            else
+            {
+                // No mid-insert collision fast path
+                pendingState.m_PendingClears = realizedState.m_Lanes;
+                pendingState.m_PendingMoves |= uiNewPositions;
+            }
         }
         else
         {
-            pForwardEntity = kContext.m_rMap.GetEntity(cpp_conv::grid::GetForwardPosition(*pNode));
+            uint64_t uiMoveCandidates = realizedState.m_Lanes;
+            if (bIsLeadItemFull)
+            {
+                const uint64_t uiMaxMask = (1ULL << std::countr_one(realizedState.m_Lanes)) - 1ULL;
+                pendingState.m_PendingClears &= ~uiMaxMask;
+                uiMoveCandidates &= ~uiMaxMask;
+            }
+
+            do
+            {
+                // Determine save area
+                uint64_t uiCollisionBit;
+                uint64_t safeRegionMask;
+                {
+                    uiCollisionBit = std::countr_zero(uiOverlaps);
+                    uiOverlaps &= ~(1ULL << uiCollisionBit);
+
+                    // Everything below our collision bit is safe to move
+                    safeRegionMask = (1ULL << uiCollisionBit) - 1;
+                }
+
+                // Perform safe move area
+                // E.g, if we had a safe region of 0b0111
+                // And move candidates 0b1010
+                // Pending moves  would be OR 0b0101
+                // Pending clears would be OR 0b0010
+                // We do not clear the 4th slot as that is our collision bit - we know a new entry is in that position
+                {
+                    pendingState.m_PendingMoves |= (uiMoveCandidates >> 1) & safeRegionMask;
+                    pendingState.m_PendingClears |= (uiMoveCandidates) & (((safeRegionMask << 1) | 0b1));
+                    pendingState.m_PendingClears &= ~(1ULL << uiCollisionBit);
+
+                    uiMoveCandidates &= ~((safeRegionMask << 1) | 0b1);
+                    uiMoveCandidates &= ~(1ULL << uiCollisionBit);
+                }
+
+                //
+                {
+                    // We can't move anything else until the following 0 bit
+                    const uint64_t uiConsecutiveCollisions = std::countr_one(uiMoveCandidates >> (uiCollisionBit + 1));
+                    const uint64_t uiClearRange = (1ULL << uiConsecutiveCollisions) - 1;
+
+                    uiMoveCandidates = (uiMoveCandidates >> (uiCollisionBit + 1) & ~uiClearRange) << (uiCollisionBit + 1);
+                }
+            }
+            while (uiOverlaps != 0);
+
+            if (uiMoveCandidates != 0)
+            {
+                pendingState.m_PendingClears |= uiMoveCandidates;
+                pendingState.m_PendingMoves |= (uiMoveCandidates >> 1);
+            }
+        }
+    }
+}
+
+void Sequence::Realize()
+{
+    for (uint8_t uiLane = 0; uiLane < c_conveyorChannels; uiLane++)
+    {
+        RealizedState& realizedState = m_RealizedStates[uiLane];
+        PendingState& pendingState = m_PendingStates[uiLane];
+
+        realizedState.m_Lanes &= ~pendingState.m_PendingClears;
+        realizedState.m_Lanes |= pendingState.m_PendingMoves;
+        realizedState.m_RealizedMovements |= pendingState.m_PendingMoves;
+        pendingState.m_PendingClears = 0;
+        pendingState.m_PendingMoves = 0;
+
+        uint64_t uiInsertions = pendingState.m_PendingInsertions;
+        pendingState.m_PendingInsertions = 0;
+
+        while (uiInsertions != 0)
+        {
+            const SlotItem item = pendingState.m_NewItems.Pop();
+            const uint32_t uiCurrentInsertIndex = 1U << std::countr_zero(uiInsertions);
+            if (item.m_bHasPosition)
+            {
+                realizedState.m_HasOverridePosition |= uiCurrentInsertIndex;
+            }
+
+            const uint32_t uiEarlierItemsMask = uiCurrentInsertIndex - 1;
+            uiInsertions &= ~uiCurrentInsertIndex;
+            const uint64_t previousItemCount = std::popcount(realizedState.m_Lanes & uiEarlierItemsMask);
+            realizedState.m_Items.Insert(previousItemCount, item);
         }
 
-        TickNode(kContext, pNode, pForwardEntity);
+#ifdef USE_VALIDATION_CHECKS
+        assert(std::popcount(realizedState.m_Lanes) == realizedState.m_Items.GetSize());
+#endif
     }
+}
+
+uint64_t Sequence::CountItemsOnBelt() const
+{
+    return std::popcount(m_RealizedStates[0].m_Lanes) + std::popcount(m_RealizedStates[1].m_Lanes);
+}
+
+void Sequence::AddItemInSlot(const uint8_t uiSequenceIndex, const int lane, const int slot, ItemId item, const Vector2F* origin)
+{
+    PendingState& pendingState = m_PendingStates[lane];
+
+    const uint64_t uiSetMask = 1ULL << (m_Length * 2 - uiSequenceIndex * 2 - slot - 1);
+    assert((pendingState.m_PendingMoves & uiSetMask) == 0);
+    assert((pendingState.m_PendingInsertions & uiSetMask) == 0);
+
+    pendingState.m_PendingInsertions |= uiSetMask;
+    pendingState.m_PendingMoves |= uiSetMask;
+
+    // Gets all bits below the current insertion point
+    const uint64_t uiPreviousInsertMask = pendingState.m_PendingInsertions & (uiSetMask - 1);
+    const int uiPreviousCount = std::popcount(uiPreviousInsertMask);
+    if (origin == nullptr)
+    {
+        pendingState.m_NewItems.Insert(uiPreviousCount, SlotItem(item));
+    }
+    else
+    {
+        pendingState.m_NewItems.Insert(uiPreviousCount, SlotItem(item, *origin));
+    }
+}
+
+bool Sequence::HasItemInSlot(const uint8_t uiSequenceIndex, const int lane, const int slot) const
+{
+    return (((m_RealizedStates[lane].m_Lanes | m_PendingStates[lane].m_PendingMoves) >> (m_Length * 2 - uiSequenceIndex * 2 - slot - 1)) & 0b1) == 1;
+}
+
+bool Sequence::DidItemMoveLastSimulation(const uint8_t uiSequenceIndex, const int lane, const int slot) const
+{
+    return ((m_RealizedStates[lane].m_RealizedMovements >> (m_Length * 2 - uiSequenceIndex * 2 - slot - 1)) & 0b1) == 1;
+}
+
+Vector2F Sequence::GetSlotPosition(const uint8_t uiSequenceIndex, const int lane, const int slot) const
+{
+    const LaneVisual& visual = m_InitializationState.m_ConveyorVisualOffsets[lane];
+    return visual.m_Origin + visual.m_UnitDirection * ((uiSequenceIndex * 2) + slot);
+}
+
+bool Sequence::TryPeakItemInSlot(const uint8_t uiSequenceIndex, const int lane, const int slot, ItemInstance& pItem) const
+{
+    if (!HasItemInSlot(uiSequenceIndex, lane, slot))
+    {
+        return false;
+    }
+
+    const RealizedState& realizedState = m_RealizedStates[lane];
+    const uint64_t uiSetMask = 1ULL << (m_Length * 2 - uiSequenceIndex * 2 - slot - 1);
+    const uint64_t uiPreviousInsertMask = realizedState.m_Lanes & (uiSetMask - 1);
+    const int uiPreviousCount = std::popcount(uiPreviousInsertMask);
+    const SlotItem item = realizedState.m_Items.Peek(uiPreviousCount);
+
+    if (!item.HasItem())
+    {
+        return false;
+    }
+
+    Vector2F startPosition;
+    const bool bHasOverridePosition = ((realizedState.m_HasOverridePosition >> (m_Length * 2 - uiSequenceIndex * 2 - slot - 1)) & 0b1) == 1;
+
+    if (bHasOverridePosition)
+    {
+        startPosition = item.m_Position;
+    }
+    else
+    {
+        startPosition = GetSlotPosition(uiSequenceIndex, lane, slot - 1);
+    }
+
+    pItem = { item.m_Item, startPosition.GetX(), startPosition.GetY(), DidItemMoveLastSimulation(uiSequenceIndex, lane, slot) };
+    return true;
 }

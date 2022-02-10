@@ -34,10 +34,11 @@ void createWindow()
 
     #if WINDOWED
     windowFlags = 0;
-    cpp_conv::apphost::App.window = SDL_CreateWindow("Cpp Conveyor", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 2560, 1080, windowFlags);
+    cpp_conv::apphost::App.window = SDL_CreateWindow("Cpp Conveyor", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1200, 800, windowFlags);
     #else
     windowFlags = 0;
-    cpp_conv::apphost::App.window = SDL_CreateWindow("Cpp Conveyor", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1200, 1000, windowFlags);
+    cpp_conv::apphost::App.window = SDL_CreateWindow("Cpp Conveyor", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 2560, 1080, windowFlags);
+    SDL_SetRelativeMouseMode(SDL_TRUE);
     #endif
 
     if (!cpp_conv::apphost::App.window)
@@ -46,7 +47,6 @@ void createWindow()
         exit(1);
     }
 
-    SDL_SetRelativeMouseMode(SDL_TRUE);
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
     SDL_SetHint(SDL_HINT_RENDER_BATCHING, "1");
 

@@ -32,7 +32,7 @@ namespace cpp_conv
 
         struct Channel
         {
-            Channel(int channelLane); 
+            Channel(int channelLane);
 
             const int m_ChannelLane;
 
@@ -44,14 +44,15 @@ namespace cpp_conv
         Conveyor(Vector3 position, Vector3 size, Direction direction, ItemId pItem = {});
 
         Direction m_direction;
-        int m_pSequenceId;
 
         std::array<Channel, c_conveyorChannels> m_pChannels;
 
         void Tick(const SceneContext& kContext) override;
+        void Realize();
+
         void Draw(RenderContext& kContext) const override;
         bool SupportsInsertion() const override { return true; }
-        bool TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel, int iSourceSlot) override;
+        bool TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, InsertInfo insertInfo) override;
 
         bool SupportsProvidingItem() const override { return true; }
         bool TryGrab(const SceneContext& kContext, bool bSingle, std::tuple<ItemId, uint32_t>& outItem) override;
@@ -72,12 +73,25 @@ namespace cpp_conv
         int GetInnerMostChannel() const { return m_iInnerMostChannel; }
         Direction GetCornerDirection() const { return m_eCornerDirection; }
 
+        bool IsPartOfASequence() const { return m_pSequence != nullptr; }
+
+        void SetSequence(Sequence* pSequence, uint8_t position);
+        void ClearSequence();
+
+        uint64_t CountItemsOnBelt();
+
         cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> GetTile() const { return m_pTile; }
 
         static_assert(c_conveyorChannels >= 1, "Conveyors must have at least once channel");
         static_assert(c_conveyorChannelSlots >= 1, "Conveyors channels must have at least once slot");
-    private: 
+    private:
+        bool HasItemInSlot(int lane, int slot);
+        void PlaceItemInSlot(int lane, int slot, InsertInfo insertInfo, bool bDirectItemSet = false);
+
         friend class Sequence;
+
+        Sequence* m_pSequence = nullptr;
+        uint8_t m_uiSequenceIndex;
 
         uint32_t m_uiCurrentTick = 0;
         uint32_t m_uiMoveTick = 10;
@@ -90,6 +104,6 @@ namespace cpp_conv
         Direction m_eCornerDirection;
         cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> m_pTile;
 
-        void AddItemToSlot(const cpp_conv::WorldMap& map, Channel* pTargetChannel, int forwardTargetItemSlot, const ItemId pItem, const Entity& pSourceEntity, int iSourceChannel, int iSourceSlot);
+        bool TryPeakItemInSlot(int lane, int slot, ItemInstance& rItem) const;
     };
 }

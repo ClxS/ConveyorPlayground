@@ -14,7 +14,8 @@ namespace cpp_conv::resources::registration
 {
     using TypeInfo = std::type_info;
     using AssetLoadFunc = std::function<ResourceAsset* (cpp_conv::resources::resource_manager::FileData&)>;
-    using AssetRenderFunc = std::function<void(cpp_conv::RenderContext& kContext, const cpp_conv::resources::RenderableAsset* pAsset, const cpp_conv::Transform2D& kTransform, cpp_conv::Colour kColourOverride)>;
+    using AssetRenderFunc = std::function<void(cpp_conv::RenderContext& kContext, const cpp_conv::resources::RenderableAsset* pAsset,
+                                               const cpp_conv::Transform2D& kTransform, cpp_conv::Colour kColourOverride, bool bTrack)>;
     using LoadFunc = std::function<void(void)>;
 
     void processSelfRegistrations();

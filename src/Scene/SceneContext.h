@@ -14,7 +14,7 @@ namespace cpp_conv
     {
         Vector3 m_player;
         cpp_conv::WorldMap& m_rMap;
-        std::vector<cpp_conv::Sequence>& m_sequences;
+        std::vector<cpp_conv::Sequence*>& m_sequences;
 
         struct
         {

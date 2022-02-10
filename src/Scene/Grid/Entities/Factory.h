@@ -12,7 +12,7 @@ namespace cpp_conv
     class FactoryDefinition;
 
     class Factory : public Entity
-    { 
+    {
     public:
         Factory(
             Vector3 position,
@@ -26,7 +26,7 @@ namespace cpp_conv
         void Draw(RenderContext& kRenderContext) const override;
 
         bool SupportsInsertion() const override { return true; }
-        bool TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel = 0, int iSourceSlot = 0) override;
+        bool TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, InsertInfo insertInfo) override;
 
         bool SupportsProvidingItem() const override { return true; }
         bool TryGrab(const SceneContext& kContext, bool bSingle, std::tuple<ItemId, uint32_t>& outItem) override;

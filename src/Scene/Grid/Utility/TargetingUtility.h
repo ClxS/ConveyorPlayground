@@ -14,7 +14,7 @@ namespace cpp_conv::targeting_util
         int32_t m_Channel;
     };
 
-    cpp_conv::Entity* FindNextTailConveyor(const cpp_conv::WorldMap& map, const cpp_conv::Conveyor& rCurrentConveyor);
+    cpp_conv::Entity* FindNextTailConveyor(const cpp_conv::WorldMap& map, const cpp_conv::Conveyor& rCurrentConveyor, RelativeDirection& outDirection);
     bool IsCornerConveyor(const cpp_conv::WorldMap& map, const Conveyor& rConveyor);
     bool IsClockwiseCorner(const cpp_conv::WorldMap& map, const Conveyor& rConveyor);
 

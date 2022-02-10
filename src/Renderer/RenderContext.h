@@ -18,5 +18,7 @@ namespace cpp_conv
         cpp_conv::WorldMap& m_rMap;
         class cpp_conv::renderer::WriteSurface* m_surface;
         float m_fZoom;
+
+        uint32_t m_uiDrawnItems;
     };
 }

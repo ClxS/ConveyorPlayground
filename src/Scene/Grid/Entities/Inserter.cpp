@@ -6,7 +6,7 @@
 #include "Renderer.h"
 #include "RenderContext.h"
 
-#include <algorithm> 
+#include <algorithm>
 #include <array>
 #include <random>
 #include <chrono>
@@ -25,7 +25,7 @@ cpp_conv::Inserter::Inserter(Vector3 position, Vector3 size, Direction direction
     , m_direction(direction)
     , m_transitTime(9999999)
     , m_cooldownTime(9999999)
-    , m_supportsStacks(false)    
+    , m_supportsStacks(false)
     , m_currentItem(ItemIds::None)
     , m_currentStackSize(0)
     , m_uiTicksRemainingInState(0)
@@ -52,7 +52,7 @@ void cpp_conv::Inserter::Tick(const SceneContext& kContext)
             m_eCurrentState = State::Transfering;
             m_uiTicksRemainingInState = m_transitTime;
         }
-        break; 
+        break;
     case State::Transfering:
         if (m_uiTicksRemainingInState > 0)
         {
@@ -153,7 +153,7 @@ bool cpp_conv::Inserter::TryInsertItem(const SceneContext& kContext)
         return false;
     }
 
-    if (!pTargetEntity->TryInsert(kContext, *this, m_currentItem, 0) && !pTargetEntity->TryInsert(kContext, *this, m_currentItem, 1))
+    if (!pTargetEntity->TryInsert(kContext, *this, InsertInfo(m_currentItem, 0)) && !pTargetEntity->TryInsert(kContext, *this, InsertInfo(m_currentItem, 1)))
     {
         return false;
     }

@@ -15,7 +15,7 @@
 #include "AppHost.h"
 
 using TypeId = size_t;
-static std::map<TypeId, std::function<void(cpp_conv::RenderContext&, const cpp_conv::resources::RenderableAsset*, cpp_conv::Transform2D, cpp_conv::Colour)>*> g_typeHandlers;
+static std::map<TypeId, std::function<void(cpp_conv::RenderContext&, const cpp_conv::resources::RenderableAsset*, cpp_conv::Transform2D, cpp_conv::Colour, bool)>*> g_typeHandlers;
 
 namespace
 {
@@ -25,7 +25,7 @@ namespace
         return s_stateMutex;
     }
 
-    std::function<void(cpp_conv::RenderContext&, const cpp_conv::resources::RenderableAsset*, cpp_conv::Transform2D, cpp_conv::Colour)>* getTypeHandler(const std::type_info& type)
+    std::function<void(cpp_conv::RenderContext&, const cpp_conv::resources::RenderableAsset*, cpp_conv::Transform2D, cpp_conv::Colour, bool)>* getTypeHandler(const std::type_info& type)
     {
         // No need to lock here, this is only called in the context of an existing lock
         auto iter = g_typeHandlers.find(type.hash_code());
@@ -39,7 +39,7 @@ namespace
 }
 
 void cpp_conv::renderer::init(cpp_conv::RenderContext& kContext, cpp_conv::renderer::SwapChain& rSwapChain)
-{    
+{
     ScreenBufferInitArgs kArgs = { };
     rSwapChain.Initialize(kContext, kArgs);
     kContext.m_surface = &rSwapChain.GetWriteSurface();
@@ -72,10 +72,10 @@ void cpp_conv::renderer::render(const SceneContext& kSceneContext, RenderContext
     std::tie(width, height) = cpp_conv::apphost::getAppDimensions();
 
     Vector2F startCellPosition = kContext.m_CameraPosition / kContext.m_fZoom * -1.0f / 64;
-    Vector2F endCellPosition = (kContext.m_CameraPosition / kContext.m_fZoom * -1.0f + Vector2F(width, height) / kContext.m_fZoom) / 64;
+    Vector2F endCellPosition = (kContext.m_CameraPosition / kContext.m_fZoom * -1.0f + Vector2F((float)width, (float)height) / kContext.m_fZoom) / 64;
     WorldMap::CellCoordinate startCoord = WorldMap::ToCellSpace({ (int)startCellPosition.GetX(), (int)startCellPosition.GetY(), 0 });
     WorldMap::CellCoordinate endCoord = WorldMap::ToCellSpace({ (int)std::ceil(endCellPosition.GetX()), (int)std::ceil(endCellPosition.GetY()), 0 });
-    
+
      uint32_t uiPassCount = 0;
      WorldMap::CellCoordinate currentCoord = startCoord;
      for (currentCoord.m_CellY = startCoord.m_CellY; currentCoord.m_CellY <= endCoord.m_CellY; currentCoord.m_CellY++)
@@ -135,13 +135,13 @@ void cpp_conv::renderer::render(const SceneContext& kSceneContext, RenderContext
          }
      }
 
-    drawPlayer(kSceneContext, kContext);
+    //drawPlayer(kSceneContext, kContext);
 }
 
-void cpp_conv::renderer::renderAsset(const std::type_info& type, RenderContext& kContext, resources::RenderableAsset* pRenderable, Transform2D transform, Colour kColourOverride)
+void cpp_conv::renderer::renderAsset(const std::type_info& type, RenderContext& kContext, resources::RenderableAsset* pRenderable, Transform2D transform, Colour kColourOverride, bool bTrack)
 {
     PROFILE_FUNC();
-    std::function<void(cpp_conv::RenderContext&, const resources::RenderableAsset*, cpp_conv::Transform2D, cpp_conv::Colour)>* pHandler = nullptr;
+    std::function<void(cpp_conv::RenderContext&, const resources::RenderableAsset*, cpp_conv::Transform2D, cpp_conv::Colour, bool)>* pHandler = nullptr;
     {
         std::lock_guard<std::mutex> lock(getStateMutex());
         pHandler = getTypeHandler(type);
@@ -152,13 +152,13 @@ void cpp_conv::renderer::renderAsset(const std::type_info& type, RenderContext& 
         return;
     }
 
-    (*pHandler)(kContext, pRenderable, std::move(transform), kColourOverride);
+    (*pHandler)(kContext, pRenderable, std::move(transform), kColourOverride, bTrack);
 }
 
-void cpp_conv::renderer::registerTypeHandler(const std::type_info& type, std::function<void(cpp_conv::RenderContext&, const resources::RenderableAsset*, cpp_conv::Transform2D, cpp_conv::Colour)> fHandler)
+void cpp_conv::renderer::registerTypeHandler(const std::type_info& type, std::function<void(cpp_conv::RenderContext&, const resources::RenderableAsset*, cpp_conv::Transform2D, cpp_conv::Colour, bool)> fHandler)
 {
     std::lock_guard<std::mutex> lock(getStateMutex());
-    g_typeHandlers[type.hash_code()] = new std::function<void(cpp_conv::RenderContext&, const resources::RenderableAsset*, cpp_conv::Transform2D, cpp_conv::Colour)>(fHandler);
+    g_typeHandlers[type.hash_code()] = new std::function<void(cpp_conv::RenderContext&, const resources::RenderableAsset*, cpp_conv::Transform2D, cpp_conv::Colour, bool)>(fHandler);
 }
 
 void cpp_conv::renderer::drawBackground(const SceneContext& kSceneContext, RenderContext& kContext)

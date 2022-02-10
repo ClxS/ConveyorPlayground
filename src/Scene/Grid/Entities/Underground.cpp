@@ -6,7 +6,7 @@
 #include "Renderer.h"
 #include "RenderContext.h"
 
-#include <algorithm> 
+#include <algorithm>
 #include <array>
 #include <random>
 #include <chrono>
@@ -63,7 +63,7 @@ cpp_conv::Underground::Underground(Vector3 position, Vector3 size, Direction dir
         cpp_conv::Conveyor(position, size, direction, cpp_conv::ItemIds::None),
         cpp_conv::Conveyor(position, size, direction, cpp_conv::ItemIds::None),
         cpp_conv::Conveyor(position, size, direction, cpp_conv::ItemIds::None)
-    }    
+    }
     , m_uiTick(0)
 {
     for (int i = 0; i < cpp_conv::c_maxUndergroundLength; i++)
@@ -77,7 +77,7 @@ void cpp_conv::Underground::Tick(const SceneContext& kContext)
 {
     int iUndergroundLength;
     Vector3 undergroundEnd;
-    
+
     std::tie(iUndergroundLength, undergroundEnd) = GetUndergroundLength(kContext.m_rMap, this, m_direction);
     if (iUndergroundLength == -1)
     {
@@ -107,7 +107,7 @@ void cpp_conv::Underground::Tick(const SceneContext& kContext)
             {
                 if (bIsHead)
                 {
-                    if (pForwardEntity && pForwardEntity->SupportsInsertion() && pForwardEntity->TryInsert(kContext, *pNode, frontMostItem.m_Item, iChannelIdx))
+                    if (pForwardEntity && pForwardEntity->SupportsInsertion() && pForwardEntity->TryInsert(kContext, *pNode, InsertInfo(frontMostItem.m_Item, iChannelIdx)))
                     {
                         frontMostItem = ItemInstance::Empty();
                     }
@@ -172,21 +172,21 @@ void cpp_conv::Underground::Draw(RenderContext& kRenderContext) const
         kRenderContext,
         pTile.get(),
         {
-            (float)m_position.GetX() * cpp_conv::renderer::c_gridScale,
-            (float)m_position.GetY() * cpp_conv::renderer::c_gridScale,
+            static_cast<float>(m_position.GetX()) * cpp_conv::renderer::c_gridScale,
+            static_cast<float>(m_position.GetY()) * cpp_conv::renderer::c_gridScale,
             eDirection
         },
         { 0xFF0000FF });
 }
 
-bool cpp_conv::Underground::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, ItemId pItem, int iSourceChannel, int iSourceLane)
+bool cpp_conv::Underground::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, const InsertInfo insertInfo)
 {
     bool bProduced = false;
-    ItemInstance& forwardTargetItem = m_arrInternalConveyors[0].m_pChannels[iSourceChannel].m_pSlots[0].m_Item;
-    ItemInstance& forwardPendingItem = m_arrInternalConveyors[0].m_pChannels[iSourceChannel].m_pSlots[0].m_Item;
+    const ItemInstance& forwardTargetItem = m_arrInternalConveyors[0].m_pChannels[insertInfo.GetSourceChannel()].m_pSlots[0].m_Item;
+    ItemInstance& forwardPendingItem = m_arrInternalConveyors[0].m_pChannels[insertInfo.GetSourceChannel()].m_pSlots[0].m_Item;
     if (forwardTargetItem.IsEmpty() && forwardPendingItem.IsEmpty())
     {
-        forwardPendingItem = { pItem, 0.0f, 0.0f, 0, 0, false };
+        forwardPendingItem = { insertInfo.GetItem(), 0.0f, 0.0f, false };
         return true;
     }
 
