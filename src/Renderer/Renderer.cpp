@@ -39,7 +39,7 @@ namespace
 }
 
 void cpp_conv::renderer::init(cpp_conv::RenderContext& kContext, cpp_conv::renderer::SwapChain& rSwapChain)
-{    
+{
     ScreenBufferInitArgs kArgs = { };
     rSwapChain.Initialize(kContext, kArgs);
     kContext.m_surface = &rSwapChain.GetWriteSurface();
@@ -75,7 +75,7 @@ void cpp_conv::renderer::render(const SceneContext& kSceneContext, RenderContext
     Vector2F endCellPosition = (kContext.m_CameraPosition / kContext.m_fZoom * -1.0f + Vector2F((float)width, (float)height) / kContext.m_fZoom) / 64;
     WorldMap::CellCoordinate startCoord = WorldMap::ToCellSpace({ (int)startCellPosition.GetX(), (int)startCellPosition.GetY(), 0 });
     WorldMap::CellCoordinate endCoord = WorldMap::ToCellSpace({ (int)std::ceil(endCellPosition.GetX()), (int)std::ceil(endCellPosition.GetY()), 0 });
-    
+
      uint32_t uiPassCount = 0;
      WorldMap::CellCoordinate currentCoord = startCoord;
      for (currentCoord.m_CellY = startCoord.m_CellY; currentCoord.m_CellY <= endCoord.m_CellY; currentCoord.m_CellY++)
@@ -135,7 +135,7 @@ void cpp_conv::renderer::render(const SceneContext& kSceneContext, RenderContext
          }
      }
 
-    drawPlayer(kSceneContext, kContext);
+    //drawPlayer(kSceneContext, kContext);
 }
 
 void cpp_conv::renderer::renderAsset(const std::type_info& type, RenderContext& kContext, resources::RenderableAsset* pRenderable, Transform2D transform, Colour kColourOverride, bool bTrack)
