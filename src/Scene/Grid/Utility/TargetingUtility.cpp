@@ -6,7 +6,7 @@
 #include "Direction.h"
 #include "Factory.h"
 
-cpp_conv::Entity* cpp_conv::targeting_util::FindNextTailConveyor(const cpp_conv::WorldMap& map, const cpp_conv::Conveyor& rCurrentConveyor)
+cpp_conv::Entity* cpp_conv::targeting_util::FindNextTailConveyor(const cpp_conv::WorldMap& map, const cpp_conv::Conveyor& rCurrentConveyor, RelativeDirection& outDirection)
 {
     static RelativeDirection directionPriority[] =
     {
@@ -64,6 +64,7 @@ cpp_conv::Entity* cpp_conv::targeting_util::FindNextTailConveyor(const cpp_conv:
 
         if (pTargetConveyor)
         {
+            outDirection = direction;
             break;
         }
     }
@@ -74,8 +75,9 @@ cpp_conv::Entity* cpp_conv::targeting_util::FindNextTailConveyor(const cpp_conv:
 bool cpp_conv::targeting_util::IsCornerConveyor(const cpp_conv::WorldMap& map, const cpp_conv::Conveyor& rConveyor)
 {
     PROFILE_FUNC();
-    const cpp_conv::Entity* pBackConverter = cpp_conv::targeting_util::FindNextTailConveyor(map, rConveyor);
-    if (pBackConverter == nullptr)
+    RelativeDirection direction;
+    const cpp_conv::Entity* pBackConverter = cpp_conv::targeting_util::FindNextTailConveyor(map, rConveyor, direction);
+    if (pBackConverter == nullptr || direction == RelativeDirection::Backwards || direction == RelativeDirection::Forward)
     {
         return false;
     }
@@ -86,41 +88,14 @@ bool cpp_conv::targeting_util::IsCornerConveyor(const cpp_conv::WorldMap& map, c
 bool cpp_conv::targeting_util::IsClockwiseCorner(const cpp_conv::WorldMap& map, const cpp_conv::Conveyor& rConveyor)
 {
     PROFILE_FUNC();
-    const cpp_conv::Entity* pBackConverter = cpp_conv::targeting_util::FindNextTailConveyor(map, rConveyor);
-    if (pBackConverter == nullptr)
+    RelativeDirection direction;
+    const cpp_conv::Entity* pBackConverter = cpp_conv::targeting_util::FindNextTailConveyor(map, rConveyor, direction);
+    if (pBackConverter == nullptr || direction == RelativeDirection::Backwards || direction == RelativeDirection::Forward)
     {
         return false;
     }
 
-    if (pBackConverter->m_eEntityKind != EntityKind::Junction)
-    {
-        if (pBackConverter->GetDirection() == rConveyor.m_direction)
-        {
-            return false;
-        }
-        Direction selfDirection = rConveyor.m_direction;
-        Direction backDirection = pBackConverter->GetDirection();
-        while (selfDirection != Direction::Up)
-        {
-            selfDirection = cpp_conv::direction::Rotate90DegreeClockwise(selfDirection);
-            backDirection = cpp_conv::direction::Rotate90DegreeClockwise(backDirection);
-        }
-
-        return backDirection == Direction::Right;
-    }
-    else
-    {
-        Vector2 offset = { 0, 0 };
-        switch (rConveyor.m_direction)
-        {
-            case Direction::Up: return rConveyor.m_position.GetX() > pBackConverter->m_position.GetX();
-            case Direction::Down:return rConveyor.m_position.GetX() < pBackConverter->m_position.GetX();
-            case Direction::Left:return rConveyor.m_position.GetY() > pBackConverter->m_position.GetY();
-            case Direction::Right:return rConveyor.m_position.GetY() < pBackConverter->m_position.GetY();
-        }
-    }
-
-    return false;
+    return (direction == RelativeDirection::Left);
 }
 
 cpp_conv::Conveyor::Channel* cpp_conv::targeting_util::GetTargetChannel(const cpp_conv::WorldMap& map, const cpp_conv::Entity& sourceNode, cpp_conv::Conveyor& targetNode, int iSourceChannel)
@@ -136,7 +111,8 @@ cpp_conv::Conveyor::Channel* cpp_conv::targeting_util::GetTargetChannel(const cp
 
     if (IsCornerConveyor(map, targetNode))
     {
-        if (&sourceNode == cpp_conv::targeting_util::FindNextTailConveyor(map, targetNode))
+        RelativeDirection direction;
+        if (&sourceNode == cpp_conv::targeting_util::FindNextTailConveyor(map, targetNode, direction))
         {
             return &targetNode.m_pChannels[iSourceChannel];
         }
@@ -172,7 +148,8 @@ int cpp_conv::targeting_util::GetChannelTargetSlot(const cpp_conv::WorldMap& map
 
     int result = 0;
 
-    if (IsCornerConveyor(map, targetNode) && &sourceNode == cpp_conv::targeting_util::FindNextTailConveyor(map, targetNode))
+    RelativeDirection direction;
+    if (IsCornerConveyor(map, targetNode) && &sourceNode == cpp_conv::targeting_util::FindNextTailConveyor(map, targetNode, direction))
     {
         return 0;
     }

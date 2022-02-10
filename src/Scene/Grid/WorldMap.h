@@ -84,6 +84,8 @@ namespace cpp_conv
         Cell* GetOrCreateCell(CellCoordinate coord);
         bool ValidateCanPlaceEntity(Vector3 position, Entity* pEntity) const;
 
+         bool m_bSuppressAssess = false;
+
         WorldMapStore m_WorldMap;
         std::vector<cpp_conv::Conveyor*> m_vConveyors;
         std::vector<cpp_conv::Conveyor*> m_vCornerConveyors;

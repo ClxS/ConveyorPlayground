@@ -81,7 +81,8 @@ const Conveyor* cpp_conv::TraceTailConveyor(WorldMap& map, Conveyor& searchStart
     {
         vOutConveyors.push_back(pCurrentConveyor);
 
-        Entity* pTargetConveyor = targeting_util::FindNextTailConveyor(map, *pCurrentConveyor);
+        RelativeDirection direction;
+        Entity* pTargetConveyor = targeting_util::FindNextTailConveyor(map, *pCurrentConveyor, direction);
         if (!pTargetConveyor ||
             pTargetConveyor->m_eEntityKind != EntityKind::Conveyor ||
             reinterpret_cast<Conveyor*>(pTargetConveyor)->IsCorner() ||
@@ -165,7 +166,8 @@ std::vector<Sequence*> cpp_conv::InitializeSequences(WorldMap& map, const std::v
 std::tuple<int, Direction> cpp_conv::GetInnerMostCornerChannel(const WorldMap& map, const Conveyor& rConveyor)
 {
     PROFILE_FUNC();
-    const Entity* pBackConverter = targeting_util::FindNextTailConveyor(map, rConveyor);
+    RelativeDirection direction;
+    const Entity* pBackConverter = targeting_util::FindNextTailConveyor(map, rConveyor, direction);
     if (pBackConverter == nullptr || pBackConverter->GetDirection() == rConveyor.m_direction)
     {
         return std::make_tuple(-1, Direction::Up);

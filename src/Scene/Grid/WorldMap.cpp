@@ -123,6 +123,7 @@ cpp_conv::Entity* cpp_conv::WorldMap::GetEntity(Vector3 position) const
 
 void cpp_conv::WorldMap::Consume(cpp_conv::resources::AssetPtr<cpp_conv::resources::Map> map)
 {
+    m_bSuppressAssess = true;
     for (Conveyor* pConveyor : map->GetConveyors())
     {
         if (!PlaceEntity(pConveyor->m_position, pConveyor))
@@ -130,7 +131,7 @@ void cpp_conv::WorldMap::Consume(cpp_conv::resources::AssetPtr<cpp_conv::resourc
             delete pConveyor;
         }
     }
-     
+
     for (Entity* pEntity : map->GetOtherEntities())
     {
         if (!PlaceEntity(pEntity->m_position, pEntity))
@@ -141,6 +142,12 @@ void cpp_conv::WorldMap::Consume(cpp_conv::resources::AssetPtr<cpp_conv::resourc
 
     map->GetConveyors().clear();
     map->GetOtherEntities().clear();
+    m_bSuppressAssess = false;
+
+    for(Conveyor* pConveyor : this->GetConveyors())
+    {
+        pConveyor->AssessPosition(*this);
+    }
 }
 
 void cpp_conv::WorldMap::PopulateCorners()
@@ -151,7 +158,7 @@ void cpp_conv::WorldMap::PopulateCorners()
         {
             m_vCornerConveyors.push_back(pConveyor);
         }
-    } 
+    }
 }
 
 bool cpp_conv::WorldMap::PlaceEntity(Vector3 position, Entity* pEntity)
@@ -211,8 +218,11 @@ bool cpp_conv::WorldMap::PlaceEntity(Vector3 position, Entity* pEntity)
                     continue;
                 }
 
-                Conveyor* pConveyor = reinterpret_cast<Conveyor*>(pEntity);
-                pConveyor->AssessPosition(*this);
+                if (!m_bSuppressAssess)
+                {
+                    Conveyor* pConveyor = reinterpret_cast<Conveyor*>(pEntity);
+                    pConveyor->AssessPosition(*this);
+                }
             }
         }
     }
