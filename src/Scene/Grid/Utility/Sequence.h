@@ -42,7 +42,7 @@ namespace cpp_conv
         [[nodiscard]] uint32_t GetCurrentTick() const { return m_pHeadConveyor->m_uiCurrentTick; }
 
     private:
-        bool MoveItemToForwardsNode(const cpp_conv::SceneContext& kContext, const cpp_conv::Conveyor& pNode, int lane) const;
+        [[nodiscard]] bool MoveItemToForwardsNode(const cpp_conv::SceneContext& kContext, const cpp_conv::Conveyor& pNode, int lane) const;
 
     private:
         friend class Conveyor;

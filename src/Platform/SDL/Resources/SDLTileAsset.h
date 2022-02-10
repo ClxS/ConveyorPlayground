@@ -18,7 +18,7 @@ namespace cpp_conv::resources
         {
         }
 
-        SDL_Texture* GetTexture() const { return m_pTexture; }
+        [[nodiscard]] SDL_Texture* GetTexture() const { return m_pTexture; }
 
     private:
         SDL_Texture* m_pTexture;

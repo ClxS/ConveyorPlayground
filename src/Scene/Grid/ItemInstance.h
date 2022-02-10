@@ -25,7 +25,7 @@ namespace cpp_conv
         float m_PreviousY;
         bool m_bShouldAnimate;
 
-        bool IsEmpty() const { return m_Item.IsEmpty(); }
+        [[nodiscard]] bool IsEmpty() const { return m_Item.IsEmpty(); }
 
         static ItemInstance Empty()
         {

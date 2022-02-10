@@ -20,10 +20,10 @@ namespace cpp_conv
         {
         }
 
-        cpp_conv::ConveyorId GetInternalId() const { return m_internalId; }
+        [[nodiscard]] cpp_conv::ConveyorId GetInternalId() const { return m_internalId; }
 
-        const std::string& GetName() const { return m_strName; }
-        cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> GetTile() const;
+        [[nodiscard]] const std::string& GetName() const { return m_strName; }
+        [[nodiscard]] cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> GetTile() const;
 
     private:
         cpp_conv::ConveyorId m_internalId;

@@ -25,9 +25,9 @@ namespace cpp_conv
         bool IsEmpty();
 
         std::vector<ItemEntry>& GetItems() { return m_vItemEntries; }
-        const std::vector<ItemEntry>& GetItems() const { return m_vItemEntries; }
+        [[nodiscard]] const std::vector<ItemEntry>& GetItems() const { return m_vItemEntries; }
 
-        std::string GetDescription() const;
+        [[nodiscard]] std::string GetDescription() const;
 
     private:
         const uint32_t m_uiMaxCapacity;

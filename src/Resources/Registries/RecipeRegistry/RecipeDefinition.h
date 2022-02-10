@@ -37,14 +37,14 @@ namespace cpp_conv
         {
         }
 
-        cpp_conv::RecipeId GetInternalId() const { return m_internalId; }
-        const std::string GetName() const { return m_strName; }
+        [[nodiscard]] cpp_conv::RecipeId GetInternalId() const { return m_internalId; }
+        [[nodiscard]] const std::string GetName() const { return m_strName; }
 
-        cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> GetTile() const;
+        [[nodiscard]] cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> GetTile() const;
 
-        uint32_t GetEffort() const { return m_uiEffort; }
-        const std::vector<RecipeItem>& GetInputItems() const { return m_vInputItems; }
-        const std::vector<RecipeItem>& GetOutputItems() const { return m_vOutputItems; }
+        [[nodiscard]] uint32_t GetEffort() const { return m_uiEffort; }
+        [[nodiscard]] const std::vector<RecipeItem>& GetInputItems() const { return m_vInputItems; }
+        [[nodiscard]] const std::vector<RecipeItem>& GetOutputItems() const { return m_vOutputItems; }
 
     private:
         cpp_conv::RecipeId m_internalId;

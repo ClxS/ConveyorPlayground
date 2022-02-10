@@ -18,7 +18,7 @@ namespace cpp_conv::resources
         {
         }
 
-        const std::vector<std::wstring>& GetData() const { return m_vChars; }
+        [[nodiscard]] const std::vector<std::wstring>& GetData() const { return m_vChars; }
     private:
         std::vector<std::wstring> m_vChars;
     };

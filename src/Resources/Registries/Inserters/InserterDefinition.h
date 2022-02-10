@@ -29,14 +29,14 @@ namespace cpp_conv
         {
         }
 
-        cpp_conv::InserterId GetInternalId() const { return m_internalId; }
+        [[nodiscard]] cpp_conv::InserterId GetInternalId() const { return m_internalId; }
 
-        const std::string& GetName() const { return m_strName; }
-        cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> GetTile() const;
+        [[nodiscard]] const std::string& GetName() const { return m_strName; }
+        [[nodiscard]] cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> GetTile() const;
 
-        uint32_t GetTransitTime() const { return m_uiTransitTime; }
-        uint32_t GetCooldownTime() const { return m_uiCooldownTime; }
-        bool IsStackingInserter() const { return m_bSupportsStacks; }
+        [[nodiscard]] uint32_t GetTransitTime() const { return m_uiTransitTime; }
+        [[nodiscard]] uint32_t GetCooldownTime() const { return m_uiCooldownTime; }
+        [[nodiscard]] bool IsStackingInserter() const { return m_bSupportsStacks; }
 
     private:
         cpp_conv::InserterId m_internalId;

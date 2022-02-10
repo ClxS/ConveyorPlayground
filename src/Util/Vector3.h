@@ -167,12 +167,12 @@ struct Vector2 : public Vector<2, int32_t, Vector2>
     Vector2() : Vector(0, 0) {}
     Vector2(int32_t x, int32_t y) : Vector(x, y) {}
 
-    int32_t GetX() const { return m_Data[0]; }
-    int32_t GetY() const { return m_Data[1]; }
+    [[nodiscard]] int32_t GetX() const { return m_Data[0]; }
+    [[nodiscard]] int32_t GetY() const { return m_Data[1]; }
     void SetX(int32_t value) { m_Data[0] = value; }
     void SetY(int32_t value) { m_Data[1] = value; }
 
-    Vector2 Rotate(Rotation rotation, Vector2 size) const
+    [[nodiscard]] Vector2 Rotate(Rotation rotation, Vector2 size) const
     {
         Vector2 c_offset(1, 1);
 
@@ -193,12 +193,12 @@ struct Vector2F : public Vector<2, float, Vector2F>
     Vector2F() : Vector2F(0.0f, 0.0f) {}
     Vector2F(float x, float y) : Vector(x, y) {}
 
-    float GetX() const { return m_Data[0]; }
-    float GetY() const { return m_Data[1]; }
+    [[nodiscard]] float GetX() const { return m_Data[0]; }
+    [[nodiscard]] float GetY() const { return m_Data[1]; }
     void SetX(float value) { m_Data[0] = value; }
     void SetY(float value) { m_Data[1] = value; }
 
-    Vector2F Rotate(Rotation rotation, Vector2F size) const
+    [[nodiscard]] Vector2F Rotate(Rotation rotation, Vector2F size) const
     {
         switch (rotation)
         {
@@ -222,9 +222,9 @@ struct Vector3 : public Vector<3, int32_t, Vector3>
     Vector3(int32_t x, int32_t y, int32_t z) : Vector(x, y, z) {}
     Vector3(Vector2 xy, int32_t z) : Vector(xy.GetX(), xy.GetY(), z) {}
 
-    int32_t GetX() const { return m_Data[0]; }
-    int32_t GetY() const { return m_Data[1]; }
-    int32_t GetZ() const { return m_Data[2]; }
+    [[nodiscard]] int32_t GetX() const { return m_Data[0]; }
+    [[nodiscard]] int32_t GetY() const { return m_Data[1]; }
+    [[nodiscard]] int32_t GetZ() const { return m_Data[2]; }
     int32_t& GetX() { return m_Data[0]; }
     int32_t& GetY() { return m_Data[1]; }
     int32_t& GetZ() { return m_Data[2]; }
@@ -232,7 +232,7 @@ struct Vector3 : public Vector<3, int32_t, Vector3>
     void SetY(int32_t value) { m_Data[1] = value; }
     void SetZ(int32_t value) { m_Data[2] = value; }
 
-    Vector2 GetXY() const { return { m_Data[0], m_Data[1] }; }
+    [[nodiscard]] Vector2 GetXY() const { return { m_Data[0], m_Data[1] }; }
     void SetXY(Vector2 value)
     {
         m_Data[0] = value.m_Data[0];

@@ -15,8 +15,8 @@ namespace cpp_conv::resources
         std::vector<Conveyor*>& GetConveyors();
         std::vector<Entity*>& GetOtherEntities();
 
-        const std::vector<Conveyor*>& GetConveyors() const;
-        const std::vector<Entity*>& GetOtherEntities() const;
+        [[nodiscard]] const std::vector<Conveyor*>& GetConveyors() const;
+        [[nodiscard]] const std::vector<Entity*>& GetOtherEntities() const;
 
     private:
         std::vector<Conveyor*> m_vConveyors;

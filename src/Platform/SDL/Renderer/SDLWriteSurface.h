@@ -25,9 +25,9 @@ namespace cpp_conv::renderer
         void Initialize() {}
         void Clear();
 
-        uint16_t GetWidth() const { return m_uiWidth; }
-        uint16_t GetHeight() const { return m_uiHeight; }
-        bool IsClearOnPresent() const { return m_bClearOnPresent; }
+        [[nodiscard]] uint16_t GetWidth() const { return m_uiWidth; }
+        [[nodiscard]] uint16_t GetHeight() const { return m_uiHeight; }
+        [[nodiscard]] bool IsClearOnPresent() const { return m_bClearOnPresent; }
 
         void Resize(RenderContext& kRenderContext, int iWidth, int iHeight) {}
         bool RequiresResize(RenderContext& kRenderContext, int iWidth, int iHeight) const { return false; }

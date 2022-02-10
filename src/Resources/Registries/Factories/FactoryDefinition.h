@@ -32,17 +32,17 @@ namespace cpp_conv
             , m_outputPipe(outputPipe)
             , m_producedRecipe(producedRecipe)
         {
-        } 
+        }
 
-        cpp_conv::FactoryId GetInternalId() const { return m_internalId; }
-        const std::string& GetName() const { return m_strName; }
-        Vector3 GetSize() const { return m_size; }
-        uint32_t GetProductionRate() const { return m_uiProductionRate; }
-        bool HasOwnOutputPipe() const { return m_bHasOwnOutputPipe; }
-        Vector3 GetOutputPipe() const { return m_outputPipe; }
-        RecipeId GetProducedRecipe() const { return m_producedRecipe; }
+        [[nodiscard]] cpp_conv::FactoryId GetInternalId() const { return m_internalId; }
+        [[nodiscard]] const std::string& GetName() const { return m_strName; }
+        [[nodiscard]] Vector3 GetSize() const { return m_size; }
+        [[nodiscard]] uint32_t GetProductionRate() const { return m_uiProductionRate; }
+        [[nodiscard]] bool HasOwnOutputPipe() const { return m_bHasOwnOutputPipe; }
+        [[nodiscard]] Vector3 GetOutputPipe() const { return m_outputPipe; }
+        [[nodiscard]] RecipeId GetProducedRecipe() const { return m_producedRecipe; }
 
-        cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> GetTile() const;
+        [[nodiscard]] cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> GetTile() const;
 
     private:
         cpp_conv::FactoryId m_internalId;

@@ -38,7 +38,7 @@ namespace cpp_conveyor
             }
         }
 
-        auto find(const T& elem) const
+        [[nodiscard]] auto find(const T& elem) const
             -> const_iterator
         {
             auto vend = _v.end();
@@ -48,15 +48,15 @@ namespace cpp_conveyor
             return it;
         }
 
-        bool contains(const T& elem) const {
+        [[nodiscard]] bool contains(const T& elem) const {
             return find(elem) != _v.end();
         }
 
-        const_iterator begin() const {
+        [[nodiscard]] const_iterator begin() const {
             return _v.begin();
         }
 
-        const_iterator end() const {
+        [[nodiscard]] const_iterator end() const {
             return _v.end();
         }
 

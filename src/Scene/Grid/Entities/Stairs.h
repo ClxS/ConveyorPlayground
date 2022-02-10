@@ -14,13 +14,13 @@ namespace cpp_conv
 
         void Tick(const SceneContext& kContext) override;
         void Draw(RenderContext& kRenderContext) const override;
-        bool SupportsInsertion() const override { return true; }
+        [[nodiscard]] bool SupportsInsertion() const override { return true; }
         bool TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, InsertInfo insertInfo) override;
 
-        const char* GetName() const override { return m_bIsUp ? "Stairs (Up)" : "Stairs (Down)"; }
-        std::string GetDescription() const override { return ""; }
+        [[nodiscard]] const char* GetName() const override { return m_bIsUp ? "Stairs (Up)" : "Stairs (Down)"; }
+        [[nodiscard]] std::string GetDescription() const override { return ""; }
 
-        Direction GetDirection() const override { return m_direction; }
+        [[nodiscard]] Direction GetDirection() const override { return m_direction; }
 
     private:
         ItemId m_pItem;
