@@ -13,7 +13,7 @@
 #include "Profiler.h"
 
 using RegistryId = cpp_conv::resources::registry::RegistryId;
-std::vector<cpp_conv::resources::AssetPtr<cpp_conv::InserterDefinition>> g_vItems;
+static std::vector<cpp_conv::resources::AssetPtr<cpp_conv::InserterDefinition>> g_vInsertersItems;
 
 namespace
 {
@@ -28,7 +28,7 @@ namespace
                 continue;
             }
 
-            g_vItems.push_back(pAsset);
+            g_vInsertersItems.push_back(pAsset);
         }
     }
 }
@@ -50,6 +50,11 @@ cpp_conv::resources::ResourceAsset* inserterAssetHandler(cpp_conv::resources::re
     std::string token;
     while (std::getline(ss, token))
     {
+        if (token.back() == '\r')
+        {
+            token.erase(token.size() - 1);
+        }
+
         switch (idx)
         {
         case 0: id = token; break;
@@ -61,14 +66,14 @@ cpp_conv::resources::ResourceAsset* inserterAssetHandler(cpp_conv::resources::re
 
         idx++;
     }
-     
+
     return new cpp_conv::InserterDefinition(cpp_conv::InserterId::FromStringId(id), rData.m_registryId, name, uiTransitTime, uiCooldownTime, bSupportsStacks);
 }
 
 const cpp_conv::resources::AssetPtr<cpp_conv::InserterDefinition> cpp_conv::resources::getInserterDefinition(cpp_conv::InserterId id)
 {
     PROFILE_FUNC();
-    for (auto item : g_vItems)
+    for (auto item : g_vInsertersItems)
     {
         if (item->GetInternalId() == id)
         {

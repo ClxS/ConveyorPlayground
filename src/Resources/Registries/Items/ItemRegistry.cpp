@@ -13,7 +13,7 @@
 #include "Profiler.h"
 
 using RegistryId = cpp_conv::resources::registry::RegistryId;
-std::vector<cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition>> g_vItems;
+static std::vector<cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition>> g_vItems;
 
 namespace
 {
@@ -47,6 +47,11 @@ cpp_conv::resources::ResourceAsset* itemAssetHandler(cpp_conv::resources::resour
     std::string token;
     while (std::getline(ss, token))
     {
+        if (token.back() == '\r')
+        {
+            token.erase(token.size() - 1);
+        }
+
         switch (idx)
         {
         case 0: id = token; break;
@@ -55,7 +60,7 @@ cpp_conv::resources::ResourceAsset* itemAssetHandler(cpp_conv::resources::resour
 
         idx++;
     }
-     
+
     return new cpp_conv::ItemDefinition(cpp_conv::ItemId::FromStringId(id), rData.m_registryId, name);
 }
 

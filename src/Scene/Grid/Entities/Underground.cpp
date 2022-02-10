@@ -33,7 +33,7 @@ std::tuple<int, Vector3> GetUndergroundLength(const cpp_conv::WorldMap& map, con
     Vector3 kTmpPosition = pStart->m_position;
     for (int i = 0; i < cpp_conv::c_maxUndergroundLength; i++)
     {
-        Vector3 kForwardPosition = cpp_conv::grid::GetForwardPosition(kTmpPosition, direction);
+        Vector3 kForwardPosition = cpp_conv::grid::getForwardPosition(kTmpPosition, direction);
         const cpp_conv::Entity* pForwardEntity = map.GetEntity(kForwardPosition);
         if (pForwardEntity == nullptr || pForwardEntity->m_eEntityKind != EntityKind::Underground)
         {
@@ -44,8 +44,8 @@ std::tuple<int, Vector3> GetUndergroundLength(const cpp_conv::WorldMap& map, con
         iTargetUnderground = i + 1; // + 1 for the start point
 
         // Move forward an extra one to skip the underground block
-        kTmpPosition = cpp_conv::grid::GetForwardPosition(kTmpPosition, direction);
-        kTargetPosition = cpp_conv::grid::GetForwardPosition(kTmpPosition, direction);
+        kTmpPosition = cpp_conv::grid::getForwardPosition(kTmpPosition, direction);
+        kTargetPosition = cpp_conv::grid::getForwardPosition(kTmpPosition, direction);
         break;
     }
 
@@ -69,7 +69,7 @@ cpp_conv::Underground::Underground(Vector3 position, Vector3 size, Direction dir
     for (int i = 0; i < cpp_conv::c_maxUndergroundLength; i++)
     {
         m_arrInternalConveyors[i].m_position = m_position;
-        position = cpp_conv::grid::GetForwardPosition(position, direction);
+        position = cpp_conv::grid::getForwardPosition(position, direction);
     }
 }
 
@@ -85,12 +85,12 @@ void cpp_conv::Underground::Tick(const SceneContext& kContext)
     }
 
     Entity* pExitEntity = kContext.m_rMap.GetEntity(undergroundEnd);
-    Vector3 position(cpp_conv::grid::GetForwardPosition(m_position, m_direction));
+    Vector3 position(cpp_conv::grid::getForwardPosition(m_position, m_direction));
 
     for (int i = 0; i < iUndergroundLength; i++)
     {
         m_arrInternalConveyors[i].m_position = position;
-        position = cpp_conv::grid::GetForwardPosition(position, m_direction);
+        position = cpp_conv::grid::getForwardPosition(position, m_direction);
     }
 
     for (int i = 0; i < iUndergroundLength; i++)

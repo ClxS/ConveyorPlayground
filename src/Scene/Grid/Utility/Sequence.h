@@ -120,10 +120,8 @@ namespace cpp_conv
         const uint8_t m_Length;
     };
 
-    Conveyor* TraceHeadConveyor(WorldMap& map, Conveyor& searchStart);
-    const Conveyor* TraceTailConveyor(WorldMap& map, Conveyor& searchStart, Conveyor& head, std::vector<Conveyor*>& vOutConveyors);
-
-    std::vector<Sequence*> InitializeSequences(WorldMap& map, const std::vector<Conveyor*>& conveyors);
-
-    std::tuple<int, Direction> GetInnerMostCornerChannel(const cpp_conv::WorldMap& map, const Conveyor& rConveyor);
+    Conveyor* traceHeadConveyor(WorldMap& map, const Conveyor& searchStart);
+    const Conveyor* traceTailConveyor(WorldMap& map, const Conveyor& searchStart, const Conveyor& head, std::vector<Conveyor*>& vOutConveyors);
+    std::vector<Sequence*> initializeSequences(WorldMap& map, const std::vector<Conveyor*>& conveyors);
+    std::tuple<int, Direction> getInnerMostCornerChannel(const cpp_conv::WorldMap& map, const Conveyor& rConveyor);
 }

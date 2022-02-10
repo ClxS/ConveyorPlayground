@@ -139,7 +139,7 @@ void cpp_conv::game::run()
         worldMap.PopulateCorners();
     }
 
-    std::vector<cpp_conv::Sequence*> sequences = cpp_conv::InitializeSequences(worldMap, worldMap.GetConveyors());
+    std::vector<cpp_conv::Sequence*> sequences = cpp_conv::initializeSequences(worldMap, worldMap.GetConveyors());
     cpp_conv::SceneContext kSceneContext =
     { 
         {},

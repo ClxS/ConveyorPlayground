@@ -13,7 +13,7 @@
 #include "Profiler.h"
 
 using RegistryId = cpp_conv::resources::registry::RegistryId;
-std::vector<cpp_conv::resources::AssetPtr<cpp_conv::ConveyorDefinition>> g_vItems;
+static std::vector<cpp_conv::resources::AssetPtr<cpp_conv::ConveyorDefinition>> g_vConveyors;
 
 namespace
 {
@@ -28,7 +28,7 @@ namespace
                 continue;
             }
 
-            g_vItems.push_back(pAsset);
+            g_vConveyors.push_back(pAsset);
         }
     }
 }
@@ -47,6 +47,11 @@ cpp_conv::resources::ResourceAsset* conveyorAssetHandler(cpp_conv::resources::re
     std::string token;
     while (std::getline(ss, token))
     {
+        if (token.back() == '\r')
+        {
+            token.erase(token.size() - 1);
+        }
+
         switch (idx)
         {
         case 0: id = token; break;
@@ -55,14 +60,14 @@ cpp_conv::resources::ResourceAsset* conveyorAssetHandler(cpp_conv::resources::re
 
         idx++;
     }
-     
+
     return new cpp_conv::ConveyorDefinition(cpp_conv::ConveyorId::FromStringId(id), rData.m_registryId, name);
 }
 
 const cpp_conv::resources::AssetPtr<cpp_conv::ConveyorDefinition> cpp_conv::resources::getConveyorDefinition(cpp_conv::ConveyorId id)
 {
     PROFILE_FUNC();
-    for (auto item : g_vItems)
+    for (auto item : g_vConveyors)
     {
         if (item->GetInternalId() == id)
         {

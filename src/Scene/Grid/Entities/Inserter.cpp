@@ -129,7 +129,7 @@ std::string cpp_conv::Inserter::GetDescription() const
 
 bool cpp_conv::Inserter::TryGrabItem(const SceneContext& kContext)
 {
-    auto pSourceEntity = kContext.m_rMap.GetEntity(grid::GetBackwardsPosition(*this));
+    auto pSourceEntity = kContext.m_rMap.GetEntity(grid::getBackwardsPosition(*this));
     if (!pSourceEntity || !pSourceEntity->SupportsProvidingItem())
     {
         return false;
@@ -147,7 +147,7 @@ bool cpp_conv::Inserter::TryGrabItem(const SceneContext& kContext)
 
 bool cpp_conv::Inserter::TryInsertItem(const SceneContext& kContext)
 {
-    auto pTargetEntity = kContext.m_rMap.GetEntity(grid::GetForwardPosition(*this));
+    auto pTargetEntity = kContext.m_rMap.GetEntity(grid::getForwardPosition(*this));
     if (!pTargetEntity || !pTargetEntity->SupportsInsertion())
     {
         return false;

@@ -207,7 +207,7 @@ void cpp_conv::Factory::RunOutputCycle(const SceneContext& kContext, const cpp_c
     Vector3 pipe = { pFactory->GetOutputPipe().GetXY().Rotate(cpp_conv::rotationFromDirection(m_direction), m_size.GetXY()), pFactory->GetOutputPipe().GetZ() };
     pipe += m_position;
 
-    cpp_conv::Entity* pEntity = kContext.m_rMap.GetEntity(cpp_conv::grid::GetForwardPosition(pipe, m_direction));
+    cpp_conv::Entity* pEntity = kContext.m_rMap.GetEntity(cpp_conv::grid::getForwardPosition(pipe, m_direction));
     if (!pEntity || !pEntity->SupportsInsertion())
     {
         return;

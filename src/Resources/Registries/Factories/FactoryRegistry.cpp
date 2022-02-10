@@ -14,7 +14,7 @@
 #include "Profiler.h"
 
 using RegistryId = cpp_conv::resources::registry::RegistryId;
-std::vector<cpp_conv::resources::AssetPtr<cpp_conv::FactoryDefinition>> g_vFactories;
+static std::vector<cpp_conv::resources::AssetPtr<cpp_conv::FactoryDefinition>> g_vFactories;
 
 namespace
 {
@@ -53,12 +53,17 @@ cpp_conv::resources::ResourceAsset* factoryAssetHandler(cpp_conv::resources::res
     std::string token;
     while (std::getline(ss, token))
     {
+        if (token.back() == '\r')
+        {
+            token.erase(token.size() - 1);
+        }
+
         switch (idx)
         {
         case 0: id = token; break;
         case 1: name = token; break;
         case 2:
-        { 
+        {
             std::istringstream tmp(token);
             tmp >> size;
             break;
@@ -86,7 +91,7 @@ cpp_conv::resources::ResourceAsset* factoryAssetHandler(cpp_conv::resources::res
 
         idx++;
     }
-     
+
     return new cpp_conv::FactoryDefinition(
         cpp_conv::FactoryId::FromStringId(id),
         rData.m_registryId,

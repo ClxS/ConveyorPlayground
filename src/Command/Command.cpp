@@ -29,7 +29,7 @@ void tryPlaceEntity(cpp_conv::SceneContext& kContext, EntityKind eKind, Directio
         cpp_conv::Conveyor* pConveyor = new cpp_conv::Conveyor(kContext.m_player, { 1, 1, 1 }, eDirection);
         if (kContext.m_rMap.PlaceEntity(kContext.m_player, pConveyor))
         {
-            kContext.m_sequences = cpp_conv::InitializeSequences(kContext.m_rMap, kContext.m_rMap.GetConveyors());
+            kContext.m_sequences = cpp_conv::initializeSequences(kContext.m_rMap, kContext.m_rMap.GetConveyors());
         }
         else
         {

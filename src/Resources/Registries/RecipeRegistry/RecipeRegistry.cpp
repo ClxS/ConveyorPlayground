@@ -13,7 +13,7 @@
 #include "Profiler.h"
 
 using RegistryId = cpp_conv::resources::registry::RegistryId;
-std::vector<cpp_conv::resources::AssetPtr<cpp_conv::RecipeDefinition>> g_vItems;
+static std::vector<cpp_conv::resources::AssetPtr<cpp_conv::RecipeDefinition>> g_vRecipes;
 
 namespace
 {
@@ -28,7 +28,7 @@ namespace
                 continue;
             }
 
-            g_vItems.push_back(pAsset);
+            g_vRecipes.push_back(pAsset);
         }
     }
 
@@ -45,11 +45,16 @@ namespace
         std::vector<cpp_conv::RecipeDefinition::RecipeItem> inputs;
         std::vector<cpp_conv::RecipeDefinition::RecipeItem> outputs;
 
-        int idx = 0; 
+        int idx = 0;
         std::string token;
         bool bIsInputItems = false;
         while (std::getline(ss, token))
         {
+            if (token.back() == '\r')
+            {
+                token.erase(token.size() - 1);
+            }
+
             switch (idx)
             {
             case 0: id = token; break;
@@ -84,7 +89,7 @@ namespace
 const cpp_conv::resources::AssetPtr<cpp_conv::RecipeDefinition> cpp_conv::resources::getRecipeDefinition(cpp_conv::RecipeId id)
 {
     PROFILE_FUNC();
-    for (auto item : g_vItems)
+    for (auto item : g_vRecipes)
     {
         if (item->GetInternalId() == id)
         {

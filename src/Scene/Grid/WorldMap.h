@@ -14,9 +14,9 @@ namespace cpp_conv
     class WorldMap
     {
     public:
-        static inline constexpr uint32_t c_uiMaximumMapSize = 128;
-        static inline constexpr uint32_t c_uiCellSize = 64;
-        static inline constexpr uint32_t c_uiMaximumLevel = 4;
+        static inline constexpr int32_t c_uiMaximumMapSize = 128;
+        static inline constexpr int32_t c_uiCellSize = 64;
+        static inline constexpr int32_t c_uiMaximumLevel = 4;
 
         struct CellCoordinate
         {
@@ -24,7 +24,7 @@ namespace cpp_conv
             int32_t m_CellY;
             int32_t m_CellSlotX;
             int32_t m_CellSlotY;
-            int32_t m_depth;
+            int32_t m_Depth;
 
             [[nodiscard]] bool IsInvalid() const
             {
@@ -33,7 +33,7 @@ namespace cpp_conv
                     m_CellX >= c_uiMaximumMapSize || m_CellY >= c_uiMaximumMapSize ||
                     m_CellSlotX < 0 || m_CellSlotY < 0 ||
                     m_CellSlotX >= c_uiCellSize || m_CellSlotY >= c_uiCellSize ||
-                    m_depth < 0 || m_depth >= c_uiMaximumLevel;
+                    m_Depth < 0 || m_Depth >= c_uiMaximumLevel;
             }
         };
 
@@ -69,13 +69,13 @@ namespace cpp_conv
         template<typename T>
         T* GetEntity(Vector3 position, EntityKind kind);
 
-        void Consume(cpp_conv::resources::AssetPtr<cpp_conv::resources::Map> map);
+        void Consume(const cpp_conv::resources::AssetPtr<cpp_conv::resources::Map>& map);
 
         void PopulateCorners();
 
-        [[nodiscard]] const std::vector<cpp_conv::Conveyor*> GetConveyors() const { return m_vConveyors; }
-        [[nodiscard]] const std::vector<cpp_conv::Conveyor*> GetCornerConveyors() const { return m_vCornerConveyors; }
-        [[nodiscard]] const std::vector<cpp_conv::Entity*> GetOtherEntities() const { return m_vOtherEntities; }
+        [[nodiscard]] std::vector<cpp_conv::Conveyor*> GetConveyors() const { return m_vConveyors; }
+        [[nodiscard]] std::vector<cpp_conv::Conveyor*> GetCornerConveyors() const { return m_vCornerConveyors; }
+        [[nodiscard]] std::vector<cpp_conv::Entity*> GetOtherEntities() const { return m_vOtherEntities; }
     private:
         using CellPtr = std::unique_ptr<Cell>;
         using WorldMapRow = std::array<CellPtr, c_uiMaximumMapSize>;

@@ -28,7 +28,7 @@ void cpp_conv::Stairs::Tick(const SceneContext& kContext)
         return;
     }
 
-    Vector3 targetPosition = cpp_conv::grid::GetForwardPosition(*this);
+    Vector3 targetPosition = cpp_conv::grid::getForwardPosition(*this);
     if (m_bIsUp)
     {
         ++targetPosition.GetZ();

@@ -110,7 +110,7 @@ void cpp_conv::renderer::render(const SceneContext& kSceneContext, RenderContext
                          {
                              currentCoord.m_CellSlotX = x;
                              currentCoord.m_CellSlotY = y;
-                             currentCoord.m_depth = kContext.m_iCurrentLayer;
+                             currentCoord.m_Depth = kContext.m_iCurrentLayer;
 
                              const Entity* pEntity = pCell->GetEntity(currentCoord);
                              if (!pEntity)

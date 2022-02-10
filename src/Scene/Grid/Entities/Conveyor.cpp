@@ -54,7 +54,7 @@ void DrawConveyorItem(
 
     if (item.m_bShouldAnimate)
     {
-        position = cpp_conv::targeting_util::GetRenderPosition(
+        position = cpp_conv::targeting_util::getRenderPosition(
             kContext.m_rMap,
             rConveyor,
             position,
@@ -120,7 +120,7 @@ void cpp_conv::Conveyor::Tick(const SceneContext& kContext)
         ItemInstance& rLeadingItem = rChannel.m_pSlots[iChannelLength - 1].m_Item;
         if (!rLeadingItem.IsEmpty())
         {
-            cpp_conv::Entity* pForwardEntity = kContext.m_rMap.GetEntity(grid::GetForwardPosition(*this));
+            cpp_conv::Entity* pForwardEntity = kContext.m_rMap.GetEntity(grid::getForwardPosition(*this));
             if (pForwardEntity &&
                 pForwardEntity->SupportsInsertion() &&
                 pForwardEntity->TryInsert(
@@ -256,13 +256,13 @@ void cpp_conv::Conveyor::Draw(RenderContext& kContext) const
 
 bool cpp_conv::Conveyor::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, const InsertInfo insertInfo)
 {
-    const cpp_conv::Conveyor::Channel* pTargetChannel = cpp_conv::targeting_util::GetTargetChannel(kContext.m_rMap, pSourceEntity, *this, insertInfo.GetSourceChannel());
+    const cpp_conv::Conveyor::Channel* pTargetChannel = cpp_conv::targeting_util::getTargetChannel(kContext.m_rMap, pSourceEntity, *this, insertInfo.GetSourceChannel());
     if (!pTargetChannel)
     {
         return false;
     }
 
-    const int forwardTargetItemSlot = cpp_conv::targeting_util::GetChannelTargetSlot(kContext.m_rMap, pSourceEntity, *this, insertInfo.GetSourceChannel());
+    const int forwardTargetItemSlot = cpp_conv::targeting_util::getChannelTargetSlot(kContext.m_rMap, pSourceEntity, *this, insertInfo.GetSourceChannel());
     if (HasItemInSlot(pTargetChannel->m_ChannelLane, forwardTargetItemSlot))
     {
         return false;
@@ -277,7 +277,7 @@ bool cpp_conv::Conveyor::TryGrab(const SceneContext& kContext, bool bSingle, std
     bool bIsCorner = IsCorner();
     int iInnerMostChannel;
     Direction eCornerDirection;
-    std::tie(iInnerMostChannel, eCornerDirection) = GetInnerMostCornerChannel(kContext.m_rMap, *this);
+    std::tie(iInnerMostChannel, eCornerDirection) = getInnerMostCornerChannel(kContext.m_rMap, *this);
 
     for (int iChannelIdx = 0; iChannelIdx < c_conveyorChannels; ++iChannelIdx)
     {
@@ -354,13 +354,13 @@ std::string cpp_conv::Conveyor::GetDescription() const
 
 void cpp_conv::Conveyor::AssessPosition(const cpp_conv::WorldMap& map)
 {
-    const Entity* pEntity = map.GetEntity(cpp_conv::grid::GetForwardPosition(m_position, m_direction));
+    const Entity* pEntity = map.GetEntity(cpp_conv::grid::getForwardPosition(m_position, m_direction));
 
-    m_bIsCorner = cpp_conv::targeting_util::IsCornerConveyor(map, *this);
-    m_bIsClockwise = cpp_conv::targeting_util::IsClockwiseCorner(map, *this);
+    m_bIsCorner = cpp_conv::targeting_util::isCornerConveyor(map, *this);
+    m_bIsClockwise = cpp_conv::targeting_util::isClockwiseCorner(map, *this);
     m_bIsCapped = !pEntity || !pEntity->SupportsInsertion();
 
-    std::tie(m_iInnerMostChannel, m_eCornerDirection) = GetInnerMostCornerChannel(map, *this);
+    std::tie(m_iInnerMostChannel, m_eCornerDirection) = getInnerMostCornerChannel(map, *this);
 
     for (int iLane = 0; iLane < static_cast<int>(m_pChannels.size()); iLane++)
     {
@@ -372,7 +372,7 @@ void cpp_conv::Conveyor::AssessPosition(const cpp_conv::WorldMap& map)
 
         for (int iSlot = 0; iSlot < static_cast<int>(m_pChannels[iLane].m_pSlots.size()); iSlot++)
         {
-            m_pChannels[iLane].m_pSlots[iSlot].m_VisualPosition = cpp_conv::targeting_util::GetRenderPosition(map, *this, { iLane, iSlot });
+            m_pChannels[iLane].m_pSlots[iSlot].m_VisualPosition = cpp_conv::targeting_util::getRenderPosition(map, *this, { iLane, iSlot });
         }
     }
 

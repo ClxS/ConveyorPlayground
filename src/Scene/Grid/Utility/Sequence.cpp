@@ -2,22 +2,21 @@
 
 #include "Sequence.h"
 
-#include "TargetingUtility.h"
-#include "Junction.h"
-#include "Underground.h"
-#include "SceneContext.h"
-#include "Direction.h"
-#include "Profiler.h"
-#include "WorldMap.h"
+#include <bit>
+#include <bitset>
 #include <cassert>
 #include <xutility>
-#include <bitset>
-#include <bit>
+#include "Direction.h"
+#include "Junction.h"
+#include "Profiler.h"
+#include "SceneContext.h"
+#include "TargetingUtility.h"
+#include "WorldMap.h"
 
 #include "vector_set.h"
 using namespace cpp_conv;
 
-Conveyor* cpp_conv::TraceHeadConveyor(WorldMap& map, Conveyor& searchStart)
+Conveyor* cpp_conv::traceHeadConveyor(WorldMap& map, const Conveyor& searchStart)
 {
     static RelativeDirection directionPriority[] =
     {
@@ -26,24 +25,24 @@ Conveyor* cpp_conv::TraceHeadConveyor(WorldMap& map, Conveyor& searchStart)
         RelativeDirection::Left,
     };
 
-    Conveyor* pCurrentConveyor = map.GetEntity<Conveyor>(searchStart.m_position, EntityKind::Conveyor);
+    auto pCurrentConveyor = map.GetEntity<Conveyor>(searchStart.m_position, EntityKind::Conveyor);
     while (true)
     {
-        Vector3 forwardPosition = grid::GetForwardPosition(*pCurrentConveyor);
-        Conveyor* pTargetConveyor = map.GetEntity<Conveyor>(forwardPosition, EntityKind::Conveyor);
+        Vector3 forwardPosition = grid::getForwardPosition(*pCurrentConveyor);
+        const auto pTargetConveyor = map.GetEntity<Conveyor>(forwardPosition, EntityKind::Conveyor);
         if (pTargetConveyor == nullptr || pTargetConveyor->IsCorner())
         {
             break;
         }
 
         const Entity* vPotentialNeighbours[4];
-        vPotentialNeighbours[(int)RelativeDirection::Backwards] = map.GetEntity<Conveyor>(grid::GetBackwardsPosition(*pTargetConveyor), EntityKind::Conveyor);
-        vPotentialNeighbours[(int)RelativeDirection::Right] = map.GetEntity<Conveyor>(grid::GetRightPosition(*pTargetConveyor), EntityKind::Conveyor);
-        vPotentialNeighbours[(int)RelativeDirection::Left] = map.GetEntity<Conveyor>(grid::GetLeftPosition(*pTargetConveyor), EntityKind::Conveyor);
+        vPotentialNeighbours[static_cast<int>(RelativeDirection::Backwards)] = map.GetEntity<Conveyor>(grid::getBackwardsPosition(*pTargetConveyor), EntityKind::Conveyor);
+        vPotentialNeighbours[static_cast<int>(RelativeDirection::Right)] = map.GetEntity<Conveyor>(grid::getRightPosition(*pTargetConveyor), EntityKind::Conveyor);
+        vPotentialNeighbours[static_cast<int>(RelativeDirection::Left)] = map.GetEntity<Conveyor>(grid::getLeftPosition(*pTargetConveyor), EntityKind::Conveyor);
 
         for (auto direction : directionPriority)
         {
-            const Entity* pDirectionEntity = vPotentialNeighbours[(int)direction];
+            const Entity* pDirectionEntity = vPotentialNeighbours[static_cast<int>(direction)];
             if (pDirectionEntity == nullptr || pDirectionEntity->m_eEntityKind != EntityKind::Conveyor)
             {
                 continue;
@@ -54,7 +53,7 @@ Conveyor* cpp_conv::TraceHeadConveyor(WorldMap& map, Conveyor& searchStart)
                 continue;
             }
 
-            if (grid::GetForwardPosition(*pDirectionEntity) == forwardPosition)
+            if (grid::getForwardPosition(*pDirectionEntity) == forwardPosition)
             {
                 return pCurrentConveyor;
             }
@@ -71,9 +70,9 @@ Conveyor* cpp_conv::TraceHeadConveyor(WorldMap& map, Conveyor& searchStart)
     return pCurrentConveyor;
 }
 
-const Conveyor* cpp_conv::TraceTailConveyor(WorldMap& map, Conveyor& searchStart, Conveyor& head, std::vector<Conveyor*>& vOutConveyors)
+const Conveyor* cpp_conv::traceTailConveyor(WorldMap& map, const Conveyor& searchStart, const Conveyor& head, std::vector<Conveyor*>& vOutConveyors)
 {
-    Conveyor* pCurrentConveyor = map.GetEntity<Conveyor>(searchStart.m_position, EntityKind::Conveyor);
+    auto pCurrentConveyor = map.GetEntity<Conveyor>(searchStart.m_position, EntityKind::Conveyor);
 
     assert(pCurrentConveyor != nullptr); // If it is null here, we are misusing this method.
 
@@ -82,7 +81,7 @@ const Conveyor* cpp_conv::TraceTailConveyor(WorldMap& map, Conveyor& searchStart
         vOutConveyors.push_back(pCurrentConveyor);
 
         RelativeDirection direction;
-        Entity* pTargetConveyor = targeting_util::FindNextTailConveyor(map, *pCurrentConveyor, direction);
+        Entity* pTargetConveyor = targeting_util::findNextTailConveyor(map, *pCurrentConveyor, direction);
         if (!pTargetConveyor ||
             pTargetConveyor->m_eEntityKind != EntityKind::Conveyor ||
             reinterpret_cast<Conveyor*>(pTargetConveyor)->IsCorner() ||
@@ -99,7 +98,7 @@ const Conveyor* cpp_conv::TraceTailConveyor(WorldMap& map, Conveyor& searchStart
     return pCurrentConveyor;
 }
 
-std::vector<Sequence*> cpp_conv::InitializeSequences(WorldMap& map, const std::vector<Conveyor*>& conveyors)
+std::vector<Sequence*> cpp_conv::initializeSequences(WorldMap& map, const std::vector<Conveyor*>& conveyors)
 {
     std::vector<Sequence*> vSequences;
     cpp_conveyor::vector_set<const Conveyor*> alreadyProcessedConveyors(conveyors.size());
@@ -119,8 +118,8 @@ std::vector<Sequence*> cpp_conv::InitializeSequences(WorldMap& map, const std::v
         }
 
         std::vector<Conveyor*> vConveyors;
-        Conveyor* pHeadConveyor = TraceHeadConveyor(map, *conveyor);
-        const Conveyor* pTailConveyor = TraceTailConveyor(map, *pHeadConveyor, *pHeadConveyor, vConveyors);
+        const Conveyor* pHeadConveyor = traceHeadConveyor(map, *conveyor);
+        traceTailConveyor(map, *pHeadConveyor, *pHeadConveyor, vConveyors);
 
         const auto end = vConveyors.end();
         std::vector<Conveyor*>::iterator chunk_begin;
@@ -138,11 +137,11 @@ std::vector<Sequence*> cpp_conv::InitializeSequences(WorldMap& map, const std::v
             }
 
             std::vector<Conveyor*> vSequenceConveyors(chunk_begin, chunk_end);
-            pTailConveyor = vSequenceConveyors.front();
+            const auto pTailConveyor = vSequenceConveyors.front();
 
             vSequences.push_back(new Sequence(
                 vSequenceConveyors[vSequenceConveyors.size() - 1],
-                (uint8_t)vSequenceConveyors.size(),
+                static_cast<uint8_t>(vSequenceConveyors.size()),
                 pTailConveyor->m_pChannels[0].m_pSlots[0].m_VisualPosition,
                 pTailConveyor->m_pChannels[1].m_pSlots[0].m_VisualPosition,
                 pTailConveyor->m_pChannels[0].m_pSlots[1].m_VisualPosition - pTailConveyor->m_pChannels[0].m_pSlots[0].m_VisualPosition
@@ -163,11 +162,11 @@ std::vector<Sequence*> cpp_conv::InitializeSequences(WorldMap& map, const std::v
     return vSequences;
 }
 
-std::tuple<int, Direction> cpp_conv::GetInnerMostCornerChannel(const WorldMap& map, const Conveyor& rConveyor)
+std::tuple<int, Direction> cpp_conv::getInnerMostCornerChannel(const WorldMap& map, const Conveyor& rConveyor)
 {
     PROFILE_FUNC();
     RelativeDirection direction;
-    const Entity* pBackConverter = targeting_util::FindNextTailConveyor(map, rConveyor, direction);
+    const Entity* pBackConverter = targeting_util::findNextTailConveyor(map, rConveyor, direction);
     if (pBackConverter == nullptr || pBackConverter->GetDirection() == rConveyor.m_direction)
     {
         return std::make_tuple(-1, Direction::Up);
@@ -188,7 +187,7 @@ bool Sequence::MoveItemToForwardsNode(const SceneContext& kContext, const Convey
 {
     const SlotItem item = m_RealizedStates[lane].m_Items.Peek();
     const Vector2F startPosition = GetSlotPosition(m_Length - 1, lane, 1);
-    Entity* pForwardEntity = kContext.m_rMap.GetEntity(grid::GetForwardPosition(pNode));
+    Entity* pForwardEntity = kContext.m_rMap.GetEntity(grid::getForwardPosition(pNode));
     return (item.HasItem() && pForwardEntity && pForwardEntity->SupportsInsertion() && pForwardEntity->TryInsert(kContext, pNode, Entity::InsertInfo(item.m_Item, static_cast<uint8_t>(lane), startPosition)));
 }
 
@@ -212,13 +211,7 @@ void Sequence::Tick(const SceneContext& kContext)
         bool bIsLeadItemFull = (realizedState.m_Lanes & 0b1) == 1;
         if (bIsLeadItemFull)
         {
-            if (this->m_Length == 3)
-            {
-                int i = 0;
-                i++;
-            }
-
-            if (MoveItemToForwardsNode(kContext, *m_pHeadConveyor, (int)uiLane))
+            if (MoveItemToForwardsNode(kContext, *m_pHeadConveyor, uiLane))
             {
                 pendingState.m_PendingClears |= 0b1;
                 realizedState.m_Items.Pop();
