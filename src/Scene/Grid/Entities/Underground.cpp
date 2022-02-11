@@ -164,8 +164,8 @@ void cpp_conv::Underground::Draw(RenderContext& kRenderContext) const
     if (iUndergroundLength == -1)
     {
         eDirection = rotationFromDirection(
-            direction::Rotate90DegreeClockwise(
-                direction::Rotate90DegreeClockwise(m_direction)));
+            direction::rotate90DegreeClockwise(
+                direction::rotate90DegreeClockwise(m_direction)));
     }
 
     renderer::renderAsset(

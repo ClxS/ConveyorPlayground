@@ -103,7 +103,6 @@ std::vector<Sequence*> cpp_conv::initializeSequences(WorldMap& map, const std::v
     std::vector<Sequence*> vSequences;
     cpp_conveyor::vector_set<const Conveyor*> alreadyProcessedConveyors(conveyors.size());
 
-    int iId = 0;
     for (auto& conveyor : conveyors)
     {
         if (alreadyProcessedConveyors.contains(conveyor))
@@ -127,7 +126,7 @@ std::vector<Sequence*> cpp_conv::initializeSequences(WorldMap& map, const std::v
         chunk_end = chunk_begin = vConveyors.begin();
         do
         {
-            if (std::distance(chunk_end, end) < Sequence::c_uiMaxSequenceLength)
+            if (static_cast<uint32_t>(std::distance(chunk_end, end)) < Sequence::c_uiMaxSequenceLength)
             {
                 chunk_end = end;
             }
@@ -176,8 +175,8 @@ std::tuple<int, Direction> cpp_conv::getInnerMostCornerChannel(const WorldMap& m
     Direction backDirection = pBackConverter->GetDirection();
     while (selfDirection != Direction::Up)
     {
-        selfDirection = direction::Rotate90DegreeClockwise(selfDirection);
-        backDirection = direction::Rotate90DegreeClockwise(backDirection);
+        selfDirection = direction::rotate90DegreeClockwise(selfDirection);
+        backDirection = direction::rotate90DegreeClockwise(backDirection);
     }
 
     return std::make_tuple(backDirection == Direction::Right ? 1 : 0, pBackConverter->GetDirection());
@@ -328,7 +327,7 @@ void Sequence::Realize()
         }
 
 #ifdef USE_VALIDATION_CHECKS
-        assert(std::popcount(realizedState.m_Lanes) == realizedState.m_Items.GetSize());
+        assert(static_cast<uint32_t>(std::popcount(realizedState.m_Lanes)) == realizedState.m_Items.GetSize());
 #endif
     }
 }
@@ -338,7 +337,7 @@ uint64_t Sequence::CountItemsOnBelt() const
     return std::popcount(m_RealizedStates[0].m_Lanes) + std::popcount(m_RealizedStates[1].m_Lanes);
 }
 
-void Sequence::AddItemInSlot(const uint8_t uiSequenceIndex, const int lane, const int slot, ItemId item, const Vector2F* origin)
+void Sequence::AddItemInSlot(const uint8_t uiSequenceIndex, const int lane, const int slot, const ItemId item, const Vector2F* origin)
 {
     PendingState& pendingState = m_PendingStates[lane];
 
@@ -375,7 +374,7 @@ bool Sequence::DidItemMoveLastSimulation(const uint8_t uiSequenceIndex, const in
 Vector2F Sequence::GetSlotPosition(const uint8_t uiSequenceIndex, const int lane, const int slot) const
 {
     const LaneVisual& visual = m_InitializationState.m_ConveyorVisualOffsets[lane];
-    return visual.m_Origin + visual.m_UnitDirection * ((uiSequenceIndex * 2) + slot);
+    return visual.m_Origin + visual.m_UnitDirection * (static_cast<float>(uiSequenceIndex) * 2.0f + static_cast<float>(slot));
 }
 
 bool Sequence::TryPeakItemInSlot(const uint8_t uiSequenceIndex, const int lane, const int slot, ItemInstance& pItem) const

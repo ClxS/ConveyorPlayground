@@ -9,7 +9,7 @@ namespace cpp_conv
 	class FixedCircularBuffer
 	{
 	public:
-		FixedCircularBuffer(uint32_t uiCapacity)
+        explicit FixedCircularBuffer(uint32_t uiCapacity)
 			: m_vData(uiCapacity)
 			, m_uiConsumePivot(0)
 			, m_uiAppendPivot(0)
@@ -38,9 +38,8 @@ namespace cpp_conv
 
 	    [[nodiscard]] uint32_t GetSize() const { return m_uiSize; }
 
-        constexpr void Insert(uint64_t uiIndex, T item)
+        constexpr void Insert(const uint64_t uiIndex, T item)
         {
-            assert(uiIndex >= 0);
             assert(uiIndex <= m_uiSize);
             assert(m_uiSize < m_uiCapacity);
             if (uiIndex == m_uiSize)

@@ -37,7 +37,8 @@ cpp_conv::resources::ResourceAsset* itemAssetHandler(cpp_conv::resources::resour
 {
     const auto pStrData = reinterpret_cast<const char*>(rData.m_pData);
 
-    const std::string copy(pStrData, rData.m_uiSize / sizeof(char));
+    // ReSharper disable once CppRedundantCastExpression
+    const std::string copy(pStrData, (int)(rData.m_uiSize / sizeof(char)));
     std::istringstream ss(copy);
 
     std::string id;

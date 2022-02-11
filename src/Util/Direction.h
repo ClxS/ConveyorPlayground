@@ -4,7 +4,7 @@
 
 namespace cpp_conv::direction
 {
-    inline Direction Rotate90DegreeClockwise(Direction direction)
+    inline Direction rotate90DegreeClockwise(const Direction direction)
     {
         switch (direction)
         {
@@ -16,7 +16,7 @@ namespace cpp_conv::direction
         return Direction::Up;
     }
 
-    inline Direction Rotate90DegreeCounterClockwise(Direction direction)
+    inline Direction rotate90DegreeCounterClockwise(const Direction direction)
     {
         switch (direction)
         {
@@ -26,5 +26,5 @@ namespace cpp_conv::direction
         case Direction::Left: return Direction::Up;
         }
         return Direction::Up;
-    }    
+    }
 }

@@ -183,7 +183,7 @@ Vector2F cpp_conv::targeting_util::getRenderPosition(const WorldMap& map, const 
     int stepsRequired = 0;
     while (eDirection != Direction::Right)
     {
-        eDirection = direction::Rotate90DegreeClockwise(eDirection);
+        eDirection = direction::rotate90DegreeClockwise(eDirection);
         stepsRequired++;
     }
 

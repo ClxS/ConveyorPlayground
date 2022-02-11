@@ -3,11 +3,12 @@
 #include <cstdint>
 #include <memory>
 #include <vector>
-#include "Entity.h"
 #include "AssetPtr.h"
 #include "Conveyor.h"
+#include "Entity.h"
 
-namespace cpp_conv { namespace resources { class Map; } }
+namespace cpp_conv::resources
+{ class Map; }
 
 namespace cpp_conv
 {

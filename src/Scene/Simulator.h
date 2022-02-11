@@ -1,7 +1,5 @@
 #pragma once
 
-#include <vector>
-#include "EntityGrid.h"
 #include "Sequence.h"
 
 namespace cpp_conv
@@ -10,6 +8,6 @@ namespace cpp_conv
 
     namespace simulation
     {
-        void simulate(SceneContext& kContext);
+        void simulate(const SceneContext& kContext);
     }
 }

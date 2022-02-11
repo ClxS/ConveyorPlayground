@@ -74,8 +74,11 @@ cpp_conv::resources::resource_manager::FileData getFileData(cpp_conv::resources:
         return {};
     }
 
-    const size_t uiLength = file.tellg();
-    file.seekg(0, std::ios::beg);
+    // ReSharper disable once CppRedundantCastExpression
+    const uint32_t uiLength = static_cast<uint32_t>(file.tellg());
+
+    // ReSharper disable once CppRedundantCastExpression
+    file.seekg((std::streamoff)0, std::ios::beg);
 
     if (uiLength == 0)
     {
@@ -119,7 +122,7 @@ cpp_conv::resources::AssetPtr<cpp_conv::resources::ResourceAsset> cpp_conv::reso
     }
 
     ResourceAsset* pAsset = (*fHandler)(kFileData);
-    
+
     delete[] kFileData.m_pData;
 
     if (!pAsset)

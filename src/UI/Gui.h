@@ -1,6 +1,6 @@
-#include "Colour.h"
+#pragma once
+
 #include "RenderContext.h"
-#include <tuple>
 
 namespace cpp_conv::ui
 {
@@ -9,5 +9,5 @@ namespace cpp_conv::ui
     void present();
     void shutdown();
 
-    void drawUI(SceneContext& kContext, RenderContext& kRenderContext);
+    void drawUI(SceneContext& kSceneContext, const RenderContext& kRenderContext);
 }

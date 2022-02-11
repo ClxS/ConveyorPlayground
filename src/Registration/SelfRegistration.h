@@ -7,7 +7,9 @@
 #include "Colour.h"
 
 namespace cpp_conv { struct Transform2D; }
-namespace cpp_conv { namespace resources { class RenderableAsset; } }
+namespace cpp_conv::resources
+{ class RenderableAsset; }
+
 namespace cpp_conv { struct RenderContext; }
 
 namespace cpp_conv::resources::registration

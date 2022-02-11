@@ -25,6 +25,7 @@ project "CppConveyor"
 		"data/**",
 		"src/**"
 	}
+	flags { "FatalWarnings" }
 
 	filter {"platforms:Console"}
 		kind "ConsoleApp"

@@ -62,6 +62,8 @@ bool cpp_conv::GeneralItemContainer::TryTake(ItemId item, uint32_t count /*= 1*/
         count -= itItems->m_pCount;
         itItems = m_vItemEntries.erase(itItems);
     }
+
+    return false;
 }
 
 bool cpp_conv::GeneralItemContainer::TryInsert(ItemId pItem, uint32_t count)

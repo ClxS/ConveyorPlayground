@@ -105,7 +105,7 @@ void cpp_conv::command::processCommands(SceneContext& kContext, RenderContext& k
         case commands::CommandType::SelectItem8: kContext.m_uiContext.m_selected = 7 % static_cast<int32_t>(EntityKind::MAX); break;
         case commands::CommandType::SelectItem9: kContext.m_uiContext.m_selected = 8 % static_cast<int32_t>(EntityKind::MAX); break;
         case commands::CommandType::RotateSelection:
-            kContext.m_uiContext.m_rotation = direction::Rotate90DegreeClockwise(kContext.m_uiContext.m_rotation); break;
+            kContext.m_uiContext.m_rotation = direction::rotate90DegreeClockwise(kContext.m_uiContext.m_rotation); break;
         case commands::CommandType::ToggleModifier:
             kContext.m_uiContext.m_bModifier = !kContext.m_uiContext.m_bModifier; break;
         case commands::CommandType::PlaceSelection:
