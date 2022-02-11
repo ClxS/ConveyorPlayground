@@ -1,18 +1,20 @@
 #pragma once
 
 #include "DataId.h"
-#include <cstdint>
 
 namespace cpp_conv
 {
     struct ItemInstance
     {
         ItemInstance()
+            : m_Item{}
+            , m_PreviousX{}
+            , m_PreviousY{}
+            , m_bShouldAnimate{}
         {
-
         }
 
-        ItemInstance(ItemId item, float previousX, float previousY, bool bShouldAnimate)
+        ItemInstance(const ItemId item, const float previousX, const float previousY, const bool bShouldAnimate)
             : m_Item(item)
             , m_PreviousX(previousX)
             , m_PreviousY(previousY)
@@ -25,7 +27,7 @@ namespace cpp_conv
         float m_PreviousY;
         bool m_bShouldAnimate;
 
-        bool IsEmpty() const { return m_Item.IsEmpty(); }
+        [[nodiscard]] bool IsEmpty() const { return m_Item.IsEmpty(); }
 
         static ItemInstance Empty()
         {

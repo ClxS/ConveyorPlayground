@@ -9,7 +9,7 @@
 #include <Windows.h>
 #endif
 
-cpp_conv::FrameLimiter::FrameLimiter(int targetFrameRate)
+cpp_conv::FrameLimiter::FrameLimiter(const int targetFrameRate)
     : m_startTime({})
     , m_targetFrameRate(1000000 / targetFrameRate)
     , m_logDuration(std::chrono::seconds(5))
@@ -36,9 +36,9 @@ void cpp_conv::FrameLimiter::EndFrame()
     if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - m_startTime) >= m_logDuration)
     {
 #if _WIN32
-        OutputDebugStringA(std::format("\n\nFPS: {}", cpp_conv::string_util::to_string_with_precision(m_uiFrameCounter / (double)m_logDuration.count(), 0)).c_str());
+        OutputDebugStringA(std::format("\n\nFPS: {}", string_util::to_string_with_precision(m_uiFrameCounter / static_cast<double>(m_logDuration.count()), 0)).c_str());
 #endif
-        cpp_conv::profiler::logAndReset(m_uiFrameCounter);
+        profiler::logAndReset(static_cast<int>(m_uiFrameCounter));
 
         m_startTime = std::chrono::high_resolution_clock::now();
         m_uiFrameCounter = 0;

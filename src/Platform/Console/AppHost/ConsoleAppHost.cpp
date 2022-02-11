@@ -5,7 +5,7 @@
 
 std::tuple<int, int> cpp_conv::apphost::getAppDimensions()
 {
-    HWND console = GetConsoleWindow();
+    const HWND console = GetConsoleWindow();
     RECT r;
     GetWindowRect(console, &r);
 

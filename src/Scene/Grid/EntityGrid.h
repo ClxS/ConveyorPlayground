@@ -1,9 +1,8 @@
 #pragma once
 
-#include <array>
-#include "Vector3.h"
-#include "Enums.h"
 #include "Entity.h"
+#include "Enums.h"
+#include "Vector3.h"
 
 namespace cpp_conv
 {
@@ -12,10 +11,10 @@ namespace cpp_conv
 
     namespace grid
     {
-        Vector3 GetForwardPosition(const Vector3& position, Direction direction);
-        Vector3 GetForwardPosition(const Entity& rEntity);
-        Vector3 GetRightPosition(const Entity& rEntity);
-        Vector3 GetBackwardsPosition(const Entity& rEntity);
-        Vector3 GetLeftPosition(const Entity& rEntity);
+        Vector3 getForwardPosition(const Vector3& position, Direction direction);
+        Vector3 getForwardPosition(const Entity& rEntity);
+        Vector3 getRightPosition(const Entity& rEntity);
+        Vector3 getBackwardsPosition(const Entity& rEntity);
+        Vector3 getLeftPosition(const Entity& rEntity);
     }
 }

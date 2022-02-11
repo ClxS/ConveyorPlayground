@@ -1,4 +1,7 @@
 #include "ConveyorRegistry.h"
+
+#include <cassert>
+
 #include "ResourceRegistry.h"
 #include "ResourceManager.h"
 #include "ConveyorDefinition.h"
@@ -13,31 +16,32 @@
 #include "Profiler.h"
 
 using RegistryId = cpp_conv::resources::registry::RegistryId;
-std::vector<cpp_conv::resources::AssetPtr<cpp_conv::ConveyorDefinition>> g_vItems;
+static std::vector<cpp_conv::resources::AssetPtr<cpp_conv::ConveyorDefinition>> g_vConveyors;
 
 namespace
 {
     void loadItems()
     {
-        for (int i = 0; i < sizeof(cpp_conv::resources::registry::c_szConveyors) / sizeof(std::filesystem::path); i++)
+        for (size_t i = 0; i < sizeof(cpp_conv::resources::registry::c_szConveyors) / sizeof(std::filesystem::path); i++)
         {
-            RegistryId asset = { i, 9 };
+            const RegistryId asset = { static_cast<int>(i), 9 };
             auto pAsset = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::ConveyorDefinition>(asset);
             if (!pAsset)
             {
                 continue;
             }
 
-            g_vItems.push_back(pAsset);
+            g_vConveyors.push_back(pAsset);
         }
     }
 }
 
 cpp_conv::resources::ResourceAsset* conveyorAssetHandler(cpp_conv::resources::resource_manager::FileData& rData)
 {
-    const char* pStrData = reinterpret_cast<const char*>(rData.m_pData);
+    const auto pStrData = reinterpret_cast<const char*>(rData.m_pData);
 
-    std::string copy(pStrData, rData.m_uiSize / sizeof(char));
+    // ReSharper disable once CppRedundantCastExpression
+    const std::string copy(pStrData, (int)(rData.m_uiSize / sizeof(char)));
     std::istringstream ss(copy);
 
     std::string id;
@@ -47,22 +51,28 @@ cpp_conv::resources::ResourceAsset* conveyorAssetHandler(cpp_conv::resources::re
     std::string token;
     while (std::getline(ss, token))
     {
+        if (token.back() == '\r')
+        {
+            token.erase(token.size() - 1);
+        }
+
         switch (idx)
         {
         case 0: id = token; break;
         case 1: name = token; break;
+        default: ; // Ignored
         }
 
         idx++;
     }
-     
+
     return new cpp_conv::ConveyorDefinition(cpp_conv::ConveyorId::FromStringId(id), rData.m_registryId, name);
 }
 
-const cpp_conv::resources::AssetPtr<cpp_conv::ConveyorDefinition> cpp_conv::resources::getConveyorDefinition(cpp_conv::ConveyorId id)
+cpp_conv::resources::AssetPtr<cpp_conv::ConveyorDefinition> cpp_conv::resources::getConveyorDefinition(ConveyorId id)
 {
     PROFILE_FUNC();
-    for (auto item : g_vItems)
+    for (auto item : g_vConveyors)
     {
         if (item->GetInternalId() == id)
         {

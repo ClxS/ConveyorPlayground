@@ -32,7 +32,7 @@ cpp_conv::Factory::Factory(Vector3 position, Direction direction, FactoryId fact
     , m_outputItems(8, uiMaxStackSize, true)
     , m_uiTick(0)
 {
-    const cpp_conv::resources::AssetPtr<cpp_conv::FactoryDefinition> pFactory = cpp_conv::resources::getFactoryDefinition(factoryId);
+    const resources::AssetPtr<FactoryDefinition> pFactory = resources::getFactoryDefinition(factoryId);
     if (!pFactory)
     {
         return;
@@ -50,7 +50,7 @@ bool cpp_conv::Factory::IsReadyToProduce() const
 
 bool cpp_conv::Factory::ProduceItems()
 {
-    const cpp_conv::resources::AssetPtr<cpp_conv::RecipeDefinition> pRecipe = cpp_conv::resources::getRecipeDefinition(m_hActiveRecipeId);
+    const resources::AssetPtr<RecipeDefinition> pRecipe = resources::getRecipeDefinition(m_hActiveRecipeId);
     if (!pRecipe)
     {
         return false;
@@ -81,7 +81,7 @@ bool cpp_conv::Factory::ProduceItems()
 void cpp_conv::Factory::Tick(const SceneContext& kContext)
 {
     PROFILE_FUNC();
-    const cpp_conv::resources::AssetPtr<cpp_conv::FactoryDefinition> pFactory = cpp_conv::resources::getFactoryDefinition(m_hFactoryId);
+    const resources::AssetPtr<FactoryDefinition> pFactory = resources::getFactoryDefinition(m_hFactoryId);
     if (!pFactory)
     {
         return;
@@ -94,25 +94,25 @@ void cpp_conv::Factory::Tick(const SceneContext& kContext)
 
 void cpp_conv::Factory::Draw(RenderContext& kRenderContext) const
 {
-    const auto pFactory = cpp_conv::resources::getFactoryDefinition(m_hFactoryId);
+    const auto pFactory = resources::getFactoryDefinition(m_hFactoryId);
     if (!pFactory)
     {
         return;
     }
 
-    auto pTile = pFactory->GetTile();
+    const auto pTile = pFactory->GetTile();
     if (!pTile)
     {
         return;
     }
 
-    cpp_conv::renderer::renderAsset(
+    renderer::renderAsset(
         kRenderContext,
         pTile.get(),
         {
-            (float)m_position.GetX() * cpp_conv::renderer::c_gridScale,
-            (float)m_position.GetY() * cpp_conv::renderer::c_gridScale,
-            cpp_conv::rotationFromDirection(m_direction)
+            (float)m_position.GetX() * renderer::c_gridScale,
+            (float)m_position.GetY() * renderer::c_gridScale,
+            rotationFromDirection(m_direction)
         },
         { 0xFFFFFF00 });
 }
@@ -124,7 +124,7 @@ bool cpp_conv::Factory::TryGrab(const SceneContext& kContext, bool bSingle, std:
 
 std::string cpp_conv::Factory::GetDescription() const
 {
-    const cpp_conv::resources::AssetPtr<cpp_conv::RecipeDefinition> pRecipe = cpp_conv::resources::getRecipeDefinition(m_hActiveRecipeId);
+    const resources::AssetPtr<RecipeDefinition> pRecipe = resources::getRecipeDefinition(m_hActiveRecipeId);
     if (!pRecipe)
     {
         return "Producing Unknown Recipe";
@@ -140,7 +140,7 @@ bool cpp_conv::Factory::TryInsert(const SceneContext& kContext, const Entity& pS
         // We only allow inserters
         return false;
     }
-    const cpp_conv::resources::AssetPtr<cpp_conv::RecipeDefinition> pRecipe = cpp_conv::resources::getRecipeDefinition(m_hActiveRecipeId);
+    const resources::AssetPtr<RecipeDefinition> pRecipe = resources::getRecipeDefinition(m_hActiveRecipeId);
     if (!pRecipe)
     {
         return false;
@@ -164,7 +164,7 @@ bool cpp_conv::Factory::TryInsert(const SceneContext& kContext, const Entity& pS
     return m_inputItems.TryInsert(insertInfo.GetItem());
 }
 
-void cpp_conv::Factory::RunProductionCycle(const cpp_conv::FactoryDefinition* pFactory)
+void cpp_conv::Factory::RunProductionCycle(const FactoryDefinition* pFactory)
 {
     if (m_hActiveRecipeId != pFactory->GetProducedRecipe())
     {
@@ -197,17 +197,17 @@ void cpp_conv::Factory::RunProductionCycle(const cpp_conv::FactoryDefinition* pF
     }
 }
 
-void cpp_conv::Factory::RunOutputCycle(const SceneContext& kContext, const cpp_conv::FactoryDefinition* pFactory)
+void cpp_conv::Factory::RunOutputCycle(const SceneContext& kContext, const FactoryDefinition* pFactory)
 {
     if (!pFactory->HasOwnOutputPipe() || m_outputItems.IsEmpty())
     {
         return;
     }
 
-    Vector3 pipe = { pFactory->GetOutputPipe().GetXY().Rotate(cpp_conv::rotationFromDirection(m_direction), m_size.GetXY()), pFactory->GetOutputPipe().GetZ() };
+    Vector3 pipe = { pFactory->GetOutputPipe().GetXY().Rotate(rotationFromDirection(m_direction), m_size.GetXY()), pFactory->GetOutputPipe().GetZ() };
     pipe += m_position;
 
-    cpp_conv::Entity* pEntity = kContext.m_rMap.GetEntity(cpp_conv::grid::GetForwardPosition(pipe, m_direction));
+    Entity* pEntity = kContext.m_rMap.GetEntity(grid::getForwardPosition(pipe, m_direction));
     if (!pEntity || !pEntity->SupportsInsertion())
     {
         return;
@@ -238,9 +238,9 @@ void cpp_conv::Factory::RunOutputCycle(const SceneContext& kContext, const cpp_c
     }
 }
 
-bool cpp_conv::Factory::TrySatisfyRecipeInput(const cpp_conv::FactoryDefinition* pFactory, uint64_t& uiOutEffort)
+bool cpp_conv::Factory::TrySatisfyRecipeInput(const FactoryDefinition* pFactory, uint64_t& uiOutEffort)
 {
-    const cpp_conv::resources::AssetPtr<cpp_conv::RecipeDefinition> pRecipe = cpp_conv::resources::getRecipeDefinition(m_hActiveRecipeId);
+    const resources::AssetPtr<RecipeDefinition> pRecipe = resources::getRecipeDefinition(m_hActiveRecipeId);
     if (!pRecipe)
     {
         return false;

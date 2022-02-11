@@ -15,8 +15,8 @@ namespace cpp_conv
         Colour m_LayerColour;
 
         uint32_t m_uiCurrentDrawPass;
-        cpp_conv::WorldMap& m_rMap;
-        class cpp_conv::renderer::WriteSurface* m_surface;
+        WorldMap& m_rMap;
+        class renderer::WriteSurface* m_surface;
         float m_fZoom;
 
         uint32_t m_uiDrawnItems;

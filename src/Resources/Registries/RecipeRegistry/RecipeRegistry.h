@@ -12,5 +12,5 @@ namespace cpp_conv
 
 namespace cpp_conv::resources
 {
-    const cpp_conv::resources::AssetPtr<cpp_conv::RecipeDefinition> getRecipeDefinition(cpp_conv::RecipeId id);
+    AssetPtr<RecipeDefinition> getRecipeDefinition(RecipeId id);
 }

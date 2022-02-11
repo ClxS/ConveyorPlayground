@@ -20,10 +20,10 @@ namespace cpp_conv
         void Tick(const SceneContext& kContext) override;
         void Draw(RenderContext& kRenderContext) const override;
 
-        Direction GetDirection() const override { return m_direction; }
+        [[nodiscard]] Direction GetDirection() const override { return m_direction; }
 
-        const char* GetName() const override { return "Inserter"; }
-        std::string GetDescription() const override;
+        [[nodiscard]] const char* GetName() const override { return "Inserter"; }
+        [[nodiscard]] std::string GetDescription() const override;
 
     private:
         enum class State

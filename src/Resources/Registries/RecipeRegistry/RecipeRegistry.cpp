@@ -13,7 +13,7 @@
 #include "Profiler.h"
 
 using RegistryId = cpp_conv::resources::registry::RegistryId;
-std::vector<cpp_conv::resources::AssetPtr<cpp_conv::RecipeDefinition>> g_vItems;
+static std::vector<cpp_conv::resources::AssetPtr<cpp_conv::RecipeDefinition>> g_vRecipes;
 
 namespace
 {
@@ -21,22 +21,23 @@ namespace
     {
         for (int i = 0; i < sizeof(cpp_conv::resources::registry::c_szRecipes) / sizeof(std::filesystem::path); i++)
         {
-            RegistryId asset = { i, 8 };
+            const RegistryId asset = { i, 8 };
             auto pAsset = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::RecipeDefinition>(asset);
             if (!pAsset)
             {
                 continue;
             }
 
-            g_vItems.push_back(pAsset);
+            g_vRecipes.push_back(pAsset);
         }
     }
 
     cpp_conv::resources::ResourceAsset* recipeAssetHandler(cpp_conv::resources::resource_manager::FileData& rData)
     {
-        const char* pStrData = reinterpret_cast<const char*>(rData.m_pData);
+        const auto pStrData = reinterpret_cast<const char*>(rData.m_pData);
 
-        std::string copy(pStrData, rData.m_uiSize / sizeof(char));
+        // ReSharper disable once CppRedundantCastExpression
+        const std::string copy(pStrData, (int)(rData.m_uiSize / sizeof(char)));
         std::istringstream ss(copy);
 
         std::string id;
@@ -45,11 +46,16 @@ namespace
         std::vector<cpp_conv::RecipeDefinition::RecipeItem> inputs;
         std::vector<cpp_conv::RecipeDefinition::RecipeItem> outputs;
 
-        int idx = 0; 
+        int idx = 0;
         std::string token;
         bool bIsInputItems = false;
         while (std::getline(ss, token))
         {
+            if (token.back() == '\r')
+            {
+                token.erase(token.size() - 1);
+            }
+
             switch (idx)
             {
             case 0: id = token; break;
@@ -57,7 +63,7 @@ namespace
             case 2: effort = std::stoi(token); break;
             case 3: break;
             default:
-                if (token == "")
+                if (token.empty())
                 {
                     bIsInputItems = true;
                 }
@@ -81,10 +87,10 @@ namespace
     }
 }
 
-const cpp_conv::resources::AssetPtr<cpp_conv::RecipeDefinition> cpp_conv::resources::getRecipeDefinition(cpp_conv::RecipeId id)
+cpp_conv::resources::AssetPtr<cpp_conv::RecipeDefinition> cpp_conv::resources::getRecipeDefinition(const RecipeId id)
 {
     PROFILE_FUNC();
-    for (auto item : g_vItems)
+    for (auto item : g_vRecipes)
     {
         if (item->GetInternalId() == id)
         {

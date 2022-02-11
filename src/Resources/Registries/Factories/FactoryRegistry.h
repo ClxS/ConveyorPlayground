@@ -12,5 +12,5 @@ namespace cpp_conv
 
 namespace cpp_conv::resources
 {
-    const cpp_conv::resources::AssetPtr<cpp_conv::FactoryDefinition> getFactoryDefinition(cpp_conv::FactoryId id);
+    const AssetPtr<FactoryDefinition> getFactoryDefinition(FactoryId id);
 }

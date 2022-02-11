@@ -10,26 +10,26 @@
 
 namespace cpp_conv
 {
-    class ItemDefinition : public cpp_conv::resources::ResourceAsset
+    class ItemDefinition : public resources::ResourceAsset
     {
     public:
-        ItemDefinition(cpp_conv::ItemId internalId, cpp_conv::resources::registry::RegistryId registryId, std::string strName)
+        ItemDefinition(ItemId internalId, resources::registry::RegistryId registryId, std::string strName)
             : m_internalId(internalId)
             , m_registryId(registryId)
             , m_strName(std::move(strName))
         {
         }
 
-        cpp_conv::ItemId GetInternalId() const { return m_internalId; }
+        ItemId GetInternalId() const { return m_internalId; }
 
         const std::string& GetName() const { return m_strName; }
-        cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> GetTile() const;
+        resources::AssetPtr<resources::TileAsset> GetTile() const;
 
     private:
-        cpp_conv::ItemId m_internalId;
-        cpp_conv::resources::registry::RegistryId m_registryId;
+        ItemId m_internalId;
+        resources::registry::RegistryId m_registryId;
         std::string m_strName;
 
-        mutable cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> m_pTile;
+        mutable resources::AssetPtr<resources::TileAsset> m_pTile;
     };
 }

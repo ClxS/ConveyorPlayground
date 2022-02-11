@@ -51,36 +51,36 @@ namespace cpp_conv
         void Realize();
 
         void Draw(RenderContext& kContext) const override;
-        bool SupportsInsertion() const override { return true; }
+        [[nodiscard]] bool SupportsInsertion() const override { return true; }
         bool TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, InsertInfo insertInfo) override;
 
-        bool SupportsProvidingItem() const override { return true; }
+        [[nodiscard]] bool SupportsProvidingItem() const override { return true; }
         bool TryGrab(const SceneContext& kContext, bool bSingle, std::tuple<ItemId, uint32_t>& outItem) override;
 
-        Direction GetDirection() const override { return m_direction; }
+        [[nodiscard]] Direction GetDirection() const override { return m_direction; }
 
-        const char* GetName() const override { return "Conveyor"; }
+        [[nodiscard]] const char* GetName() const override { return "Conveyor"; }
 
-        std::string GetDescription() const override;
+        [[nodiscard]] std::string GetDescription() const override;
 
-        virtual uint32_t GetDrawPassCount() const { return 2; }
+        [[nodiscard]] virtual uint32_t GetDrawPassCount() const { return 2; }
 
-        void AssessPosition(const cpp_conv::WorldMap& map);
+        void AssessPosition(const WorldMap& map);
 
-        bool IsCorner() const { return m_bIsCorner; }
-        bool IsClockwiseCorner() const { return m_bIsClockwise; }
-        bool IsCapped() const { return m_bIsCapped; }
-        int GetInnerMostChannel() const { return m_iInnerMostChannel; }
-        Direction GetCornerDirection() const { return m_eCornerDirection; }
+        [[nodiscard]] bool IsCorner() const { return m_bIsCorner; }
+        [[nodiscard]] bool IsClockwiseCorner() const { return m_bIsClockwise; }
+        [[nodiscard]] bool IsCapped() const { return m_bIsCapped; }
+        [[nodiscard]] int GetInnerMostChannel() const { return m_iInnerMostChannel; }
+        [[nodiscard]] Direction GetCornerDirection() const { return m_eCornerDirection; }
 
-        bool IsPartOfASequence() const { return m_pSequence != nullptr; }
+        [[nodiscard]] bool IsPartOfASequence() const { return m_pSequence != nullptr; }
 
         void SetSequence(Sequence* pSequence, uint8_t position);
         void ClearSequence();
 
         uint64_t CountItemsOnBelt();
 
-        cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> GetTile() const { return m_pTile; }
+        [[nodiscard]] resources::AssetPtr<resources::TileAsset> GetTile() const { return m_pTile; }
 
         static_assert(c_conveyorChannels >= 1, "Conveyors must have at least once channel");
         static_assert(c_conveyorChannelSlots >= 1, "Conveyors channels must have at least once slot");
@@ -102,7 +102,7 @@ namespace cpp_conv
         bool m_bIsCapped;
         int m_iInnerMostChannel;
         Direction m_eCornerDirection;
-        cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> m_pTile;
+        resources::AssetPtr<resources::TileAsset> m_pTile;
 
         bool TryPeakItemInSlot(int lane, int slot, ItemInstance& rItem) const;
     };

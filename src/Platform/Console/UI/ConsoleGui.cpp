@@ -24,7 +24,7 @@ void cpp_conv::ui::platform::drawText(const std::string& szText, cpp_conv::Colou
     std::tie(appWidth, appHeight) = cpp_conv::apphost::getAppDimensions();
 
     uint32_t consoleWorldX = (uint32_t)((((double)x / designWidth) * 1.05f) * rSurface->GetWidth());
-    uint32_t consoleWorldY = (uint32_t)((((double)y / designHeight) * 1.05f) * rSurface->GetHeight());
+    const uint32_t consoleWorldY = (uint32_t)((((double)y / designHeight) * 1.05f) * rSurface->GetHeight());
     for (int i = 0; i < szText.length(); ++i)
     {
         cpp_conv::renderer::setCell(*pRenderContext, szText[i], consoleWorldX + i, consoleWorldY, cpp_conv::renderer::getWin32Colour(colour), true);
@@ -49,7 +49,7 @@ void cpp_conv::ui::platform::drawText(const std::wstring& szText, cpp_conv::Colo
     std::tie(appWidth, appHeight) = cpp_conv::apphost::getAppDimensions();
 
     uint32_t consoleWorldX = (uint32_t)((((double)x / designWidth) * 1.05f) * rSurface->GetWidth());
-    uint32_t consoleWorldY = (uint32_t)((((double)y / designHeight) * 1.05f) * rSurface->GetHeight());
+    const uint32_t consoleWorldY = (uint32_t)((((double)y / designHeight) * 1.05f) * rSurface->GetHeight());
     for (int i = 0; i < szText.length(); ++i)
     {
         cpp_conv::renderer::setCell(*pRenderContext, szText[i], consoleWorldX + i, consoleWorldY, cpp_conv::renderer::getWin32Colour(colour), true);

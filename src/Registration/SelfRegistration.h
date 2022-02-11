@@ -7,15 +7,17 @@
 #include "Colour.h"
 
 namespace cpp_conv { struct Transform2D; }
-namespace cpp_conv { namespace resources { class RenderableAsset; } }
+namespace cpp_conv::resources
+{ class RenderableAsset; }
+
 namespace cpp_conv { struct RenderContext; }
 
 namespace cpp_conv::resources::registration
 {
     using TypeInfo = std::type_info;
-    using AssetLoadFunc = std::function<ResourceAsset* (cpp_conv::resources::resource_manager::FileData&)>;
-    using AssetRenderFunc = std::function<void(cpp_conv::RenderContext& kContext, const cpp_conv::resources::RenderableAsset* pAsset,
-                                               const cpp_conv::Transform2D& kTransform, cpp_conv::Colour kColourOverride, bool bTrack)>;
+    using AssetLoadFunc = std::function<ResourceAsset* (resource_manager::FileData&)>;
+    using AssetRenderFunc = std::function<void(RenderContext& kContext, const RenderableAsset* pAsset,
+                                               const Transform2D& kTransform, Colour kColourOverride, bool bTrack)>;
     using LoadFunc = std::function<void(void)>;
 
     void processSelfRegistrations();

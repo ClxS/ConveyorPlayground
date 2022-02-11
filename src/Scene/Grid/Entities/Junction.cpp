@@ -24,7 +24,7 @@ void shuffle(RandomAccessIterator first, RandomAccessIterator last, URNG&& g)
 
 cpp_conv::Junction::Junction(Vector3 position, Vector3 size)
     : Entity(position, size, EntityKind::Junction)
-    , m_pItem(cpp_conv::ItemIds::None)
+    , m_pItem(ItemIds::None)
     , m_uiTick(0)
 {
 }
@@ -37,12 +37,12 @@ void cpp_conv::Junction::Tick(const SceneContext& kContext)
     }
 
     m_uiTick++;
-    std::array<std::tuple<cpp_conv::Entity*, Direction>, 4> arrDirectionEntities =
+    std::array<std::tuple<Entity*, Direction>, 4> arrDirectionEntities =
     {
-        std::make_tuple(kContext.m_rMap.GetEntity(cpp_conv::grid::GetForwardPosition(m_position, Direction::Up)), Direction::Up),
-        std::make_tuple(kContext.m_rMap.GetEntity(cpp_conv::grid::GetForwardPosition(m_position, Direction::Right)), Direction::Right),
-        std::make_tuple(kContext.m_rMap.GetEntity(cpp_conv::grid::GetForwardPosition(m_position, Direction::Down)), Direction::Down),
-        std::make_tuple(kContext.m_rMap.GetEntity(cpp_conv::grid::GetForwardPosition(m_position, Direction::Left)), Direction::Left),
+        std::make_tuple(kContext.m_rMap.GetEntity(grid::getForwardPosition(m_position, Direction::Up)), Direction::Up),
+        std::make_tuple(kContext.m_rMap.GetEntity(grid::getForwardPosition(m_position, Direction::Right)), Direction::Right),
+        std::make_tuple(kContext.m_rMap.GetEntity(grid::getForwardPosition(m_position, Direction::Down)), Direction::Down),
+        std::make_tuple(kContext.m_rMap.GetEntity(grid::getForwardPosition(m_position, Direction::Left)), Direction::Left),
     };
 
     std::default_random_engine engine(m_uiTick % 256);
@@ -52,9 +52,9 @@ void cpp_conv::Junction::Tick(const SceneContext& kContext)
         std::swap(arrDirectionEntities.begin()[i], arrDirectionEntities.begin()[d(engine)]);
     }
 
-    for (auto entityDirectionPair : arrDirectionEntities)
+    for (const auto entityDirectionPair : arrDirectionEntities)
     {
-        cpp_conv::Entity* pEntity;
+        Entity* pEntity;
         Direction direction;
 
         std::tie(pEntity, direction) = entityDirectionPair;
@@ -65,11 +65,11 @@ void cpp_conv::Junction::Tick(const SceneContext& kContext)
         }
 
         bool bFound = false;
-        for (int iExitChannel = 0; iExitChannel < cpp_conv::c_conveyorChannels; ++iExitChannel)
+        for (int iExitChannel = 0; iExitChannel < c_conveyorChannels; ++iExitChannel)
         {
             if (pEntity->TryInsert(kContext, *this, InsertInfo(m_pItem, iExitChannel)))
             {
-                m_pItem = cpp_conv::ItemIds::None;
+                m_pItem = ItemIds::None;
                 bFound = true;
                 break;
             }
@@ -84,18 +84,18 @@ void cpp_conv::Junction::Tick(const SceneContext& kContext)
 
 void cpp_conv::Junction::Draw(RenderContext& kRenderContext) const
 {
-    auto pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Junction);
+    const auto pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::visual::Junction);
     if (!pTile)
     {
         return;
     }
 
-    cpp_conv::renderer::renderAsset(
+    renderer::renderAsset(
         kRenderContext,
         pTile.get(),
         {
-            static_cast<float>(m_position.GetX()) * cpp_conv::renderer::c_gridScale,
-            static_cast<float>(m_position.GetY()) * cpp_conv::renderer::c_gridScale,
+            static_cast<float>(m_position.GetX()) * renderer::c_gridScale,
+            static_cast<float>(m_position.GetY()) * renderer::c_gridScale,
             Rotation::DegZero
         },
         { 0xFFFF00FF });

@@ -31,7 +31,7 @@ namespace cpp_conv::resources::resource_manager
     template<typename TType>
     AssetPtr<TType> loadAsset(registry::RegistryId kAssetId)
     {
-        auto pAsset = loadAsset(typeid(TType), kAssetId);
+        const auto pAsset = loadAsset(typeid(TType), kAssetId);
         if (!pAsset)
         {
             return nullptr;
@@ -43,7 +43,7 @@ namespace cpp_conv::resources::resource_manager
     template<typename TType>
     AssetPtr<TType> loadAssetUncached(registry::RegistryId kAssetId)
     {
-        auto pAsset = loadAssetUncached(typeid(TType), kAssetId);
+        const auto pAsset = loadAssetUncached(typeid(TType), kAssetId);
         if (!pAsset)
         {
             return nullptr;

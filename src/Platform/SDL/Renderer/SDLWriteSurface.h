@@ -12,22 +12,22 @@ namespace cpp_conv::renderer
     class SDLWriteSurface
     {
     public:
-        SDLWriteSurface(cpp_conv::RenderContext& kRenderContext,
-                        uint16_t uiWidth,
-                        uint16_t uiHeight,
-                        bool bClearOnPresent)
+        SDLWriteSurface(RenderContext& kRenderContext,
+                        const uint16_t uiWidth,
+                        const uint16_t uiHeight,
+                        const bool bClearOnPresent)
             : m_uiWidth(uiWidth)
             , m_uiHeight(uiHeight)
-            , m_bClearOnPresent(true)
-        { 
+            , m_bClearOnPresent(bClearOnPresent)
+        {
         }
 
         void Initialize() {}
         void Clear();
 
-        uint16_t GetWidth() const { return m_uiWidth; }
-        uint16_t GetHeight() const { return m_uiHeight; }
-        bool IsClearOnPresent() const { return m_bClearOnPresent; }
+        [[nodiscard]] uint16_t GetWidth() const { return m_uiWidth; }
+        [[nodiscard]] uint16_t GetHeight() const { return m_uiHeight; }
+        [[nodiscard]] bool IsClearOnPresent() const { return m_bClearOnPresent; }
 
         void Resize(RenderContext& kRenderContext, int iWidth, int iHeight) {}
         bool RequiresResize(RenderContext& kRenderContext, int iWidth, int iHeight) const { return false; }

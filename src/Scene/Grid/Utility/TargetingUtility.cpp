@@ -1,12 +1,12 @@
 #include "TargetingUtility.h"
-#include "Sequence.h"
-#include "Profiler.h"
 #include "Conveyor.h"
-#include "EntityGrid.h"
 #include "Direction.h"
+#include "EntityGrid.h"
 #include "Factory.h"
+#include "Profiler.h"
+#include "WorldMap.h"
 
-cpp_conv::Entity* cpp_conv::targeting_util::FindNextTailConveyor(const cpp_conv::WorldMap& map, const cpp_conv::Conveyor& rCurrentConveyor, RelativeDirection& outDirection)
+cpp_conv::Entity* cpp_conv::targeting_util::findNextTailConveyor(const WorldMap& map, const Conveyor& rCurrentConveyor, RelativeDirection& outDirection)
 {
     static RelativeDirection directionPriority[] =
     {
@@ -16,19 +16,19 @@ cpp_conv::Entity* cpp_conv::targeting_util::FindNextTailConveyor(const cpp_conv:
     };
 
     Vector3 vPositions[4];
-    vPositions[(int)RelativeDirection::Backwards] = cpp_conv::grid::GetBackwardsPosition(rCurrentConveyor);
-    vPositions[(int)RelativeDirection::Right] = cpp_conv::grid::GetRightPosition(rCurrentConveyor);
-    vPositions[(int)RelativeDirection::Left] = cpp_conv::grid::GetLeftPosition(rCurrentConveyor);
+    vPositions[static_cast<int>(RelativeDirection::Backwards)] = grid::getBackwardsPosition(rCurrentConveyor);
+    vPositions[static_cast<int>(RelativeDirection::Right)] = grid::getRightPosition(rCurrentConveyor);
+    vPositions[static_cast<int>(RelativeDirection::Left)] = grid::getLeftPosition(rCurrentConveyor);
 
-    cpp_conv::Entity* vPotentialNeighbours[4];
-    vPotentialNeighbours[(int)RelativeDirection::Backwards] = map.GetEntity(vPositions[(int)RelativeDirection::Backwards]);
-    vPotentialNeighbours[(int)RelativeDirection::Right] = map.GetEntity(vPositions[(int)RelativeDirection::Right]);
-    vPotentialNeighbours[(int)RelativeDirection::Left] = map.GetEntity(vPositions[(int)RelativeDirection::Left]);
+    Entity* vPotentialNeighbours[4];
+    vPotentialNeighbours[static_cast<int>(RelativeDirection::Backwards)] = map.GetEntity(vPositions[static_cast<int>(RelativeDirection::Backwards)]);
+    vPotentialNeighbours[static_cast<int>(RelativeDirection::Right)] = map.GetEntity(vPositions[static_cast<int>(RelativeDirection::Right)]);
+    vPotentialNeighbours[static_cast<int>(RelativeDirection::Left)] = map.GetEntity(vPositions[static_cast<int>(RelativeDirection::Left)]);
 
-    cpp_conv::Entity* pTargetConveyor = nullptr;
+    Entity* pTargetConveyor = nullptr;
     for (auto direction : directionPriority)
     {
-        cpp_conv::Entity* pDirectionEntity = vPotentialNeighbours[(int)direction];
+        Entity* pDirectionEntity = vPotentialNeighbours[static_cast<int>(direction)];
         if (pDirectionEntity == nullptr)
         {
             continue;
@@ -39,7 +39,7 @@ cpp_conv::Entity* cpp_conv::targeting_util::FindNextTailConveyor(const cpp_conv:
             case EntityKind::Stairs:
             case EntityKind::Underground:
             case EntityKind::Conveyor:
-                if (cpp_conv::grid::GetForwardPosition(*pDirectionEntity) == rCurrentConveyor.m_position)
+                if (grid::getForwardPosition(*pDirectionEntity) == rCurrentConveyor.m_position)
                 {
                     pTargetConveyor = pDirectionEntity;
                 }
@@ -49,17 +49,19 @@ cpp_conv::Entity* cpp_conv::targeting_util::FindNextTailConveyor(const cpp_conv:
                 break;
             case EntityKind::Producer:
             {
-                Factory* pFactory = reinterpret_cast<Factory*>(pDirectionEntity);
-                if (pFactory->HasOutputPipe() && vPositions[(int)direction] == pFactory->m_position + pFactory->GetOutputPipe())
+                const Factory* pFactory = reinterpret_cast<Factory*>(pDirectionEntity);
+                if (pFactory->HasOutputPipe() && vPositions[static_cast<int>(direction)] == pFactory->m_position + pFactory->GetOutputPipe())
                 {
                     pTargetConveyor = pDirectionEntity;
                 }
                 break;
             }
-            case EntityKind::MAX:
-                break;
+            case EntityKind::Inserter:
+            case EntityKind::Storage:
             default:
                 continue;
+            case EntityKind::MAX:
+                break;
         }
 
         if (pTargetConveyor)
@@ -72,11 +74,11 @@ cpp_conv::Entity* cpp_conv::targeting_util::FindNextTailConveyor(const cpp_conv:
     return pTargetConveyor;
 }
 
-bool cpp_conv::targeting_util::IsCornerConveyor(const cpp_conv::WorldMap& map, const cpp_conv::Conveyor& rConveyor)
+bool cpp_conv::targeting_util::isCornerConveyor(const WorldMap& map, const Conveyor& rConveyor)
 {
     PROFILE_FUNC();
     RelativeDirection direction;
-    const cpp_conv::Entity* pBackConverter = cpp_conv::targeting_util::FindNextTailConveyor(map, rConveyor, direction);
+    const Entity* pBackConverter = findNextTailConveyor(map, rConveyor, direction);
     if (pBackConverter == nullptr || direction == RelativeDirection::Backwards || direction == RelativeDirection::Forward)
     {
         return false;
@@ -85,11 +87,11 @@ bool cpp_conv::targeting_util::IsCornerConveyor(const cpp_conv::WorldMap& map, c
     return pBackConverter->GetDirection() != rConveyor.GetDirection() || pBackConverter->m_eEntityKind == EntityKind::Junction;
 }
 
-bool cpp_conv::targeting_util::IsClockwiseCorner(const cpp_conv::WorldMap& map, const cpp_conv::Conveyor& rConveyor)
+bool cpp_conv::targeting_util::isClockwiseCorner(const WorldMap& map, const Conveyor& rConveyor)
 {
     PROFILE_FUNC();
     RelativeDirection direction;
-    const cpp_conv::Entity* pBackConverter = cpp_conv::targeting_util::FindNextTailConveyor(map, rConveyor, direction);
+    const Entity* pBackConverter = findNextTailConveyor(map, rConveyor, direction);
     if (pBackConverter == nullptr || direction == RelativeDirection::Backwards || direction == RelativeDirection::Forward)
     {
         return false;
@@ -98,28 +100,29 @@ bool cpp_conv::targeting_util::IsClockwiseCorner(const cpp_conv::WorldMap& map, 
     return (direction == RelativeDirection::Left);
 }
 
-cpp_conv::Conveyor::Channel* cpp_conv::targeting_util::GetTargetChannel(const cpp_conv::WorldMap& map, const cpp_conv::Entity& sourceNode, cpp_conv::Conveyor& targetNode, int iSourceChannel)
+cpp_conv::Conveyor::Channel* cpp_conv::targeting_util::getTargetChannel(const WorldMap& map, const Entity& sourceNode,
+                                                                        Conveyor& targetNode, int iSourceChannel)
 {
     Direction eSourceDirection = sourceNode.GetDirection();
 
-    int mask = (int)eSourceDirection | (int)targetNode.m_direction;
+    const int mask = static_cast<int>(eSourceDirection) | static_cast<int>(targetNode.m_direction);
     if (sourceNode.m_eEntityKind != EntityKind::Junction && (mask == 0b11 || (mask >> 2) == 0b11))
     {
         // The nodes are facing either other, no valid path.
         return nullptr;
     }
 
-    if (IsCornerConveyor(map, targetNode))
+    if (isCornerConveyor(map, targetNode))
     {
         RelativeDirection direction;
-        if (&sourceNode == cpp_conv::targeting_util::FindNextTailConveyor(map, targetNode, direction))
+        if (&sourceNode == findNextTailConveyor(map, targetNode, direction))
         {
             return &targetNode.m_pChannels[iSourceChannel];
         }
 
-        return cpp_conv::targeting_util::IsClockwiseCorner(map, targetNode)
-            ? &targetNode.m_pChannels[0]
-            : &targetNode.m_pChannels[1];
+        return isClockwiseCorner(map, targetNode)
+                   ? &targetNode.m_pChannels[0]
+                   : &targetNode.m_pChannels[1];
     }
 
     if (eSourceDirection == targetNode.m_direction)
@@ -138,9 +141,9 @@ cpp_conv::Conveyor::Channel* cpp_conv::targeting_util::GetTargetChannel(const cp
     return nullptr;
 }
 
-int cpp_conv::targeting_util::GetChannelTargetSlot(const cpp_conv::WorldMap& map, const cpp_conv::Entity& sourceNode, const cpp_conv::Conveyor& targetNode, int iSourceChannel)
+int cpp_conv::targeting_util::getChannelTargetSlot(const WorldMap& map, const Entity& sourceNode, const Conveyor& targetNode, int iSourceChannel)
 {
-    Direction eSourceDirection = sourceNode.GetDirection();
+    const Direction eSourceDirection = sourceNode.GetDirection();
     if (eSourceDirection == targetNode.m_direction)
     {
         return 0;
@@ -149,20 +152,20 @@ int cpp_conv::targeting_util::GetChannelTargetSlot(const cpp_conv::WorldMap& map
     int result = 0;
 
     RelativeDirection direction;
-    if (IsCornerConveyor(map, targetNode) && &sourceNode == cpp_conv::targeting_util::FindNextTailConveyor(map, targetNode, direction))
+    if (isCornerConveyor(map, targetNode) && &sourceNode == findNextTailConveyor(map, targetNode, direction))
     {
         return 0;
     }
 
     switch (eSourceDirection)
     {
-    case Direction::Up: result = targetNode.m_direction == Direction::Left ? iSourceChannel : cpp_conv::c_conveyorChannels - 1 - iSourceChannel; break;
-    case Direction::Down: result = targetNode.m_direction == Direction::Left ? cpp_conv::c_conveyorChannels - 1 - iSourceChannel : iSourceChannel; break;
-    case Direction::Left: result = targetNode.m_direction == Direction::Up ? cpp_conv::c_conveyorChannels - 1 - iSourceChannel : iSourceChannel; break;
-    case Direction::Right: result = targetNode.m_direction == Direction::Up ? iSourceChannel : cpp_conv::c_conveyorChannels - 1 - iSourceChannel; break;
+    case Direction::Up: result = targetNode.m_direction == Direction::Left ? iSourceChannel : c_conveyorChannels - 1 - iSourceChannel; break;
+    case Direction::Down: result = targetNode.m_direction == Direction::Left ? c_conveyorChannels - 1 - iSourceChannel : iSourceChannel; break;
+    case Direction::Left: result = targetNode.m_direction == Direction::Up ? c_conveyorChannels - 1 - iSourceChannel : iSourceChannel; break;
+    case Direction::Right: result = targetNode.m_direction == Direction::Up ? iSourceChannel : c_conveyorChannels - 1 - iSourceChannel; break;
     }
 
-    if (cpp_conv::targeting_util::IsCornerConveyor(map, targetNode))
+    if (isCornerConveyor(map, targetNode))
     {
         result++;
     }
@@ -170,7 +173,7 @@ int cpp_conv::targeting_util::GetChannelTargetSlot(const cpp_conv::WorldMap& map
     return result;
 }
 
-Vector2F cpp_conv::targeting_util::GetRenderPosition(const cpp_conv::WorldMap& map, const cpp_conv::Conveyor& conveyor, ConveyorSlot slot, bool bAnimate, float fLerpFactor, Vector2F previousPosition)
+Vector2F cpp_conv::targeting_util::getRenderPosition(const WorldMap& map, const Conveyor& conveyor, ConveyorSlot slot, bool bAnimate, float fLerpFactor, Vector2F previousPosition)
 {
     PROFILE_FUNC();
     // This method translates the current direction in Right-facing space, determines the offsets, then rotates the offsets back to their original
@@ -180,12 +183,12 @@ Vector2F cpp_conv::targeting_util::GetRenderPosition(const cpp_conv::WorldMap& m
     int stepsRequired = 0;
     while (eDirection != Direction::Right)
     {
-        eDirection = cpp_conv::direction::Rotate90DegreeClockwise(eDirection);
+        eDirection = direction::rotate90DegreeClockwise(eDirection);
         stepsRequired++;
     }
 
-    bool bIsCorner = cpp_conv::targeting_util::IsCornerConveyor(map, conveyor);
-    bool bIsClockwiseConveyor = cpp_conv::targeting_util::IsClockwiseCorner(map, conveyor);
+    const bool bIsCorner = isCornerConveyor(map, conveyor);
+    const bool bIsClockwiseConveyor = isClockwiseCorner(map, conveyor);
 
     Vector2F position;
     if (bIsCorner)
@@ -225,18 +228,17 @@ Vector2F cpp_conv::targeting_util::GetRenderPosition(const cpp_conv::WorldMap& m
     }
     else
     {
-        position = { 1.0f + slot.m_Channel, 1.0f + slot.m_Lane };
+        position = { 1.0f + static_cast<float>(slot.m_Channel), 1.0f + static_cast<float>(slot.m_Lane) };
     }
 
-
     constexpr float c_fBlockSize = 4;
-    Vector2F blockSize(c_fBlockSize, c_fBlockSize);
-    Rotation backToOrigin = (Rotation)((4 - stepsRequired) % 4);
+    const Vector2F blockSize(c_fBlockSize, c_fBlockSize);
+    const auto backToOrigin = static_cast<Rotation>((4 - stepsRequired) % 4);
     position = position.Rotate(backToOrigin, blockSize);
 
-    Vector2F offset = position * 0.5f * c_fBlockSize - Vector2F(1.0f, 1.0f) - (cpp_conv::renderer::c_gridScale / c_fBlockSize);
+    const Vector2F offset = position * 0.5f * c_fBlockSize - Vector2F(1.0f, 1.0f) - (renderer::c_gridScale / c_fBlockSize);
 
-    Vector2F end = (Vector2F((float)conveyor.m_position.GetX(), (float)conveyor.m_position.GetY()) * blockSize) + offset;
+    const Vector2F end = (Vector2F(static_cast<float>(conveyor.m_position.GetX()), static_cast<float>(conveyor.m_position.GetY())) * blockSize) + offset;
     if (!bAnimate)
     {
         return end;
@@ -245,9 +247,9 @@ Vector2F cpp_conv::targeting_util::GetRenderPosition(const cpp_conv::WorldMap& m
     return previousPosition + ((end - previousPosition) * fLerpFactor);
 }
 
-Vector2F cpp_conv::targeting_util::GetRenderPosition(
-    const cpp_conv::WorldMap& map,
-    const cpp_conv::Conveyor& conveyor,
+Vector2F cpp_conv::targeting_util::getRenderPosition(
+    const WorldMap& map,
+    const Conveyor& conveyor,
     Vector2F renderPosition,
     float fLerpFactor,
     Vector2F previousPosition)

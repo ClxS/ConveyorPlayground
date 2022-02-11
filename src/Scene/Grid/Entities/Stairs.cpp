@@ -14,7 +14,7 @@
 
 cpp_conv::Stairs::Stairs(Vector3 position, Vector3 size, Direction direction, bool bIsUp)
     : Entity(position, size, EntityKind::Stairs)
-    , m_pItem(cpp_conv::ItemIds::None)
+    , m_pItem(ItemIds::None)
     , m_uiTick(0)
     , m_direction(direction)
     , m_bIsUp(bIsUp)
@@ -28,7 +28,7 @@ void cpp_conv::Stairs::Tick(const SceneContext& kContext)
         return;
     }
 
-    Vector3 targetPosition = cpp_conv::grid::GetForwardPosition(*this);
+    Vector3 targetPosition = grid::getForwardPosition(*this);
     if (m_bIsUp)
     {
         ++targetPosition.GetZ();
@@ -42,28 +42,28 @@ void cpp_conv::Stairs::Tick(const SceneContext& kContext)
 
     if (pTarget->TryInsert(kContext, *this, InsertInfo(m_pItem)))
     {
-        m_pItem = cpp_conv::ItemIds::None;
+        m_pItem = ItemIds::None;
     }
 }
 
 void cpp_conv::Stairs::Draw(RenderContext& kRenderContext) const
 {
-    auto pTile =
+    const auto pTile =
         m_bIsUp
-            ? cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::StairsUp)
-            : cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::StairsDown);
+            ? cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::visual::StairsUp)
+            : cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::visual::StairsDown);
 
     if (!pTile)
     {
         return;
     }
 
-    cpp_conv::renderer::renderAsset(
+    renderer::renderAsset(
         kRenderContext,
         pTile.get(),
         {
-            (float)m_position.GetX() * cpp_conv::renderer::c_gridScale,
-            (float)m_position.GetY() * cpp_conv::renderer::c_gridScale,
+            (float)m_position.GetX() * renderer::c_gridScale,
+            (float)m_position.GetY() * renderer::c_gridScale,
             Rotation::DegZero
         },
         { 0xFFFF00FF });

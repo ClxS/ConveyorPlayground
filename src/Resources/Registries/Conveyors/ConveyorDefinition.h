@@ -10,24 +10,24 @@
 
 namespace cpp_conv
 {
-    class ConveyorDefinition : public cpp_conv::resources::ResourceAsset
+    class ConveyorDefinition : public resources::ResourceAsset
     {
     public:
-        ConveyorDefinition(cpp_conv::ConveyorId internalId, cpp_conv::resources::registry::RegistryId registryId, std::string strName)
+        ConveyorDefinition(const ConveyorId internalId, const resources::registry::RegistryId registryId, std::string strName)
             : m_internalId(internalId)
             , m_registryId(registryId)
             , m_strName(std::move(strName))
         {
         }
 
-        cpp_conv::ConveyorId GetInternalId() const { return m_internalId; }
+        [[nodiscard]] ConveyorId GetInternalId() const { return m_internalId; }
 
-        const std::string& GetName() const { return m_strName; }
-        cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> GetTile() const;
+        [[nodiscard]] const std::string& GetName() const { return m_strName; }
+        [[nodiscard]] resources::AssetPtr<resources::TileAsset> GetTile() const;
 
     private:
-        cpp_conv::ConveyorId m_internalId;
-        cpp_conv::resources::registry::RegistryId m_registryId;
+        ConveyorId m_internalId;
+        resources::registry::RegistryId m_registryId;
         std::string m_strName;
     };
 }

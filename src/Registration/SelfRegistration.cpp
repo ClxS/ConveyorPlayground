@@ -21,28 +21,28 @@ std::vector<cpp_conv::resources::registration::LoadHandler*>& getLoadStore()
 
 void cpp_conv::resources::registration::processSelfRegistrations()
 {
-    for (auto pHandler : getAssetLoadStore())
+    for (const auto pHandler : getAssetLoadStore())
     {
-        cpp_conv::resources::resource_manager::registerTypeHandler(pHandler->m_rType, pHandler->m_rFunc);
+        registerTypeHandler(pHandler->m_rType, pHandler->m_rFunc);
     }
 
-    for (auto pHandler : getAssetRenderStore())
+    for (const auto pHandler : getAssetRenderStore())
     {
-        cpp_conv::renderer::registerTypeHandler(pHandler->m_rType, pHandler->m_rFunc);
+        renderer::registerTypeHandler(pHandler->m_rType, pHandler->m_rFunc);
     }
 
-    for (auto pHandler : getLoadStore())
+    for (const auto pHandler : getLoadStore())
     {
         pHandler->m_rFunc();
     }
 }
 
-void cpp_conv::resources::registration::registerAssetLoadHandler(cpp_conv::resources::registration::AssetLoadHandler* pHandler)
+void cpp_conv::resources::registration::registerAssetLoadHandler(AssetLoadHandler* pHandler)
 {
     getAssetLoadStore().push_back(pHandler);
 }
 
-void cpp_conv::resources::registration::registerAssetRenderHandler(cpp_conv::resources::registration::AssetRenderHandler* pHandler)
+void cpp_conv::resources::registration::registerAssetRenderHandler(AssetRenderHandler* pHandler)
 {
     getAssetRenderStore().push_back(pHandler);
 }

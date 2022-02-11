@@ -10,15 +10,15 @@ struct SDL_Texture;
 
 namespace cpp_conv::resources
 {
-    class SDLTile2DAsset : public RenderableAsset
+    class SDLTile2DAsset final : public RenderableAsset
     {
     public:
-        SDLTile2DAsset(SDL_Texture* pTexture)
+        explicit SDLTile2DAsset(SDL_Texture* pTexture)
             : m_pTexture(pTexture)
         {
         }
 
-        SDL_Texture* GetTexture() const { return m_pTexture; }
+        [[nodiscard]] SDL_Texture* GetTexture() const { return m_pTexture; }
 
     private:
         SDL_Texture* m_pTexture;

@@ -12,5 +12,5 @@ namespace cpp_conv
 
 namespace cpp_conv::resources
 {
-    const cpp_conv::resources::AssetPtr<cpp_conv::InserterDefinition> getInserterDefinition(cpp_conv::InserterId id);
+    AssetPtr<InserterDefinition> getInserterDefinition(InserterId id);
 }

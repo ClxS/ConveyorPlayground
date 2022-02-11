@@ -5,9 +5,9 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
-cpp_conv::resources::ResourceAsset* textTileLoadHandler(cpp_conv::resources::resource_manager::FileData& rData)
+cpp_conv::resources::ResourceAsset* textTileLoadHandler(const cpp_conv::resources::resource_manager::FileData& data)
 {
-    SDL_RWops* pSrc = SDL_RWFromMem(rData.m_pData, (int)rData.m_uiSize);
+    SDL_RWops* pSrc = SDL_RWFromMem(data.m_pData, static_cast<int>(data.m_uiSize));
     if (!pSrc)
     {
         return nullptr;
@@ -18,8 +18,8 @@ cpp_conv::resources::ResourceAsset* textTileLoadHandler(cpp_conv::resources::res
     {
         return nullptr;
     }
-      
-    SDL_Texture* pTexture = SDL_CreateTextureFromSurface(cpp_conv::apphost::App.renderer, pSurface);
+
+    SDL_Texture* pTexture = SDL_CreateTextureFromSurface(cpp_conv::apphost::app.m_Renderer, pSurface);
     SDL_FreeSurface(pSurface);
 
     if (!pTexture)

@@ -1,14 +1,16 @@
-#include "Input.h"
+// ReSharper disable CppClangTidyConcurrencyMtUnsafe
 #include "AppHost.h"
-#include "Profiler.h"
 #include "CommandType.h"
+#include "Input.h"
+#include "Profiler.h"
 #include "SDL_events.h"
 
 #include <backends/imgui_impl_sdl.h>
-#include "Vector3.h"
 #include "RenderContext.h"
+#include "Vector3.h"
 
-void cpp_conv::input::receiveInput(cpp_conv::SceneContext& kContext, cpp_conv::RenderContext& kRenderContext, std::queue<cpp_conv::commands::CommandType>& commands)
+void cpp_conv::input::receiveInput(SceneContext& kContext, RenderContext& kRenderContext, std::queue<
+                                       commands::CommandType>& commands)
 {
     SDL_Event event;
     // TODO Consider DPI here
@@ -19,7 +21,7 @@ void cpp_conv::input::receiveInput(cpp_conv::SceneContext& kContext, cpp_conv::R
     static bool bRightMouseDown = false;
     static Vector2 vMouseDownPos = {};
     static bool bIsPanActive = {};
-        
+
 
     while (SDL_PollEvent(&event))
     {
@@ -28,19 +30,17 @@ void cpp_conv::input::receiveInput(cpp_conv::SceneContext& kContext, cpp_conv::R
         {
         case SDL_QUIT:
             exit(0);
-            break;
         case SDL_KEYDOWN:
             switch (event.key.keysym.sym)
             {
                 case SDLK_PAGEUP:
-                    commands.push(cpp_conv::commands::CommandType::MoveFloorUp);
+                    commands.push(commands::CommandType::MoveFloorUp);
                     break;
                 case SDLK_PAGEDOWN:
-                    commands.push(cpp_conv::commands::CommandType::MoveFloorDown);
+                    commands.push(commands::CommandType::MoveFloorDown);
                     break;
                 case SDLK_ESCAPE:
                     exit(0);
-                    break;
                 default:
                     break;
             }
@@ -51,6 +51,7 @@ void cpp_conv::input::receiveInput(cpp_conv::SceneContext& kContext, cpp_conv::R
                 case SDL_BUTTON_LEFT: bLeftMouseDown = true; vMouseDownPos = { event.button.x, event.button.y }; break;
                 case SDL_BUTTON_MIDDLE: bMiddleMouseDown = true; break;
                 case SDL_BUTTON_RIGHT: bRightMouseDown = true; break;
+                default:; // Ignored
             }
             break;
         case SDL_MOUSEBUTTONUP:
@@ -59,6 +60,7 @@ void cpp_conv::input::receiveInput(cpp_conv::SceneContext& kContext, cpp_conv::R
                 case SDL_BUTTON_LEFT: bLeftMouseDown = false; bIsPanActive = false;  break;
                 case SDL_BUTTON_MIDDLE: bMiddleMouseDown = false; break;
                 case SDL_BUTTON_RIGHT: bRightMouseDown = false; break;
+                default:; // Ignored
             }
             break;
         case SDL_MOUSEMOTION:
@@ -76,7 +78,7 @@ void cpp_conv::input::receiveInput(cpp_conv::SceneContext& kContext, cpp_conv::R
 
                 if (bIsPanActive)
                 {
-                    Vector2F vRelative = { (float)event.motion.xrel, (float)event.motion.yrel };
+                    const Vector2F vRelative = { static_cast<float>(event.motion.xrel), static_cast<float>(event.motion.yrel) };
                     kRenderContext.m_CameraPosition += (vRelative );
                 }
             }

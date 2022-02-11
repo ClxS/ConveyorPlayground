@@ -12,5 +12,5 @@ namespace cpp_conv
 
 namespace cpp_conv::resources
 {
-    const cpp_conv::resources::AssetPtr<cpp_conv::ConveyorDefinition> getConveyorDefinition(cpp_conv::ConveyorId id);
+    AssetPtr<ConveyorDefinition> getConveyorDefinition(ConveyorId id);
 }

@@ -9,8 +9,8 @@
 cpp_conv::resources::ResourceAsset* textTileLoadHandler(cpp_conv::resources::resource_manager::FileData& rData)
 {
     const wchar_t* pStrData = reinterpret_cast<const wchar_t*>(rData.m_pData);
-     
-    std::wstring copy(pStrData, rData.m_uiSize / sizeof(wchar_t));
+
+    const std::wstring copy(pStrData, rData.m_uiSize / sizeof(wchar_t));
     std::wistringstream ss(copy);
     std::wstring strLine;
 
@@ -19,8 +19,8 @@ cpp_conv::resources::ResourceAsset* textTileLoadHandler(cpp_conv::resources::res
     {
         txt.push_back(strLine);
     }
-     
-    auto pTile = new cpp_conv::resources::TextTileAsset(txt);
+
+    const auto pTile = new cpp_conv::resources::TextTileAsset(txt);
     return pTile;
 }
 

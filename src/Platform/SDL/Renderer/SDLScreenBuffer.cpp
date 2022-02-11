@@ -3,12 +3,12 @@
 #include "SDLAppHost.h"
 #include "SDLWriteSurface.h"
 
-void cpp_conv::renderer::SDLScreenBuffer::Present()
+void cpp_conv::renderer::SDLScreenBuffer::Present() const
 {
-    SDL_RenderPresent(cpp_conv::apphost::App.renderer);
+    SDL_RenderPresent(apphost::app.m_Renderer);
 
-    if (m_rWriteSurface.IsClearOnPresent())
+    if (m_RWriteSurface.IsClearOnPresent())
     {
-        m_rWriteSurface.Clear();
+        m_RWriteSurface.Clear();
     }
 }

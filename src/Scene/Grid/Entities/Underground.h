@@ -18,13 +18,13 @@ namespace cpp_conv
 
         void Tick(const SceneContext& kContext) override;
         void Draw(RenderContext& kRenderContext) const override;
-        bool SupportsInsertion() const override { return true; }
+        [[nodiscard]] bool SupportsInsertion() const override { return true; }
         bool TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, InsertInfo insertInfo) override;
 
-        Direction GetDirection() const override { return m_direction; }
+        [[nodiscard]] Direction GetDirection() const override { return m_direction; }
 
-        const char* GetName() const override { return "Tunnel"; }
-        std::string GetDescription() const override { return ""; }
+        [[nodiscard]] const char* GetName() const override { return "Tunnel"; }
+        [[nodiscard]] std::string GetDescription() const override { return ""; }
 
     private:
         Direction m_direction;

@@ -1,15 +1,18 @@
 #pragma once
 
+// ReSharper disable once CppInconsistentNaming
 struct SDL_Window;
+
+// ReSharper disable once CppInconsistentNaming
 struct SDL_Renderer;
 
 namespace cpp_conv::apphost
 {
     struct SdlContext
     {
-        SDL_Renderer* renderer;
-        SDL_Window* window;
+        SDL_Renderer* m_Renderer;
+        SDL_Window* m_Window;
     };
 
-    extern SdlContext App;
+    extern SdlContext app;
 }
