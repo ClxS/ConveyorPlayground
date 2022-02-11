@@ -31,7 +31,7 @@ cpp_conv::Inserter::Inserter(Vector3 position, Vector3 size, Direction direction
     , m_uiTicksRemainingInState(0)
     , m_eCurrentState(State::WaitingPickup)
 {
-    const cpp_conv::resources::AssetPtr<cpp_conv::InserterDefinition> pFactory = cpp_conv::resources::getInserterDefinition(inserterId);
+    const resources::AssetPtr<InserterDefinition> pFactory = resources::getInserterDefinition(inserterId);
     if (!pFactory)
     {
         return;
@@ -81,25 +81,25 @@ void cpp_conv::Inserter::Tick(const SceneContext& kContext)
 
 void cpp_conv::Inserter::Draw(RenderContext& kRenderContext) const
 {
-    auto pFactory = cpp_conv::resources::getInserterDefinition(m_inserterId);
+    const auto pFactory = resources::getInserterDefinition(m_inserterId);
     if (!pFactory)
     {
         return;
     }
 
-    auto pTile = pFactory->GetTile();
+    const auto pTile = pFactory->GetTile();
     if (!pTile)
     {
         return;
     }
 
-    cpp_conv::renderer::renderAsset(
+    renderer::renderAsset(
         kRenderContext,
         pTile.get(),
         {
-            (float)m_position.GetX() * cpp_conv::renderer::c_gridScale,
-            (float)m_position.GetY() * cpp_conv::renderer::c_gridScale,
-            cpp_conv::rotationFromDirection(m_direction)
+            (float)m_position.GetX() * renderer::c_gridScale,
+            (float)m_position.GetY() * renderer::c_gridScale,
+            rotationFromDirection(m_direction)
         },
         { 0xFF0000FF });
 }
@@ -113,7 +113,7 @@ std::string cpp_conv::Inserter::GetDescription() const
         break;
     case State::Transfering:
     {
-        cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> pItem = cpp_conv::resources::getItemDefinition(m_currentItem);
+        const resources::AssetPtr<ItemDefinition> pItem = resources::getItemDefinition(m_currentItem);
         return std::format("Transfering {}", pItem == nullptr ? "Unknown item" : pItem->GetName());
         break;
     }
@@ -129,7 +129,7 @@ std::string cpp_conv::Inserter::GetDescription() const
 
 bool cpp_conv::Inserter::TryGrabItem(const SceneContext& kContext)
 {
-    auto pSourceEntity = kContext.m_rMap.GetEntity(grid::getBackwardsPosition(*this));
+    const auto pSourceEntity = kContext.m_rMap.GetEntity(grid::getBackwardsPosition(*this));
     if (!pSourceEntity || !pSourceEntity->SupportsProvidingItem())
     {
         return false;
@@ -147,7 +147,7 @@ bool cpp_conv::Inserter::TryGrabItem(const SceneContext& kContext)
 
 bool cpp_conv::Inserter::TryInsertItem(const SceneContext& kContext)
 {
-    auto pTargetEntity = kContext.m_rMap.GetEntity(grid::getForwardPosition(*this));
+    const auto pTargetEntity = kContext.m_rMap.GetEntity(grid::getForwardPosition(*this));
     if (!pTargetEntity || !pTargetEntity->SupportsInsertion())
     {
         return false;

@@ -5,8 +5,8 @@ cpp_conv::renderer::SwapChain::SwapChain(RenderContext& kRenderContext, uint32_t
     , m_writeSurface(kRenderContext, uiWidth, uiHeight, true)
     , m_colourBuffers
     {
-        { m_writeSurface },
-        { m_writeSurface }
+        { ScreenBuffer(m_writeSurface) },
+        { ScreenBuffer(m_writeSurface) }
     }
 {
 }
@@ -28,7 +28,7 @@ void cpp_conv::renderer::SwapChain::SwapAndPresent()
 
 cpp_conv::renderer::WriteSurface& cpp_conv::renderer::SwapChain::GetWriteSurface()
 {
-    return m_writeSurface; 
+    return m_writeSurface;
 }
 
 bool cpp_conv::renderer::SwapChain::RequiresResize(RenderContext& kRenderContext, int iWidth, int iHeight) const

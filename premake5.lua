@@ -1,6 +1,6 @@
 workspace "CppConveyor"
 	location "build"
-	platforms { "Console", "SDL" }
+	platforms { --[["Console",]] "SDL" }
 	configurations { "Debug", "Release" }
 	filter { "platforms:Console" }
 		system "Windows"
@@ -20,7 +20,7 @@ project "CppConveyor"
 	language "C++"
 	editandcontinue "On"
 	debugdir "$(TargetDir)"
-	files { 
+	files {
 		".editorconfig",
 		"data/**",
 		"src/**"
@@ -48,12 +48,12 @@ project "CppConveyor"
 			'robocopy "' .. path.getabsolute("data/common") .. '" "$(TargetDir)data" /E',
 		}
 		if os.isdir(path.getabsolute('data/sdlPrivate')) then
-			print("Private assets exist, using those")			
+			print("Private assets exist, using those")
 			postbuildcommands {
 				'robocopy "' .. path.getabsolute("data/sdlPrivate") .. '" "$(TargetDir)data/platform" /E',
 				'exit /b 0'
 			}
-		else			
+		else
 			postbuildcommands {
 				'robocopy "' .. path.getabsolute("data/sdl") .. '" "$(TargetDir)data/platform" /E',
 				'exit /b 0'

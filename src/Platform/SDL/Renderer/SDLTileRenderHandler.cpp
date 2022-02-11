@@ -1,10 +1,9 @@
-#include "RenderContext.h"
 #include "RenderableAsset.h"
-#include "Transform2D.h"
-#include "Renderer.h"
+#include "RenderContext.h"
+#include "SDLAppHost.h"
 #include "SDLTileAsset.h"
 #include "SelfRegistration.h"
-#include "SDLAppHost.h"
+#include "Transform2D.h"
 
 #include <SDL.h>
 #include <SDL_render.h>
@@ -15,7 +14,7 @@ void tileRenderer(
     const cpp_conv::resources::RenderableAsset* pAsset,
     const cpp_conv::Transform2D& kTransform,
     cpp_conv::Colour kColourOverride,
-    bool bTrack)
+    const bool bTrack)
 {
     PROFILE_FUNC();
     SDL_Rect dest = {};
@@ -29,13 +28,13 @@ void tileRenderer(
     if (kTransform.m_bFillScreen)
     {
         int windowWidth, windowHeight;
-        SDL_GetWindowSize(cpp_conv::apphost::App.window, &windowWidth, &windowHeight);
-        SDL_QueryTexture(pTexture, NULL, NULL, &dest.w, &dest.h);
+        SDL_GetWindowSize(cpp_conv::apphost::app.m_Window, &windowWidth, &windowHeight);
+        SDL_QueryTexture(pTexture, nullptr, nullptr, &dest.w, &dest.h);
 
-        int screenCameraX = (int)(kContext.m_CameraPosition.GetX());
-        int screenCameraY = (int)(kContext.m_CameraPosition.GetY());
-        dest.w *= kContext.m_fZoom;
-        dest.h *= kContext.m_fZoom;
+        const int screenCameraX = static_cast<int>(kContext.m_CameraPosition.GetX());
+        const int screenCameraY = static_cast<int>(kContext.m_CameraPosition.GetY());
+        dest.w = static_cast<int>(static_cast<float>(dest.w) * kContext.m_fZoom);
+        dest.h = static_cast<int>(static_cast<float>(dest.h) * kContext.m_fZoom);
         for (int y = -dest.h + (screenCameraY % dest.h); y < windowHeight; y += dest.h)
         {
             for (int x = -dest.w + (screenCameraX % dest.w); x < windowWidth; x += dest.w)
@@ -44,7 +43,7 @@ void tileRenderer(
                 dest.y = y;
 
 
-                SDL_RenderCopy(cpp_conv::apphost::App.renderer, pTexture, NULL, &dest);
+                SDL_RenderCopy(cpp_conv::apphost::app.m_Renderer, pTexture, nullptr, &dest);
                 if (bTrack)
                 {
                     ++kContext.m_uiDrawnItems;
@@ -69,24 +68,28 @@ void tileRenderer(
         case Rotation::Deg270:
             angle = 270.0f;
             break;
-        default:
-            break;
         }
 
-        dest.x = (int)(kTransform.m_x * 16 * kContext.m_fZoom) + kContext.m_CameraPosition.GetX();
-        dest.y = (int)(kTransform.m_y * 16 * kContext.m_fZoom) + kContext.m_CameraPosition.GetY();
-        SDL_QueryTexture(pTexture, NULL, NULL, &dest.w, &dest.h);
-        SDL_Point rotatePivot = { dest.w * kContext.m_fZoom / 2, dest.h * kContext.m_fZoom / 2 };
+        dest.x = static_cast<int>(kTransform.m_x * 16 * kContext.m_fZoom + kContext.m_CameraPosition.GetX());
+        dest.y = static_cast<int>(kTransform.m_y * 16 * kContext.m_fZoom + kContext.m_CameraPosition.GetY());
+        SDL_QueryTexture(pTexture, nullptr, nullptr, &dest.w, &dest.h);
 
-        dest.w *= kContext.m_fZoom;
-        dest.h *= kContext.m_fZoom;
+        const SDL_Point rotatePivot =
+        {
+            static_cast<int>(static_cast<float>(dest.w) * kContext.m_fZoom / 2),
+            static_cast<int>(static_cast<float>(dest.h) * kContext.m_fZoom / 2)
+        };
+
+        dest.w = static_cast<int>(static_cast<float>(dest.w) * kContext.m_fZoom);
+        dest.h = static_cast<int>(static_cast<float>(dest.h) * kContext.m_fZoom);
 
         int windowWidth, windowHeight;
-        SDL_GetWindowSize(cpp_conv::apphost::App.window, &windowWidth, &windowHeight);
+        SDL_GetWindowSize(cpp_conv::apphost::app.m_Window, &windowWidth, &windowHeight);
         if ((dest.x + dest.w >= 0 || dest.x <= windowWidth) && (dest.y + dest.h >= 0 || dest.y <= windowHeight))
         {
             SDL_SetTextureAlphaMod(pTexture, kContext.m_LayerColour.m_argb.m_a);
-            SDL_RenderCopyEx(cpp_conv::apphost::App.renderer, pTexture, NULL, &dest, angle, &rotatePivot, SDL_RendererFlip::SDL_FLIP_NONE);
+            SDL_RenderCopyEx(cpp_conv::apphost::app.m_Renderer, pTexture, nullptr, &dest, angle, &rotatePivot,  // NOLINT(clang-diagnostic-double-promotion)
+                             SDL_FLIP_NONE);
 
             if (bTrack)
             {

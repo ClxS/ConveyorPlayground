@@ -12,14 +12,14 @@ namespace cpp_conv::renderer
     class SDLWriteSurface
     {
     public:
-        SDLWriteSurface(cpp_conv::RenderContext& kRenderContext,
-                        uint16_t uiWidth,
-                        uint16_t uiHeight,
-                        bool bClearOnPresent)
+        SDLWriteSurface(RenderContext& kRenderContext,
+                        const uint16_t uiWidth,
+                        const uint16_t uiHeight,
+                        const bool bClearOnPresent)
             : m_uiWidth(uiWidth)
             , m_uiHeight(uiHeight)
-            , m_bClearOnPresent(true)
-        { 
+            , m_bClearOnPresent(bClearOnPresent)
+        {
         }
 
         void Initialize() {}

@@ -174,7 +174,7 @@ struct Vector2 : public Vector<2, int32_t, Vector2>
 
     [[nodiscard]] Vector2 Rotate(Rotation rotation, Vector2 size) const
     {
-        Vector2 c_offset(1, 1);
+        const Vector2 c_offset(1, 1);
 
         size -= c_offset;
         switch (rotation)

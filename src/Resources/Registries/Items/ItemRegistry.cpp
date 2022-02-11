@@ -21,7 +21,7 @@ namespace
     {
         for (int i = 0; i < sizeof(cpp_conv::resources::registry::c_szItemsPaths) / sizeof(std::filesystem::path); i++)
         {
-            RegistryId asset = { i, 2 };
+            const RegistryId asset = { i, 2 };
             auto pAsset = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::ItemDefinition>(asset);
             if (!pAsset)
             {
@@ -35,9 +35,9 @@ namespace
 
 cpp_conv::resources::ResourceAsset* itemAssetHandler(cpp_conv::resources::resource_manager::FileData& rData)
 {
-    const char* pStrData = reinterpret_cast<const char*>(rData.m_pData);
+    const auto pStrData = reinterpret_cast<const char*>(rData.m_pData);
 
-    std::string copy(pStrData, rData.m_uiSize / sizeof(char));
+    const std::string copy(pStrData, rData.m_uiSize / sizeof(char));
     std::istringstream ss(copy);
 
     std::string id;
@@ -64,7 +64,7 @@ cpp_conv::resources::ResourceAsset* itemAssetHandler(cpp_conv::resources::resour
     return new cpp_conv::ItemDefinition(cpp_conv::ItemId::FromStringId(id), rData.m_registryId, name);
 }
 
-const cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> cpp_conv::resources::getItemDefinition(cpp_conv::ItemId id)
+cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> cpp_conv::resources::getItemDefinition(const ItemId id)
 {
     PROFILE_FUNC();
     for (auto item : g_vItems)

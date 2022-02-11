@@ -10,7 +10,7 @@ namespace cpp_conv::resources
     {
     public:
         Map();
-        ~Map();
+        ~Map() override;
 
         std::vector<Conveyor*>& GetConveyors();
         std::vector<Entity*>& GetOtherEntities();

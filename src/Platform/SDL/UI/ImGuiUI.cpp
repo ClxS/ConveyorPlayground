@@ -1,8 +1,8 @@
 #include <cstdint>
 
+#include "AppHost.h"
 #include "Gui.h"
 #include "RenderContext.h"
-#include "AppHost.h"
 #include "SDLAppHost.h"
 
 #include <imgui.h>
@@ -15,14 +15,14 @@ void cpp_conv::ui::initializeGuiSystem()
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
-    ImGui_ImplSDL2_InitForSDLRenderer(cpp_conv::apphost::App.window);
-    ImGui_ImplSDLRenderer_Init(cpp_conv::apphost::App.renderer);
+    ImGui_ImplSDL2_InitForSDLRenderer(apphost::app.m_Window);
+    ImGui_ImplSDLRenderer_Init(apphost::app.m_Renderer);
 }
 
 void cpp_conv::ui::newFrame()
 {
     ImGui_ImplSDLRenderer_NewFrame();
-    ImGui_ImplSDL2_NewFrame(cpp_conv::apphost::App.window);
+    ImGui_ImplSDL2_NewFrame(apphost::app.m_Window);
 }
 
 void cpp_conv::ui::present()
@@ -34,7 +34,7 @@ void cpp_conv::ui::present()
     }
 
     ImGui_ImplSDLRenderer_RenderDrawData(pDrawData);
-    SDL_RenderPresent(cpp_conv::apphost::App.renderer);
+    SDL_RenderPresent(apphost::app.m_Renderer);
 }
 
 void cpp_conv::ui::shutdown()

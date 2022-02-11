@@ -42,7 +42,7 @@ namespace cpp_conv
         [[nodiscard]] uint32_t GetCurrentTick() const { return m_pHeadConveyor->m_uiCurrentTick; }
 
     private:
-        [[nodiscard]] bool MoveItemToForwardsNode(const cpp_conv::SceneContext& kContext, const cpp_conv::Conveyor& pNode, int lane) const;
+        [[nodiscard]] bool MoveItemToForwardsNode(const SceneContext& kContext, const Conveyor& pNode, int lane) const;
 
     private:
         friend class Conveyor;
@@ -123,5 +123,5 @@ namespace cpp_conv
     Conveyor* traceHeadConveyor(WorldMap& map, const Conveyor& searchStart);
     const Conveyor* traceTailConveyor(WorldMap& map, const Conveyor& searchStart, const Conveyor& head, std::vector<Conveyor*>& vOutConveyors);
     std::vector<Sequence*> initializeSequences(WorldMap& map, const std::vector<Conveyor*>& conveyors);
-    std::tuple<int, Direction> getInnerMostCornerChannel(const cpp_conv::WorldMap& map, const Conveyor& rConveyor);
+    std::tuple<int, Direction> getInnerMostCornerChannel(const WorldMap& map, const Conveyor& rConveyor);
 }

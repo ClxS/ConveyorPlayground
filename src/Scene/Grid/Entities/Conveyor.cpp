@@ -74,8 +74,8 @@ void DrawConveyor(
     Direction direction,
     Direction cornerSourceDirection)
 {
-    cpp_conv::Transform2D transform = { (float)x, (float)y, cpp_conv::rotationFromDirection(direction) };
-    auto pTile = rConveyor.GetTile();
+    const cpp_conv::Transform2D transform = { (float)x, (float)y, cpp_conv::rotationFromDirection(direction) };
+    const auto pTile = rConveyor.GetTile();
     if (pTile)
     {
         tileRenderer(kContext, pTile.get(), transform);
@@ -107,11 +107,11 @@ void cpp_conv::Conveyor::Tick(const SceneContext& kContext)
     }
 
     m_uiCurrentTick = 0;
-    for (int iChannelIdx = 0; iChannelIdx < cpp_conv::c_conveyorChannels; iChannelIdx++)
+    for (int iChannelIdx = 0; iChannelIdx < c_conveyorChannels; iChannelIdx++)
     {
-        cpp_conv::Conveyor::Channel& rChannel = m_pChannels[iChannelIdx];
+        Channel& rChannel = m_pChannels[iChannelIdx];
 
-        int iChannelLength = cpp_conv::c_conveyorChannelSlots;
+        int iChannelLength = c_conveyorChannelSlots;
         if (m_bIsCorner)
         {
             iChannelLength += m_iInnerMostChannel == iChannelIdx ? -1 : 1;
@@ -120,7 +120,7 @@ void cpp_conv::Conveyor::Tick(const SceneContext& kContext)
         ItemInstance& rLeadingItem = rChannel.m_pSlots[iChannelLength - 1].m_Item;
         if (!rLeadingItem.IsEmpty())
         {
-            cpp_conv::Entity* pForwardEntity = kContext.m_rMap.GetEntity(grid::getForwardPosition(*this));
+            Entity* pForwardEntity = kContext.m_rMap.GetEntity(grid::getForwardPosition(*this));
             if (pForwardEntity &&
                 pForwardEntity->SupportsInsertion() &&
                 pForwardEntity->TryInsert(
@@ -162,10 +162,10 @@ void cpp_conv::Conveyor::Tick(const SceneContext& kContext)
 
 void cpp_conv::Conveyor::Realize()
 {
-    for (int iChannelIdx = 0; iChannelIdx < cpp_conv::c_conveyorChannels; iChannelIdx++)
+    for (int iChannelIdx = 0; iChannelIdx < c_conveyorChannels; iChannelIdx++)
     {
-        cpp_conv::Conveyor::Channel& rChannel = m_pChannels[iChannelIdx];
-        int iChannelLength = cpp_conv::c_conveyorChannelSlots;
+        Channel& rChannel = m_pChannels[iChannelIdx];
+        int iChannelLength = c_conveyorChannelSlots;
         if (m_bIsCorner)
         {
             iChannelLength += m_iInnerMostChannel == iChannelIdx ? -1 : 1;
@@ -185,10 +185,10 @@ void cpp_conv::Conveyor::Realize()
 void cpp_conv::Conveyor::Draw(RenderContext& kContext) const
 {
     PROFILE_FUNC();
-    int conveyorX = m_position.GetX() * 4;
-    int conveyorY = m_position.GetY() * 4;
+    const int conveyorX = m_position.GetX() * 4;
+    const int conveyorY = m_position.GetY() * 4;
 
-    bool bIsCorner = IsCorner();
+    const bool bIsCorner = IsCorner();
 
     switch (kContext.m_uiCurrentDrawPass)
     {
@@ -210,7 +210,7 @@ void cpp_conv::Conveyor::Draw(RenderContext& kContext) const
         PROFILE_SCOPE(Conveyor_Pass1);
         for (int uiChannel = 0; uiChannel < c_conveyorChannels; uiChannel++)
         {
-            int iChannelLength = cpp_conv::c_conveyorChannelSlots;
+            int iChannelLength = c_conveyorChannelSlots;
             if (m_bIsCorner)
             {
                 iChannelLength += m_iInnerMostChannel == uiChannel ? -1 : 1;
@@ -224,7 +224,7 @@ void cpp_conv::Conveyor::Draw(RenderContext& kContext) const
                     continue;
                 }
 
-                cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> pItem = cpp_conv::resources::getItemDefinition(itemInstance.m_Item);
+                const resources::AssetPtr<ItemDefinition> pItem = resources::getItemDefinition(itemInstance.m_Item);
                 if (!pItem)
                 {
                     continue;
@@ -256,13 +256,13 @@ void cpp_conv::Conveyor::Draw(RenderContext& kContext) const
 
 bool cpp_conv::Conveyor::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, const InsertInfo insertInfo)
 {
-    const cpp_conv::Conveyor::Channel* pTargetChannel = cpp_conv::targeting_util::getTargetChannel(kContext.m_rMap, pSourceEntity, *this, insertInfo.GetSourceChannel());
+    const Channel* pTargetChannel = targeting_util::getTargetChannel(kContext.m_rMap, pSourceEntity, *this, insertInfo.GetSourceChannel());
     if (!pTargetChannel)
     {
         return false;
     }
 
-    const int forwardTargetItemSlot = cpp_conv::targeting_util::getChannelTargetSlot(kContext.m_rMap, pSourceEntity, *this, insertInfo.GetSourceChannel());
+    const int forwardTargetItemSlot = targeting_util::getChannelTargetSlot(kContext.m_rMap, pSourceEntity, *this, insertInfo.GetSourceChannel());
     if (HasItemInSlot(pTargetChannel->m_ChannelLane, forwardTargetItemSlot))
     {
         return false;
@@ -274,14 +274,14 @@ bool cpp_conv::Conveyor::TryInsert(const SceneContext& kContext, const Entity& p
 
 bool cpp_conv::Conveyor::TryGrab(const SceneContext& kContext, bool bSingle, std::tuple<ItemId, uint32_t>& outItem)
 {
-    bool bIsCorner = IsCorner();
+    const bool bIsCorner = IsCorner();
     int iInnerMostChannel;
     Direction eCornerDirection;
     std::tie(iInnerMostChannel, eCornerDirection) = getInnerMostCornerChannel(kContext.m_rMap, *this);
 
     for (int iChannelIdx = 0; iChannelIdx < c_conveyorChannels; ++iChannelIdx)
     {
-        int iChannelLength = cpp_conv::c_conveyorChannelSlots;
+        int iChannelLength = c_conveyorChannelSlots;
         if (bIsCorner)
         {
             iChannelLength += iInnerMostChannel == iChannelIdx ? -1 : 1;
@@ -303,11 +303,11 @@ bool cpp_conv::Conveyor::TryGrab(const SceneContext& kContext, bool bSingle, std
 
 std::string cpp_conv::Conveyor::GetDescription() const
 {
-    std::map<cpp_conv::ItemId, int> storedItems;
+    std::map<ItemId, int> storedItems;
 
     for (int iChannelIdx = 0; iChannelIdx < c_conveyorChannels; ++iChannelIdx)
     {
-        for (int iChannelSlot = 0; iChannelSlot < cpp_conv::c_conveyorChannelSlots; ++iChannelSlot)
+        for (int iChannelSlot = 0; iChannelSlot < c_conveyorChannelSlots; ++iChannelSlot)
         {
             ItemId item = m_pChannels[iChannelIdx].m_pSlots[iChannelSlot].m_Item.m_Item;
             if (!item.IsEmpty())
@@ -337,7 +337,7 @@ std::string cpp_conv::Conveyor::GetDescription() const
                 str += ", ";
             }
 
-            cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> pItem = cpp_conv::resources::getItemDefinition(item);
+            resources::AssetPtr<ItemDefinition> pItem = resources::getItemDefinition(item);
             if (pItem)
             {
                 str += std::format("{} {}", count, pItem->GetName());
@@ -352,12 +352,12 @@ std::string cpp_conv::Conveyor::GetDescription() const
     return str;
 }
 
-void cpp_conv::Conveyor::AssessPosition(const cpp_conv::WorldMap& map)
+void cpp_conv::Conveyor::AssessPosition(const WorldMap& map)
 {
-    const Entity* pEntity = map.GetEntity(cpp_conv::grid::getForwardPosition(m_position, m_direction));
+    const Entity* pEntity = map.GetEntity(grid::getForwardPosition(m_position, m_direction));
 
-    m_bIsCorner = cpp_conv::targeting_util::isCornerConveyor(map, *this);
-    m_bIsClockwise = cpp_conv::targeting_util::isClockwiseCorner(map, *this);
+    m_bIsCorner = targeting_util::isCornerConveyor(map, *this);
+    m_bIsClockwise = targeting_util::isClockwiseCorner(map, *this);
     m_bIsCapped = !pEntity || !pEntity->SupportsInsertion();
 
     std::tie(m_iInnerMostChannel, m_eCornerDirection) = getInnerMostCornerChannel(map, *this);
@@ -372,7 +372,7 @@ void cpp_conv::Conveyor::AssessPosition(const cpp_conv::WorldMap& map)
 
         for (int iSlot = 0; iSlot < static_cast<int>(m_pChannels[iLane].m_pSlots.size()); iSlot++)
         {
-            m_pChannels[iLane].m_pSlots[iSlot].m_VisualPosition = cpp_conv::targeting_util::getRenderPosition(map, *this, { iLane, iSlot });
+            m_pChannels[iLane].m_pSlots[iSlot].m_VisualPosition = targeting_util::getRenderPosition(map, *this, { iLane, iSlot });
         }
     }
 
@@ -380,22 +380,22 @@ void cpp_conv::Conveyor::AssessPosition(const cpp_conv::WorldMap& map)
     {
         if (!IsCapped())
         {
-            m_pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Conveyor_Straight);
+            m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::visual::Conveyor_Straight);
         }
         else
         {
-            m_pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Conveyor_Straight_End);
+            m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::visual::Conveyor_Straight_End);
         }
     }
     else
     {
         if (IsClockwiseCorner())
         {
-            m_pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Conveyor_CornerClockwise);
+            m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::visual::Conveyor_CornerClockwise);
         }
         else
         {
-            m_pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Conveyor_CornerAntiClockwise);
+            m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::visual::Conveyor_CornerAntiClockwise);
         }
     }
 }
@@ -436,9 +436,9 @@ bool cpp_conv::Conveyor::HasItemInSlot(int lane, int slot)
         return m_pSequence->HasItemInSlot(m_uiSequenceIndex, lane, slot);
     }
 
-    cpp_conv::Conveyor::Channel& rTargetChannel = m_pChannels[lane];
-    ItemInstance& forwardTargetItem = rTargetChannel.m_pSlots[slot].m_Item;
-    ItemInstance& forwardPendingItem = rTargetChannel.m_pPendingItems[slot];
+    Channel& rTargetChannel = m_pChannels[lane];
+    const ItemInstance& forwardTargetItem = rTargetChannel.m_pSlots[slot].m_Item;
+    const ItemInstance& forwardPendingItem = rTargetChannel.m_pPendingItems[slot];
 
     return (!forwardTargetItem.IsEmpty() || !forwardPendingItem.IsEmpty());
 }

@@ -21,7 +21,7 @@ namespace
     {
         for (int i = 0; i < sizeof(cpp_conv::resources::registry::c_szRecipes) / sizeof(std::filesystem::path); i++)
         {
-            RegistryId asset = { i, 8 };
+            const RegistryId asset = { i, 8 };
             auto pAsset = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::RecipeDefinition>(asset);
             if (!pAsset)
             {
@@ -34,7 +34,7 @@ namespace
 
     cpp_conv::resources::ResourceAsset* recipeAssetHandler(cpp_conv::resources::resource_manager::FileData& rData)
     {
-        const char* pStrData = reinterpret_cast<const char*>(rData.m_pData);
+        const auto pStrData = reinterpret_cast<const char*>(rData.m_pData);
 
         std::string copy(pStrData, rData.m_uiSize / sizeof(char));
         std::istringstream ss(copy);
@@ -62,7 +62,7 @@ namespace
             case 2: effort = std::stoi(token); break;
             case 3: break;
             default:
-                if (token == "")
+                if (token.empty())
                 {
                     bIsInputItems = true;
                 }
@@ -86,7 +86,7 @@ namespace
     }
 }
 
-const cpp_conv::resources::AssetPtr<cpp_conv::RecipeDefinition> cpp_conv::resources::getRecipeDefinition(cpp_conv::RecipeId id)
+cpp_conv::resources::AssetPtr<cpp_conv::RecipeDefinition> cpp_conv::resources::getRecipeDefinition(const RecipeId id)
 {
     PROFILE_FUNC();
     for (auto item : g_vRecipes)

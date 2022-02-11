@@ -10,12 +10,12 @@
 
 namespace cpp_conv
 {
-    class InserterDefinition : public cpp_conv::resources::ResourceAsset
+    class InserterDefinition : public resources::ResourceAsset
     {
     public:
         InserterDefinition(
-            cpp_conv::InserterId internalId,
-            cpp_conv::resources::registry::RegistryId registryId,
+            InserterId internalId,
+            resources::registry::RegistryId registryId,
             std::string strName,
             uint32_t uiTransitTime,
             uint32_t uiCooldownTime,
@@ -29,18 +29,18 @@ namespace cpp_conv
         {
         }
 
-        [[nodiscard]] cpp_conv::InserterId GetInternalId() const { return m_internalId; }
+        [[nodiscard]] InserterId GetInternalId() const { return m_internalId; }
 
         [[nodiscard]] const std::string& GetName() const { return m_strName; }
-        [[nodiscard]] cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> GetTile() const;
+        [[nodiscard]] resources::AssetPtr<resources::TileAsset> GetTile() const;
 
         [[nodiscard]] uint32_t GetTransitTime() const { return m_uiTransitTime; }
         [[nodiscard]] uint32_t GetCooldownTime() const { return m_uiCooldownTime; }
         [[nodiscard]] bool IsStackingInserter() const { return m_bSupportsStacks; }
 
     private:
-        cpp_conv::InserterId m_internalId;
-        cpp_conv::resources::registry::RegistryId m_registryId;
+        InserterId m_internalId;
+        resources::registry::RegistryId m_registryId;
         std::string m_strName;
 
         uint32_t m_uiTransitTime;

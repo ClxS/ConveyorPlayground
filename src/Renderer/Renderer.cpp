@@ -28,7 +28,7 @@ namespace
     std::function<void(cpp_conv::RenderContext&, const cpp_conv::resources::RenderableAsset*, cpp_conv::Transform2D, cpp_conv::Colour, bool)>* getTypeHandler(const std::type_info& type)
     {
         // No need to lock here, this is only called in the context of an existing lock
-        auto iter = g_typeHandlers.find(type.hash_code());
+        const auto iter = g_typeHandlers.find(type.hash_code());
         if (iter == g_typeHandlers.end())
         {
             return nullptr;
@@ -38,7 +38,7 @@ namespace
     }
 }
 
-void cpp_conv::renderer::init(cpp_conv::RenderContext& kContext, cpp_conv::renderer::SwapChain& rSwapChain)
+void cpp_conv::renderer::init(RenderContext& kContext, SwapChain& rSwapChain)
 {
     ScreenBufferInitArgs kArgs = { };
     rSwapChain.Initialize(kContext, kArgs);
@@ -47,7 +47,7 @@ void cpp_conv::renderer::init(cpp_conv::RenderContext& kContext, cpp_conv::rende
 
 void drawPlayer(const cpp_conv::SceneContext& kSceneContext, cpp_conv::RenderContext& kRenderContext)
 {
-    auto pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Player);
+    const auto pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Player);
     if (!pTile)
     {
         return;
@@ -69,12 +69,12 @@ void cpp_conv::renderer::render(const SceneContext& kSceneContext, RenderContext
     drawBackground(kSceneContext, kContext);
 
     int width, height;
-    std::tie(width, height) = cpp_conv::apphost::getAppDimensions();
+    std::tie(width, height) = apphost::getAppDimensions();
 
-    Vector2F startCellPosition = kContext.m_CameraPosition / kContext.m_fZoom * -1.0f / 64;
-    Vector2F endCellPosition = (kContext.m_CameraPosition / kContext.m_fZoom * -1.0f + Vector2F((float)width, (float)height) / kContext.m_fZoom) / 64;
-    WorldMap::CellCoordinate startCoord = WorldMap::ToCellSpace({ (int)startCellPosition.GetX(), (int)startCellPosition.GetY(), 0 });
-    WorldMap::CellCoordinate endCoord = WorldMap::ToCellSpace({ (int)std::ceil(endCellPosition.GetX()), (int)std::ceil(endCellPosition.GetY()), 0 });
+    const Vector2F startCellPosition = kContext.m_CameraPosition / kContext.m_fZoom * -1.0f / 64;
+    const Vector2F endCellPosition = (kContext.m_CameraPosition / kContext.m_fZoom * -1.0f + Vector2F((float)width, (float)height) / kContext.m_fZoom) / 64;
+    const WorldMap::CellCoordinate startCoord = WorldMap::ToCellSpace({ (int)startCellPosition.GetX(), (int)startCellPosition.GetY(), 0 });
+    const WorldMap::CellCoordinate endCoord = WorldMap::ToCellSpace({ (int)std::ceil(endCellPosition.GetX()), (int)std::ceil(endCellPosition.GetY()), 0 });
 
      uint32_t uiPassCount = 0;
      WorldMap::CellCoordinate currentCoord = startCoord;
@@ -141,7 +141,7 @@ void cpp_conv::renderer::render(const SceneContext& kSceneContext, RenderContext
 void cpp_conv::renderer::renderAsset(const std::type_info& type, RenderContext& kContext, resources::RenderableAsset* pRenderable, Transform2D transform, Colour kColourOverride, bool bTrack)
 {
     PROFILE_FUNC();
-    std::function<void(cpp_conv::RenderContext&, const resources::RenderableAsset*, cpp_conv::Transform2D, cpp_conv::Colour, bool)>* pHandler = nullptr;
+    const std::function<void(RenderContext&, const resources::RenderableAsset*, Transform2D, Colour, bool)>* pHandler = nullptr;
     {
         std::lock_guard<std::mutex> lock(getStateMutex());
         pHandler = getTypeHandler(type);
@@ -155,28 +155,30 @@ void cpp_conv::renderer::renderAsset(const std::type_info& type, RenderContext& 
     (*pHandler)(kContext, pRenderable, std::move(transform), kColourOverride, bTrack);
 }
 
-void cpp_conv::renderer::registerTypeHandler(const std::type_info& type, std::function<void(cpp_conv::RenderContext&, const resources::RenderableAsset*, cpp_conv::Transform2D, cpp_conv::Colour, bool)> fHandler)
+void cpp_conv::renderer::registerTypeHandler(const std::type_info& type, std::function<void(RenderContext&, const resources::RenderableAsset*,
+                                                 Transform2D, Colour, bool)> fHandler)
 {
     std::lock_guard<std::mutex> lock(getStateMutex());
-    g_typeHandlers[type.hash_code()] = new std::function<void(cpp_conv::RenderContext&, const resources::RenderableAsset*, cpp_conv::Transform2D, cpp_conv::Colour, bool)>(fHandler);
+    g_typeHandlers[type.hash_code()] = new std::function<void(RenderContext&, const resources::RenderableAsset*,
+                                                              Transform2D, Colour, bool)>(fHandler);
 }
 
 void cpp_conv::renderer::drawBackground(const SceneContext& kSceneContext, RenderContext& kContext)
 {
     PROFILE_FUNC();
-    auto pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(
-        cpp_conv::resources::registry::visual::BackgroundRepeating);
+    const auto pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(
+        resources::registry::visual::BackgroundRepeating);
     if (!pTile)
     {
         return;
     }
 
-    cpp_conv::renderer::renderAsset(
+    renderAsset(
         kContext,
         pTile.get(),
         {
-            (float)kSceneContext.m_player.GetX() * cpp_conv::renderer::c_gridScale,
-            (float)kSceneContext.m_player.GetY() * cpp_conv::renderer::c_gridScale,
+            (float)kSceneContext.m_player.GetX() * c_gridScale,
+            (float)kSceneContext.m_player.GetY() * c_gridScale,
             Rotation::DegZero,
             true
         },

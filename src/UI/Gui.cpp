@@ -28,7 +28,7 @@ void cpp_conv::ui::drawUI(SceneContext& kSceneContext, RenderContext& kRenderCon
 
     ImGui::NewFrame();
 
-    ImGuiWindowFlags flags = 0;
+    const ImGuiWindowFlags flags = 0;
 
     /*uint64_t uiItemCount = 0;
     for (auto& sequence : kSceneContext.m_sequences)

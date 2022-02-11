@@ -12,14 +12,14 @@ void cpp_conv::input::receiveInput(cpp_conv::SceneContext& kContext, cpp_conv::R
 {
     DWORD dwPendingEvents;
 
-    HANDLE hInputHandle = GetStdHandle(STD_INPUT_HANDLE);
+    const HANDLE hInputHandle = GetStdHandle(STD_INPUT_HANDLE);
     if (!GetNumberOfConsoleInputEvents(hInputHandle, &dwPendingEvents))
     {
         printf("GetNumberOfConsoleInputEvents failed: %i\n", GetLastError());
         return;
     }
 
-    DWORD fdwMode = ENABLE_EXTENDED_FLAGS | ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT;
+    const DWORD fdwMode = ENABLE_EXTENDED_FLAGS | ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT;
     if (!SetConsoleMode(hInputHandle, fdwMode))
     {
 

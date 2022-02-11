@@ -21,7 +21,7 @@ namespace
     {
         for (int i = 0; i < sizeof(cpp_conv::resources::registry::c_szInserterPaths) / sizeof(std::filesystem::path); i++)
         {
-            RegistryId asset = { i, 6 };
+            const RegistryId asset = { i, 6 };
             auto pAsset = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::InserterDefinition>(asset);
             if (!pAsset)
             {
@@ -35,9 +35,9 @@ namespace
 
 cpp_conv::resources::ResourceAsset* inserterAssetHandler(cpp_conv::resources::resource_manager::FileData& rData)
 {
-    const char* pStrData = reinterpret_cast<const char*>(rData.m_pData);
+    const auto pStrData = reinterpret_cast<const char*>(rData.m_pData);
 
-    std::string copy(pStrData, rData.m_uiSize / sizeof(char));
+    const std::string copy(pStrData, rData.m_uiSize / sizeof(char));
     std::istringstream ss(copy);
 
     std::string id;
@@ -70,7 +70,8 @@ cpp_conv::resources::ResourceAsset* inserterAssetHandler(cpp_conv::resources::re
     return new cpp_conv::InserterDefinition(cpp_conv::InserterId::FromStringId(id), rData.m_registryId, name, uiTransitTime, uiCooldownTime, bSupportsStacks);
 }
 
-const cpp_conv::resources::AssetPtr<cpp_conv::InserterDefinition> cpp_conv::resources::getInserterDefinition(cpp_conv::InserterId id)
+cpp_conv::resources::AssetPtr<cpp_conv::InserterDefinition> cpp_conv::resources::getInserterDefinition(
+    const InserterId id)
 {
     PROFILE_FUNC();
     for (auto item : g_vInsertersItems)

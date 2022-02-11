@@ -110,15 +110,15 @@ void cpp_conv::game::run()
     srand((unsigned int)time(NULL));
 
     int iWidth, iHeight;
-    std::tie(iWidth, iHeight) = cpp_conv::apphost::getAppDimensions();
+    std::tie(iWidth, iHeight) = apphost::getAppDimensions();
 
-    cpp_conv::resources::registration::processSelfRegistrations();
+    registration::processSelfRegistrations();
 
     WorldMap worldMap;
     {
         //CreateMillionTileMap(worldMap);
 
-        AssetPtr<Map> map = resource_manager::loadAssetUncached<Map>(registry::data::MapSimple);
+        const AssetPtr<Map> map = resource_manager::loadAssetUncached<Map>(registry::data::MapSimple);
         worldMap.Consume(map);
 
         /*map = resource_manager::loadAssetUncached<Map>(registry::data::MapSimple1);
@@ -139,8 +139,8 @@ void cpp_conv::game::run()
         worldMap.PopulateCorners();
     }
 
-    std::vector<cpp_conv::Sequence*> sequences = cpp_conv::initializeSequences(worldMap, worldMap.GetConveyors());
-    cpp_conv::SceneContext kSceneContext =
+    std::vector<Sequence*> sequences = initializeSequences(worldMap, worldMap.GetConveyors());
+    SceneContext kSceneContext =
     { 
         {},
         worldMap,
@@ -153,7 +153,7 @@ void cpp_conv::game::run()
         }
     };
 
-    cpp_conv::RenderContext kRenderContext =
+    RenderContext kRenderContext =
     {
         { 0, 0 },
         0,
@@ -164,13 +164,13 @@ void cpp_conv::game::run()
         0.8f
     };
 
-    cpp_conv::renderer::SwapChain swapChain(kRenderContext, iWidth, iHeight);
-    cpp_conv::renderer::init(kRenderContext, swapChain);
+    renderer::SwapChain swapChain(kRenderContext, iWidth, iHeight);
+    init(kRenderContext, swapChain);
 
-    cpp_conv::FrameLimiter frameLimter(1);
-    std::queue<cpp_conv::commands::CommandType> commands;
+    FrameLimiter frameLimter(1);
+    std::queue<commands::CommandType> commands;
 
-    cpp_conv::ui::initializeGuiSystem();
+    ui::initializeGuiSystem();
 
 
     frameLimter.Start();
@@ -205,6 +205,6 @@ void cpp_conv::game::run()
         frameLimter.EndFrame();
     }
 
-    cpp_conv::ui::shutdown();
+    ui::shutdown();
 }
 

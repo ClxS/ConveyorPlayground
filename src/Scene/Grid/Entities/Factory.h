@@ -41,9 +41,9 @@ namespace cpp_conv
 
     private:
         bool ProduceItems();
-        void RunProductionCycle(const cpp_conv::FactoryDefinition* pFactory);
-        bool TrySatisfyRecipeInput(const cpp_conv::FactoryDefinition* pFactory, uint64_t& uiOutEffort);
-        void RunOutputCycle(const SceneContext& kContext, const cpp_conv::FactoryDefinition* pFactory);
+        void RunProductionCycle(const FactoryDefinition* pFactory);
+        bool TrySatisfyRecipeInput(const FactoryDefinition* pFactory, uint64_t& uiOutEffort);
+        void RunOutputCycle(const SceneContext& kContext, const FactoryDefinition* pFactory);
 
         GeneralItemContainer m_inputItems;
         GeneralItemContainer m_outputItems;

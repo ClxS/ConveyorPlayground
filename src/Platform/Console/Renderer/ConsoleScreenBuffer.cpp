@@ -26,7 +26,7 @@ void cpp_conv::renderer::ConsoleScreenBuffer::Initialize(RenderContext& kRenderC
     wcscpy_s<32>(cfi.FaceName, L"Lucida Console");
 
     m_initArgs = rArgs;
-    COORD coordBufSize = { (SHORT)m_rWriteSurface.GetWidth(), (SHORT)m_rWriteSurface.GetHeight() };
+    const COORD coordBufSize = { (SHORT)m_rWriteSurface.GetWidth(), (SHORT)m_rWriteSurface.GetHeight() };
     SMALL_RECT srctWriteRect;
     srctWriteRect.Left = srctWriteRect.Top = 0;
     srctWriteRect.Right = m_rWriteSurface.GetWidth() - 1;
@@ -49,8 +49,8 @@ void cpp_conv::renderer::ConsoleScreenBuffer::Initialize(RenderContext& kRenderC
 
 void cpp_conv::renderer::ConsoleScreenBuffer::Present()
 {
-    COORD coordBufSize = { (SHORT)m_rWriteSurface.GetWidth(), (SHORT)m_rWriteSurface.GetHeight() };
-    COORD coordBufCoord = { 0, 0 };
+    const COORD coordBufSize = { (SHORT)m_rWriteSurface.GetWidth(), (SHORT)m_rWriteSurface.GetHeight() };
+    const COORD coordBufCoord = { 0, 0 };
     SMALL_RECT srctWriteRect;
     srctWriteRect.Left = srctWriteRect.Top = 0;
     srctWriteRect.Right = m_rWriteSurface.GetWidth() - 1;

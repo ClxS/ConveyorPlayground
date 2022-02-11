@@ -69,13 +69,13 @@ namespace cpp_conv
         template<typename T>
         T* GetEntity(Vector3 position, EntityKind kind);
 
-        void Consume(const cpp_conv::resources::AssetPtr<cpp_conv::resources::Map>& map);
+        void Consume(const resources::AssetPtr<resources::Map>& map);
 
         void PopulateCorners();
 
-        [[nodiscard]] std::vector<cpp_conv::Conveyor*> GetConveyors() const { return m_vConveyors; }
-        [[nodiscard]] std::vector<cpp_conv::Conveyor*> GetCornerConveyors() const { return m_vCornerConveyors; }
-        [[nodiscard]] std::vector<cpp_conv::Entity*> GetOtherEntities() const { return m_vOtherEntities; }
+        [[nodiscard]] std::vector<Conveyor*> GetConveyors() const { return m_vConveyors; }
+        [[nodiscard]] std::vector<Conveyor*> GetCornerConveyors() const { return m_vCornerConveyors; }
+        [[nodiscard]] std::vector<Entity*> GetOtherEntities() const { return m_vOtherEntities; }
     private:
         using CellPtr = std::unique_ptr<Cell>;
         using WorldMapRow = std::array<CellPtr, c_uiMaximumMapSize>;
@@ -87,13 +87,13 @@ namespace cpp_conv
          bool m_bSuppressAssess = false;
 
         WorldMapStore m_WorldMap;
-        std::vector<cpp_conv::Conveyor*> m_vConveyors;
-        std::vector<cpp_conv::Conveyor*> m_vCornerConveyors;
-        std::vector<cpp_conv::Entity*> m_vOtherEntities;
+        std::vector<Conveyor*> m_vConveyors;
+        std::vector<Conveyor*> m_vCornerConveyors;
+        std::vector<Entity*> m_vOtherEntities;
     };
 
     template<typename T>
-    const T* cpp_conv::WorldMap::GetEntity(Vector3 position, EntityKind kind) const
+    const T* WorldMap::GetEntity(Vector3 position, EntityKind kind) const
     {
         auto pEntity = GetEntity(position);
         if (!pEntity || pEntity->m_eEntityKind != kind)
@@ -105,8 +105,8 @@ namespace cpp_conv
     }
 
     template<typename T>
-    T* cpp_conv::WorldMap::GetEntity(Vector3 position, EntityKind kind)
+    T* WorldMap::GetEntity(Vector3 position, EntityKind kind)
     {
-        return const_cast<T*>(const_cast<const cpp_conv::WorldMap*>(this)->GetEntity<T>(position, kind));
+        return const_cast<T*>(const_cast<const WorldMap*>(this)->GetEntity<T>(position, kind));
     }
 }

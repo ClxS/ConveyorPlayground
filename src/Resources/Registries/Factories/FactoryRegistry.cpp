@@ -22,7 +22,7 @@ namespace
     {
         for (int i = 0; i < sizeof(cpp_conv::resources::registry::c_szFactoryPaths) / sizeof(std::filesystem::path); i++)
         {
-            RegistryId asset = { i, 4 };
+            const RegistryId asset = { i, 4 };
             auto pAsset = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::FactoryDefinition>(asset);
             if (!pAsset)
             {
@@ -36,7 +36,7 @@ namespace
 
 cpp_conv::resources::ResourceAsset* factoryAssetHandler(cpp_conv::resources::resource_manager::FileData& rData)
 {
-    const char* pStrData = reinterpret_cast<const char*>(rData.m_pData);
+    const auto pStrData = reinterpret_cast<const char*>(rData.m_pData);
 
     std::string copy(pStrData, (const unsigned int)(rData.m_uiSize / sizeof(char)));
     std::istringstream ss(copy);
@@ -103,7 +103,7 @@ cpp_conv::resources::ResourceAsset* factoryAssetHandler(cpp_conv::resources::res
         cpp_conv::RecipeId::FromStringId(producedRecipeId));
 }
 
-const cpp_conv::resources::AssetPtr<cpp_conv::FactoryDefinition> cpp_conv::resources::getFactoryDefinition(cpp_conv::FactoryId id)
+const cpp_conv::resources::AssetPtr<cpp_conv::FactoryDefinition> cpp_conv::resources::getFactoryDefinition(FactoryId id)
 {
     PROFILE_FUNC();
     for (auto item : g_vFactories)

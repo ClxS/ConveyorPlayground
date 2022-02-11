@@ -8,24 +8,22 @@
 
 namespace cpp_conv::apphost
 {
-    cpp_conv::apphost::SdlContext App;
+    SdlContext app;
 }
 
 std::tuple<int, int> cpp_conv::apphost::getAppDimensions()
 {
     int width, height;
-    SDL_GetWindowSize(cpp_conv::apphost::App.window, &width, &height);
+    SDL_GetWindowSize(app.m_Window, &width, &height);
 
     return std::make_tuple(width, height);
 }
 
 void createWindow()
 {
-    int rendererFlags, windowFlags;
+    int windowFlags;
 
-    rendererFlags = SDL_RENDERER_ACCELERATED;
-
-
+    constexpr int rendererFlags = SDL_RENDERER_ACCELERATED;
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         printf("Couldn't initialize SDL: %s\n", SDL_GetError());
@@ -34,14 +32,14 @@ void createWindow()
 
     #if WINDOWED
     windowFlags = 0;
-    cpp_conv::apphost::App.window = SDL_CreateWindow("Cpp Conveyor", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1200, 800, windowFlags);
+    cpp_conv::apphost::app.m_Window = SDL_CreateWindow("Cpp Conveyor", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1200, 800, windowFlags);
     #else
     windowFlags = 0;
     cpp_conv::apphost::App.window = SDL_CreateWindow("Cpp Conveyor", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 2560, 1080, windowFlags);
     SDL_SetRelativeMouseMode(SDL_TRUE);
     #endif
 
-    if (!cpp_conv::apphost::App.window)
+    if (!cpp_conv::apphost::app.m_Window)
     {
         printf("Failed to open %d x %d window: %s\n", 800, 600, SDL_GetError());
         exit(1);
@@ -50,14 +48,14 @@ void createWindow()
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
     SDL_SetHint(SDL_HINT_RENDER_BATCHING, "1");
 
-    cpp_conv::apphost::App.renderer = SDL_CreateRenderer(cpp_conv::apphost::App.window, -1, rendererFlags);
+    cpp_conv::apphost::app.m_Renderer = SDL_CreateRenderer(cpp_conv::apphost::app.m_Window, -1, rendererFlags);
 
-    if (!cpp_conv::apphost::App.renderer)
+    if (!cpp_conv::apphost::app.m_Renderer)
     {
         printf("Failed to create renderer: %s\n", SDL_GetError());
         exit(1);
     }
-} 
+}
 
 #ifdef __cplusplus
 extern "C"

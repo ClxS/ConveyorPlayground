@@ -12,5 +12,5 @@ namespace cpp_conv
 
 namespace cpp_conv::resources
 {
-    const cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> getItemDefinition(cpp_conv::ItemId id);
+    AssetPtr<ItemDefinition> getItemDefinition(ItemId id);
 }

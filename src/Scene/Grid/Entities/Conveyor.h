@@ -65,7 +65,7 @@ namespace cpp_conv
 
         [[nodiscard]] virtual uint32_t GetDrawPassCount() const { return 2; }
 
-        void AssessPosition(const cpp_conv::WorldMap& map);
+        void AssessPosition(const WorldMap& map);
 
         [[nodiscard]] bool IsCorner() const { return m_bIsCorner; }
         [[nodiscard]] bool IsClockwiseCorner() const { return m_bIsClockwise; }
@@ -80,7 +80,7 @@ namespace cpp_conv
 
         uint64_t CountItemsOnBelt();
 
-        [[nodiscard]] cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> GetTile() const { return m_pTile; }
+        [[nodiscard]] resources::AssetPtr<resources::TileAsset> GetTile() const { return m_pTile; }
 
         static_assert(c_conveyorChannels >= 1, "Conveyors must have at least once channel");
         static_assert(c_conveyorChannelSlots >= 1, "Conveyors channels must have at least once slot");
@@ -102,7 +102,7 @@ namespace cpp_conv
         bool m_bIsCapped;
         int m_iInnerMostChannel;
         Direction m_eCornerDirection;
-        cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> m_pTile;
+        resources::AssetPtr<resources::TileAsset> m_pTile;
 
         bool TryPeakItemInSlot(int lane, int slot, ItemInstance& rItem) const;
     };

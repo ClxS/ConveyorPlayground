@@ -18,18 +18,18 @@ void cpp_conv::Storage::Tick(const SceneContext& kContext)
 
 void cpp_conv::Storage::Draw(RenderContext& kRenderContext) const
 {
-    auto pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Storage);
+    const auto pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::visual::Storage);
     if (!pTile)
     {
         return;
     }
 
-    cpp_conv::renderer::renderAsset(
+    renderer::renderAsset(
         kRenderContext,
         pTile.get(),
         {
-            (float)m_position.GetX() * cpp_conv::renderer::c_gridScale,
-            (float)m_position.GetY() * cpp_conv::renderer::c_gridScale,
+            (float)m_position.GetX() * renderer::c_gridScale,
+            (float)m_position.GetY() * renderer::c_gridScale,
             Rotation::DegZero
         },
         { 0xFFFFFF00 });

@@ -16,22 +16,22 @@ namespace cpp_conv::renderer
     class SDLScreenBuffer
     {
     public:
-        SDLScreenBuffer(SDLWriteSurface& rWriteSurface)
-            : m_rWriteSurface(rWriteSurface)
+        explicit SDLScreenBuffer(SDLWriteSurface& rWriteSurface)
+            : m_RWriteSurface(rWriteSurface)
         {}
-        ~SDLScreenBuffer() {}
+        ~SDLScreenBuffer() = default;
 
         void Initialize(RenderContext& kRenderContext, SDLScreenBufferInitArgs& rArgs) {}
 
-        void Present();
+        void Present() const;
 
         void Shutdown() {}
 
         void RecreateBuffer(RenderContext& kRenderContext) {}
 
     private:
-        SDLWriteSurface& m_rWriteSurface;
-        SDLScreenBufferInitArgs m_initArgs;
+        SDLWriteSurface& m_RWriteSurface;
+        SDLScreenBufferInitArgs m_InitArgs;
     };
 
     using ScreenBuffer = SDLScreenBuffer;

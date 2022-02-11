@@ -50,12 +50,12 @@ namespace cpp_conv
             }
 
             uint32_t iStartIndex = (m_uiConsumePivot + uiIndex) % m_uiCapacity;
-            uint32_t iPushForwardCount = m_uiSize;
+            const uint32_t iPushForwardCount = m_uiSize;
 
             if ((iStartIndex + iPushForwardCount) >= m_uiCapacity)
             {
-                uint32_t prewrapMoveSize = m_uiCapacity - iStartIndex;
-                uint32_t postWrapMoveSize = m_uiAppendPivot;
+                const uint32_t prewrapMoveSize = m_uiCapacity - iStartIndex;
+                const uint32_t postWrapMoveSize = m_uiAppendPivot;
 
                 std::memcpy(&m_vData[1], &m_vData[0], postWrapMoveSize * sizeof(T));
                 m_vData[0] = m_vData[m_uiCapacity - 1];
@@ -92,7 +92,7 @@ namespace cpp_conv
 	};
 
     template<typename T>
-    T cpp_conv::FixedCircularBuffer<T>::Remove(int index /*= 0*/)
+    T FixedCircularBuffer<T>::Remove(int index /*= 0*/)
     {
         assert(m_uiSize > 0);
         assert(index < m_uiSize);
@@ -110,7 +110,7 @@ namespace cpp_conv
 
         --m_uiSize;
 
-        uint32_t toMove = m_uiSize - index;
+        const uint32_t toMove = m_uiSize - index;
         if (m_uiAppendPivot == m_uiConsumePivot || toMove == 0)
         {
             return value;
@@ -122,8 +122,8 @@ namespace cpp_conv
         }
         else
         {
-            uint32_t prePivotMove = toMove - m_uiAppendPivot - 1;
-            uint32_t postPivotMove = m_uiAppendPivot;
+            const uint32_t prePivotMove = toMove - m_uiAppendPivot - 1;
+            const uint32_t postPivotMove = m_uiAppendPivot;
 
             std::memmove(&m_vData[uiTakeIndex], &m_vData[uiTakeIndex] + 1, sizeof(T) * prePivotMove);
             m_vData[m_uiCapacity - 1] = m_vData[0];

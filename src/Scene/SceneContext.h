@@ -13,8 +13,8 @@ namespace cpp_conv
     struct SceneContext
     {
         Vector3 m_player;
-        cpp_conv::WorldMap& m_rMap;
-        std::vector<cpp_conv::Sequence*>& m_sequences;
+        WorldMap& m_rMap;
+        std::vector<Sequence*>& m_sequences;
 
         struct
         {

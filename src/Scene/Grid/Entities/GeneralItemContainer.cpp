@@ -82,13 +82,13 @@ bool cpp_conv::GeneralItemContainer::TryInsert(ItemId pItem, uint32_t count)
                 return true;
             }
 
-            uint32_t uiSpace = m_uiMaxStackSize - rItemEntry.m_pCount;
+            const uint32_t uiSpace = m_uiMaxStackSize - rItemEntry.m_pCount;
             count -= uiSpace;
             rItemEntry.m_pCount += uiSpace;
         }
     }
 
-    uint32_t remainingFullStacks = count / m_uiMaxStackSize;
+    const uint32_t remainingFullStacks = count / m_uiMaxStackSize;
     uint32_t remainingPartialStack = count % m_uiMaxStackSize;
 
     for (uint32_t i = 0; i < remainingFullStacks; i++)
@@ -133,7 +133,7 @@ bool cpp_conv::GeneralItemContainer::CouldInsert(ItemId pItem, uint32_t count /*
         return false;
     }
 
-    uint32_t extraSlotsRequired = count / m_uiMaxStackSize + ((count % m_uiMaxStackSize) == 0 ? 0 : 1);
+    const uint32_t extraSlotsRequired = count / m_uiMaxStackSize + ((count % m_uiMaxStackSize) == 0 ? 0 : 1);
     return (m_vItemEntries.size() + extraSlotsRequired) <= m_uiMaxCapacity;
 }
 
@@ -172,7 +172,7 @@ bool cpp_conv::GeneralItemContainer::IsEmpty()
 
 std::string cpp_conv::GeneralItemContainer::GetDescription() const
 {
-    std::map<cpp_conv::ItemId, int> storedItems;
+    std::map<ItemId, int> storedItems;
 
     for(const ItemEntry& itemEntry : m_vItemEntries)
     {
@@ -199,7 +199,7 @@ std::string cpp_conv::GeneralItemContainer::GetDescription() const
                 str += ", ";
             }
 
-            cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> pItem = cpp_conv::resources::getItemDefinition(item.first);
+            resources::AssetPtr<ItemDefinition> pItem = resources::getItemDefinition(item.first);
             if (pItem)
             {
                 str += std::format("{} {}", item.second, pItem->GetName());

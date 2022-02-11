@@ -33,7 +33,7 @@ std::tuple<int, Vector3> GetUndergroundLength(const cpp_conv::WorldMap& map, con
     Vector3 kTmpPosition = pStart->m_position;
     for (int i = 0; i < cpp_conv::c_maxUndergroundLength; i++)
     {
-        Vector3 kForwardPosition = cpp_conv::grid::getForwardPosition(kTmpPosition, direction);
+        const Vector3 kForwardPosition = cpp_conv::grid::getForwardPosition(kTmpPosition, direction);
         const cpp_conv::Entity* pForwardEntity = map.GetEntity(kForwardPosition);
         if (pForwardEntity == nullptr || pForwardEntity->m_eEntityKind != EntityKind::Underground)
         {
@@ -57,19 +57,19 @@ cpp_conv::Underground::Underground(Vector3 position, Vector3 size, Direction dir
     , m_direction(direction)
     , m_arrInternalConveyors
     {
-        cpp_conv::Conveyor(position, size, direction, cpp_conv::ItemIds::None),
-        cpp_conv::Conveyor(position, size, direction, cpp_conv::ItemIds::None),
-        cpp_conv::Conveyor(position, size, direction, cpp_conv::ItemIds::None),
-        cpp_conv::Conveyor(position, size, direction, cpp_conv::ItemIds::None),
-        cpp_conv::Conveyor(position, size, direction, cpp_conv::ItemIds::None),
-        cpp_conv::Conveyor(position, size, direction, cpp_conv::ItemIds::None)
+        Conveyor(position, size, direction, ItemIds::None),
+        Conveyor(position, size, direction, ItemIds::None),
+        Conveyor(position, size, direction, ItemIds::None),
+        Conveyor(position, size, direction, ItemIds::None),
+        Conveyor(position, size, direction, ItemIds::None),
+        Conveyor(position, size, direction, ItemIds::None)
     }
     , m_uiTick(0)
 {
-    for (int i = 0; i < cpp_conv::c_maxUndergroundLength; i++)
+    for (int i = 0; i < c_maxUndergroundLength; i++)
     {
         m_arrInternalConveyors[i].m_position = m_position;
-        position = cpp_conv::grid::getForwardPosition(position, direction);
+        position = grid::getForwardPosition(position, direction);
     }
 }
 
@@ -85,23 +85,23 @@ void cpp_conv::Underground::Tick(const SceneContext& kContext)
     }
 
     Entity* pExitEntity = kContext.m_rMap.GetEntity(undergroundEnd);
-    Vector3 position(cpp_conv::grid::getForwardPosition(m_position, m_direction));
+    Vector3 position(grid::getForwardPosition(m_position, m_direction));
 
     for (int i = 0; i < iUndergroundLength; i++)
     {
         m_arrInternalConveyors[i].m_position = position;
-        position = cpp_conv::grid::getForwardPosition(position, m_direction);
+        position = grid::getForwardPosition(position, m_direction);
     }
 
     for (int i = 0; i < iUndergroundLength; i++)
     {
-        bool bIsHead = (i >= iUndergroundLength - 1);
+        const bool bIsHead = (i >= iUndergroundLength - 1);
         Conveyor* pNode = &m_arrInternalConveyors[i];
-        for (int iChannelIdx = 0; iChannelIdx < cpp_conv::c_conveyorChannels; iChannelIdx++)
+        for (int iChannelIdx = 0; iChannelIdx < c_conveyorChannels; iChannelIdx++)
         {
-            int iChannelLength = cpp_conv::c_conveyorChannelSlots;
+            const int iChannelLength = c_conveyorChannelSlots;
 
-            cpp_conv::Entity* pForwardEntity = bIsHead ? pExitEntity : &m_arrInternalConveyors[i + 1];
+            Entity* pForwardEntity = bIsHead ? pExitEntity : &m_arrInternalConveyors[i + 1];
             ItemInstance& frontMostItem = pNode->m_pChannels[iChannelIdx].m_pSlots[iChannelLength - 1].m_Item;
             if (!frontMostItem.IsEmpty())
             {
@@ -114,7 +114,7 @@ void cpp_conv::Underground::Tick(const SceneContext& kContext)
                 }
                 else
                 {
-                    cpp_conv::Conveyor* pForwardNode = reinterpret_cast<cpp_conv::Conveyor*>(pForwardEntity);
+                    Conveyor* pForwardNode = reinterpret_cast<Conveyor*>(pForwardEntity);
                     ItemInstance& forwardTargetItem = pForwardNode->m_pChannels[iChannelIdx].m_pSlots[0].m_Item;
                     ItemInstance& forwardPendingItem = pForwardNode->m_pChannels[iChannelIdx].m_pPendingItems[0];
                     if (forwardTargetItem.IsEmpty() && forwardPendingItem.IsEmpty())
@@ -149,7 +149,7 @@ void cpp_conv::Underground::Tick(const SceneContext& kContext)
 
 void cpp_conv::Underground::Draw(RenderContext& kRenderContext) const
 {
-    auto pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Tunnel);
+    const auto pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::visual::Tunnel);
     if (!pTile)
     {
         return;
@@ -160,20 +160,20 @@ void cpp_conv::Underground::Draw(RenderContext& kRenderContext) const
 
     std::tie(iUndergroundLength, undergroundEnd) = GetUndergroundLength(kRenderContext.m_rMap, this, m_direction);
 
-    Rotation eDirection = cpp_conv::rotationFromDirection(m_direction);
+    Rotation eDirection = rotationFromDirection(m_direction);
     if (iUndergroundLength == -1)
     {
-        eDirection = cpp_conv::rotationFromDirection(
-            cpp_conv::direction::Rotate90DegreeClockwise(
-                cpp_conv::direction::Rotate90DegreeClockwise(m_direction)));
+        eDirection = rotationFromDirection(
+            direction::Rotate90DegreeClockwise(
+                direction::Rotate90DegreeClockwise(m_direction)));
     }
 
-    cpp_conv::renderer::renderAsset(
+    renderer::renderAsset(
         kRenderContext,
         pTile.get(),
         {
-            static_cast<float>(m_position.GetX()) * cpp_conv::renderer::c_gridScale,
-            static_cast<float>(m_position.GetY()) * cpp_conv::renderer::c_gridScale,
+            static_cast<float>(m_position.GetX()) * renderer::c_gridScale,
+            static_cast<float>(m_position.GetY()) * renderer::c_gridScale,
             eDirection
         },
         { 0xFF0000FF });
