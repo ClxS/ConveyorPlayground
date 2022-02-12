@@ -112,7 +112,7 @@ namespace cpp_conv::resources::registry
     {
         P("data/conveyors/Basic", c_dataExtension),
     };
-     
+
     inline static const std::filesystem::path* c_szCategoryPaths[] =
     {
         c_szAssetPaths,
