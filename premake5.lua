@@ -4,11 +4,15 @@ workspace "CppConveyor"
 	location "build"
 	platforms { --[["Console",]] "SDL" }
 	configurations { "Debug", "Release" }
-	filter { "platforms:Console" }
+	filter { "platforms:SDL" }
 		system "Windows"
 		architecture "x86_64"
 	filter{}
 
+	filter { "platforms:Tools_Win64" }
+		configmap {
+			["SDL"] = "Tools_Win64",
+		}
 
     filter { "configurations:Release" }
    		optimize "Full"
@@ -19,6 +23,7 @@ workspace "CppConveyor"
 
 group("Tools")
 	project "ToolsCore"
+		platforms { "Tools_Win64" }
 		kind "StaticLib"
 		targetdir "bin/tools/lib"
 		language "C++"
@@ -34,6 +39,7 @@ group("Tools")
 		cppdialect "C++latest"
 
 	project "AssetBuilder"
+		platforms { "Tools_Win64" }
 		kind "ConsoleApp"
 		targetdir "bin/tools"
 		targetname "AssetBuilder"
