@@ -321,7 +321,7 @@ void Sequence::Realize()
             }
 
             const uint32_t uiEarlierItemsMask = uiCurrentInsertIndex - 1;
-            uiInsertions &= ~uiCurrentInsertIndex;
+            uiInsertions &= ~static_cast<uint64_t>(uiCurrentInsertIndex);
             const uint64_t previousItemCount = std::popcount(realizedState.m_Lanes & uiEarlierItemsMask);
             realizedState.m_Items.Insert(previousItemCount, item);
         }
