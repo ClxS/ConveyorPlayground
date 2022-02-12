@@ -18,6 +18,21 @@ workspace "CppConveyor"
 	filter{}
 
 group("Tools")
+	project "ToolsCore"
+		kind "StaticLib"
+		targetdir "bin/tools/lib"
+		language "C++"
+		files {
+			"tools/Core/src/**",
+			"tools/Core/include/**",
+		}
+		includedirs {
+			"tools/Core/src",
+			"tools/Core/include",
+		}
+		flags { "FatalWarnings" }
+		cppdialect "C++latest"
+
 	project "AssetBuilder"
 		kind "ConsoleApp"
 		targetdir "bin/tools"
@@ -30,10 +45,15 @@ group("Tools")
 			"tools/AssetBuilder/include/**",
 		}	
 		includedirs {
+			"tools/Core/include",
 			"tools/AssetBuilder/src/**",	
 			"tools/AssetBuilder/include/**",		
 		}
+		links {
+			"ToolsCore",
+		}
 		flags { "FatalWarnings" }
+		cppdialect "C++latest"
 
 group("")
 	project "CppConveyor"
