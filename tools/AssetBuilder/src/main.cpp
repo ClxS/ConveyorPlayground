@@ -180,7 +180,7 @@ std::string sanitizeAssetNameForVariable(const std::filesystem::path& path)
     return filename.substr(0, dot);
 }
 
-void writeGroup(std::stringstream& outStream, const AssetTree::TreeNode& node, const int depth)
+void writeGroup(std::stringstream& outStream, const AssetTree::TreeNode& node, const int depth, int& index)
 {
     std::string groupNamespace = node.m_Path.string();
     std::ranges::transform(groupNamespace, groupNamespace.begin(), [](const unsigned char c){ return std::tolower(c); });
@@ -189,31 +189,45 @@ void writeGroup(std::stringstream& outStream, const AssetTree::TreeNode& node, c
 
     for(auto& group : node.m_ChildNodes)
     {
-        writeGroup(outStream, *group, depth + 1);
+        writeGroup(outStream, *group, depth + 1, index);
     }
 
     for(const auto& [fullPath, relativePath] : node.m_Assets)
     {
         outStream
             << std::string((depth + 1) * 4, ' ')
-            << "const std::filesystem::path c_"
+            << "constexpr RegistryId c_"
             << sanitizeAssetNameForVariable(relativePath)
-            << " = R\"("
-            << relativePath.string()
-            << ")\";\n";
+            << " = " << index << ";\n";
+        index++;
     }
 
-    outStream << std::string((depth + 1) * 4, ' ') << "inline const std::array<const std::filesystem::path*, " << node.m_Assets.size() << ">& getAll() {\n";
-    outStream << std::string((depth + 2) * 4, ' ') << "static std::array<const std::filesystem::path*, " << node.m_Assets.size() << "> s_all { \n";
-    for(const auto& [fullPath, relativePath] : node.m_Assets)
+    if (!node.m_Assets.empty())
     {
-        outStream << std::string((depth + 3) * 4, ' ') << "&c_" << sanitizeAssetNameForVariable(relativePath) << ",\n";
+        outStream << std::string((depth + 1) * 4, ' ') << "constexpr std::array c_AllAssets { \n";
+        for(const auto& [fullPath, relativePath] : node.m_Assets)
+        {
+            outStream << std::string((depth + 2) * 4, ' ') << "c_" << sanitizeAssetNameForVariable(relativePath) << ",\n";
+        }
+        outStream<< std::string((depth + 1) * 4, ' ') << "};\n";
     }
-    outStream<< std::string((depth + 2) * 4, ' ') << "};\n";
-    outStream << std::string((depth + 2) * 4, ' ') << "return s_all;\n";
-    outStream<< std::string((depth + 1) * 4, ' ') << "}\n";
 
     outStream << std::string(depth * 4, ' ') << "}\n";
+}
+
+void writeFiles(std::stringstream& outStream, const AssetTree::TreeNode& node, const int depth, int& index)
+{
+    for(auto& group : node.m_ChildNodes)
+    {
+        writeFiles(outStream, *group, depth, index);
+    }
+
+    for(const auto& [fullPath, relativePath] : node.m_Assets)
+    {
+        outStream << std::string((depth + 1) * 4, ' ') << "std::filesystem::path(R\"("
+            << relativePath.string()
+            << ")\"),\n";
+    }
 }
 
 std::string generateFileFromTree(const AssetTree& tree, const std::string& fileNamespace)
@@ -221,11 +235,31 @@ std::string generateFileFromTree(const AssetTree& tree, const std::string& fileN
     std::stringstream outFile;
     outFile << "#include <filesystem>\n";
     outFile << "namespace " << fileNamespace << " {\n";
+    outFile << std::string(1 * 4, ' ') << "using RegistryId = uint32_t;\n";
 
+    int index = 0;
     for(auto& group : tree.GetRoot().m_ChildNodes)
     {
-        writeGroup(outFile, *group, 1);
+        writeGroup(outFile, *group, 1, index);
     }
+
+    outFile << std::string(1 * 4, ' ') << "const std::array c_Files = {\n";
+    for(auto& group : tree.GetRoot().m_ChildNodes)
+    {
+        writeFiles(outFile, *group, 1, index);
+    }
+
+    outFile << std::string(1 * 4, ' ') << "};\n";
+
+    /*
+    *outStream
+            << std::string((depth + 1) * 4, ' ')
+            << "constexpr RegistryId c_"
+            << sanitizeAssetNameForVariable(relativePath)
+            << " = R\"("
+            << relativePath.string()
+            << ")\";\n";
+     */
 
     outFile << "}";
     return outFile.str();
