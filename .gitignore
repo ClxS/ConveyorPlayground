@@ -37,4 +37,5 @@ x64
 build
 bin
 sdlPrivate
+generated
 !premake5.exe
