@@ -88,7 +88,7 @@ group("")
 				[[
 				  <Target Name="GenerateAssetSpec" BeforeTargets="InitializeBuildStatus">
 				  	<Message Text="Generating Asset Specification" Importance="High" />
-				  	<Exec Command="$(ToolsDir)\AssetBuilder.exe -r $(DataDir) --platform $(Platform) -d --ns $(DataNamespace) -o $(CodeDir)\Generated\AssetRegistry.h" />
+				  	<Exec Command="$(ToolsDir)\AssetBuilder.exe -r $(DataDir) --platform $(BuildPlatform) -d --ns $(DataNamespace) -o $(CodeDir)\Generated\AssetRegistry.h" />
 				  </Target>
 				]]
 			}
@@ -96,6 +96,9 @@ group("")
 
 		filter {"platforms:Console"}
 			kind "ConsoleApp"
+			customprops {
+				["BuildPlatform"] = 'Console',
+			}
 			defines {
 				"_CONSOLE"
 			}
@@ -109,6 +112,9 @@ group("")
 			}
 		filter {"platforms:SDL"}
 			kind "WindowedApp"
+			customprops {
+				["BuildPlatform"] = 'SDL',
+			}
 			defines {
 				"_SDL"
 			}
