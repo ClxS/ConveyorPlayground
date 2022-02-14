@@ -109,14 +109,17 @@ bool cppconv::tools::arg_parser::ArgumentsBase::TryRead(const int argc, char** a
         }
         else
         {
-            const char* szValueEntry = iParameterIdx < (argc - 1) ? argv[iParameterIdx] : nullptr;
+            const char* szValueEntry = iParameterIdx < (argc) ? argv[iParameterIdx] : nullptr;
 
             if (szValueEntry == nullptr || szValueEntry[0] == '-')
             {
                 // Special handling for "flag fields" (bool), which can be set just by the presence of the flag
                 if (currentField->m_bIsFlag)
                 {
-                    currentField->Read("");
+                    if (currentField->Read(""))
+                    {
+                        currentField->m_bIsSet = true;
+                    }
                 }
                 else
                 {
@@ -137,6 +140,10 @@ bool cppconv::tools::arg_parser::ArgumentsBase::TryRead(const int argc, char** a
                 errors.push_back(std::format("Parameter {} failed to read value {}", currentField->m_Name, szValueEntry));
                 bIsError = true;
                 continue;
+            }
+            else
+            {
+                currentField->m_bIsSet = true;
             }
         }
     }
@@ -163,7 +170,7 @@ bool cppconv::tools::arg_parser::ArgumentsBase::TryRead(const int argc, char** a
 
         for(const auto& error : errors)
         {
-            std::cout << "    " << error;
+            std::cout << "    " << error << "\n";
         }
     }
 
