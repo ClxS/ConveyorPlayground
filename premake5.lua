@@ -73,12 +73,22 @@ group("")
 			"src/**"
 		}
 		flags { "FatalWarnings" }
+		dependson {
+			"AssetBuilder"
+		}
+		customprops {
+			["ToolsDir"] = path.getabsolute('bin/tools'),
+			["DataDir"] = path.getabsolute('data'),
+			["CodeDir"] = path.getabsolute('src'),
+			["DataNamespace"] = 'cpp_conv::resources::registry',			
+		}
 
 		if _ACTION == 'vs2022' then
 			customtargets {
 				[[
 				  <Target Name="GenerateAssetSpec" BeforeTargets="InitializeBuildStatus">
 				  	<Message Text="Generating Asset Specification" Importance="High" />
+				  	<Exec Command="$(ToolsDir)\AssetBuilder.exe -r $(DataDir) --platform $(Platform) -d --ns $(DataNamespace) -o $(CodeDir)\Generated\AssetRegistry.h" />
 				  </Target>
 				]]
 			}
