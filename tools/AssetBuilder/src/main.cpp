@@ -196,7 +196,7 @@ void writeGroup(std::stringstream& outStream, const AssetTree::TreeNode& node, c
     {
         outStream
             << std::string((depth + 1) * 4, ' ')
-            << "constexpr RegistryId c_"
+            << "inline constexpr RegistryId c_"
             << sanitizeAssetNameForVariable(relativePath)
             << " = " << index << ";\n";
         index++;
@@ -204,12 +204,12 @@ void writeGroup(std::stringstream& outStream, const AssetTree::TreeNode& node, c
 
     if (!node.m_Assets.empty())
     {
-        outStream << std::string((depth + 1) * 4, ' ') << "constexpr std::array c_AllAssets { \n";
+        outStream << std::string((depth + 1) * 4, ' ') << "inline constexpr std::array<RegistryId, " << node.m_Assets.size() << "> c_AllAssets {{ \n";
         for(const auto& [fullPath, relativePath] : node.m_Assets)
         {
             outStream << std::string((depth + 2) * 4, ' ') << "c_" << sanitizeAssetNameForVariable(relativePath) << ",\n";
         }
-        outStream<< std::string((depth + 1) * 4, ' ') << "};\n";
+        outStream<< std::string((depth + 1) * 4, ' ') << "}};\n";
     }
 
     outStream << std::string(depth * 4, ' ') << "}\n";
@@ -233,6 +233,8 @@ void writeFiles(std::stringstream& outStream, const AssetTree::TreeNode& node, c
 std::string generateFileFromTree(const AssetTree& tree, const std::string& fileNamespace)
 {
     std::stringstream outFile;
+    outFile << "#pragma once\n";
+    outFile << "#include <array>\n";;
     outFile << "#include <filesystem>\n";
     outFile << "namespace " << fileNamespace << " {\n";
     outFile << std::string(1 * 4, ' ') << "using RegistryId = uint32_t;\n";
@@ -243,24 +245,13 @@ std::string generateFileFromTree(const AssetTree& tree, const std::string& fileN
         writeGroup(outFile, *group, 1, index);
     }
 
-    outFile << std::string(1 * 4, ' ') << "const std::array c_Files = {\n";
+    outFile << std::string(1 * 4, ' ') << "const std::array<std::filesystem::path, " << index + 1 << "> c_Files = {{\n";
     for(auto& group : tree.GetRoot().m_ChildNodes)
     {
         writeFiles(outFile, *group, 1, index);
     }
 
-    outFile << std::string(1 * 4, ' ') << "};\n";
-
-    /*
-    *outStream
-            << std::string((depth + 1) * 4, ' ')
-            << "constexpr RegistryId c_"
-            << sanitizeAssetNameForVariable(relativePath)
-            << " = R\"("
-            << relativePath.string()
-            << ")\";\n";
-     */
-
+    outFile << std::string(1 * 4, ' ') << "}};\n";
     outFile << "}";
     return outFile.str();
 }
