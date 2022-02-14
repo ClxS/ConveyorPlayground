@@ -111,7 +111,7 @@ bool cppconv::tools::arg_parser::ArgumentsBase::TryRead(const int argc, char** a
         {
             const char* szValueEntry = iParameterIdx < (argc - 1) ? argv[iParameterIdx] : nullptr;
 
-            if (szValueEntry == nullptr)
+            if (szValueEntry == nullptr || szValueEntry[0] == '-')
             {
                 // Special handling for "flag fields" (bool), which can be set just by the presence of the flag
                 if (currentField->m_bIsFlag)
