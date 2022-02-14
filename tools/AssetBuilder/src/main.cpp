@@ -146,7 +146,6 @@ AssetTree generateAssetTree(const std::string& root, const std::string& platform
 
         for (const auto & entry : fs::directory_iterator(path))
         {
-            std::cout << entry.path() << std::endl;
             if (entry.is_directory())
             {
                 fs::path relativePath = relative(entry, branchRoot);
