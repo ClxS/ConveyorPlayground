@@ -1,0 +1,11 @@
+[factory]
+id="FACTORY_COPPER_SMELTER"
+name="Copper Smelter"
+asset="assets::factories::CopperSmelter"
+recipe="RECIPE_COPPER_PLATE"
+rate=1
+
+[factory.size]
+x = 3
+y = 3
+z = 1

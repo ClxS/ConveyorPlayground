@@ -1,3 +1,0 @@
-ITEM_IRON_ORE
-Iron Ore
-assets::items::IronOre

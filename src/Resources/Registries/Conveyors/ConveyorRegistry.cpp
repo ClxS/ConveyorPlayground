@@ -10,6 +10,10 @@
 #include <memory>
 #include <sstream>
 #include <iostream>
+
+#include <tuple>
+#include <tomlcpp.hpp>
+
 #include "SelfRegistration.h"
 #include "DataId.h"
 #include "Profiler.h"
@@ -39,32 +43,53 @@ cpp_conv::resources::ResourceAsset* conveyorAssetHandler(cpp_conv::resources::re
     const auto pStrData = reinterpret_cast<const char*>(rData.m_pData);
 
     // ReSharper disable once CppRedundantCastExpression
-    const std::string copy(pStrData, (int)(rData.m_uiSize / sizeof(char)));
-    std::istringstream ss(copy);
+    std::string copy(pStrData, (int)(rData.m_uiSize / sizeof(char)));
 
-    std::string id;
-    std::string name;
-
-    int idx = 0;
-    std::string token;
-    while (std::getline(ss, token))
+    const auto [table, errors] = ::toml::parse(copy);
+    if (!table)
     {
-        if (token.back() == '\r')
-        {
-            token.erase(token.size() - 1);
-        }
-
-        switch (idx)
-        {
-        case 0: id = token; break;
-        case 1: name = token; break;
-        default: ; // Ignored
-        }
-
-        idx++;
+        std::cerr << "Failed to read TOML: " << errors << "\n";
+        return nullptr;
     }
 
-    return new cpp_conv::ConveyorDefinition(cpp_conv::ConveyorId::FromStringId(id), rData.m_registryId, name);
+    const auto conveyor = table->getTable("conveyor");
+    if (!conveyor)
+    {
+        std::cerr << "File did not contain a top level [conveyor] entry\n";
+        return nullptr;
+    }
+
+    bool bOk = false;
+    std::string id;
+    std::string name;
+    int64_t tickDelay;
+
+    std::tie(bOk, id) = conveyor->getString("id");
+    if (!bOk)
+    {
+        std::cerr << "Conveyor is missing required field 'id'\n";
+        return nullptr;
+    }
+
+    std::tie(bOk, name) = conveyor->getString("name");
+    if (!bOk)
+    {
+        std::cerr << "Conveyor is missing required field 'name'\n";
+        return nullptr;
+    }
+
+    std::tie(bOk, tickDelay) = conveyor->getInt("tickDelay");
+    if (!bOk)
+    {
+        std::cerr << "Conveyor is missing required field 'tickDelay'\n";
+        return nullptr;
+    }
+
+    return new cpp_conv::ConveyorDefinition(
+        cpp_conv::ConveyorId::FromStringId(id),
+        rData.m_registryId,
+        name,
+        static_cast<int>(tickDelay));
 }
 
 cpp_conv::resources::AssetPtr<cpp_conv::ConveyorDefinition> cpp_conv::resources::getConveyorDefinition(ConveyorId id)

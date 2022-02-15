@@ -1,0 +1,7 @@
+[inserter]
+id="INSERTER_BASIC"
+name="Basic Inserter"
+asset="assets::factories::CopperMine"
+transitTime=4
+cooldownTime=2
+supportsStacks=false

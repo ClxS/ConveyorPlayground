@@ -1,0 +1,16 @@
+[factory]
+id="FACTORY_COPPER_MINE"
+name="Copper Mine"
+asset="assets::factories::CopperMine"
+recipe="RECIPE_COPPER_ORE"
+rate=1
+
+[factory.size]
+x = 3
+y = 3
+z = 1
+
+[[factory.pipes.output]]
+x = 2
+y = 1
+z = 0

@@ -1,0 +1,8 @@
+[recipe]
+id="RECIPE_COPPER_ORE"
+description="Produces Copper Ore from thin air!"
+effort=1
+
+[recipe.output]
+ITEM_COPPER_ORE = 1
+

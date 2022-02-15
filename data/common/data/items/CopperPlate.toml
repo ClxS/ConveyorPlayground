@@ -1,0 +1,4 @@
+[item]
+id="ITEM_COPPER_PLATE"
+name="Copper Plate"
+asset="assets::items::CopperPlate"

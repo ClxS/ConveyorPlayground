@@ -1,3 +1,0 @@
-ITEM_COPPER_PLATE
-Copper Plate
-assets::items::CopperPlate

@@ -1,7 +1,0 @@
-FACTORY_COPPER_SMELTER
-Copper Smelter
-assets::factories::CopperSmelter
-3 3 1
-1
-0
-RECIPE_COPPER_PLATE

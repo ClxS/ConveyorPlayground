@@ -1,0 +1,11 @@
+[recipe]
+id="RECIPE_COPPER_PLATE"
+description="1 Copper Plate from 10 Copper Ore"
+effort=10
+
+[recipe.input]
+ITEM_COPPER_ORE = 10
+
+[recipe.output]
+ITEM_COPPER_PLATE = 1
+

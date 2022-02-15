@@ -1,0 +1,4 @@
+[conveyor]
+id="CONVEYOR_BASIC"
+name="Basic Conveyor"
+tickDelay=10

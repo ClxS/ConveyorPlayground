@@ -1,3 +1,0 @@
-ITEM_COAL_ORE
-Coal
-assets::items::Coal

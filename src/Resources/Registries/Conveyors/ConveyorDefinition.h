@@ -13,10 +13,15 @@ namespace cpp_conv
     class ConveyorDefinition : public resources::ResourceAsset
     {
     public:
-        ConveyorDefinition(const ConveyorId internalId, const resources::registry::RegistryId registryId, std::string strName)
+        ConveyorDefinition(
+            const ConveyorId internalId,
+            const resources::registry::RegistryId registryId,
+            std::string strName,
+            const int tickDelay)
             : m_internalId(internalId)
             , m_registryId(registryId)
             , m_strName(std::move(strName))
+            , m_TickDelay(tickDelay)
         {
         }
 
@@ -28,5 +33,6 @@ namespace cpp_conv
         ConveyorId m_internalId;
         resources::registry::RegistryId m_registryId;
         std::string m_strName;
+        int m_TickDelay;
     };
 }

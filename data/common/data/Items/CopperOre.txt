@@ -1,3 +1,0 @@
-ITEM_COPPER_ORE
-Copper Ore
-assets::items::CopperOre

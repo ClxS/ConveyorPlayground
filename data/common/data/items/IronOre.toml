@@ -1,0 +1,4 @@
+[item]
+id="ITEM_IRON_ORE"
+name="Ore Ore"
+asset="assets::items::IronOre"
