@@ -1,3 +1,4 @@
+#include <EventToken.h>
 #include <iostream>
 
 #include "Arguments.h"
@@ -10,6 +11,7 @@
 #include <fstream>
 
 ExitCode doSpecGenerate(const Arguments&);
+ExitCode doCook(const Arguments&);
 ExitCode mainImpl(int argc, char **argv);
 
 int main(const int argc, char **argv)
@@ -31,6 +33,7 @@ ExitCode mainImpl(const int argc, char **argv)
     switch (fnv1(args.m_Mode.m_Value))
     {
         case fnv1("generate-spec"): return doSpecGenerate(args);
+        case fnv1("cook"): return doCook(args);
         default:
             std::cerr << "Unknown verb " << args.m_Mode.m_Value << "\n";
             return ExitCode::UnknownMode;
@@ -215,18 +218,41 @@ void writeGroup(std::stringstream& outStream, const AssetTree::TreeNode& node, c
     outStream << std::string(depth * 4, ' ') << "}\n";
 }
 
-void writeFiles(std::stringstream& outStream, const AssetTree::TreeNode& node, const int depth, int& index)
+std::string replaceAll(std::string str, const std::string& from, const std::string& to)
+{
+    size_t start_pos = 0;
+    while((start_pos = str.find(from, start_pos)) != std::string::npos)
+    {
+        str.replace(start_pos, from.length(), to);
+        start_pos += to.length();
+    }
+
+    return str;
+}
+
+std::string getAssetRelativeName(std::filesystem::path relativePath)
+{
+    relativePath = relativePath.replace_extension();
+    std::string namespaceName = relativePath.string();
+    namespaceName = replaceAll(namespaceName, "\\", "::");
+    namespaceName = replaceAll(namespaceName, "/", "::");
+    return namespaceName;
+}
+
+void writeAssets(std::stringstream& outStream, const AssetTree::TreeNode& node, const int depth, int& index)
 {
     for(auto& group : node.m_ChildNodes)
     {
-        writeFiles(outStream, *group, depth, index);
+        writeAssets(outStream, *group, depth, index);
     }
 
     for(const auto& [fullPath, relativePath] : node.m_Assets)
     {
-        outStream << std::string((depth + 1) * 4, ' ') << "std::filesystem::path(R\"("
+        outStream << std::string((depth + 1) * 4, ' ') << "{ std::filesystem::path(R\"("
             << relativePath.string()
-            << ")\"),\n";
+            << ")\"),"
+            << "\"" << getAssetRelativeName(relativePath) << "\""
+            << "},\n";
     }
 }
 
@@ -236,8 +262,10 @@ std::string generateFileFromTree(const AssetTree& tree, const std::string& fileN
     outFile << "#pragma once\n";
     outFile << "#include <array>\n";;
     outFile << "#include <filesystem>\n";
+    outFile << "#include <string>\n";
     outFile << "namespace " << fileNamespace << " {\n";
     outFile << std::string(1 * 4, ' ') << "using RegistryId = uint32_t;\n";
+    outFile << std::string(1 * 4, ' ') << "struct Asset { std::filesystem::path m_Path; std::string m_RelativeName; };\n";
 
     int index = 0;
     for(auto& group : tree.GetRoot().m_ChildNodes)
@@ -245,13 +273,24 @@ std::string generateFileFromTree(const AssetTree& tree, const std::string& fileN
         writeGroup(outFile, *group, 1, index);
     }
 
-    outFile << std::string(1 * 4, ' ') << "const std::array<std::filesystem::path, " << index + 1 << "> c_Files = {{\n";
+
+    outFile << std::string(1 * 4, ' ') << "const std::array<Asset, " << index + 1 << "> c_Files = {{\n";
     for(auto& group : tree.GetRoot().m_ChildNodes)
     {
-        writeFiles(outFile, *group, 1, index);
+        writeAssets(outFile, *group, 1, index);
     }
-
     outFile << std::string(1 * 4, ' ') << "}};\n";
+
+    outFile << std::string(1 * 4, ' ') << "inline bool tryLookUpId(const std::string_view& str, RegistryId* outId) {\n";
+    outFile << std::string(2 * 4, ' ') << "if (!outId) return false;\n";
+    outFile << std::string(2 * 4, ' ') << "for(uint32_t i = 0; i < c_Files.size(); i++) {\n";
+    outFile << std::string(3 * 4, ' ') << "if (c_Files[i].m_RelativeName == str) { *outId = i; return true; }\n";
+    outFile << std::string(2 * 4, ' ') << "}\n";
+    outFile << std::string(2 * 4, ' ') << "return false;\n";
+    outFile << std::string(1 * 4, ' ') << "}\n";
+
+
+
     outFile << "}";
     return outFile.str();
 }
@@ -306,6 +345,50 @@ ExitCode doSpecGenerate(const Arguments& args)
     {
         printf("File did not match after writing");
         return ExitCode::FileOutputMismatch;
+    }
+
+    return ExitCode::Success;
+}
+
+void copyAssets(const AssetTree::TreeNode& node, const std::filesystem::path& dataRoot, const std::filesystem::path& outputRoot)
+{
+    for(auto& group : node.m_ChildNodes)
+    {
+        copyAssets(*group, dataRoot, outputRoot);
+    }
+
+    for(const auto& [fullPath, relativePath] : node.m_Assets)
+    {
+        std::filesystem::path fullRootedPath = dataRoot / fullPath;
+        std::filesystem::path outputPath = outputRoot / relativePath;
+        if (!exists(outputPath.parent_path()) && !create_directories(outputPath.parent_path()))
+        {
+            std::cerr << "Failed to create directory " << outputPath.parent_path() << "\n";
+            continue;
+        }
+
+        if (!copy_file(fullRootedPath, outputPath, std::filesystem::copy_options::overwrite_existing))
+        {
+            std::cerr << "Failed to copy asset from " << fullPath << " to " << outputPath << "\n";
+        }
+    }
+}
+
+ExitCode doCook(const Arguments& args)
+{
+    if (!args.m_OutputFile.m_bIsSet)
+    {
+        return ExitCode::MissingRequiredArgument;
+    }
+
+    namespace fs = std::filesystem;
+
+    fs::path dataRoot = args.m_DataRoot.m_Value;
+    fs::path outputRoot = args.m_OutputFile.m_Value;
+    const AssetTree tree = generateAssetTree(args.m_DataRoot.m_Value, args.m_Platform.m_Value);
+    for(auto& group : tree.GetRoot().m_ChildNodes)
+    {
+        copyAssets(*group, dataRoot, outputRoot);
     }
 
     return ExitCode::Success;
