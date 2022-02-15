@@ -131,10 +131,16 @@ group("")
 				"imgui",
 			}
 		filter {}
+
+		links {
+			"tomlcpp",
+		}
 		includedirs {
 			"src",
 			"src/**",
+			"third_party/tomlcpp",
 		}
+
 		cppdialect "C++latest"
 		vpaths
 		{
@@ -149,3 +155,4 @@ group("ThirdParty")
 	dofile('third_party/sdl.lua')
 	dofile('third_party/sdlimage.lua')
 	dofile('third_party/imgui.lua')
+	dofile('third_party/tomlcpp.lua')
