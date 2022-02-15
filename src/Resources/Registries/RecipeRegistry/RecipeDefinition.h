@@ -3,12 +3,13 @@
 #include "ResourceAsset.h"
 #include "TileAsset.h"
 #include "DataId.h"
-#include "ResourceRegistry.h"
 #include "AssetPtr.h"
 #include "TileAsset.h"
 
 #include <vector>
 #include <string>
+
+#include "AssetRegistry.h"
 
 namespace cpp_conv
 {
@@ -39,8 +40,6 @@ namespace cpp_conv
 
         [[nodiscard]] RecipeId GetInternalId() const { return m_internalId; }
         [[nodiscard]] const std::string GetName() const { return m_strName; }
-
-        [[nodiscard]] resources::AssetPtr<resources::TileAsset> GetTile() const;
 
         [[nodiscard]] uint32_t GetEffort() const { return m_uiEffort; }
         [[nodiscard]] const std::vector<RecipeItem>& GetInputItems() const { return m_vInputItems; }

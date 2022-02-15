@@ -1,4 +1,3 @@
-ITEM_COAL_PRODUCER
-Copper Mine
-ITEM_COAL_ORE
-7
+CONVEYOR_BASIC
+Basic Conveyor
+10

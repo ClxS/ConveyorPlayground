@@ -1,5 +1,6 @@
 INSERTER_BASIC
 Basic Inserter
+assets::factories::CopperMine
 4
 2
 0

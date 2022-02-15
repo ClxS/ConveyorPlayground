@@ -4,8 +4,8 @@
 #include "ResourceAsset.h"
 #include "TileAsset.h"
 #include "DataId.h"
-#include "ResourceRegistry.h"
 #include "AssetPtr.h"
+#include "AssetRegistry.h"
 #include "TileAsset.h"
 
 namespace cpp_conv
@@ -23,7 +23,6 @@ namespace cpp_conv
         [[nodiscard]] ConveyorId GetInternalId() const { return m_internalId; }
 
         [[nodiscard]] const std::string& GetName() const { return m_strName; }
-        [[nodiscard]] resources::AssetPtr<resources::TileAsset> GetTile() const;
 
     private:
         ConveyorId m_internalId;

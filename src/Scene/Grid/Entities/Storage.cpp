@@ -1,5 +1,4 @@
 #include "Storage.h"
-#include "ResourceRegistry.h"
 #include "ResourceManager.h"
 #include "Renderer.h"
 #include "TileAsset.h"
@@ -18,7 +17,7 @@ void cpp_conv::Storage::Tick(const SceneContext& kContext)
 
 void cpp_conv::Storage::Draw(RenderContext& kRenderContext) const
 {
-    const auto pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::visual::Storage);
+    const auto pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::assets::c_Storage);
     if (!pTile)
     {
         return;

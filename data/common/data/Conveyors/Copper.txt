@@ -1,3 +1,0 @@
-CONVEYOR_BASIC
-Basic Conveyor
-10

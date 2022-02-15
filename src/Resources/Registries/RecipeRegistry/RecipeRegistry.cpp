@@ -1,5 +1,4 @@
 #include "RecipeRegistry.h"
-#include "ResourceRegistry.h"
 #include "ResourceManager.h"
 #include "RecipeDefinition.h"
 #include "AssetPtr.h"
@@ -19,9 +18,8 @@ namespace
 {
     void loadItems()
     {
-        for (int i = 0; i < sizeof(cpp_conv::resources::registry::c_szRecipes) / sizeof(std::filesystem::path); i++)
+        for(const RegistryId asset : cpp_conv::resources::registry::data::recipes::c_AllAssets)
         {
-            const RegistryId asset = { i, 8 };
             auto pAsset = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::RecipeDefinition>(asset);
             if (!pAsset)
             {

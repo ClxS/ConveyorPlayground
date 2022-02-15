@@ -4,8 +4,8 @@
 #include "ResourceAsset.h"
 #include "TileAsset.h"
 #include "DataId.h"
-#include "ResourceRegistry.h"
 #include "AssetPtr.h"
+#include "AssetRegistry.h"
 #include "TileAsset.h"
 
 namespace cpp_conv
@@ -16,12 +16,14 @@ namespace cpp_conv
         InserterDefinition(
             InserterId internalId,
             resources::registry::RegistryId registryId,
+            resources::registry::RegistryId assetId,
             std::string strName,
             uint32_t uiTransitTime,
             uint32_t uiCooldownTime,
             bool bSupportsStacks)
             : m_internalId(internalId)
             , m_registryId(registryId)
+            , m_AssetId(assetId)
             , m_strName(std::move(strName))
             , m_uiTransitTime(uiTransitTime)
             , m_uiCooldownTime(uiCooldownTime)
@@ -41,6 +43,7 @@ namespace cpp_conv
     private:
         InserterId m_internalId;
         resources::registry::RegistryId m_registryId;
+        resources::registry::RegistryId m_AssetId;
         std::string m_strName;
 
         uint32_t m_uiTransitTime;

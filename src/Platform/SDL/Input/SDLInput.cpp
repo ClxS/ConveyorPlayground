@@ -8,6 +8,7 @@
 #include <backends/imgui_impl_sdl.h>
 #include "RenderContext.h"
 #include "Vector3.h"
+#include "AssetRegistry.h"
 
 void cpp_conv::input::receiveInput(SceneContext& kContext, RenderContext& kRenderContext, std::queue<
                                        commands::CommandType>& commands)

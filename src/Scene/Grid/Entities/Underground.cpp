@@ -10,7 +10,6 @@
 #include <array>
 #include <random>
 #include <chrono>
-#include "ResourceRegistry.h"
 #include "ResourceManager.h"
 #include "TileAsset.h"
 #include "WorldMap.h"
@@ -149,7 +148,7 @@ void cpp_conv::Underground::Tick(const SceneContext& kContext)
 
 void cpp_conv::Underground::Draw(RenderContext& kRenderContext) const
 {
-    const auto pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::visual::Tunnel);
+    const auto pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::assets::conveyors::c_Tunnel);
     if (!pTile)
     {
         return;

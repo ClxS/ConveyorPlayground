@@ -65,7 +65,7 @@ cpp_conv::resources::resource_manager::FileData getFileData(cpp_conv::resources:
     const auto filePath = rootPath
         /
         "data" /
-        cpp_conv::resources::registry::c_szCategoryPaths[kAssetId.m_category][kAssetId.m_index];
+        cpp_conv::resources::registry::c_Files[kAssetId].m_Path;
 
     std::ifstream file;
     file.open(filePath, std::ios::binary | std::ios::ate);

@@ -4,8 +4,8 @@
 #include "ResourceAsset.h"
 #include "TileAsset.h"
 #include "DataId.h"
-#include "ResourceRegistry.h"
 #include "AssetPtr.h"
+#include "AssetRegistry.h"
 #include "TileAsset.h"
 #include "Vector3.h"
 
@@ -17,6 +17,7 @@ namespace cpp_conv
         FactoryDefinition(
             FactoryId internalId,
             resources::registry::RegistryId registryId,
+            resources::registry::RegistryId assetId,
             std::string strName,
             Vector3 size,
             uint32_t productionRate,
@@ -25,6 +26,7 @@ namespace cpp_conv
             RecipeId producedRecipe)
             : m_internalId(internalId)
             , m_registryId(registryId)
+            , m_AssetId(assetId)
             , m_strName(std::move(strName))
             , m_size(size)
             , m_uiProductionRate(productionRate)
@@ -47,6 +49,7 @@ namespace cpp_conv
     private:
         FactoryId m_internalId;
         resources::registry::RegistryId m_registryId;
+        resources::registry::RegistryId m_AssetId;
         std::string m_strName;
         Vector3 m_size;
         uint32_t m_uiProductionRate;

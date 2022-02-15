@@ -1,5 +1,6 @@
 FACTORY_COPPER_MINE
 Copper Mine
+assets::factories::CopperMine
 3 3 1
 1
 1 2 1 0

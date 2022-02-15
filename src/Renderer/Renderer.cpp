@@ -7,7 +7,6 @@
 #include <map>
 #include <mutex>
 #include "TileRenderHandler.h"
-#include "ResourceRegistry.h"
 #include "ResourceManager.h"
 #include "TileAsset.h"
 #include "Profiler.h"
@@ -47,7 +46,7 @@ void cpp_conv::renderer::init(RenderContext& kContext, SwapChain& rSwapChain)
 
 void drawPlayer(const cpp_conv::SceneContext& kSceneContext, cpp_conv::RenderContext& kRenderContext)
 {
-    const auto pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::visual::Player);
+    const auto pTile = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::resources::TileAsset>(cpp_conv::resources::registry::assets::items::c_CopperOre);
     if (!pTile)
     {
         return;
@@ -167,7 +166,7 @@ void cpp_conv::renderer::drawBackground(const SceneContext& kSceneContext, Rende
 {
     PROFILE_FUNC();
     const auto pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(
-        resources::registry::visual::BackgroundRepeating);
+        resources::registry::assets::c_background_repeating);
     if (!pTile)
     {
         return;

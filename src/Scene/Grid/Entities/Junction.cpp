@@ -84,7 +84,7 @@ void cpp_conv::Junction::Tick(const SceneContext& kContext)
 
 void cpp_conv::Junction::Draw(RenderContext& kRenderContext) const
 {
-    const auto pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::visual::Junction);
+    const auto pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::assets::conveyors::c_Junction);
     if (!pTile)
     {
         return;

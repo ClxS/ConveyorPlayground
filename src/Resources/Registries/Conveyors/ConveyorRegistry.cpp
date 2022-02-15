@@ -2,7 +2,6 @@
 
 #include <cassert>
 
-#include "ResourceRegistry.h"
 #include "ResourceManager.h"
 #include "ConveyorDefinition.h"
 #include "AssetPtr.h"
@@ -22,9 +21,8 @@ namespace
 {
     void loadItems()
     {
-        for (size_t i = 0; i < sizeof(cpp_conv::resources::registry::c_szConveyors) / sizeof(std::filesystem::path); i++)
+        for(const RegistryId asset : cpp_conv::resources::registry::data::conveyors::c_AllAssets)
         {
-            const RegistryId asset = { static_cast<int>(i), 9 };
             auto pAsset = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::ConveyorDefinition>(asset);
             if (!pAsset)
             {

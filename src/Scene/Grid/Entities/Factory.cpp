@@ -8,7 +8,6 @@
 #include <array>
 #include <random>
 #include "ResourceManager.h"
-#include "ResourceRegistry.h"
 #include "TileAsset.h"
 #include "DataId.h"
 #include "AssetPtr.h"

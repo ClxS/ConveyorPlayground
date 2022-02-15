@@ -380,22 +380,22 @@ void cpp_conv::Conveyor::AssessPosition(const WorldMap& map)
     {
         if (!IsCapped())
         {
-            m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::visual::Conveyor_Straight);
+            m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::assets::conveyors::c_ConveyorStraight);
         }
         else
         {
-            m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::visual::Conveyor_Straight_End);
+            m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::assets::conveyors::c_ConveyorStraightEnd);
         }
     }
     else
     {
         if (IsClockwiseCorner())
         {
-            m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::visual::Conveyor_CornerClockwise);
+            m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::assets::conveyors::c_ConveyorCornerClockwise);
         }
         else
         {
-            m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::visual::Conveyor_CornerAntiClockwise);
+            m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::assets::conveyors::c_ConveyorCornerAntiClockwise);
         }
     }
 }

@@ -118,7 +118,7 @@ void cpp_conv::game::run()
     {
         //CreateMillionTileMap(worldMap);
 
-        const AssetPtr<Map> map = resource_manager::loadAssetUncached<Map>(registry::data::MapSimple);
+        const AssetPtr<Map> map = resource_manager::loadAssetUncached<Map>(registry::maps::c_simple);
         worldMap.Consume(map);
 
         /*map = resource_manager::loadAssetUncached<Map>(registry::data::MapSimple1);
@@ -141,7 +141,7 @@ void cpp_conv::game::run()
 
     std::vector<Sequence*> sequences = initializeSequences(worldMap, worldMap.GetConveyors());
     SceneContext kSceneContext =
-    { 
+    {
         {},
         worldMap,
         sequences,
@@ -167,7 +167,7 @@ void cpp_conv::game::run()
     renderer::SwapChain swapChain(kRenderContext, iWidth, iHeight);
     init(kRenderContext, swapChain);
 
-    FrameLimiter frameLimter(1);
+    FrameLimiter frameLimter(60);
     std::queue<commands::CommandType> commands;
 
     ui::initializeGuiSystem();
@@ -175,7 +175,7 @@ void cpp_conv::game::run()
 
     frameLimter.Start();
     float fCurrentZoom = kRenderContext.m_fZoom;
-    while (true) 
+    while (true)
     {
         kRenderContext.m_uiDrawnItems = 0;
 
@@ -192,7 +192,7 @@ void cpp_conv::game::run()
                 /*kRenderContext.m_cameraQuad.m_uiWidth = swapChain.GetWriteSurface().GetWidth();
                 kRenderContext.m_cameraQuad.m_uiHeight = swapChain.GetWriteSurface().GetHeight();*/
             }
-            }()); 
+            }());
 
         PROFILE(UpdateCamera, updateCamera(kSceneContext, kRenderContext));
 

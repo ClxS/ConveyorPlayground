@@ -50,8 +50,8 @@ void cpp_conv::Stairs::Draw(RenderContext& kRenderContext) const
 {
     const auto pTile =
         m_bIsUp
-            ? cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::visual::StairsUp)
-            : cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::visual::StairsDown);
+            ? cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::assets::c_Storage)
+            : cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::assets::c_Storage);
 
     if (!pTile)
     {

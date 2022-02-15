@@ -17,6 +17,11 @@ void tileRenderer(
     const bool bTrack)
 {
     PROFILE_FUNC();
+    if (!pAsset)
+    {
+        return;
+    }
+
     SDL_Rect dest = {};
     const auto pTile = reinterpret_cast<const cpp_conv::resources::SDLTile2DAsset*>(pAsset);
     SDL_Texture* pTexture = pTile->GetTexture();

@@ -3,8 +3,8 @@
 #include <functional>
 #include <memory>
 
-#include "ResourceRegistry.h"
 #include "AssetPtr.h"
+#include "AssetRegistry.h"
 #include "ResourceAsset.h"
 
 namespace cpp_conv::resources::resource_manager

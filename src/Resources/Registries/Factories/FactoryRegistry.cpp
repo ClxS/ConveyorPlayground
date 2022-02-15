@@ -1,5 +1,4 @@
 #include "FactoryRegistry.h"
-#include "ResourceRegistry.h"
 #include "ResourceManager.h"
 #include "FactoryDefinition.h"
 #include "AssetPtr.h"
@@ -20,9 +19,8 @@ namespace
 {
     void loadFactories()
     {
-        for (int i = 0; i < sizeof(cpp_conv::resources::registry::c_szFactoryPaths) / sizeof(std::filesystem::path); i++)
+        for(const RegistryId asset : cpp_conv::resources::registry::data::factories::c_AllAssets)
         {
-            const RegistryId asset = { i, 4 };
             auto pAsset = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::FactoryDefinition>(asset);
             if (!pAsset)
             {
@@ -43,6 +41,7 @@ cpp_conv::resources::ResourceAsset* factoryAssetHandler(cpp_conv::resources::res
 
     std::string id;
     std::string name;
+    std::string asset;
     std::string producedRecipeId;
     Vector3 size = {};
     Vector3 outputPipe = {};
@@ -62,14 +61,15 @@ cpp_conv::resources::ResourceAsset* factoryAssetHandler(cpp_conv::resources::res
         {
         case 0: id = token; break;
         case 1: name = token; break;
-        case 2:
+        case 2: asset = token; break;
+        case 3:
         {
             std::istringstream tmp(token);
             tmp >> size;
             break;
         }
-        case 3: rate = std::stoi(token); break;
-        case 4:
+        case 4: rate = std::stoi(token); break;
+        case 5:
         {
             std::istringstream tmp(token);
             int32_t hasPipe;
@@ -86,15 +86,22 @@ cpp_conv::resources::ResourceAsset* factoryAssetHandler(cpp_conv::resources::res
 
             break;
         }
-        case 5: producedRecipeId = token; break;
+        case 6: producedRecipeId = token; break;
         }
 
         idx++;
     }
 
+    RegistryId assetId;
+    if (!cpp_conv::resources::registry::tryLookUpId(asset, &assetId))
+    {
+        assetId = cpp_conv::resources::registry::assets::c_missingno;
+    }
+
     return new cpp_conv::FactoryDefinition(
         cpp_conv::FactoryId::FromStringId(id),
         rData.m_registryId,
+        assetId,
         name,
         size,
         rate,

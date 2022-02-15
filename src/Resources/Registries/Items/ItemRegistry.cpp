@@ -1,5 +1,4 @@
 #include "ItemRegistry.h"
-#include "ResourceRegistry.h"
 #include "ResourceManager.h"
 #include "ItemDefinition.h"
 #include "AssetPtr.h"
@@ -19,9 +18,8 @@ namespace
 {
     void loadItems()
     {
-        for (int i = 0; i < sizeof(cpp_conv::resources::registry::c_szItemsPaths) / sizeof(std::filesystem::path); i++)
+        for(const RegistryId asset : cpp_conv::resources::registry::data::items::c_AllAssets)
         {
-            const RegistryId asset = { i, 2 };
             auto pAsset = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::ItemDefinition>(asset);
             if (!pAsset)
             {
@@ -43,6 +41,7 @@ cpp_conv::resources::ResourceAsset* itemAssetHandler(cpp_conv::resources::resour
 
     std::string id;
     std::string name;
+    std::string asset;
 
     int idx = 0;
     std::string token;
@@ -57,12 +56,19 @@ cpp_conv::resources::ResourceAsset* itemAssetHandler(cpp_conv::resources::resour
         {
         case 0: id = token; break;
         case 1: name = token; break;
+        case 2: asset = token;
         }
 
         idx++;
     }
 
-    return new cpp_conv::ItemDefinition(cpp_conv::ItemId::FromStringId(id), rData.m_registryId, name);
+    RegistryId assetId;
+    if (!cpp_conv::resources::registry::tryLookUpId(asset, &assetId))
+    {
+        assetId = cpp_conv::resources::registry::assets::c_missingno;
+    }
+
+    return new cpp_conv::ItemDefinition(cpp_conv::ItemId::FromStringId(id), rData.m_registryId, assetId, name);
 }
 
 cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> cpp_conv::resources::getItemDefinition(const ItemId id)

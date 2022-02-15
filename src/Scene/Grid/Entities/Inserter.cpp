@@ -10,7 +10,6 @@
 #include <array>
 #include <random>
 #include <chrono>
-#include "ResourceRegistry.h"
 #include "ResourceManager.h"
 #include "TileAsset.h"
 #include "InserterDefinition.h"

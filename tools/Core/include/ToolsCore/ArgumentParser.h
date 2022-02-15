@@ -129,8 +129,8 @@ namespace cppconv::tools::arg_parser
 #define ARG_CTOR_5_V(Type, Verb, A, B, C, D, E) Type() : cppconv::tools::arg_parser::ArgumentsBase(&(m_##Verb), {&(m_##A), &(m_##B), &(m_##C), &(m_##D), &(m_##E)}) {}
 
 #define VERB_1(NAME, VALUE1) cppconv::tools::arg_parser::VerbParameter m_##NAME = { #NAME, { VALUE1 } }
-#define VERB_2(NAME, VALUE1) cppconv::tools::arg_parser::VerbParameter m_##NAME = { #NAME, { VALUE1 } }
-#define VERB_3(NAME, VALUE1) cppconv::tools::arg_parser::VerbParameter m_##NAME = { #NAME, { VALUE1 } }
+#define VERB_2(NAME, VALUE1, VALUE2) cppconv::tools::arg_parser::VerbParameter m_##NAME = { #NAME, { VALUE1, VALUE2 } }
+#define VERB_3(NAME, VALUE1, VALUE2, VALUE3) cppconv::tools::arg_parser::VerbParameter m_##NAME = { #NAME, { VALUE1, VALUE2, VALUE3 } }
 
 #define ARG(NAME, TYPE, SWITCH_SHORT, SWITCH_LONG, DESCRIPTION)\
     cppconv::tools::arg_parser::ArgumentParameter<TYPE> m_##NAME = { #NAME, false, (char)(SWITCH_SHORT), SWITCH_LONG }
