@@ -138,6 +138,7 @@ group("")
 		includedirs {
 			"src",
 			"src/**",
+			"src/Generated",
 			"third_party/tomlcpp",
 		}
 
