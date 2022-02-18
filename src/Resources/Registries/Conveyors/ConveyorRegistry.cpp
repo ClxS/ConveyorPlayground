@@ -40,46 +40,20 @@ namespace
 
 cpp_conv::resources::ResourceAsset* conveyorAssetHandler(cpp_conv::resources::resource_manager::FileData& rData)
 {
-#define VALIDATE(FIELD) if (!bOk) { std::cerr << "Conveyor is missing required field '" #FIELD "'\n"; return nullptr; }
-
     const auto pStrData = reinterpret_cast<const char*>(rData.m_pData);
 
     // ReSharper disable once CppRedundantCastExpression
-    std::string copy(pStrData, (int)(rData.m_uiSize / sizeof(char)));
+    const std::string copy(pStrData, (int)(rData.m_uiSize / sizeof(char)));
 
-    const auto [table, errors] = ::toml::parse(copy);
-    if (!table)
+    std::string errors;
+    auto pDefinition = cpp_conv::ConveyorDefinition::Deserialize(copy, &errors);
+    if (!pDefinition)
     {
-        std::cerr << "Failed to read TOML: " << errors << "\n";
+        std::cerr << errors;
         return nullptr;
     }
 
-    const auto conveyor = table->getTable("conveyor");
-    if (!conveyor)
-    {
-        std::cerr << "File did not contain a top level [conveyor] entry\n";
-        return nullptr;
-    }
-
-    bool bOk = false;
-    std::string id;
-    std::string name;
-    int64_t tickDelay;
-
-    std::tie(bOk, id) = conveyor->getString("id");
-    VALIDATE(id)
-
-    std::tie(bOk, name) = conveyor->getString("name");
-    VALIDATE(name)
-
-    std::tie(bOk, tickDelay) = conveyor->getInt("tickDelay");
-    VALIDATE(tickDelay)
-
-    return new cpp_conv::ConveyorDefinition(
-        cpp_conv::ConveyorId::FromStringId(id),
-        rData.m_registryId,
-        name,
-        static_cast<int>(tickDelay));
+    return pDefinition.release();
 }
 
 cpp_conv::resources::AssetPtr<cpp_conv::ConveyorDefinition> cpp_conv::resources::getConveyorDefinition(ConveyorId id)

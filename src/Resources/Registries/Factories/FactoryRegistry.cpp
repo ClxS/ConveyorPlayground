@@ -12,6 +12,9 @@
 #include "DataId.h"
 #include "Profiler.h"
 
+#include <tuple>
+#include <tomlcpp.hpp>
+
 using RegistryId = cpp_conv::resources::registry::RegistryId;
 static std::vector<cpp_conv::resources::AssetPtr<cpp_conv::FactoryDefinition>> g_vFactories;
 
@@ -36,78 +39,18 @@ cpp_conv::resources::ResourceAsset* factoryAssetHandler(cpp_conv::resources::res
 {
     const auto pStrData = reinterpret_cast<const char*>(rData.m_pData);
 
-    std::string copy(pStrData, (const unsigned int)(rData.m_uiSize / sizeof(char)));
-    std::istringstream ss(copy);
+    // ReSharper disable once CppRedundantCastExpression
+    const std::string copy(pStrData, (int)(rData.m_uiSize / sizeof(char)));
 
-    std::string id;
-    std::string name;
-    std::string asset;
-    std::string producedRecipeId;
-    Vector3 size = {};
-    Vector3 outputPipe = {};
-    bool bHasOwnOutputPipe = false;
-    int rate = 0;
-
-    int idx = 0;
-    std::string token;
-    while (std::getline(ss, token))
+    std::string errors;
+    auto pDefinition = cpp_conv::FactoryDefinition::Deserialize(copy, &errors);
+    if (!pDefinition)
     {
-        if (token.back() == '\r')
-        {
-            token.erase(token.size() - 1);
-        }
-
-        switch (idx)
-        {
-        case 0: id = token; break;
-        case 1: name = token; break;
-        case 2: asset = token; break;
-        case 3:
-        {
-            std::istringstream tmp(token);
-            tmp >> size;
-            break;
-        }
-        case 4: rate = std::stoi(token); break;
-        case 5:
-        {
-            std::istringstream tmp(token);
-            int32_t hasPipe;
-            tmp >> hasPipe;
-            if (hasPipe)
-            {
-                bHasOwnOutputPipe = true;
-                tmp >> outputPipe;
-            }
-            else
-            {
-                bHasOwnOutputPipe = false;
-            }
-
-            break;
-        }
-        case 6: producedRecipeId = token; break;
-        }
-
-        idx++;
+        std::cerr << errors;
+        return nullptr;
     }
 
-    RegistryId assetId;
-    if (!cpp_conv::resources::registry::tryLookUpId(asset, &assetId))
-    {
-        assetId = cpp_conv::resources::registry::assets::c_missingno;
-    }
-
-    return new cpp_conv::FactoryDefinition(
-        cpp_conv::FactoryId::FromStringId(id),
-        rData.m_registryId,
-        assetId,
-        name,
-        size,
-        rate,
-        bHasOwnOutputPipe,
-        outputPipe,
-        cpp_conv::RecipeId::FromStringId(producedRecipeId));
+    return pDefinition.release();
 }
 
 const cpp_conv::resources::AssetPtr<cpp_conv::FactoryDefinition> cpp_conv::resources::getFactoryDefinition(FactoryId id)

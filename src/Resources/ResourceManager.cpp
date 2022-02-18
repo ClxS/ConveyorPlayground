@@ -65,13 +65,13 @@ cpp_conv::resources::resource_manager::FileData getFileData(cpp_conv::resources:
     const auto filePath = rootPath
         /
         "data" /
-        cpp_conv::resources::registry::c_Files[kAssetId].m_Path;
+        cpp_conv::resources::registry::c_Files[kAssetId.m_Value].m_Path;
 
     std::ifstream file;
     file.open(filePath, std::ios::binary | std::ios::ate);
     if (file.fail())
     {
-        return {};
+        return { RegistryId::Invalid(), nullptr, 0 };
     }
 
     // ReSharper disable once CppRedundantCastExpression
@@ -82,7 +82,7 @@ cpp_conv::resources::resource_manager::FileData getFileData(cpp_conv::resources:
 
     if (uiLength == 0)
     {
-        return {};
+        return { RegistryId::Invalid(), nullptr, 0 };
     }
 
     uint8_t* pData = new uint8_t[uiLength];

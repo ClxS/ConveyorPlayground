@@ -10,11 +10,14 @@
 #include <string>
 
 #include "AssetRegistry.h"
+#include "Serializable.h"
+#include "TomlSerializer.h"
 
 namespace cpp_conv
 {
-    class RecipeDefinition : public resources::ResourceAsset
+    class RecipeDefinition : public Serializable<RecipeDefinition, TomlSerializer, resources::ResourceAsset>
     {
+        inline static TomlSerializer::Config ms_ConveyorConfig = { "recipe" };
     public:
         struct RecipeItem
         {
@@ -22,36 +25,47 @@ namespace cpp_conv
             uint32_t m_uiCount;
         };
 
-        RecipeDefinition(
-            RecipeId internalId,
-            resources::registry::RegistryId registryId,
-            std::string name,
-            uint32_t uiEffort,
-            std::vector<RecipeItem> inputItems,
-            std::vector<RecipeItem> outputItems)
-            : m_internalId(internalId)
-            , m_registryId(registryId)
-            , m_strName(name)
-            , m_uiEffort(uiEffort)
-            , m_vInputItems(std::move(inputItems))
-            , m_vOutputItems(std::move(outputItems))
+        RecipeDefinition()
+            : Serializable(
+                ms_ConveyorConfig,
+                {
+                    &m_InternalId,
+                    &m_Name,
+                    &m_Description,
+                    &m_Effort,
+                    &m_InputItems,
+                    &m_OutputItems,
+                })
         {
         }
 
-        [[nodiscard]] RecipeId GetInternalId() const { return m_internalId; }
-        [[nodiscard]] const std::string GetName() const { return m_strName; }
+        [[nodiscard]] RecipeId GetInternalId() const { return m_InternalId.m_Value; }
+        [[nodiscard]] std::string GetName() const { return m_Name.m_Value; }
+        [[nodiscard]] std::string GetDescription() const { return m_Description.m_Value; }
+        [[nodiscard]] uint32_t GetEffort() const { return m_Effort.m_Value; }
 
-        [[nodiscard]] uint32_t GetEffort() const { return m_uiEffort; }
-        [[nodiscard]] const std::vector<RecipeItem>& GetInputItems() const { return m_vInputItems; }
-        [[nodiscard]] const std::vector<RecipeItem>& GetOutputItems() const { return m_vOutputItems; }
+        [[nodiscard]] const std::vector<RecipeItem>& GetInputItems() const { return m_InputItems.m_Value; }
+        [[nodiscard]] const std::vector<RecipeItem>& GetOutputItems() const { return m_OutputItems.m_Value; }
 
     private:
-        RecipeId m_internalId;
-        resources::registry::RegistryId m_registryId;
-        std::string m_strName;
+        DataField<RecipeId, "id"> m_InternalId{};
+        DataField<std::string, "name"> m_Name{};
+        DataField<std::string, "description", false> m_Description{};
+        DataField<uint32_t, "effort"> m_Effort{};
 
-        uint32_t m_uiEffort;
-        std::vector<RecipeItem> m_vInputItems;
-        std::vector<RecipeItem> m_vOutputItems;
+        DataField<std::vector<RecipeItem>, "input", false> m_InputItems;
+        DataField<std::vector<RecipeItem>, "output"> m_OutputItems;
+    };
+
+    template<>
+    struct TypedDataReader<RecipeDefinition::RecipeItem>
+    {
+        static bool Read(const toml::Table* value, const char* szPropertyName, RecipeDefinition::RecipeItem& pTargetVariable);
+    };
+
+    template<>
+    struct TypedDataReader<std::vector<RecipeDefinition::RecipeItem>>
+    {
+        static bool Read(const toml::Table* value, const char* szPropertyName, std::vector<RecipeDefinition::RecipeItem>& pTargetVariable);
     };
 }

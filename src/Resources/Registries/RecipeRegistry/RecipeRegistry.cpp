@@ -36,52 +36,16 @@ namespace
 
         // ReSharper disable once CppRedundantCastExpression
         const std::string copy(pStrData, (int)(rData.m_uiSize / sizeof(char)));
-        std::istringstream ss(copy);
 
-        std::string id;
-        std::string name;
-        uint32_t effort;
-        std::vector<cpp_conv::RecipeDefinition::RecipeItem> inputs;
-        std::vector<cpp_conv::RecipeDefinition::RecipeItem> outputs;
-
-        int idx = 0;
-        std::string token;
-        bool bIsInputItems = false;
-        while (std::getline(ss, token))
+        std::string errors;
+        auto pDefinition = cpp_conv::RecipeDefinition::Deserialize(copy, &errors);
+        if (!pDefinition)
         {
-            if (token.back() == '\r')
-            {
-                token.erase(token.size() - 1);
-            }
-
-            switch (idx)
-            {
-            case 0: id = token; break;
-            case 1: name = token; break;
-            case 2: effort = std::stoi(token); break;
-            case 3: break;
-            default:
-                if (token.empty())
-                {
-                    bIsInputItems = true;
-                }
-                else
-                {
-                    std::string item;
-                    uint32_t count;
-                    std::istringstream tmp(token);
-                    tmp >> item >> count;
-
-                    (bIsInputItems ? inputs : outputs).emplace_back(cpp_conv::ItemId::FromStringId(item), count);
-                }
-
-                break;
-            }
-
-            idx++;
+            std::cerr << errors;
+            return nullptr;
         }
 
-        return new cpp_conv::RecipeDefinition(cpp_conv::RecipeId::FromStringId(id), rData.m_registryId, name, effort, inputs, outputs);
+        return pDefinition.release();
     }
 }
 

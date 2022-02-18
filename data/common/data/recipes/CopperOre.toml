@@ -1,5 +1,6 @@
 [recipe]
 id="RECIPE_COPPER_ORE"
+name="Copper Ore"
 description="Produces Copper Ore from thin air!"
 effort=1
 

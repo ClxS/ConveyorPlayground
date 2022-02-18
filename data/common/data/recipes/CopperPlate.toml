@@ -1,5 +1,6 @@
 [recipe]
 id="RECIPE_COPPER_PLATE"
+name="Copper Plate"
 description="1 Copper Plate from 10 Copper Ore"
 effort=10
 

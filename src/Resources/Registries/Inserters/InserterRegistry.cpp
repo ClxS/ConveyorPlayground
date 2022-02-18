@@ -37,51 +37,16 @@ cpp_conv::resources::ResourceAsset* inserterAssetHandler(cpp_conv::resources::re
 
     // ReSharper disable once CppRedundantCastExpression
     const std::string copy(pStrData, (int)(rData.m_uiSize / sizeof(char)));
-    std::istringstream ss(copy);
 
-    std::string id;
-    std::string name;
-    std::string asset;
-    uint32_t uiTransitTime;
-    uint32_t uiCooldownTime;
-    bool bSupportsStacks;
-
-    int idx = 0;
-    std::string token;
-    while (std::getline(ss, token))
+    std::string errors;
+    auto pDefinition = cpp_conv::InserterDefinition::Deserialize(copy, &errors);
+    if (!pDefinition)
     {
-        if (token.back() == '\r')
-        {
-            token.erase(token.size() - 1);
-        }
-
-        switch (idx)
-        {
-        case 0: id = token; break;
-        case 1: name = token; break;
-        case 2: asset = token; break;
-        case 3: uiTransitTime = std::stoi(token); break;
-        case 4: uiCooldownTime = std::stoi(token); break;
-        case 5: bSupportsStacks = std::stoi(token); break;
-        }
-
-        idx++;
+        std::cerr << errors;
+        return nullptr;
     }
 
-    RegistryId assetId;
-    if (!cpp_conv::resources::registry::tryLookUpId(asset, &assetId))
-    {
-        assetId = cpp_conv::resources::registry::assets::c_missingno;
-    }
-
-    return new cpp_conv::InserterDefinition(
-        cpp_conv::InserterId::FromStringId(id),
-        rData.m_registryId,
-        assetId,
-        name,
-        uiTransitTime,
-        uiCooldownTime,
-        bSupportsStacks);
+    return pDefinition.release();
 }
 
 cpp_conv::resources::AssetPtr<cpp_conv::InserterDefinition> cpp_conv::resources::getInserterDefinition(

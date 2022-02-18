@@ -37,38 +37,16 @@ cpp_conv::resources::ResourceAsset* itemAssetHandler(cpp_conv::resources::resour
 
     // ReSharper disable once CppRedundantCastExpression
     const std::string copy(pStrData, (int)(rData.m_uiSize / sizeof(char)));
-    std::istringstream ss(copy);
 
-    std::string id;
-    std::string name;
-    std::string asset;
-
-    int idx = 0;
-    std::string token;
-    while (std::getline(ss, token))
+    std::string errors;
+    auto pDefinition = cpp_conv::ItemDefinition::Deserialize(copy, &errors);
+    if (!pDefinition)
     {
-        if (token.back() == '\r')
-        {
-            token.erase(token.size() - 1);
-        }
-
-        switch (idx)
-        {
-        case 0: id = token; break;
-        case 1: name = token; break;
-        case 2: asset = token;
-        }
-
-        idx++;
+        std::cerr << errors;
+        return nullptr;
     }
 
-    RegistryId assetId;
-    if (!cpp_conv::resources::registry::tryLookUpId(asset, &assetId))
-    {
-        assetId = cpp_conv::resources::registry::assets::c_missingno;
-    }
-
-    return new cpp_conv::ItemDefinition(cpp_conv::ItemId::FromStringId(id), rData.m_registryId, assetId, name);
+    return pDefinition.release();
 }
 
 cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> cpp_conv::resources::getItemDefinition(const ItemId id)
