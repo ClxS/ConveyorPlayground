@@ -264,8 +264,15 @@ std::string generateFileFromTree(const AssetTree& tree, const std::string& fileN
     outFile << "#include <filesystem>\n";
     outFile << "#include <string>\n";
     outFile << "namespace " << fileNamespace << " {\n";
-    outFile << std::string(1 * 4, ' ') << "using RegistryId = uint32_t;\n";
+    outFile << std::string(1 * 4, ' ') << "struct RegistryId\n";
+    outFile << std::string(1 * 4, ' ') << "{\n";
+    outFile << std::string(2 * 4, ' ') << "constexpr RegistryId(uint32_t value) : m_Value(value) {}\n";
+    outFile << std::string(2 * 4, ' ') << "static RegistryId Invalid() { return 0xFFFFFFFF; }\n";
+    outFile << std::string(2 * 4, ' ') << "bool operator<(const RegistryId& other) const { return m_Value < other.m_Value; }\n";
+    outFile << std::string(2 * 4, ' ') << "uint32_t m_Value;\n";
+    outFile << std::string(1 * 4, ' ') << "};\n";
     outFile << std::string(1 * 4, ' ') << "struct Asset { std::filesystem::path m_Path; std::string m_RelativeName; };\n";
+
 
     int index = 0;
     for(auto& group : tree.GetRoot().m_ChildNodes)
