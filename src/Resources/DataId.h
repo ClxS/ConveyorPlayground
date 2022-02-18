@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <string>
+#include "Serialization/DataField.h"
 
 namespace cpp_conv
 {
@@ -41,6 +42,18 @@ namespace cpp_conv
     namespace NAME##Ids\
     {\
         constexpr NAME##Id None = { 0 };\
+    }\
+    template<>\
+    struct TypedDataReader<NAME##Id>\
+    {\
+        static bool Read(const toml::Table* value, const char* szPropertyName, NAME##Id& pTargetVariable)\
+        {\
+            std::string strValue;\
+            bool bResult = TypedDataReader<std::string>::Read(value, szPropertyName, strValue);\
+            if (!bResult) return false;\
+            pTargetVariable = NAME##Id::FromStringId(strValue);\
+            return true;\
+        }\
     }
 
     DEFINE_UNIQUE_DATA_TYPE(Item);
