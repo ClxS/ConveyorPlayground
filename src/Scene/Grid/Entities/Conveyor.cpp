@@ -48,7 +48,7 @@ void DrawConveyorItem(
     Vector2F previousPosition = {};
     if (item.m_bShouldAnimate && uiMoveTick != 0)
     {
-        fLerpFactor = uiCurrentTick / (float)uiMoveTick;
+        fLerpFactor = uiCurrentTick / static_cast<float>(uiMoveTick);
         previousPosition = { item.m_PreviousX, item.m_PreviousY };
     }
 

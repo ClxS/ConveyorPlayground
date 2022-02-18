@@ -113,7 +113,7 @@ void cpp_conv::Underground::Tick(const SceneContext& kContext)
                 }
                 else
                 {
-                    Conveyor* pForwardNode = reinterpret_cast<Conveyor*>(pForwardEntity);
+                    Conveyor* pForwardNode = static_cast<Conveyor*>(pForwardEntity);
                     ItemInstance& forwardTargetItem = pForwardNode->m_pChannels[iChannelIdx].m_pSlots[0].m_Item;
                     ItemInstance& forwardPendingItem = pForwardNode->m_pChannels[iChannelIdx].m_pPendingItems[0];
                     if (forwardTargetItem.IsEmpty() && forwardPendingItem.IsEmpty())

@@ -49,7 +49,7 @@ cpp_conv::Entity* cpp_conv::targeting_util::findNextTailConveyor(const WorldMap&
                 break;
             case EntityKind::Producer:
             {
-                const Factory* pFactory = reinterpret_cast<Factory*>(pDirectionEntity);
+                const Factory* pFactory = static_cast<Factory*>(pDirectionEntity);
                 if (pFactory->HasOutputPipe() && vPositions[static_cast<int>(direction)] == pFactory->m_position + pFactory->GetOutputPipe())
                 {
                     pTargetConveyor = pDirectionEntity;

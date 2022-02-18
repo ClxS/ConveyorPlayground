@@ -110,7 +110,7 @@ struct Vector
             m_Data[i] += other.m_Data[i];
         }
 
-        return *(reinterpret_cast<TCrtp*>(this));
+        return *(static_cast<TCrtp*>(this));
     }
 
     TCrtp& operator-=(const TCrtp& other)
@@ -120,7 +120,7 @@ struct Vector
             m_Data[i] -= other.m_Data[i];
         }
 
-        return *(reinterpret_cast<TCrtp*>(this));
+        return *(static_cast<TCrtp*>(this));
     }
 
     bool operator==(const TCrtp& other) const

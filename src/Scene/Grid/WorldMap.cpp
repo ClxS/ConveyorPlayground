@@ -187,7 +187,7 @@ bool cpp_conv::WorldMap::PlaceEntity(Vector3 position, Entity* pEntity)
 
     if (pEntity->m_eEntityKind == EntityKind::Conveyor)
     {
-        m_vConveyors.push_back(reinterpret_cast<Conveyor*>(pEntity));
+        m_vConveyors.push_back(static_cast<Conveyor*>(pEntity));
     }
     else
     {
@@ -220,7 +220,7 @@ bool cpp_conv::WorldMap::PlaceEntity(Vector3 position, Entity* pEntity)
 
                 if (!m_bSuppressAssess)
                 {
-                    const auto pConveyor = reinterpret_cast<Conveyor*>(pEntityInSlot);
+                    const auto pConveyor = static_cast<Conveyor*>(pEntityInSlot);
                     pConveyor->AssessPosition(*this);
                 }
             }

@@ -78,7 +78,7 @@ bool cpp_conv::Stairs::TryInsert(const SceneContext& kContext, const Entity& pSo
 
     if (!m_bIsUp && pSourceEntity.m_position.GetZ() != (m_position.GetZ() + 1))
     {
-        if (pSourceEntity.m_eEntityKind == EntityKind::Stairs && reinterpret_cast<const Stairs*>(&pSourceEntity)->m_bIsUp)
+        if (pSourceEntity.m_eEntityKind == EntityKind::Stairs && static_cast<const Stairs*>(&pSourceEntity)->m_bIsUp)
         {
             // Special case, we allow up stairs to make this transition
         }

@@ -102,7 +102,7 @@ namespace cpp_conv
             return nullptr;
         }
 
-        return reinterpret_cast<const T*>(pEntity);
+        return static_cast<const T*>(pEntity);
     }
 
     template<typename T>

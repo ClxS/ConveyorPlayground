@@ -64,7 +64,7 @@ Conveyor* cpp_conv::traceHeadConveyor(WorldMap& map, const Conveyor& searchStart
             break;
         }
 
-        pCurrentConveyor = reinterpret_cast<Conveyor*>(pTargetConveyor);
+        pCurrentConveyor = static_cast<Conveyor*>(pTargetConveyor);
     }
 
     return pCurrentConveyor;
@@ -84,14 +84,14 @@ const Conveyor* cpp_conv::traceTailConveyor(WorldMap& map, const Conveyor& searc
         Entity* pTargetConveyor = targeting_util::findNextTailConveyor(map, *pCurrentConveyor, direction);
         if (!pTargetConveyor ||
             pTargetConveyor->m_eEntityKind != EntityKind::Conveyor ||
-            reinterpret_cast<Conveyor*>(pTargetConveyor)->IsCorner() ||
+            static_cast<Conveyor*>(pTargetConveyor)->IsCorner() ||
             pTargetConveyor == &searchStart ||
             pTargetConveyor == &head)
         {
             break;
         }
 
-        pCurrentConveyor = reinterpret_cast<Conveyor*>(pTargetConveyor);
+        pCurrentConveyor = static_cast<Conveyor*>(pTargetConveyor);
     }
 
     std::ranges::reverse(vOutConveyors);

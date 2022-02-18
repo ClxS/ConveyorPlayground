@@ -64,7 +64,7 @@ cpp_conv::resources::ResourceAsset* mapAssetHandler(const cpp_conv::resources::r
             {
                 if (pEntity->m_eEntityKind == EntityKind::Conveyor)
                 {
-                    pMap->GetConveyors().push_back(reinterpret_cast<cpp_conv::Conveyor*>(pEntity));
+                    pMap->GetConveyors().push_back(static_cast<cpp_conv::Conveyor*>(pEntity));
                 }
                 else
                 {
