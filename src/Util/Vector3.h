@@ -216,6 +216,22 @@ struct Vector2F : public Vector<2, float, Vector2F>
     }
 };
 
+struct Vector3F : public Vector<3, float, Vector3F>
+{
+    Vector3F() : Vector3F(0.0f, 0.0f, 0.0f) {}
+    Vector3F(const float x, const float y, const float z) : Vector(x, y, z) {}
+    Vector3F(const Vector2F& xy, const float z) : Vector(xy.GetX(), xy.GetY(), z) {}
+
+    [[nodiscard]] float GetX() const { return m_Data[0]; }
+    [[nodiscard]] float GetY() const { return m_Data[1]; }
+    [[nodiscard]] float GetZ() const { return m_Data[2]; }
+    void SetX(const float value) { m_Data[0] = value; }
+    void SetY(const float value) { m_Data[1] = value; }
+    void SetZ(const float value) { m_Data[2] = value; }
+
+    [[nodiscard]] Vector2F GetXY() const { return { m_Data[0], m_Data[1] }; }
+};
+
 struct Vector3 : public Vector<3, int32_t, Vector3>
 {
     Vector3() = default;
