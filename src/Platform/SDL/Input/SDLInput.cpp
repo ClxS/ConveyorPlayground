@@ -1,4 +1,6 @@
 // ReSharper disable CppClangTidyConcurrencyMtUnsafe
+#include <iostream>
+
 #include "AppHost.h"
 #include "CommandType.h"
 #include "Input.h"
@@ -9,6 +11,26 @@
 #include "RenderContext.h"
 #include "Vector3.h"
 #include "AssetRegistry.h"
+
+void doZoom(cpp_conv::RenderContext& kRenderContext, float newZoom)
+{
+    newZoom = std::max(newZoom, 0.25f);
+    newZoom = std::min(newZoom, 2.0f);
+
+    auto [w, h]  = cpp_conv::apphost::getAppDimensions();
+    auto [x, y] = cpp_conv::apphost::getCursorPosition();
+
+    // ReSharper disable once CppRedundantCastExpression
+    Vector2F screenCoords((float)x, (float)y);
+    screenCoords = screenCoords;
+
+    const Vector2F offset = screenCoords + kRenderContext.m_CameraPosition.GetXY();
+    const Vector2F prePosition = offset * kRenderContext.m_fZoom;
+    const Vector2F postPosition = offset * newZoom;
+
+    kRenderContext.m_CameraPosition -= Vector3F(postPosition - prePosition, 0.0f);
+    kRenderContext.m_fZoom = newZoom;
+}
 
 void cpp_conv::input::receiveInput(SceneContext& kContext, RenderContext& kRenderContext, std::queue<
                                        commands::CommandType>& commands)
@@ -80,7 +102,7 @@ void cpp_conv::input::receiveInput(SceneContext& kContext, RenderContext& kRende
                 if (bIsPanActive)
                 {
                     const Vector2F vRelative = { static_cast<float>(event.motion.xrel), static_cast<float>(event.motion.yrel) };
-                    kRenderContext.m_CameraPosition += (vRelative );
+                    kRenderContext.m_CameraPosition += Vector3F(vRelative, 0.0f) / kRenderContext.m_fZoom;
                 }
             }
 
@@ -88,13 +110,11 @@ void cpp_conv::input::receiveInput(SceneContext& kContext, RenderContext& kRende
         case SDL_MOUSEWHEEL:
             if (event.wheel.y > 0) // scroll up
             {
-                kRenderContext.m_fZoom *= 1.1f;
-                kRenderContext.m_fZoom = std::min(kRenderContext.m_fZoom, 2.0f);
+                doZoom(kRenderContext, kRenderContext.m_fZoom * 1.1f);
             }
             else if (event.wheel.y < 0) // scroll down
             {
-                kRenderContext.m_fZoom *= 0.9f;
-                kRenderContext.m_fZoom = std::max(kRenderContext.m_fZoom, 0.25f);
+                doZoom(kRenderContext, kRenderContext.m_fZoom * 0.9f);
             }
             break;
         default:

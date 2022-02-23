@@ -50,8 +50,8 @@ void cpp_conv::ui::drawUI(SceneContext& kSceneContext, const RenderContext& kRen
         //ImGui::Text(std::format("Items in World: {}", uiItemCount).c_str());
         ImGui::Text(std::format("Drawn items: {}", kRenderContext.m_uiDrawnItems).c_str());
 
-        ImGui::Text(std::format("Position: {}, {}", kSceneContext.m_player.GetX(), kSceneContext.m_player.GetY()).c_str());
-        ImGui::Text(std::format("Current Floor: {}", kSceneContext.m_player.GetZ()).c_str());
+        ImGui::Text(std::format("Position: {}, {}", kRenderContext.m_CameraPosition.GetX(), kRenderContext.m_CameraPosition.GetY()).c_str());
+        ImGui::Text(std::format("Current Floor: {}", kRenderContext.m_CameraPosition.GetZ()).c_str());
 
         ImGui::Text("Item Type (NUM 1-9)");
 

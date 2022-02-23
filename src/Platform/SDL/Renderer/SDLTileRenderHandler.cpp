@@ -36,8 +36,8 @@ void tileRenderer(
         SDL_GetWindowSize(cpp_conv::apphost::app.m_Window, &windowWidth, &windowHeight);
         SDL_QueryTexture(pTexture, nullptr, nullptr, &dest.w, &dest.h);
 
-        const int screenCameraX = static_cast<int>(kContext.m_CameraPosition.GetX());
-        const int screenCameraY = static_cast<int>(kContext.m_CameraPosition.GetY());
+        const int screenCameraX = static_cast<int>(kContext.m_CameraPosition.GetX() * kContext.m_fZoom);
+        const int screenCameraY = static_cast<int>(kContext.m_CameraPosition.GetY() * kContext.m_fZoom);
         dest.w = static_cast<int>(static_cast<float>(dest.w) * kContext.m_fZoom);
         dest.h = static_cast<int>(static_cast<float>(dest.h) * kContext.m_fZoom);
         for (int y = -dest.h + (screenCameraY % dest.h); y < windowHeight; y += dest.h)
@@ -46,7 +46,6 @@ void tileRenderer(
             {
                 dest.x = x;
                 dest.y = y;
-
 
                 SDL_RenderCopy(cpp_conv::apphost::app.m_Renderer, pTexture, nullptr, &dest);
                 if (bTrack)
@@ -75,8 +74,8 @@ void tileRenderer(
             break;
         }
 
-        dest.x = static_cast<int>(kTransform.m_x * 16 * kContext.m_fZoom + kContext.m_CameraPosition.GetX());
-        dest.y = static_cast<int>(kTransform.m_y * 16 * kContext.m_fZoom + kContext.m_CameraPosition.GetY());
+        dest.x = static_cast<int>((kTransform.m_x * 16 + kContext.m_CameraPosition.GetX()) * kContext.m_fZoom);
+        dest.y = static_cast<int>((kTransform.m_y * 16 + kContext.m_CameraPosition.GetY()) * kContext.m_fZoom);
         SDL_QueryTexture(pTexture, nullptr, nullptr, &dest.w, &dest.h);
 
         const SDL_Point rotatePivot =

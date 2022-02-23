@@ -10,7 +10,7 @@ namespace cpp_conv
 {
     struct RenderContext
     {
-        Vector2F m_CameraPosition;
+        Vector3F m_CameraPosition;
         int32_t m_iCurrentLayer;
         Colour m_LayerColour;
 

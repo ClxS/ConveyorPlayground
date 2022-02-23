@@ -142,7 +142,6 @@ void cpp_conv::game::run()
     std::vector<Sequence*> sequences = initializeSequences(worldMap, worldMap.GetConveyors());
     SceneContext kSceneContext =
     {
-        {},
         worldMap,
         sequences,
         { std::chrono::high_resolution_clock::now() },
@@ -155,7 +154,7 @@ void cpp_conv::game::run()
 
     RenderContext kRenderContext =
     {
-        { 0, 0 },
+        { 0.0f, 0.0f, 0.0f },
         0,
         { 0xFFFFFFFF },
         0,

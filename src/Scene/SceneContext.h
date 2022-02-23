@@ -12,7 +12,6 @@ namespace cpp_conv
 {
     struct SceneContext
     {
-        Vector3 m_player;
         WorldMap& m_rMap;
         std::vector<Sequence*>& m_sequences;
 
@@ -21,7 +20,7 @@ namespace cpp_conv
             std::chrono::steady_clock::time_point m_lastPlayerMove;
         } m_debounce;
 
-        struct 
+        struct
         {
             int32_t m_selected;
             Direction m_rotation;

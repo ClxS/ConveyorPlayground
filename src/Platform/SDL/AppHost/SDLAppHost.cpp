@@ -19,6 +19,13 @@ std::tuple<int, int> cpp_conv::apphost::getAppDimensions()
     return std::make_tuple(width, height);
 }
 
+std::tuple<int, int> cpp_conv::apphost::getCursorPosition()
+{
+    int mouseX, mouseY;
+    uint32_t buttons = SDL_GetMouseState(&mouseX, &mouseY);
+    return std::make_tuple(mouseX, mouseY);
+}
+
 void createWindow()
 {
     int windowFlags;

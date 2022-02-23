@@ -56,8 +56,8 @@ void drawPlayer(const cpp_conv::SceneContext& kSceneContext, cpp_conv::RenderCon
         kRenderContext,
         pTile.get(),
         {
-            (float)kSceneContext.m_player.GetX() * cpp_conv::renderer::c_gridScale,
-            (float)kSceneContext.m_player.GetY() * cpp_conv::renderer::c_gridScale,
+            (float)kRenderContext.m_CameraPosition.GetX(),
+            (float)kRenderContext.m_CameraPosition.GetY(),
             Rotation::DegZero
         },
         { 0xFFFFFFFF });
@@ -70,8 +70,8 @@ void cpp_conv::renderer::render(const SceneContext& kSceneContext, RenderContext
     int width, height;
     std::tie(width, height) = apphost::getAppDimensions();
 
-    const Vector2F startCellPosition = kContext.m_CameraPosition / kContext.m_fZoom * -1.0f / 64;
-    const Vector2F endCellPosition = (kContext.m_CameraPosition / kContext.m_fZoom * -1.0f + Vector2F((float)width, (float)height) / kContext.m_fZoom) / 64;
+    const Vector2F startCellPosition = kContext.m_CameraPosition.GetXY() / kContext.m_fZoom * -1.0f / 64;
+    const Vector2F endCellPosition = (kContext.m_CameraPosition.GetXY() / kContext.m_fZoom * -1.0f + Vector2F((float)width, (float)height) / kContext.m_fZoom) / 64;
     const WorldMap::CellCoordinate startCoord = WorldMap::ToCellSpace({ (int)startCellPosition.GetX(), (int)startCellPosition.GetY(), 0 });
     const WorldMap::CellCoordinate endCoord = WorldMap::ToCellSpace({ (int)std::ceil(endCellPosition.GetX()), (int)std::ceil(endCellPosition.GetY()), 0 });
 
@@ -87,7 +87,7 @@ void cpp_conv::renderer::render(const SceneContext& kSceneContext, RenderContext
                  continue;
              }
 
-             for (kContext.m_iCurrentLayer = 0; kContext.m_iCurrentLayer <= kSceneContext.m_player.GetZ(); kContext.m_iCurrentLayer++)
+             for (kContext.m_iCurrentLayer = 0; kContext.m_iCurrentLayer <= kContext.m_CameraPosition.GetZ(); kContext.m_iCurrentLayer++)
              {
                  if (!pCell->HasFloor(kContext.m_iCurrentLayer))
                  {
@@ -95,7 +95,7 @@ void cpp_conv::renderer::render(const SceneContext& kSceneContext, RenderContext
                  }
 
                  kContext.m_LayerColour = { 0xFFFFFFFF };
-                 kContext.m_LayerColour.m_argb.m_a = (uint8_t)(std::pow(0.5F, kSceneContext.m_player.GetZ() - kContext.m_iCurrentLayer) * 0xFF);
+                 kContext.m_LayerColour.m_argb.m_a = (uint8_t)(std::pow(0.5F, kContext.m_CameraPosition.GetZ() - kContext.m_iCurrentLayer) * 0xFF);
 
                  bool bHadPassAction = false;
                  uint32_t uiPass = 0;
@@ -176,8 +176,8 @@ void cpp_conv::renderer::drawBackground(const SceneContext& kSceneContext, Rende
         kContext,
         pTile.get(),
         {
-            (float)kSceneContext.m_player.GetX() * c_gridScale,
-            (float)kSceneContext.m_player.GetY() * c_gridScale,
+            (float)kContext.m_CameraPosition.GetX(),
+            (float)kContext.m_CameraPosition.GetY(),
             Rotation::DegZero,
             true
         },

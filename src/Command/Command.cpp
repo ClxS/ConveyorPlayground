@@ -2,22 +2,16 @@
 #include "SceneContext.h"
 
 #include <chrono>
+
+#include "AppHost.h"
 #include "Direction.h"
 #include "RenderContext.h"
+#include "SDL_mouse.h"
 #include "Stairs.h"
 #include "WorldMap.h"
 
 constexpr auto c_debounceTime = std::chrono::milliseconds(250);
 
-void tryUpdatePlayer(cpp_conv::SceneContext& kContext, Vector3 newPosition)
-{
-    if (newPosition.GetZ() < 0 || newPosition.GetZ() >= cpp_conv::WorldMap::c_uiMaximumLevel)
-    {
-        return;
-    }
-
-    kContext.m_player = newPosition;
-}
 
 void tryPlaceEntity(cpp_conv::SceneContext& kContext, EntityKind eKind, Direction eDirection, bool bModifier = false)
 {
@@ -25,7 +19,7 @@ void tryPlaceEntity(cpp_conv::SceneContext& kContext, EntityKind eKind, Directio
     {
     case EntityKind::Conveyor:
     {
-        const auto pConveyor = new cpp_conv::Conveyor(kContext.m_player, { 1, 1, 1 }, eDirection);
+        /*const auto pConveyor = new cpp_conv::Conveyor(kContext.m_player, { 1, 1, 1 }, eDirection);
         if (kContext.m_rMap.PlaceEntity(kContext.m_player, pConveyor))
         {
             kContext.m_sequences = initializeSequences(kContext.m_rMap, kContext.m_rMap.GetConveyors());
@@ -33,17 +27,17 @@ void tryPlaceEntity(cpp_conv::SceneContext& kContext, EntityKind eKind, Directio
         else
         {
             delete pConveyor;
-        }
+        }*/
         break;
     }
     case EntityKind::Stairs:
     {
-        const Vector3 position = { kContext.m_player.GetX(), kContext.m_player.GetY(), bModifier ? kContext.m_player.GetZ() : (kContext.m_player.GetZ() - 1)};
+        /*const Vector3 position = { kContext.m_player.GetX(), kContext.m_player.GetY(), bModifier ? kContext.m_player.GetZ() : (kContext.m_player.GetZ() - 1)};
         const auto pStairs = new cpp_conv::Stairs(position, { 1, 1, 2 }, eDirection, bModifier);
         if (!kContext.m_rMap.PlaceEntity(position, pStairs))
         {
             delete pStairs;
-        }
+        }*/
         break;
     }
     default: /* Ignored */;
@@ -67,7 +61,7 @@ void cpp_conv::command::processCommands(SceneContext& kContext, RenderContext& k
         kContext.m_debounce.m_lastPlayerMove = now;
         switch (command)
         {
-        case commands::CommandType::MoveUp:
+        /*case commands::CommandType::MoveUp:
             tryUpdatePlayer(kContext, { kContext.m_player.GetX(), kContext.m_player.GetY() + 1, kContext.m_player.GetZ() });
             break;
         case commands::CommandType::MoveDown:
@@ -78,21 +72,42 @@ void cpp_conv::command::processCommands(SceneContext& kContext, RenderContext& k
             break;
         case commands::CommandType::MoveRight:
             tryUpdatePlayer(kContext, { kContext.m_player.GetX() + 1, kContext.m_player.GetY(), kContext.m_player.GetZ() });
-            break;
+            break;*/
         case commands::CommandType::MoveFloorDown:
-            tryUpdatePlayer(kContext, { kContext.m_player.GetX(), kContext.m_player.GetY(), kContext.m_player.GetZ() - 1 });
+            kRenderContext.m_CameraPosition.SetZ(kRenderContext.m_CameraPosition.GetZ() - 1);
             break;
         case commands::CommandType::MoveFloorUp:
-            tryUpdatePlayer(kContext, { kContext.m_player.GetX(), kContext.m_player.GetY(), kContext.m_player.GetZ() + 1 });
+            kRenderContext.m_CameraPosition.SetZ(kRenderContext.m_CameraPosition.GetZ() + 1);
             break;
        /* case cpp_conv::commands::CommandType::PlaceStairsDown:
             tryPlaceEntity(kContext, EntityKind::Stairs, Direction::Right, false);
             break;*/
         case commands::CommandType::DecrementZoom:
-            kRenderContext.m_fZoom -= 0.1f;
+            {
+                const float newZoom = kRenderContext.m_fZoom - 0.1f;
+                if (newZoom < 0.0)
+                {
+                    return;
+                }
+
+                auto [x, y] = apphost::getCursorPosition();
+
+                // ReSharper disable once CppRedundantCastExpression
+                Vector2F position(static_cast<float>(x), static_cast<float>(y));
+                position += kRenderContext.m_CameraPosition.GetXY();
+
+                Vector2F prePosition = position * kRenderContext.m_fZoom;
+                Vector2F postPosition = position * newZoom;
+
+                kRenderContext.m_CameraPosition -= Vector3F(postPosition - prePosition, 0.0f);
+                kRenderContext.m_fZoom -= 0.1f;
+            }
             break;
         case commands::CommandType::IncrementZoom:
-            kRenderContext.m_fZoom += 0.1f;
+            {
+                kRenderContext.m_fZoom += 0.1f;
+                auto [mouseX, mouseY] = apphost::getCursorPosition();
+            }
             break;
         case commands::CommandType::SelectItem1: kContext.m_uiContext.m_selected = 0 % static_cast<int32_t>(EntityKind::MAX); break;
         case commands::CommandType::SelectItem2: kContext.m_uiContext.m_selected = 1 % static_cast<int32_t>(EntityKind::MAX); break;
