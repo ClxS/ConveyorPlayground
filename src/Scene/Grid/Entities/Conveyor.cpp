@@ -274,26 +274,46 @@ bool cpp_conv::Conveyor::TryInsert(const SceneContext& kContext, const Entity& p
 
 bool cpp_conv::Conveyor::TryGrab(const SceneContext& kContext, bool bSingle, std::tuple<ItemId, uint32_t>& outItem)
 {
-    const bool bIsCorner = IsCorner();
-    int iInnerMostChannel;
-    Direction eCornerDirection;
-    std::tie(iInnerMostChannel, eCornerDirection) = getInnerMostCornerChannel(kContext.m_rMap, *this);
-
-    for (int iChannelIdx = 0; iChannelIdx < c_conveyorChannels; ++iChannelIdx)
+    if (IsPartOfASequence())
     {
-        int iChannelLength = c_conveyorChannelSlots;
-        if (bIsCorner)
+        for(int iChannelLane(0); iChannelLane < 2; ++iChannelLane)
         {
-            iChannelLength += iInnerMostChannel == iChannelIdx ? -1 : 1;
-        }
-
-        for (int iChannelSlot = 0; iChannelSlot < iChannelLength; ++iChannelSlot)
-        {
-            if (!m_pChannels[iChannelIdx].m_pSlots[iChannelSlot].m_Item.IsEmpty())
+            for(int iChannelSlot(0); iChannelSlot < 2; ++iChannelSlot)
             {
-                outItem = std::make_tuple(m_pChannels[iChannelIdx].m_pSlots[iChannelSlot].m_Item.m_Item, 1);
-                m_pChannels[iChannelIdx].m_pSlots[iChannelSlot].m_Item = ItemInstance::Empty();
-                return true;
+                if (!m_pSequence->HasItemInSlot(m_uiSequenceIndex, iChannelLane, iChannelSlot))
+                    continue;
+
+                ItemId item;
+                Vector2F origin;
+                if (m_pSequence->RemoveItemFromSlot(m_uiSequenceIndex, iChannelLane, iChannelSlot, item, origin))
+                {
+                    outItem = std::make_tuple(item, 1);
+                    return true;
+                }
+            }
+        }
+    }
+    else
+    {
+        const bool bIsCorner = IsCorner();
+        auto [iInnerMostChannel, eCornerDirection] = getInnerMostCornerChannel(kContext.m_rMap, *this);
+
+        for (int iChannelIdx = 0; iChannelIdx < c_conveyorChannels; ++iChannelIdx)
+        {
+            int iChannelLength = c_conveyorChannelSlots;
+            if (bIsCorner)
+            {
+                iChannelLength += iInnerMostChannel == iChannelIdx ? -1 : 1;
+            }
+
+            for (int iChannelSlot = 0; iChannelSlot < iChannelLength; ++iChannelSlot)
+            {
+                if (!m_pChannels[iChannelIdx].m_pSlots[iChannelSlot].m_Item.IsEmpty())
+                {
+                    outItem = std::make_tuple(m_pChannels[iChannelIdx].m_pSlots[iChannelSlot].m_Item.m_Item, 1);
+                    m_pChannels[iChannelIdx].m_pSlots[iChannelSlot].m_Item = ItemInstance::Empty();
+                    return true;
+                }
             }
         }
     }

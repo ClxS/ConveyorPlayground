@@ -190,6 +190,14 @@ bool Sequence::MoveItemToForwardsNode(const SceneContext& kContext, const Convey
     return (item.HasItem() && pForwardEntity && pForwardEntity->SupportsInsertion() && pForwardEntity->TryInsert(kContext, pNode, Entity::InsertInfo(item.m_Item, static_cast<uint8_t>(lane), startPosition)));
 }
 
+const Sequence::RealizedState& Sequence::GetFreshRealizedStateForTick(uint8_t uiLane)
+{
+    RealizedState& realizedState = m_RealizedStates[uiLane];
+    realizedState.m_RealizedMovements = 0;
+    realizedState.m_HasOverridePosition = 0;
+    return realizedState;
+}
+
 void Sequence::Tick(const SceneContext& kContext)
 {
     m_pHeadConveyor->m_uiCurrentTick++;
@@ -201,10 +209,8 @@ void Sequence::Tick(const SceneContext& kContext)
     m_pHeadConveyor->m_uiCurrentTick = 0;
     for (uint8_t uiLane = 0; uiLane < c_conveyorChannels; uiLane++)
     {
-        RealizedState& realizedState = m_RealizedStates[uiLane];
+        const RealizedState& realizedState = GetFreshRealizedStateForTick(uiLane);
         PendingState& pendingState = m_PendingStates[uiLane];
-        realizedState.m_RealizedMovements = 0;
-        realizedState.m_HasOverridePosition = 0;
         pendingState.m_PendingClears = 0;
 
         bool bIsLeadItemFull = (realizedState.m_Lanes & 0b1) == 1;
@@ -212,8 +218,7 @@ void Sequence::Tick(const SceneContext& kContext)
         {
             if (MoveItemToForwardsNode(kContext, *m_pHeadConveyor, uiLane))
             {
-                pendingState.m_PendingClears |= 0b1;
-                realizedState.m_Items.Pop();
+                pendingState.m_PendingRemovals |= 0b1;
                 bIsLeadItemFull = false;
             }
         }
@@ -302,9 +307,33 @@ void Sequence::Realize()
         RealizedState& realizedState = m_RealizedStates[uiLane];
         PendingState& pendingState = m_PendingStates[uiLane];
 
+        if (pendingState.m_PendingRemovals != 0)
+        {
+            uint64_t mutableRealizedLane = realizedState.m_Lanes;
+            while(pendingState.m_PendingRemovals != 0)
+            {
+                const uint64_t uiClearIndex = 1ULL << std::countr_zero(pendingState.m_PendingRemovals);
+                const uint64_t uiEarlierItemsMask = uiClearIndex - 1;
+                pendingState.m_PendingRemovals &= ~static_cast<uint64_t>(uiClearIndex);
+
+                const uint8_t removalIndex = std::popcount(mutableRealizedLane & uiEarlierItemsMask);
+                realizedState.m_Items.Remove(removalIndex);
+
+                mutableRealizedLane &= ~static_cast<uint64_t>(uiClearIndex);
+
+                if ((pendingState.m_PendingClears & uiClearIndex) != 0)
+                {
+                    // This was being moved previously, need to clear the move as well, which will be 1 slot to the right
+                    pendingState.m_PendingMoves &= ~(uiClearIndex >> 1ULL);
+                }
+            }
+            //realizedState.m_Items.Pop();
+        }
+
         realizedState.m_Lanes &= ~pendingState.m_PendingClears;
         realizedState.m_Lanes |= pendingState.m_PendingMoves;
         realizedState.m_RealizedMovements |= pendingState.m_PendingMoves;
+
         pendingState.m_PendingClears = 0;
         pendingState.m_PendingMoves = 0;
 
@@ -361,9 +390,25 @@ void Sequence::AddItemInSlot(const uint8_t uiSequenceIndex, const int lane, cons
     }
 }
 
+bool Sequence::RemoveItemFromSlot(const uint8_t uiSequenceIndex, const int iChannelLane, const int iChannelSlot, ItemId& outItem, Vector2F& outOrigin)
+{
+    PendingState& pendingState = m_PendingStates[iChannelLane];
+
+    const uint64_t uiSetMask = 1ULL << (m_Length * 2 - uiSequenceIndex * 2 - iChannelSlot - 1);
+    assert((pendingState.m_PendingMoves & uiSetMask) != 0);
+    assert((pendingState.m_PendingRemovals & uiSetMask) == 0);
+
+    pendingState.m_PendingRemovals &= uiSetMask;
+    return true;
+}
+
 bool Sequence::HasItemInSlot(const uint8_t uiSequenceIndex, const int lane, const int slot) const
 {
-    return (((m_RealizedStates[lane].m_Lanes | m_PendingStates[lane].m_PendingMoves) >> (m_Length * 2 - uiSequenceIndex * 2 - slot - 1)) & 0b1) == 1;
+    const int uiSetMask = 1ULL << (m_Length * 2 - uiSequenceIndex * 2 - slot - 1);
+    return
+        (m_RealizedStates[lane].m_Lanes & uiSetMask) != 0 ||
+        (m_PendingStates[lane].m_PendingMoves & uiSetMask) != 0 ||
+        (m_PendingStates[lane].m_PendingInsertions & uiSetMask) != 0;
 }
 
 bool Sequence::DidItemMoveLastSimulation(const uint8_t uiSequenceIndex, const int lane, const int slot) const

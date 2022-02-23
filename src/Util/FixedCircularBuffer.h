@@ -34,7 +34,7 @@ namespace cpp_conv
 			return value;
 		}
 
-        T Remove(int index = 0);
+        T Remove(uint32_t index = 0);
 
 	    [[nodiscard]] uint32_t GetSize() const { return m_uiSize; }
 
@@ -91,7 +91,7 @@ namespace cpp_conv
 	};
 
     template<typename T>
-    T FixedCircularBuffer<T>::Remove(int index /*= 0*/)
+    T FixedCircularBuffer<T>::Remove(uint32_t index /*= 0*/)
     {
         assert(m_uiSize > 0);
         assert(index < m_uiSize);

@@ -32,7 +32,10 @@ namespace cpp_conv
 
         inline static constexpr uint32_t c_uiMaxSequenceLength = 32;
         [[nodiscard]] bool HasItemInSlot(uint8_t uiSequenceIndex, int lane, int slot) const;
+
         void AddItemInSlot(uint8_t uiSequenceIndex, int lane, int slot, ItemId item, const Vector2F* origin = nullptr);
+        bool RemoveItemFromSlot(uint8_t uiSequenceIndex, int iChannelLane, int iChannelSlot, ItemId& outItem, Vector2F& outOrigin);
+
         [[nodiscard]] bool DidItemMoveLastSimulation(uint8_t uiSequenceIndex, int lane, int slot) const;
         [[nodiscard]] Vector2F GetSlotPosition(uint8_t uiSequenceIndex, const int lane, int slot) const;
         bool TryPeakItemInSlot(uint8_t uiSequenceIndex, int lane, int slot, ItemInstance& pItem) const;
@@ -110,6 +113,7 @@ namespace cpp_conv
             uint64_t m_PendingInsertions = {};
             uint64_t m_PendingMoves = {};
             uint64_t m_PendingClears = {};
+            uint64_t m_PendingRemovals = {};
             FixedCircularBuffer<SlotItem> m_NewItems;
         };
 
@@ -118,6 +122,8 @@ namespace cpp_conv
 
         Conveyor* m_pHeadConveyor;
         const uint8_t m_Length;
+
+        const RealizedState& GetFreshRealizedStateForTick(uint8_t uiLane);
     };
 
     Conveyor* traceHeadConveyor(WorldMap& map, const Conveyor& searchStart);
