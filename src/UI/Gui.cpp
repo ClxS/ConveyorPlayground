@@ -87,10 +87,9 @@ void cpp_conv::ui::drawUI(SceneContext& kSceneContext, const RenderContext& kRen
             ImGui::Text("Stairs go up? (T)");
             ImGui::Text(kSceneContext.m_uiContext.m_bModifier ? "   true" : "   false");
         }
-
-
-        ImGui::End();
     }
+    ImGui::End();
+
 
     ImGui::Render();
 
