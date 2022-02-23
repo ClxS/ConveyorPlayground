@@ -32,11 +32,12 @@ namespace cpp_conv
 
         struct Channel
         {
+            // ReSharper disable once CppNonExplicitConvertingConstructor
             Channel(int channelLane);
 
             const int m_ChannelLane;
 
-            int m_LaneLength;
+            int m_LaneLength = 2;
             std::array<Lane, c_conveyorChannelSlots + 1> m_pSlots;
             std::array<ItemInstance, c_conveyorChannelSlots + 1> m_pPendingItems;
         };

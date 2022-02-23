@@ -118,7 +118,7 @@ void cpp_conv::game::run()
     {
         //CreateMillionTileMap(worldMap);
 
-        const AssetPtr<Map> map = resource_manager::loadAssetUncached<Map>(registry::maps::c_simple);
+        const AssetPtr<Map> map = resource_manager::loadAssetUncached<Map>(registry::maps::c_bigmap);
         worldMap.Consume(map);
 
         /*map = resource_manager::loadAssetUncached<Map>(registry::data::MapSimple1);
