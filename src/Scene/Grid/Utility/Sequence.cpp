@@ -392,13 +392,22 @@ void Sequence::AddItemInSlot(const uint8_t uiSequenceIndex, const int lane, cons
 
 bool Sequence::RemoveItemFromSlot(const uint8_t uiSequenceIndex, const int iChannelLane, const int iChannelSlot, ItemId& outItem, Vector2F& outOrigin)
 {
+    const RealizedState& realizedState = m_RealizedStates[iChannelLane];
     PendingState& pendingState = m_PendingStates[iChannelLane];
 
     const uint64_t uiSetMask = 1ULL << (m_Length * 2 - uiSequenceIndex * 2 - iChannelSlot - 1);
-    assert((pendingState.m_PendingMoves & uiSetMask) != 0);
+    assert(HasItemInSlot(uiSequenceIndex, iChannelLane, iChannelSlot));
     assert((pendingState.m_PendingRemovals & uiSetMask) == 0);
 
     pendingState.m_PendingRemovals &= uiSetMask;
+
+    const uint64_t uiEarlierItemsMask = uiSetMask - 1;
+    const uint8_t removalIndex = std::popcount(realizedState.m_Lanes & uiEarlierItemsMask);
+    const SlotItem& item = realizedState.m_Items.Peek(removalIndex);
+
+    outItem = item.m_Item;
+    outOrigin = item.m_bHasPosition ? item.m_Position : GetSlotPosition(uiSequenceIndex, iChannelLane, iChannelSlot);
+
     return true;
 }
 
