@@ -64,6 +64,17 @@ void cpp_conv::Junction::Tick(const SceneContext& kContext)
             continue;
         }
 
+        if (pEntity->m_eEntityKind == EntityKind::Conveyor)
+        {
+            const Conveyor* pConveyor = static_cast<Conveyor*>(pEntity);
+
+            // Check it's not an input conveyor
+            if (grid::getForwardPosition(pConveyor->m_position, pConveyor->m_direction) == m_position)
+            {
+                continue;
+            }
+        }
+
         bool bFound = false;
         for (int iExitChannel = 0; iExitChannel < c_conveyorChannels; ++iExitChannel)
         {
