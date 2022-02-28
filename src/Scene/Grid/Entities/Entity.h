@@ -7,6 +7,7 @@
 
 namespace cpp_conv
 {
+    class WorldMap;
     struct SceneContext;
     struct RenderContext;
 
@@ -79,6 +80,9 @@ namespace cpp_conv
         [[nodiscard]] virtual const char* GetName() const = 0;
         [[nodiscard]] virtual std::string GetDescription() const = 0;
         [[nodiscard]] virtual uint32_t GetDrawPassCount() const { return 1; }
+
+        [[nodiscard]] virtual bool RequiresPlacementLocalityChecks() const { return false; }
+        virtual void OnLocalityUpdate(const WorldMap&) {};
 
         Vector3 m_position;
         Vector3 m_size;

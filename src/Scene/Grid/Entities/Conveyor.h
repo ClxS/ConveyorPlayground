@@ -21,7 +21,7 @@ namespace cpp_conv
     struct SceneContext;
     struct RenderContext;
 
-    class Conveyor : public Entity
+    class Conveyor final : public Entity
     {
     public:
         struct Lane
@@ -64,9 +64,7 @@ namespace cpp_conv
 
         [[nodiscard]] std::string GetDescription() const override;
 
-        [[nodiscard]] virtual uint32_t GetDrawPassCount() const { return 2; }
-
-        void AssessPosition(const WorldMap& map);
+        [[nodiscard]] uint32_t GetDrawPassCount() const override { return 2; }
 
         [[nodiscard]] bool IsCorner() const { return m_bIsCorner; }
         [[nodiscard]] bool IsClockwiseCorner() const { return m_bIsClockwise; }
@@ -75,6 +73,9 @@ namespace cpp_conv
         [[nodiscard]] Direction GetCornerDirection() const { return m_eCornerDirection; }
 
         [[nodiscard]] bool IsPartOfASequence() const { return m_pSequence != nullptr; }
+
+        [[nodiscard]] bool RequiresPlacementLocalityChecks() const override { return true; }
+        void OnLocalityUpdate(const WorldMap& map) override;
 
         void SetSequence(Sequence* pSequence, uint8_t position);
         void ClearSequence();

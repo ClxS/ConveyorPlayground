@@ -372,7 +372,7 @@ std::string cpp_conv::Conveyor::GetDescription() const
     return str;
 }
 
-void cpp_conv::Conveyor::AssessPosition(const WorldMap& map)
+void cpp_conv::Conveyor::OnLocalityUpdate(const WorldMap& map)
 {
     const Entity* pEntity = map.GetEntity(grid::getForwardPosition(m_position, m_direction));
 

@@ -144,9 +144,20 @@ void cpp_conv::WorldMap::Consume(const resources::AssetPtr<resources::Map>& map)
     map->GetOtherEntities().clear();
     m_bSuppressAssess = false;
 
-    for(Conveyor* pConveyor : this->GetConveyors())
+    for(Entity* pEntity : this->GetConveyors())
     {
-        pConveyor->AssessPosition(*this);
+        if (pEntity->RequiresPlacementLocalityChecks())
+        {
+            pEntity->OnLocalityUpdate(*this);
+        }
+    }
+
+    for(Entity* pEntity : this->GetOtherEntities())
+    {
+        if (pEntity->RequiresPlacementLocalityChecks())
+        {
+            pEntity->OnLocalityUpdate(*this);
+        }
     }
 }
 
@@ -213,15 +224,14 @@ bool cpp_conv::WorldMap::PlaceEntity(Vector3 position, Entity* pEntity)
                 }
 
                 Entity* pEntityInSlot = pCell->GetEntity(coord);
-                if (!pEntityInSlot || pEntityInSlot->m_eEntityKind != EntityKind::Conveyor)
+                if (!pEntityInSlot || !pEntityInSlot->RequiresPlacementLocalityChecks())
                 {
                     continue;
                 }
 
                 if (!m_bSuppressAssess)
                 {
-                    const auto pConveyor = static_cast<Conveyor*>(pEntityInSlot);
-                    pConveyor->AssessPosition(*this);
+                    pEntityInSlot->OnLocalityUpdate(*this);
                 }
             }
         }
