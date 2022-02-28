@@ -72,6 +72,8 @@ namespace cpp_conv
         [[nodiscard]] int GetInnerMostChannel() const { return m_iInnerMostChannel; }
         [[nodiscard]] Direction GetCornerDirection() const { return m_eCornerDirection; }
 
+        [[nodiscard]] uint32_t GetMoveTick() const { return m_uiMoveTick; }
+
         [[nodiscard]] bool IsPartOfASequence() const { return m_pSequence != nullptr; }
 
         [[nodiscard]] bool RequiresPlacementLocalityChecks() const override { return true; }

@@ -16,19 +16,19 @@ namespace cpp_conv
     class Sequence
     {
     public:
-        Sequence(Conveyor* pHead, const uint8_t uiLength, const Vector2F laneOnePosition, const Vector2F laneTwoPosition, const Vector2F unitDirection)
+        Sequence(const Entity* pHead, const uint8_t uiLength, const Vector2F laneOnePosition, const Vector2F laneTwoPosition, const Vector2F unitDirection, const uint32_t uiMoveTick)
             : m_InitializationState{ { LaneVisual(laneOnePosition, unitDirection), LaneVisual(laneTwoPosition, unitDirection) } }
             , m_RealizedStates { RealizedState(uiLength * 2), RealizedState(uiLength * 2) }
             , m_PendingStates{ PendingState(uiLength * 2), PendingState(uiLength * 2) }
-            , m_pHeadConveyor(pHead)
+            , m_pHeadEntity(pHead)
             , m_Length(uiLength)
+            , m_uiCurrentTick{0}
+            , m_uiMoveTick{uiMoveTick}
         {
         }
 
         void Tick(const SceneContext& kContext);
         void Realize();
-
-        [[nodiscard]] const Conveyor* GetHeadConveyor() const { return m_pHeadConveyor; }
 
         inline static constexpr uint32_t c_uiMaxSequenceLength = 32;
         [[nodiscard]] bool HasItemInSlot(uint8_t uiSequenceIndex, int lane, int slot) const;
@@ -41,11 +41,11 @@ namespace cpp_conv
         bool TryPeakItemInSlot(uint8_t uiSequenceIndex, int lane, int slot, ItemInstance& pItem) const;
         [[nodiscard]] uint64_t CountItemsOnBelt() const;
 
-        [[nodiscard]] uint32_t GetMoveTick() const { return m_pHeadConveyor->m_uiMoveTick; }
-        [[nodiscard]] uint32_t GetCurrentTick() const { return m_pHeadConveyor->m_uiCurrentTick; }
+        [[nodiscard]] uint32_t GetMoveTick() const { return m_uiMoveTick; }
+        [[nodiscard]] uint32_t GetCurrentTick() const { return m_uiCurrentTick; }
 
     private:
-        [[nodiscard]] bool MoveItemToForwardsNode(const SceneContext& kContext, const Conveyor& pNode, int lane) const;
+        [[nodiscard]] bool MoveItemToForwardsNode(const SceneContext& kContext, const Entity& pNode, int lane) const;
 
     private:
         friend class Conveyor;
@@ -120,8 +120,11 @@ namespace cpp_conv
         std::array<RealizedState, c_conveyorChannels> m_RealizedStates;
         std::array<PendingState, c_conveyorChannels> m_PendingStates;
 
-        Conveyor* m_pHeadConveyor;
+        const Entity* m_pHeadEntity;
         const uint8_t m_Length;
+
+        uint32_t m_uiCurrentTick;
+        uint32_t m_uiMoveTick;
 
         const RealizedState& GetFreshRealizedStateForTick(uint8_t uiLane);
     };

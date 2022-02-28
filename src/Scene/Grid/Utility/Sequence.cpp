@@ -143,7 +143,8 @@ std::vector<Sequence*> cpp_conv::initializeSequences(WorldMap& map, const std::v
                 static_cast<uint8_t>(vSequenceConveyors.size()),
                 pTailConveyor->m_pChannels[0].m_pSlots[0].m_VisualPosition,
                 pTailConveyor->m_pChannels[1].m_pSlots[0].m_VisualPosition,
-                pTailConveyor->m_pChannels[0].m_pSlots[1].m_VisualPosition - pTailConveyor->m_pChannels[0].m_pSlots[0].m_VisualPosition
+                pTailConveyor->m_pChannels[0].m_pSlots[1].m_VisualPosition - pTailConveyor->m_pChannels[0].m_pSlots[0].m_VisualPosition,
+                vSequenceConveyors[vSequenceConveyors.size() - 1]->GetMoveTick()
             ));
 
             Sequence* sequence = vSequences.back();
@@ -182,7 +183,7 @@ std::tuple<int, Direction> cpp_conv::getInnerMostCornerChannel(const WorldMap& m
     return std::make_tuple(backDirection == Direction::Right ? 1 : 0, pBackConverter->GetDirection());
 }
 
-bool Sequence::MoveItemToForwardsNode(const SceneContext& kContext, const Conveyor& pNode, const int lane) const
+bool Sequence::MoveItemToForwardsNode(const SceneContext& kContext, const Entity& pNode, const int lane) const
 {
     const SlotItem item = m_RealizedStates[lane].m_Items.Peek();
     const Vector2F startPosition = GetSlotPosition(m_Length - 1, lane, 1);
@@ -200,13 +201,13 @@ const Sequence::RealizedState& Sequence::GetFreshRealizedStateForTick(uint8_t ui
 
 void Sequence::Tick(const SceneContext& kContext)
 {
-    m_pHeadConveyor->m_uiCurrentTick++;
-    if (m_pHeadConveyor->m_uiCurrentTick < m_pHeadConveyor->m_uiMoveTick)
+    m_uiCurrentTick++;
+    if (m_uiCurrentTick < m_uiMoveTick)
     {
         return;
     }
 
-    m_pHeadConveyor->m_uiCurrentTick = 0;
+    m_uiCurrentTick = 0;
     for (uint8_t uiLane = 0; uiLane < c_conveyorChannels; uiLane++)
     {
         const RealizedState& realizedState = GetFreshRealizedStateForTick(uiLane);
@@ -216,7 +217,7 @@ void Sequence::Tick(const SceneContext& kContext)
         bool bIsLeadItemFull = (realizedState.m_Lanes & 0b1) == 1;
         if (bIsLeadItemFull)
         {
-            if (MoveItemToForwardsNode(kContext, *m_pHeadConveyor, uiLane))
+            if (MoveItemToForwardsNode(kContext, *m_pHeadEntity, uiLane))
             {
                 pendingState.m_PendingRemovals |= 0b1;
                 bIsLeadItemFull = false;

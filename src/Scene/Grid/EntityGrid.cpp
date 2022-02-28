@@ -2,7 +2,7 @@
 
 #include "Entity.h"
 
-Vector3 cpp_conv::grid::getForwardPosition(const Vector3& position, Direction direction)
+Vector3 cpp_conv::grid::getForwardPosition(const Vector3& position, const Direction direction)
 {
     Vector3 facingDirection;
 
@@ -14,7 +14,7 @@ Vector3 cpp_conv::grid::getForwardPosition(const Vector3& position, Direction di
     case Direction::Down: facingDirection = { 0, -1, 0 }; break;
     }
 
-    return (Vector3)(position + facingDirection);
+    return position + facingDirection;
 }
 
 Vector3 cpp_conv::grid::getForwardPosition(const Entity& rEntity)
