@@ -74,7 +74,7 @@ void DrawConveyor(
     Direction direction,
     Direction cornerSourceDirection)
 {
-    const cpp_conv::Transform2D transform = { (float)x, (float)y, cpp_conv::rotationFromDirection(direction) };
+    const cpp_conv::Transform2D transform = { static_cast<float>(x), static_cast<float>(y), cpp_conv::rotationFromDirection(direction) };
     const auto pTile = rConveyor.GetTile();
     if (pTile)
     {
@@ -85,11 +85,11 @@ void DrawConveyor(
 cpp_conv::Conveyor::Channel::Channel(int channelLane)
     : m_ChannelLane(channelLane)
 {
-    std::fill(std::begin(m_pSlots), std::end(m_pSlots), Lane(ItemInstance::Empty(), Vector2F()));
-    std::fill(std::begin(m_pPendingItems), std::end(m_pPendingItems), ItemInstance::Empty());
+    std::ranges::fill(m_pSlots, Lane(ItemInstance::Empty(), Vector2F()));
+    std::ranges::fill(m_pPendingItems, ItemInstance::Empty());
 }
 
-cpp_conv::Conveyor::Conveyor(Vector3 position, Vector3 size, Direction direction, ItemId pItem)
+cpp_conv::Conveyor::Conveyor(const Vector3 position, const Vector3 size, const Direction direction, ItemId pItem)
     : Entity(position, size, EntityKind::Conveyor)
     , m_direction(direction)
     , m_pSequence(nullptr)
@@ -251,6 +251,7 @@ void cpp_conv::Conveyor::Draw(RenderContext& kContext) const
 
         break;
     }
+    default: assert(false);
     }
 }
 
@@ -449,21 +450,21 @@ uint64_t cpp_conv::Conveyor::CountItemsOnBelt()
     return uiCount;
 }
 
-bool cpp_conv::Conveyor::HasItemInSlot(int lane, int slot)
+bool cpp_conv::Conveyor::HasItemInSlot(int lane, int slot) const
 {
     if (IsPartOfASequence())
     {
         return m_pSequence->HasItemInSlot(m_uiSequenceIndex, lane, slot);
     }
 
-    Channel& rTargetChannel = m_pChannels[lane];
+    const Channel& rTargetChannel = m_pChannels[lane];
     const ItemInstance& forwardTargetItem = rTargetChannel.m_pSlots[slot].m_Item;
     const ItemInstance& forwardPendingItem = rTargetChannel.m_pPendingItems[slot];
 
     return (!forwardTargetItem.IsEmpty() || !forwardPendingItem.IsEmpty());
 }
 
-void cpp_conv::Conveyor::PlaceItemInSlot(int lane, int slot, const InsertInfo insertInfo, bool bDirectItemSet)
+void cpp_conv::Conveyor::PlaceItemInSlot(const int lane, const int slot, const InsertInfo insertInfo, const bool bDirectItemSet)
 {
     assert(!HasItemInSlot(lane, slot));
 
@@ -498,11 +499,11 @@ void cpp_conv::Conveyor::PlaceItemInSlot(int lane, int slot, const InsertInfo in
     }
 }
 
-bool cpp_conv::Conveyor::TryPeakItemInSlot(int lane, int slot, ItemInstance& pItem) const
+bool cpp_conv::Conveyor::TryPeakItemInSlot(const int lane, const int slot, ItemInstance& rItem) const
 {
     if (IsPartOfASequence())
     {
-        return m_pSequence->TryPeakItemInSlot(m_uiSequenceIndex, lane, slot, pItem);
+        return m_pSequence->TryPeakItemInSlot(m_uiSequenceIndex, lane, slot, rItem);
     }
 
     if (m_pChannels[lane].m_pSlots[slot].m_Item.IsEmpty())
@@ -510,6 +511,6 @@ bool cpp_conv::Conveyor::TryPeakItemInSlot(int lane, int slot, ItemInstance& pIt
         return false;
     }
 
-    pItem = m_pChannels[lane].m_pSlots[slot].m_Item;
+    rItem = m_pChannels[lane].m_pSlots[slot].m_Item;
     return true;
 }

@@ -89,7 +89,7 @@ namespace cpp_conv
         static_assert(c_conveyorChannels >= 1, "Conveyors must have at least once channel");
         static_assert(c_conveyorChannelSlots >= 1, "Conveyors channels must have at least once slot");
     private:
-        bool HasItemInSlot(int lane, int slot);
+        bool HasItemInSlot(int lane, int slot) const;
         void PlaceItemInSlot(int lane, int slot, InsertInfo insertInfo, bool bDirectItemSet = false);
 
         friend class Sequence;
@@ -98,7 +98,7 @@ namespace cpp_conv
         uint8_t m_uiSequenceIndex;
 
         uint32_t m_uiCurrentTick = 0;
-        uint32_t m_uiMoveTick = 10;
+        const uint32_t m_uiMoveTick = 10;
         bool m_bHasWork = false;
 
         bool m_bIsCorner;
