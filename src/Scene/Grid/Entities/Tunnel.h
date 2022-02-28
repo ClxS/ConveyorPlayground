@@ -11,24 +11,24 @@ namespace cpp_conv
 
     constexpr int c_maxUndergroundLength = 6;
 
-    class Underground : public Entity
+    class Tunnel : public Entity
     {
     public:
-        Underground(Vector3 position, Vector3 size, Direction direction);
+        Tunnel(Vector3 position, Vector3 size, Direction direction);
 
         void Tick(const SceneContext& kContext) override;
         void Draw(RenderContext& kRenderContext) const override;
         [[nodiscard]] bool SupportsInsertion() const override { return true; }
         bool TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, InsertInfo insertInfo) override;
 
-        [[nodiscard]] Direction GetDirection() const override { return m_direction; }
+        [[nodiscard]] Direction GetDirection() const override { return m_Direction; }
 
         [[nodiscard]] const char* GetName() const override { return "Tunnel"; }
         [[nodiscard]] std::string GetDescription() const override { return ""; }
 
     private:
-        Direction m_direction;
-        std::array<Conveyor, c_maxUndergroundLength> m_arrInternalConveyors;
-        uint64_t m_uiTick;
+        Direction m_Direction;
+        std::array<Conveyor, c_maxUndergroundLength> m_ArrInternalConveyors;
+        uint64_t m_Tick;
     };
 }

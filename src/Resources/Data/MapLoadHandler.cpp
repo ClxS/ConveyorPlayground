@@ -10,7 +10,7 @@
 #include "Map.h"
 #include "ResourceManager.h"
 #include "Storage.h"
-#include "Underground.h"
+#include "Tunnel.h"
 
 #include <iostream>
 #include <sstream>
@@ -53,10 +53,10 @@ cpp_conv::resources::ResourceAsset* mapAssetHandler(const cpp_conv::resources::r
             case 'J': pEntity = new cpp_conv::Junction({ static_cast<int32_t>(iCol), iRow, 0 }, size1x1); break;
             case 'S': pEntity = new cpp_conv::Storage({ static_cast<int32_t>(iCol), iRow, 0 }, size1x1, 16, 256); break;
             case '@': pEntity = new cpp_conv::Stairs({ static_cast<int32_t>(iCol), iRow, 0 }, { 1, 1, 2 }, Direction::Right, true); break;
-            case 'u': pEntity = new cpp_conv::Underground({ static_cast<int32_t>(iCol), iRow, 0 }, size1x1, Direction::Down); break;
-            case 'y': pEntity = new cpp_conv::Underground({ static_cast<int32_t>(iCol), iRow, 0 }, size1x1, Direction::Up); break;
-            case 'i': pEntity = new cpp_conv::Underground({ static_cast<int32_t>(iCol), iRow, 0 }, size1x1, Direction::Left); break;
-            case 'o': pEntity = new cpp_conv::Underground({ static_cast<int32_t>(iCol), iRow, 0 }, size1x1, Direction::Right); break;
+            case 'u': pEntity = new cpp_conv::Tunnel({ static_cast<int32_t>(iCol), iRow, 0 }, size1x1, Direction::Down); break;
+            case 'y': pEntity = new cpp_conv::Tunnel({ static_cast<int32_t>(iCol), iRow, 0 }, size1x1, Direction::Up); break;
+            case 'i': pEntity = new cpp_conv::Tunnel({ static_cast<int32_t>(iCol), iRow, 0 }, size1x1, Direction::Left); break;
+            case 'o': pEntity = new cpp_conv::Tunnel({ static_cast<int32_t>(iCol), iRow, 0 }, size1x1, Direction::Right); break;
             default: ; // Ignored
             }
 
