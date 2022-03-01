@@ -16,3 +16,6 @@
 [submodule "third_party/tomlcpp"]
 	path = third_party/tomlcpp
 	url = https://github.com/ClxS/tomlcpp
+[submodule "third_party/EASTL"]
+	path = third_party/EASTL
+	url = https://github.com/electronicarts/EASTL.git
