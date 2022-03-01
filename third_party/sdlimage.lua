@@ -14,4 +14,8 @@ project "SDLImage"
 			"SDL_Image/*.h",
 		}
 		flags { "MultiProcessorCompile" }
+
+		exports {
+			["includedirs"]	= path.getabsolute("SDL_Image"),	
+		}
 	filter {}

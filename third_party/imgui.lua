@@ -15,4 +15,8 @@ project "imgui"
 			"imgui/backends/*_impl_sdl*",
 		}
 		flags { "MultiProcessorCompile" }
+
+		exports {
+			["includedirs"]	= path.getabsolute("imgui"),		
+		}
 	filter {}

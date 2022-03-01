@@ -16,3 +16,6 @@
 [submodule "third_party/tomlcpp"]
 	path = third_party/tomlcpp
 	url = https://github.com/ClxS/tomlcpp
+[submodule "third_party/premake-core"]
+	path = third_party/premake-core
+	url = https://github.com/ClxS/premake-core.git

@@ -120,11 +120,6 @@ group("")
 			removefiles {
 				"src/Platform/Console/**",
 			}
-			includedirs {
-				"third_party/SDL/include",
-				"third_party/SDL_Image",
-				"third_party/imgui",
-			}
 			links {
 				"SDL",
 				"SDLImage",
@@ -139,7 +134,6 @@ group("")
 			"src",
 			"src/**",
 			"src/Generated",
-			"third_party/tomlcpp",
 		}
 
 		cppdialect "C++latest"

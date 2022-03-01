@@ -41,4 +41,8 @@ project "SDL"
 			'HAVE_LIBC',
 		}
 		flags { "MultiProcessorCompile" }
+		
+		exports {
+			["includedirs"]	= path.getabsolute("SDL/include"),
+		}
 	filter {}

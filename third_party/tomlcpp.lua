@@ -6,3 +6,7 @@ project "tomlcpp"
 		"tomlcpp/tomlcpp.hpp",
 		"tomlcpp/tomlcpp.cpp",
 	}
+
+	exports {
+		["includedirs"]	= path.getabsolute("tomlcpp"),
+	}
