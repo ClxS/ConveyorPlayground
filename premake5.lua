@@ -21,6 +21,21 @@ workspace "CppConveyor"
 		intrinsics "on"
 	filter{}
 
+	solutionitems {
+		["build"] = {
+			["module"] = {
+				"lua/**.lua",
+			},
+			["premake"] = {
+				"*.lua",
+				"src/**.lua",
+			},
+		},
+		["data"] = {
+
+		}
+	}
+
 group("Tools")
 	project "ToolsCore"
 		platforms { "Tools_Win64" }
@@ -45,15 +60,15 @@ group("Tools")
 		targetname "AssetBuilder"
 		location "build/AssetBuilder"
 		language "C++"
-		debugdir "$(TargetDir)"	
+		debugdir "$(TargetDir)"
 		files {
 			"tools/AssetBuilder/src/**",
 			"tools/AssetBuilder/include/**",
-		}	
+		}
 		includedirs {
 			"tools/Core/include",
-			"tools/AssetBuilder/src/**",	
-			"tools/AssetBuilder/include/**",		
+			"tools/AssetBuilder/src/**",
+			"tools/AssetBuilder/include/**",
 		}
 		links {
 			"ToolsCore",
@@ -80,7 +95,7 @@ group("")
 			["ToolsDir"] = path.getabsolute('bin/tools'),
 			["DataDir"] = path.getabsolute('data'),
 			["CodeDir"] = path.getabsolute('src'),
-			["DataNamespace"] = 'cpp_conv::resources::registry',			
+			["DataNamespace"] = 'cpp_conv::resources::registry',
 		}
 
 		if _ACTION == 'vs2022' then

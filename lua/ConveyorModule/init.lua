@@ -1,5 +1,6 @@
 dofile("utilfunctions.lua")
 dofile("tableExtensions.lua")
+dofile("solutionItems.lua")
 dofile("customProps.lua")
 dofile("customTargets.lua")
 dofile("exportables.lua")
