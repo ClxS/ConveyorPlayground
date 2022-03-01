@@ -134,14 +134,12 @@ group("")
 
 		links {
 			"tomlcpp",
-			"EASTL"
 		}
 		includedirs {
 			"src",
 			"src/**",
 			"src/Generated",
 			"third_party/tomlcpp",
-			"third_party/eastl/include",
 		}
 
 		cppdialect "C++latest"
@@ -159,4 +157,3 @@ group("ThirdParty")
 	dofile('third_party/sdlimage.lua')
 	dofile('third_party/imgui.lua')
 	dofile('third_party/tomlcpp.lua')
-	dofile('third_party/EASTL.lua')
