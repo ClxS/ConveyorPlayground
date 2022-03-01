@@ -1,6 +1,8 @@
-      v
-  AAA v<<<<<<<<
-  AAA>v       ^
-  AAA >>>>>>>>^
+      >>>>S
+      u
+
+  AAA u
+  AAA>^
+  AAA
 
 

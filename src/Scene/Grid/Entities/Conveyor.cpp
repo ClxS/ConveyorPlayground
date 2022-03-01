@@ -92,9 +92,8 @@ cpp_conv::Conveyor::Channel::Channel(int channelLane)
 cpp_conv::Conveyor::Conveyor(const Vector3 position, const Vector3 size, const Direction direction, ItemId pItem)
     : Entity(position, size, EntityKind::Conveyor)
     , m_direction(direction)
-    , m_pSequence(nullptr)
-    , m_uiSequenceIndex(0)
     , m_pChannels({ 0, 1 })
+    , m_uiSequenceIndex(0)
 {
 }
 

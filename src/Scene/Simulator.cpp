@@ -9,14 +9,14 @@ void cpp_conv::simulation::simulate(const SceneContext& kContext)
         sequence->Tick(kContext);
     }
 
-    for (Entity* pProducer : kContext.m_rMap.GetOtherEntities())
-    {
-        pProducer->Tick(kContext);
-    }
-
     for (Conveyor* pConveyor : kContext.m_rMap.GetCornerConveyors())
     {
         pConveyor->Tick(kContext);
+    }
+
+    for (Entity* pEntity : kContext.m_rMap.GetOtherEntities())
+    {
+        pEntity->Tick(kContext);
     }
 
     for (const auto& sequence : kContext.m_sequences)
@@ -27,5 +27,10 @@ void cpp_conv::simulation::simulate(const SceneContext& kContext)
     for (Conveyor* pConveyor : kContext.m_rMap.GetCornerConveyors())
     {
         pConveyor->Realize();
+    }
+
+    for (Entity* pEntity : kContext.m_rMap.GetOtherEntities())
+    {
+        pEntity->Realize();
     }
 }

@@ -56,6 +56,7 @@ namespace cpp_conv
         virtual ~Entity() = default;
 
         virtual void Tick(const SceneContext& kContext) = 0;
+        virtual void Realize() {}
         virtual void Draw(RenderContext& kContext) const = 0;
 
         virtual bool TryInsert(

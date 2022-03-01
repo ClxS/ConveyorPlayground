@@ -16,7 +16,13 @@ namespace cpp_conv
     class Sequence
     {
     public:
-        Sequence(const Entity* pHead, const uint8_t uiLength, const Vector2F laneOnePosition, const Vector2F laneTwoPosition, const Vector2F unitDirection, const uint32_t uiMoveTick)
+        Sequence(
+            const Entity* pHead,
+            const uint8_t uiLength,
+            const Vector2F laneOnePosition,
+            const Vector2F laneTwoPosition,
+            const Vector2F unitDirection,
+            const uint32_t uiMoveTick)
             : m_InitializationState{ { LaneVisual(laneOnePosition, unitDirection), LaneVisual(laneTwoPosition, unitDirection) } }
             , m_RealizedStates { RealizedState(uiLength * 2), RealizedState(uiLength * 2) }
             , m_PendingStates{ PendingState(uiLength * 2), PendingState(uiLength * 2) }
@@ -28,6 +34,7 @@ namespace cpp_conv
         }
 
         void Tick(const SceneContext& kContext);
+
         void Realize();
 
         inline static constexpr uint32_t c_uiMaxSequenceLength = 32;
@@ -36,6 +43,8 @@ namespace cpp_conv
         void AddItemInSlot(uint8_t uiSequenceIndex, int lane, int slot, ItemId item, const Vector2F* origin = nullptr);
         bool RemoveItemFromSlot(uint8_t uiSequenceIndex, int iChannelLane, int iChannelSlot, ItemId& outItem, Vector2F& outOrigin);
 
+        [[nodiscard]] const Entity* GetHeadEntity() const { return m_pHeadEntity; }
+
         [[nodiscard]] bool DidItemMoveLastSimulation(uint8_t uiSequenceIndex, int lane, int slot) const;
         [[nodiscard]] Vector2F GetSlotPosition(uint8_t uiSequenceIndex, const int lane, int slot) const;
         bool TryPeakItemInSlot(uint8_t uiSequenceIndex, int lane, int slot, ItemInstance& pItem) const;
@@ -43,6 +52,8 @@ namespace cpp_conv
 
         [[nodiscard]] uint32_t GetMoveTick() const { return m_uiMoveTick; }
         [[nodiscard]] uint32_t GetCurrentTick() const { return m_uiCurrentTick; }
+
+        [[nodiscard]] uint32_t NeedsRealization() const { return m_bNeedsRealization; }
 
     private:
         [[nodiscard]] bool MoveItemToForwardsNode(const SceneContext& kContext, const Entity& pNode, int lane) const;
@@ -125,6 +136,7 @@ namespace cpp_conv
 
         uint32_t m_uiCurrentTick;
         uint32_t m_uiMoveTick;
+        bool m_bNeedsRealization = false;
 
         const RealizedState& GetFreshRealizedStateForTick(uint8_t uiLane);
     };

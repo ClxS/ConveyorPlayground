@@ -37,7 +37,7 @@ cpp_conv::Entity* cpp_conv::targeting_util::findNextTailConveyor(const WorldMap&
         switch (pDirectionEntity->m_eEntityKind)
         {
             case EntityKind::Stairs:
-            case EntityKind::Underground:
+            case EntityKind::Tunnel:
             case EntityKind::Conveyor:
                 if (grid::getForwardPosition(*pDirectionEntity) == rCurrentConveyor.m_position)
                 {
@@ -171,6 +171,36 @@ int cpp_conv::targeting_util::getChannelTargetSlot(const WorldMap& map, const En
     }
 
     return result;
+}
+
+Vector2F cpp_conv::targeting_util::getTilePosition(
+       const cpp_conv::WorldMap& map,
+       const cpp_conv::Entity& entity,
+       cpp_conv::targeting_util::ConveyorSlot slot)
+{
+    PROFILE_FUNC();
+    // This method translates the current direction in Right-facing space, determines the offsets, then rotates the offsets back to their original
+    // direction-facing space.
+
+    Direction eDirection = entity.GetDirection();
+    int stepsRequired = 0;
+    while (eDirection != Direction::Right)
+    {
+        eDirection = cpp_conv::direction::rotate90DegreeClockwise(eDirection);
+        stepsRequired++;
+    }
+
+    Vector2F position = {1.0f + static_cast<float>(slot.m_Channel), 1.0f + static_cast<float>(slot.m_Lane)};
+
+    constexpr float c_fBlockSize = 4;
+    const Vector2F blockSize(c_fBlockSize, c_fBlockSize);
+    const auto backToOrigin = static_cast<Rotation>((4 - stepsRequired) % 4);
+    position = position.Rotate(backToOrigin, blockSize);
+
+    const Vector2F offset = position * 0.5f * c_fBlockSize - Vector2F(1.0f, 1.0f) - (cpp_conv::renderer::c_gridScale / c_fBlockSize);
+
+    const Vector2F end = (Vector2F(static_cast<float>(entity.m_position.GetX()), static_cast<float>(entity.m_position.GetY())) * blockSize) + offset;
+    return end;
 }
 
 Vector2F cpp_conv::targeting_util::getRenderPosition(const WorldMap& map, const Conveyor& conveyor, ConveyorSlot slot, bool bAnimate, float fLerpFactor, Vector2F previousPosition)

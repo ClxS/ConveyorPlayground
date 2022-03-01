@@ -17,6 +17,21 @@ Vector3 cpp_conv::grid::getForwardPosition(const Vector3& position, const Direct
     return position + facingDirection;
 }
 
+Vector3 cpp_conv::grid::getBackwardsPosition(const Vector3& position, const Direction direction)
+{
+    Vector3 facingDirection;
+
+    switch (direction)
+    {
+    case Direction::Left: facingDirection = { -1, 0, 0 }; break;
+    case Direction::Up: facingDirection = { 0, 1, 0 }; break;
+    case Direction::Right: facingDirection = { 1, 0, 0 }; break;
+    case Direction::Down: facingDirection = { 0, -1, 0 }; break;
+    }
+
+    return position - facingDirection;
+}
+
 Vector3 cpp_conv::grid::getForwardPosition(const Entity& rEntity)
 {
     return getForwardPosition(rEntity.m_position, rEntity.GetDirection());

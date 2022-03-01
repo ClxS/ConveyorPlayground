@@ -12,9 +12,11 @@ namespace cpp_conv
     namespace grid
     {
         Vector3 getForwardPosition(const Vector3& position, Direction direction);
+        Vector3 getBackwardsPosition(const Vector3& position, Direction direction);
         Vector3 getForwardPosition(const Entity& rEntity);
         Vector3 getRightPosition(const Entity& rEntity);
         Vector3 getBackwardsPosition(const Entity& rEntity);
+
         Vector3 getLeftPosition(const Entity& rEntity);
     }
 }

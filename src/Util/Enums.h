@@ -26,7 +26,7 @@ enum class EntityKind
     Producer,
     Stairs,
     Storage,
-    Underground,
+    Tunnel,
 
     MAX
 };

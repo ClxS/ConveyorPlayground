@@ -49,7 +49,7 @@ namespace cpp_conv
         std::array<Channel, c_conveyorChannels> m_pChannels;
 
         void Tick(const SceneContext& kContext) override;
-        void Realize();
+        void Realize() override;
 
         void Draw(RenderContext& kContext) const override;
         [[nodiscard]] bool SupportsInsertion() const override { return true; }
