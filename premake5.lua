@@ -31,8 +31,8 @@ workspace "CppConveyor"
 				"src/**.lua",
 			},
 		},
-		["data"] = {
-
+		["data/*"] = {
+			"data/**",
 		}
 	}
 
@@ -84,7 +84,6 @@ group("")
 		debugdir "$(TargetDir)"
 		files {
 			".editorconfig",
-			"data/**",
 			"src/**"
 		}
 		flags { "FatalWarnings" }
