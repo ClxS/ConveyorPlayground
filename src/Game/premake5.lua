@@ -3,7 +3,8 @@ project "CppConveyor"
 	editandcontinue "On"
 	debugdir "$(TargetDir)"
 	files {
-		"**"
+		"**.h",
+		"**.cpp",
 	}
 	flags { "FatalWarnings" }
 	dependson {
