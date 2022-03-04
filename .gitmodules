@@ -19,3 +19,6 @@
 [submodule "src/ThirdParty/premake-core"]
 	path = src/ThirdParty/premake-core
 	url = https://github.com/ClxS/premake-core.git
+[submodule "src/ThirdParty/bgfx"]
+	path = src/ThirdParty/bgfx
+	url = https://github.com/ClxS/bgfx.git
