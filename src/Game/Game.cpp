@@ -26,6 +26,8 @@
 #include <chrono>
 #include "WorldMap.h"
 #include "Factory.h"
+#include "AtlasAppHost/Application.h"
+#include "AtlasAppHost/Main.h"
 
 #undef max
 #undef min
@@ -105,16 +107,15 @@ void CreateMillionTileMap(cpp_conv::WorldMap& worldMap)
     }
 }
 
-void cpp_conv::game::run()
+int gameMain(int argc, char* argv[])
 {
+    logStartUp();
     srand((unsigned int)time(NULL));
-
-    int iWidth, iHeight;
-    std::tie(iWidth, iHeight) = apphost::getAppDimensions();
+    auto [iWidth, iHeight] = atlas::app_host::Application::Get().GetAppDimensions();
 
     registration::processSelfRegistrations();
 
-    WorldMap worldMap;
+    cpp_conv::WorldMap worldMap;
     {
         //CreateMillionTileMap(worldMap);
 
@@ -139,8 +140,8 @@ void cpp_conv::game::run()
         worldMap.PopulateCorners();
     }
 
-    std::vector<Sequence*> sequences = initializeSequences(worldMap, worldMap.GetConveyors());
-    SceneContext kSceneContext =
+    std::vector<cpp_conv::Sequence*> sequences = initializeSequences(worldMap, worldMap.GetConveyors());
+    cpp_conv::SceneContext kSceneContext =
     {
         worldMap,
         sequences,
@@ -152,7 +153,7 @@ void cpp_conv::game::run()
         }
     };
 
-    RenderContext kRenderContext =
+    cpp_conv::RenderContext kRenderContext =
     {
         { 0.0f, 0.0f, 0.0f },
         0,
@@ -163,13 +164,13 @@ void cpp_conv::game::run()
         0.8f
     };
 
-    renderer::SwapChain swapChain(kRenderContext, iWidth, iHeight);
+    cpp_conv::renderer::SwapChain swapChain(kRenderContext, iWidth, iHeight);
     init(kRenderContext, swapChain);
 
-    FrameLimiter frameLimter(60);
-    std::queue<commands::CommandType> commands;
+    cpp_conv::FrameLimiter frameLimter(60);
+    std::queue<cpp_conv::commands::CommandType> commands;
 
-    ui::initializeGuiSystem();
+    cpp_conv::ui::initializeGuiSystem();
 
 
     frameLimter.Start();
@@ -184,7 +185,7 @@ void cpp_conv::game::run()
         PROFILE(ResizeSwap, [&]() {
             int iNewWidth;
             int iNewHeight;
-            std::tie(iNewWidth, iNewHeight) = cpp_conv::apphost::getAppDimensions();
+            std::tie(iNewWidth, iNewHeight) = atlas::app_host::Application::Get().GetAppDimensions();
             if (swapChain.RequiresResize(kRenderContext, iNewWidth, iNewHeight))
             {
                 swapChain.ResizeBuffers(kRenderContext, iNewWidth, iNewHeight);
@@ -204,6 +205,7 @@ void cpp_conv::game::run()
         frameLimter.EndFrame();
     }
 
-    ui::shutdown();
+    cpp_conv::ui::shutdown();
+    return 0;
 }
 

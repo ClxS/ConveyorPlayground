@@ -28,6 +28,25 @@ function importLinkExports()
             for cfg in project.eachconfig(prj) do
                 diagLog('\t' .. cfg.name)
 
+                for _,export in ipairs(cfg.exports) do
+                    for exportKey, exportValue in pairs(export) do
+                        diagLog('\t\t\tImporting ' .. exportKey)
+                        if cfg[exportKey] == nil then
+                            cfg[exportKey] = {}
+                        elseif type(cfg[exportKey]) ~= "table" then
+                            error("Trying to append field " .. exportKey .. " to non-table")
+                        end
+
+                        if type(exportValue) == "table" then
+                            cfg[exportKey] = table.concatenate(cfg[exportKey], exportValue)
+                            diagLog(exportValue[1])
+                        else
+                            table.insert(cfg[exportKey], exportValue)
+                            diagLog(exportValue)
+                        end
+                    end
+                end
+
                 local processedLinks = {}
                 local linkTable = table.shallowCopy(cfg.links)
                 if not linkTable then

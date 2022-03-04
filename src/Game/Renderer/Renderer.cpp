@@ -12,6 +12,7 @@
 #include "Profiler.h"
 #include "WorldMap.h"
 #include "AppHost.h"
+#include "AtlasAppHost/Application.h"
 
 using TypeId = size_t;
 static std::map<TypeId, std::function<void(cpp_conv::RenderContext&, const cpp_conv::resources::RenderableAsset*, cpp_conv::Transform2D, cpp_conv::Colour, bool)>*> g_typeHandlers;
@@ -67,8 +68,7 @@ void cpp_conv::renderer::render(const SceneContext& kSceneContext, RenderContext
 {
     drawBackground(kSceneContext, kContext);
 
-    int width, height;
-    std::tie(width, height) = apphost::getAppDimensions();
+    auto [width, height] = atlas::app_host::Application::Get().GetAppDimensions();
 
     const Vector2F startCellPosition = kContext.m_CameraPosition.GetXY() / kContext.m_fZoom * -1.0f / 64;
     const Vector2F endCellPosition = (kContext.m_CameraPosition.GetXY() / kContext.m_fZoom * -1.0f + Vector2F((float)width, (float)height) / kContext.m_fZoom) / 64;

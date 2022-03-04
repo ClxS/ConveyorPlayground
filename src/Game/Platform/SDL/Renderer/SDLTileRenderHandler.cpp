@@ -8,6 +8,7 @@
 #include <SDL.h>
 #include <SDL_render.h>
 #include "Profiler.h"
+#include "AtlasAppHost/Application.h"
 
 void tileRenderer(
     cpp_conv::RenderContext& kContext,
@@ -30,10 +31,12 @@ void tileRenderer(
         return;
     }
 
+    atlas::app_host::platform::PlatformApplication& platform = atlas::app_host::Application::Get().GetPlatform();
     if (kTransform.m_bFillScreen)
     {
         int windowWidth, windowHeight;
-        SDL_GetWindowSize(cpp_conv::apphost::app.m_Window, &windowWidth, &windowHeight);
+
+        SDL_GetWindowSize(platform.GetSDLContext().m_Window, &windowWidth, &windowHeight);
         SDL_QueryTexture(pTexture, nullptr, nullptr, &dest.w, &dest.h);
 
         const int screenCameraX = static_cast<int>(kContext.m_CameraPosition.GetX() * kContext.m_fZoom);
@@ -47,7 +50,7 @@ void tileRenderer(
                 dest.x = x;
                 dest.y = y;
 
-                SDL_RenderCopy(cpp_conv::apphost::app.m_Renderer, pTexture, nullptr, &dest);
+                SDL_RenderCopy(platform.GetSDLContext().m_Renderer, pTexture, nullptr, &dest);
                 if (bTrack)
                 {
                     ++kContext.m_uiDrawnItems;
@@ -88,11 +91,11 @@ void tileRenderer(
         dest.h = static_cast<int>(static_cast<float>(dest.h) * kContext.m_fZoom);
 
         int windowWidth, windowHeight;
-        SDL_GetWindowSize(cpp_conv::apphost::app.m_Window, &windowWidth, &windowHeight);
+        SDL_GetWindowSize(platform.GetSDLContext().m_Window, &windowWidth, &windowHeight);
         if ((dest.x + dest.w >= 0 || dest.x <= windowWidth) && (dest.y + dest.h >= 0 || dest.y <= windowHeight))
         {
             SDL_SetTextureAlphaMod(pTexture, kContext.m_LayerColour.m_argb.m_a);
-            SDL_RenderCopyEx(cpp_conv::apphost::app.m_Renderer, pTexture, nullptr, &dest, angle, &rotatePivot,  // NOLINT(clang-diagnostic-double-promotion)
+            SDL_RenderCopyEx(platform.GetSDLContext().m_Renderer, pTexture, nullptr, &dest, angle, &rotatePivot,  // NOLINT(clang-diagnostic-double-promotion)
                              SDL_FLIP_NONE);
 
             if (bTrack)

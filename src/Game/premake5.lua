@@ -63,6 +63,8 @@ project "CppConveyor"
 
 	links {
 		"tomlcpp",
+
+		"AtlasAppHost",
 	}
 	includedirs {
 		".",

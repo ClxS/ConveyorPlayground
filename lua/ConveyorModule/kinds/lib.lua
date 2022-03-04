@@ -3,12 +3,31 @@ function lib(name)
         kind "StaticLib"
     	language "C++"
     	files {
-    		"**.h",
-    		"**.cpp",
+    		"*.lua",
+    		"include/**",
+    		"src/**",
+    		"platform/SDL/**",
     	}
+
     	flags { "FatalWarnings" }
     	pchsource("src/" .. name .. "PCH.cpp")
     	pchheader(name .. "PCH.h")
+        exports {
+            ["includedirs"] = {
+                path.getabsolute("include"),
+            }
+        }
+
+        filter { "platforms:SDL" }
+            includedirs {
+                "platform/SDL/src",
+            }
+            exports {
+                ["includedirs"] = {
+                    path.getabsolute("platform/SDL/include"),
+                }
+            }
+        filter {}
 end
 
 

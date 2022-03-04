@@ -5,6 +5,9 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
+#include "AtlasAppHost/Application.h"
+#include "AtlasAppHost/PlatformApplication.h"
+
 cpp_conv::resources::ResourceAsset* textTileLoadHandler(const cpp_conv::resources::resource_manager::FileData& data)
 {
     SDL_RWops* pSrc = SDL_RWFromMem(data.m_pData, static_cast<int>(data.m_uiSize));
@@ -19,7 +22,8 @@ cpp_conv::resources::ResourceAsset* textTileLoadHandler(const cpp_conv::resource
         return nullptr;
     }
 
-    SDL_Texture* pTexture = SDL_CreateTextureFromSurface(cpp_conv::apphost::app.m_Renderer, pSurface);
+    atlas::app_host::platform::PlatformApplication& platform = atlas::app_host::Application::Get().GetPlatform();
+    SDL_Texture* pTexture = SDL_CreateTextureFromSurface(platform.GetSDLContext().m_Renderer, pSurface);
     SDL_FreeSurface(pSurface);
 
     if (!pTexture)

@@ -30,7 +30,6 @@ workspace "CppConveyor"
 			},
 			["premake/*"] = {
 				"*.lua",
-				"src/**.lua",
 			},
 		},
 		["data/*"] = {
