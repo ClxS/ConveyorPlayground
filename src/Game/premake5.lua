@@ -68,6 +68,3 @@ project "CppConveyor"
 		".",
 		"**",
 	}
-
-	cppdialect "C++latest"
-	flags { "MultiProcessorCompile" }
