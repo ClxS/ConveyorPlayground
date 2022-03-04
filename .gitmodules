@@ -22,3 +22,6 @@
 [submodule "src/ThirdParty/bgfx"]
 	path = src/ThirdParty/bgfx
 	url = https://github.com/ClxS/bgfx.git
+[submodule "src/ThirdParty/eigen"]
+	path = src/ThirdParty/eigen
+	url = https://gitlab.com/libeigen/eigen.git
