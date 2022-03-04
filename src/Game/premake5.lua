@@ -3,7 +3,6 @@ project "CppConveyor"
 	editandcontinue "On"
 	debugdir "$(TargetDir)"
 	files {
-		"../../.editorconfig",
 		"**"
 	}
 	flags { "FatalWarnings" }
