@@ -17,6 +17,6 @@ project "imgui"
 		flags { "MultiProcessorCompile" }
 
 		exports {
-			["includedirs"]	= path.getabsolute("imgui"),		
+			["includedirs"]	= path.getabsolute("imgui"),
 		}
 	filter {}
