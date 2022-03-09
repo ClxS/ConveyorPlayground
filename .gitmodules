@@ -25,3 +25,6 @@
 [submodule "src/ThirdParty/eigen"]
 	path = src/ThirdParty/eigen
 	url = https://gitlab.com/libeigen/eigen.git
+[submodule "src/ThirdParty/RmlUi"]
+	path = src/ThirdParty/RmlUi
+	url = https://github.com/ClxS/RmlUi
