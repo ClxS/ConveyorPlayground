@@ -34,41 +34,7 @@
 
 using namespace cpp_conv::resources;
 
-namespace
-{
-    void updateCamera(cpp_conv::SceneContext& kContext, cpp_conv::RenderContext& kRenderContext)
-    {
-        /*constexpr int c_iPadding = 3 * cpp_conv::renderer::c_gridScale;
-        constexpr int c_iPlayerSize = cpp_conv::renderer::c_gridScale;
-        int playerX = kContext.m_player.GetX() * cpp_conv::renderer::c_gridScale;
-        int playerY = kContext.m_player.GetY() * cpp_conv::renderer::c_gridScale;
-
-        if (playerX < kRenderContext.m_cameraQuad.GetLeft() + c_iPadding)
-        {
-            kRenderContext.m_cameraQuad.m_x = playerX - c_iPadding;
-        }
-
-        if (playerY < kRenderContext.m_cameraQuad.GetTop() + (c_iPadding + c_iPlayerSize))
-        {
-            kRenderContext.m_cameraQuad.m_y = playerY - c_iPadding;
-        }
-
-        if (playerX > (kRenderContext.m_cameraQuad.GetRight() - (c_iPadding + c_iPlayerSize)))
-        {
-            kRenderContext.m_cameraQuad.m_x = (playerX + c_iPadding + c_iPlayerSize) - kRenderContext.m_cameraQuad.m_uiWidth;
-        }
-
-        if (playerY > (kRenderContext.m_cameraQuad.GetBottom() - (c_iPadding + c_iPlayerSize)))
-        {
-            kRenderContext.m_cameraQuad.m_y = (playerY + c_iPadding + c_iPlayerSize) - kRenderContext.m_cameraQuad.m_uiHeight;
-        }
-
-        kRenderContext.m_cameraQuad.m_x = std::max(kRenderContext.m_cameraQuad.m_x, 0);
-        kRenderContext.m_cameraQuad.m_y = std::max(kRenderContext.m_cameraQuad.m_y, 0);*/
-    }
-}
-
-void CreateMillionTileMap(cpp_conv::WorldMap& worldMap)
+void createMillionTileMap(cpp_conv::WorldMap& worldMap)
 {
     worldMap.PlaceEntity({ 0, 0, 0 }, new cpp_conv::Factory({ (int32_t)0, 0, 0 }, Direction::Right, cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_MINE")));
     int count = 0;
@@ -110,33 +76,15 @@ void CreateMillionTileMap(cpp_conv::WorldMap& worldMap)
 int gameMain(int argc, char* argv[])
 {
     logStartUp();
-    srand((unsigned int)time(NULL));
+    srand(static_cast<unsigned>(time(nullptr)));
     auto [iWidth, iHeight] = atlas::app_host::Application::Get().GetAppDimensions();
 
     registration::processSelfRegistrations();
 
     cpp_conv::WorldMap worldMap;
     {
-        //CreateMillionTileMap(worldMap);
-
         const AssetPtr<Map> map = resource_manager::loadAssetUncached<Map>(registry::maps::c_simple);
         worldMap.Consume(map);
-
-        /*map = resource_manager::loadAssetUncached<Map>(registry::data::MapSimple1);
-        for (auto& pEntity : map->GetConveyors()) { pEntity->m_position.SetZ(1); }
-        for (auto& pEntity : map->GetOtherEntities()) { pEntity->m_position.SetZ(1); }
-        worldMap.Consume(map);
-
-        map = resource_manager::loadAssetUncached<Map>(registry::data::MapSimple2);
-        for (auto& pEntity : map->GetConveyors()) { pEntity->m_position.SetZ(2); }
-        for (auto& pEntity : map->GetOtherEntities()) { pEntity->m_position.SetZ(2); }
-        worldMap.Consume(map);
-
-        map = resource_manager::loadAssetUncached<Map>(registry::data::MapSimple3);
-        for (auto& pEntity : map->GetConveyors()) { pEntity->m_position.SetZ(3); }
-        for (auto& pEntity : map->GetOtherEntities()) { pEntity->m_position.SetZ(3); }
-        worldMap.Consume(map);*/
-
         worldMap.PopulateCorners();
     }
 
@@ -167,13 +115,13 @@ int gameMain(int argc, char* argv[])
     cpp_conv::renderer::SwapChain swapChain(kRenderContext, iWidth, iHeight);
     init(kRenderContext, swapChain);
 
-    cpp_conv::FrameLimiter frameLimter(60);
+    cpp_conv::FrameLimiter frameLimiter(60);
     std::queue<cpp_conv::commands::CommandType> commands;
 
     cpp_conv::ui::initializeGuiSystem();
 
 
-    frameLimter.Start();
+    frameLimiter.Start();
     float fCurrentZoom = kRenderContext.m_fZoom;
     while (true)
     {
@@ -182,27 +130,24 @@ int gameMain(int argc, char* argv[])
         PROFILE(Input, cpp_conv::input::receiveInput(kSceneContext, kRenderContext, commands));
         PROFILE(CommandProcess, cpp_conv::command::processCommands(kSceneContext, kRenderContext, commands));
         PROFILE(Simulation, cpp_conv::simulation::simulate(kSceneContext));
-        PROFILE(ResizeSwap, [&]() {
+        PROFILE(ResizeSwap, [&]()
+        {
             int iNewWidth;
             int iNewHeight;
             std::tie(iNewWidth, iNewHeight) = atlas::app_host::Application::Get().GetAppDimensions();
             if (swapChain.RequiresResize(kRenderContext, iNewWidth, iNewHeight))
             {
                 swapChain.ResizeBuffers(kRenderContext, iNewWidth, iNewHeight);
-                /*kRenderContext.m_cameraQuad.m_uiWidth = swapChain.GetWriteSurface().GetWidth();
-                kRenderContext.m_cameraQuad.m_uiHeight = swapChain.GetWriteSurface().GetHeight();*/
             }
-            }());
-
-        PROFILE(UpdateCamera, updateCamera(kSceneContext, kRenderContext));
+        }());
 
         PROFILE(Render, cpp_conv::renderer::render(kSceneContext, kRenderContext));
         PROFILE(DrawUI, cpp_conv::ui::drawUI(kSceneContext, kRenderContext));
         PROFILE(Present, swapChain.SwapAndPresent());
 
-        PROFILE(FrameCapSleep, frameLimter.Limit());
+        PROFILE(FrameCapSleep, frameLimiter.Limit());
         PROFILE(UpdatePersistence, cpp_conv::resources::resource_manager::updatePersistenceStore());
-        frameLimter.EndFrame();
+        frameLimiter.EndFrame();
     }
 
     cpp_conv::ui::shutdown();
