@@ -28,3 +28,6 @@
 [submodule "src/ThirdParty/RmlUi"]
 	path = src/ThirdParty/RmlUi
 	url = https://github.com/ClxS/RmlUi
+[submodule "src/ThirdParty/freetype"]
+	path = src/ThirdParty/freetype
+	url = https://github.com/ClxS/freetype
