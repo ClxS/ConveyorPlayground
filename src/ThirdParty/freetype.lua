@@ -54,10 +54,10 @@ project "freetype"
         ["includedirs"]	= path.getabsolute("freetype/include"),
     }
 
-    --filter { "system:Windows" }
-    files {
-        "freetype/builds/windows/ftsystem.c",
-        "freetype/builds/windows/ftdebug.c",
-        "freetype/src/base/ftver.rc",
-    }
-    --filter{}
+    filter { "system:windows" }
+        files {
+            "freetype/builds/windows/ftsystem.c",
+            "freetype/builds/windows/ftdebug.c",
+            "freetype/src/base/ftver.rc",
+        }
+    filter{}
