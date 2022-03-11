@@ -31,3 +31,6 @@
 [submodule "src/ThirdParty/freetype"]
 	path = src/ThirdParty/freetype
 	url = https://github.com/ClxS/freetype
+[submodule "src/ThirdParty/bx"]
+	path = src/ThirdParty/bx
+	url = https://github.com/bkaradzic/bx
