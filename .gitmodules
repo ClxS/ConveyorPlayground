@@ -34,3 +34,6 @@
 [submodule "src/ThirdParty/bx"]
 	path = src/ThirdParty/bx
 	url = https://github.com/bkaradzic/bx
+[submodule "src/ThirdParty/bimg"]
+	path = src/ThirdParty/bimg
+	url = https://github.com/bkaradzic/bimg
