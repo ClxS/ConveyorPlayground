@@ -37,3 +37,6 @@
 [submodule "src/ThirdParty/bimg"]
 	path = src/ThirdParty/bimg
 	url = https://github.com/bkaradzic/bimg
+[submodule "src/ThirdParty/googletest"]
+	path = src/ThirdParty/googletest
+	url = https://github.com/google/googletest.git
