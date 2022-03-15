@@ -50,14 +50,19 @@ group("Engine")
     include("src/Engine/AtlasResource")
     include("src/Engine/AtlasScene")
 
+group("Engine/Tests")
+    include("src/Engine/Tests/AtlasSceneTests")
+
 
 group("")
 	include("src/Game")
 
 
 group("ThirdParty")
+	include('src/ThirdParty/benchmark.lua')
 	include('src/ThirdParty/eigen.lua')
 	include('src/ThirdParty/freetype.lua')
+	include('src/ThirdParty/gtest.lua')
 	include('src/ThirdParty/imgui.lua')
 	include('src/ThirdParty/rmlui.lua')
 	include('src/ThirdParty/sdl.lua')

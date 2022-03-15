@@ -40,3 +40,6 @@
 [submodule "src/ThirdParty/googletest"]
 	path = src/ThirdParty/googletest
 	url = https://github.com/google/googletest.git
+[submodule "src/ThirdParty/benchmark"]
+	path = src/ThirdParty/benchmark
+	url = https://github.com/google/benchmark
