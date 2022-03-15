@@ -1,4 +1,1 @@
 lib "AtlasScene"
-    links {
-        "optick",
-    }
