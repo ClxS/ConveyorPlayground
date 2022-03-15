@@ -43,3 +43,6 @@
 [submodule "src/ThirdParty/benchmark"]
 	path = src/ThirdParty/benchmark
 	url = https://github.com/google/benchmark
+[submodule "src/ThirdParty/optick"]
+	path = src/ThirdParty/optick
+	url = https://github.com/ClxS/optick
