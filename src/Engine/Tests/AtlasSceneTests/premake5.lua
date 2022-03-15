@@ -4,5 +4,6 @@ test "AtlasSceneTests"
 		"premake5.lua",
 	}
     links {
+        "optick",
         "AtlasScene",
     }
