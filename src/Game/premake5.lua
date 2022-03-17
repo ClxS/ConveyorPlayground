@@ -3,6 +3,7 @@ project "CppConveyor"
 	editandcontinue "On"
 	debugdir "$(TargetDir)"
 	files {
+	    "premake5.lua",
 		"**.h",
 		"**.cpp",
 	}
@@ -63,8 +64,10 @@ project "CppConveyor"
 
 	links {
 		"tomlcpp",
+		"eigen",
 
 		"AtlasAppHost",
+		"AtlasScene",
 	}
 	includedirs {
 		".",

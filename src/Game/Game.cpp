@@ -34,45 +34,6 @@
 
 using namespace cpp_conv::resources;
 
-void createMillionTileMap(cpp_conv::WorldMap& worldMap)
-{
-    worldMap.PlaceEntity({ 0, 0, 0 }, new cpp_conv::Factory({ (int32_t)0, 0, 0 }, Direction::Right, cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_MINE")));
-    int count = 0;
-    for (int y = 1; y < 31 * 64; y += 2)
-    {
-        if (y == 1)
-        {
-            worldMap.PlaceEntity({ 3, y, 0 }, new cpp_conv::Conveyor({ 3, y, 0 }, { 1, 1, 1 }, Direction::Right));
-            worldMap.PlaceEntity({ 3, y + 1, 0 }, new cpp_conv::Conveyor({ 3, y + 1, 0 }, { 1, 1, 1 }, Direction::Up));
-            count += 2;
-        }
-        else
-        {
-            worldMap.PlaceEntity({ 3, y, 0 }, new cpp_conv::Conveyor({ 3, y, 0 }, { 1, 1, 1 }, Direction::Right));
-            worldMap.PlaceEntity({ 3, y + 1, 0 }, new cpp_conv::Conveyor({ 3, y + 1, 0 }, { 1, 1, 1 }, Direction::Up));
-            count += 2;
-        }
-
-        const int width = 250;
-        //const int width = 31 * 64 - 1;
-        for (int x = 4; x < width; x++)
-        {
-            worldMap.PlaceEntity({ x, y, 0 }, new cpp_conv::Conveyor({ x, y, 0 }, { 1, 1, 1 }, Direction::Right));
-            worldMap.PlaceEntity({ x, y + 1, 0 }, new cpp_conv::Conveyor({ x, y + 1, 0 }, { 1, 1, 1 }, Direction::Left));
-            count += 2;
-
-            if (count >= 1000)
-            {
-                return;
-            }
-        }
-
-        worldMap.PlaceEntity({ width, y, 0 }, new cpp_conv::Conveyor({ width, y, 0 }, { 1, 1, 1 }, Direction::Up));
-        worldMap.PlaceEntity({ width, y + 1, 0 }, new cpp_conv::Conveyor({ width, y + 1, 0 }, { 1, 1, 1 }, Direction::Left));
-        count += 2;
-    }
-}
-
 int gameMain(int argc, char* argv[])
 {
     logStartUp();
