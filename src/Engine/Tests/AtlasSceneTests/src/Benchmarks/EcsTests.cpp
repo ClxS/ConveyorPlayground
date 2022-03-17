@@ -1,49 +1,18 @@
 #include <gtest/gtest.h>
 
-#include "AtlasScene/ComponentRegistry.h"
-#include "AtlasScene/EcsManager.h"
-
-namespace
-{
-    struct TransformComponent
-    {
-        TransformComponent(): m_X{0} {}
-        explicit TransformComponent(const int x)
-            : m_X(x)
-        {}
-
-        int m_X;
-    };
-
-    struct SizeComponent
-    {
-        SizeComponent(): m_X{0} {}
-        explicit SizeComponent(const int x)
-            : m_X(x)
-        {}
-        int m_X;
-    };
-
-    struct TestComponent
-    {
-    };
-}
+#include "AtlasScene/ECS/EcsManager.h"
+#include "TestComponents.h"
 
 TEST(AtlasScene, EcsAddEntity)
 {
-    atlas::scene::ComponentRegistry::Reset();
-    atlas::scene::ComponentRegistry::RegisterComponent<SizeComponent>();
-    atlas::scene::ComponentRegistry::RegisterComponent<TransformComponent>();
-    atlas::scene::ComponentRegistry::RegisterComponent<TestComponent>();
-
     atlas::scene::EcsManager ecsManager;
     const auto e1 = ecsManager.AddEntity();
-    ecsManager.AddEntity();
-    ecsManager.AddEntity();
-    ecsManager.AddEntity();
+    const auto e2 = ecsManager.AddEntity();
+    const auto e3 = ecsManager.AddEntity();
+    const auto e4 = ecsManager.AddEntity();
 
-    auto& transform = ecsManager.AddComponent<TransformComponent>(e1, 78);
-    auto& size = ecsManager.AddComponent<SizeComponent>(e1, SizeComponent{78});
+    ecsManager.AddComponent<TransformComponent>(e1, 11);
+    ecsManager.AddComponent<SizeComponent>(e1, SizeComponent{78});
 
     int foundCount = 0;
     for(atlas::scene::EntityId entity : ecsManager.GetEntitiesWithComponents<TransformComponent, SizeComponent>())

@@ -1,34 +1,10 @@
 #include <benchmark/benchmark.h>
 
-#include "AtlasScene/EcsManager.h"
-
-namespace
-{
-    struct TransformComponent
-    {
-        TransformComponent(): m_X{0} {}
-        explicit TransformComponent(const int x)
-            : m_X(x)
-        {}
-
-        int m_X;
-    };
-
-    struct SizeComponent
-    {
-        SizeComponent(): m_X{0} {}
-        explicit SizeComponent(const int x)
-            : m_X(x)
-        {}
-
-        int m_X;
-    };
-}
+#include "AtlasScene/ECS/EcsManager.h"
+#include "TestComponents.h"
 
 static void Creating10MEntities(benchmark::State& state)
 {
-    atlas::scene::ComponentRegistry::Reset();
-    atlas::scene::ComponentRegistry::RegisterComponent<TransformComponent>();
     atlas::scene::EcsManager ecsManager;
     for (auto _ : state)
     {
@@ -41,8 +17,6 @@ static void Creating10MEntities(benchmark::State& state)
 
 static void Deleting10MEntities(benchmark::State& state)
 {
-    atlas::scene::ComponentRegistry::Reset();
-    atlas::scene::ComponentRegistry::RegisterComponent<TransformComponent>();
     atlas::scene::EcsManager ecsManager;
 
     for(int i = 0; i < 10000000; i++)
@@ -61,8 +35,6 @@ static void Deleting10MEntities(benchmark::State& state)
 
 static void IterateAndUnpack10MOneComponent(benchmark::State& state)
 {
-    atlas::scene::ComponentRegistry::Reset();
-    atlas::scene::ComponentRegistry::RegisterComponent<TransformComponent>();
     atlas::scene::EcsManager ecsManager;
 
     for(int i = 0; i < 10000000; i++)
@@ -83,9 +55,6 @@ static void IterateAndUnpack10MOneComponent(benchmark::State& state)
 
 static void IterateAndUnpack10MTwoComponent(benchmark::State& state)
 {
-    atlas::scene::ComponentRegistry::Reset();
-    atlas::scene::ComponentRegistry::RegisterComponent<TransformComponent>();
-    atlas::scene::ComponentRegistry::RegisterComponent<SizeComponent>();
     atlas::scene::EcsManager ecsManager;
 
     for(int i = 0; i < 10000000; i++)
@@ -107,9 +76,6 @@ static void IterateAndUnpack10MTwoComponent(benchmark::State& state)
 
 static void IterateAndUnpack10MTwoComponentDelegate(benchmark::State& state)
 {
-    atlas::scene::ComponentRegistry::Reset();
-    atlas::scene::ComponentRegistry::RegisterComponent<TransformComponent>();
-    atlas::scene::ComponentRegistry::RegisterComponent<SizeComponent>();
     atlas::scene::EcsManager ecsManager;
 
     for(int i = 0; i < 10000000; i++)

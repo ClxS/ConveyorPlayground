@@ -4,7 +4,8 @@
 #include <cstdint>
 #include <vector>
 
-#include "AtlasScene/Entity.h"
+#include "Archetype.h"
+#include "Entity.h"
 
 namespace atlas::scene
 {
@@ -17,6 +18,8 @@ namespace atlas::scene
         virtual void Remove(int32_t uiIndex) = 0;
         virtual void SwapAndPop(int32_t uiRemovedIndex) = 0;
         virtual void Pop() = 0;
+
+        virtual void ClaimFromOtherPool(PoolBase* pOther, int32_t otherIndex) = 0;
     };
 
     template<typename TDataType, bool TIsSparse, uint32_t TInitialSize>
@@ -52,9 +55,17 @@ namespace atlas::scene
             m_Data.push_back({});
         }
 
-        void Push(TDataType data)
+        TDataType& Push(TDataType data)
         {
             m_Data.push_back(data);
+            return m_Data.back();
+        }
+
+        template<typename...TValues>
+        TDataType& Push(TValues&&... data)
+        {
+            m_Data.emplace_back(std::forward<TValues&&>(data)...);
+            return m_Data.back();
         }
 
         void Pop()
@@ -97,24 +108,41 @@ namespace atlas::scene
             m_Data.pop_back();
         }
 
+        void ClaimFromOtherPool(PoolBase* pOther, int32_t otherIndex) override
+        {
+            auto* pTypedOther = static_cast<Pool<TDataType, TIsSparse, TInitialSize>*>(pOther);
+            Push(pTypedOther->GetReference(otherIndex));
+
+            if (pTypedOther->Size() > 1 || otherIndex != pTypedOther->Size() - 1)
+            {
+                pTypedOther->SwapAndPop(otherIndex);
+            }
+            else
+            {
+                pTypedOther->Pop();
+            }
+        }
+
         [[nodiscard]] int32_t Size() const
         {
             return static_cast<int32_t>(m_Data.size());
         }
 
+        [[nodiscard]] const std::vector<TDataType>& GetData() const { return m_Data; }
+
     private:
         std::vector<TDataType> m_Data;
     };
 
-    struct EntityInfo
+    struct EntityIndex
     {
-        EntityId m_EntityId = EntityId::Invalid();
-        uint64_t m_PossessedComponentMask = 0;
+        int32_t m_EntityIndex = -1;
+        ArchetypeIndex m_ArchetypeIndex = ArchetypeIndex::Empty();
     };
 
     template<typename TComponentType>
-    using ComponentPool = Pool<TComponentType, false, 1 << 16>;
+    using ComponentPool = Pool<TComponentType, false, 1 << 8>;
 
-    using EntityPool = Pool<EntityInfo, false, 1 << 16>;
-    using EntityIndicesPool = Pool<int32_t, true, 1 << 16>;
+    using EntityPool = Pool<EntityId, false, 1 << 8>;
+    using EntityIndicesPool = Pool<EntityIndex, true, 1 << 8>;
 }

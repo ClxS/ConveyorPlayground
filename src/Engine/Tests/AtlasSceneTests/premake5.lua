@@ -6,3 +6,6 @@ test "AtlasSceneTests"
     links {
         "AtlasScene",
     }
+    includedirs {
+        "src",
+    }

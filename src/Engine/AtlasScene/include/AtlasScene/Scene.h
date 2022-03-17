@@ -1,6 +1,6 @@
 #pragma once
 
-#include "AtlasScene/EcsManager.h"
+#include "AtlasScene/ECS/EcsManager.h"
 
 namespace atlas::scene
 {
@@ -9,14 +9,19 @@ namespace atlas::scene
     public:
         virtual ~SceneBase() = default;
         virtual void OnEntered() = 0;
+        virtual void OnUpdate() = 0;
+        virtual void OnRender() = 0;
         virtual void OnExited() = 0;
     };
 
-    template<typename TSceneHost>
-    class Scene : public SceneBase
+    class EcsScene : public SceneBase
     {
+    protected:
+        virtual ~EcsScene() override = default;
+
+        EcsManager& GetEcsManager() { return m_EcsManager; }
+
     private:
-        TSceneHost m_SceneHost;
         EcsManager m_EcsManager;
     };
 }

@@ -8,6 +8,11 @@ namespace atlas::scene
     {
         int32_t m_Value = -1;
 
+        EntityId()
+            : m_Value{-1}
+        {
+        }
+
         explicit EntityId(const int32_t value)
             : m_Value(value)
         {

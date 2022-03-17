@@ -1,5 +1,5 @@
 project "eigen"
-	kind "StaticLib"
+	kind "Utility"
 	files {
 		"eigen.lua",
 		"eigen/Eigen/**",

@@ -1,12 +1,16 @@
 #include <gtest/gtest.h>
 #include <benchmark/benchmark.h>
 
+#include "TestComponents.h"
+
 int main(int argc, char** argv)
 {
+    registerTestComponents();
+
     ::benchmark::Initialize(&argc, argv);
 
     testing::InitGoogleTest();
-    RUN_ALL_TESTS();
+    //RUN_ALL_TESTS();
 
     if (::benchmark::ReportUnrecognizedArguments(argc, argv))
     {
