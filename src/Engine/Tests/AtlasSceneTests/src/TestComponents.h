@@ -1,5 +1,5 @@
 #pragma once
-#include "AtlasScene/ECS/ComponentRegistry.h"
+#include "AtlasScene/ECS/Components/ComponentRegistry.h"
 
 struct TransformComponent
 {

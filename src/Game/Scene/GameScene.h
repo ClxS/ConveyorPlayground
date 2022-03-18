@@ -19,13 +19,13 @@ namespace cpp_conv
 
         void OnEntered() override
         {
-            atlas::scene::EcsManager& ecs = GetEcsManager();
-            for(auto& entity : m_InitialisationData.m_Map.GetConveyors())
-            {
+            //atlas::scene::EcsManager& ecs = GetEcsManager();
+            //for(auto& entity : m_InitialisationData.m_Map.GetConveyors())
+            //{
                 //auto ecsEntity = ecs.AddEntity();
                 //ecs.AddComponent<components::PositionComponent>(ecsEntity, entity->m_position);
                 //ecs.AddComponent<components::DirectionComponent>(ecsEntity, entity->m_direction);
-            }
+            //}
         }
         void OnUpdate() override
         {

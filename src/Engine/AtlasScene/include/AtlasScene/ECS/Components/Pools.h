@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "Archetype.h"
-#include "Entity.h"
+#include "AtlasScene/ECS/Entity.h"
 
 namespace atlas::scene
 {

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "AtlasScene/ECS/EcsManager.h"
+#include "AtlasScene/ECS/Components/EcsManager.h"
+#include "ECS/Systems/SystemsManager.h"
 
 namespace atlas::scene
 {
@@ -8,10 +9,10 @@ namespace atlas::scene
     {
     public:
         virtual ~SceneBase() = default;
-        virtual void OnEntered() = 0;
-        virtual void OnUpdate() = 0;
-        virtual void OnRender() = 0;
-        virtual void OnExited() = 0;
+        virtual void OnEntered() {}
+        virtual void OnUpdate() {}
+        virtual void OnRender() {}
+        virtual void OnExited() {}
     };
 
     class EcsScene : public SceneBase
@@ -19,9 +20,23 @@ namespace atlas::scene
     protected:
         virtual ~EcsScene() override = default;
 
-        EcsManager& GetEcsManager() { return m_EcsManager; }
+        void OnEntered() override
+        {
+            SystemsBuilder builder;
+            ConstructSystems(builder);
+
+            m_SystemsManager.Initialise(builder, m_EcsManager);
+        }
+
+        void OnUpdate() override
+        {
+            m_SystemsManager.Update(m_EcsManager);
+        }
+
+        virtual void ConstructSystems(SystemsBuilder& builder) = 0;
 
     private:
+        SystemsManager m_SystemsManager;
         EcsManager m_EcsManager;
     };
 }

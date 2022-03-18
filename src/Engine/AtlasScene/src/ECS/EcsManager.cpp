@@ -1,63 +1,5 @@
 #include "AtlasScenePCH.h"
-#include "AtlasScene/ECS/EcsManager.h"
-
-#include <AsyncInfo.h>
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// Iterator
-/*
-atlas::scene::EcsManager::EntityComponentIterator::Iterator::Iterator(const EntityPool& entityPool,
-    const uint64_t componentMask, const bool bIsEnd): m_EntityPool{entityPool}
-                                                      , m_ComponentMask{componentMask}
-                                                      , m_CurrentIndex(bIsEnd ? -1 : FindNextMatchingSlot(-1))
-{
-}
-
-atlas::scene::EcsManager::EntityComponentIterator::Iterator::reference atlas::scene::EcsManager::EntityComponentIterator
-::Iterator::operator*() const
-{ return m_EntityPool.GetCopy(m_CurrentIndex).m_EntityId; }
-
-atlas::scene::EcsManager::EntityComponentIterator::Iterator::pointer atlas::scene::EcsManager::EntityComponentIterator::
-Iterator::operator->() const
-{ return m_EntityPool.GetCopy(m_CurrentIndex).m_EntityId; }
-
-atlas::scene::EcsManager::EntityComponentIterator::Iterator& atlas::scene::EcsManager::EntityComponentIterator::Iterator
-::operator++()
-{
-    m_CurrentIndex = FindNextMatchingSlot(m_CurrentIndex);
-    return *this;
-}
-
-atlas::scene::EcsManager::EntityComponentIterator::Iterator atlas::scene::EcsManager::EntityComponentIterator::Iterator
-::operator++(int)
-{ Iterator tmp = *this; ++(*this); return tmp; }
-
-bool atlas::scene::operator==(const EcsManager::EntityComponentIterator::Iterator& a,
-    const EcsManager::EntityComponentIterator::Iterator& b)
-{ return a.m_CurrentIndex == b.m_CurrentIndex; }
-
-bool atlas::scene::operator!=(const EcsManager::EntityComponentIterator::Iterator& a,
-    const EcsManager::EntityComponentIterator::Iterator& b)
-{ return a.m_CurrentIndex != b.m_CurrentIndex; }
-
-int32_t atlas::scene::EcsManager::EntityComponentIterator::Iterator::FindNextMatchingSlot(const int32_t current) const
-{
-    for(int i = current + 1; i < m_EntityPool.Size(); ++i)
-    {
-        if ((m_EntityPool.GetCopy(i).m_PossessedComponentMask & m_ComponentMask) == m_ComponentMask)
-        {
-            return i;
-        }
-    }
-
-    return -1;
-}
-
-atlas::scene::EcsManager::EntityComponentIterator::EntityComponentIterator(const EntityPool& entityPool,
-    const uint64_t componentMask): m_EntityPool{entityPool}
-                                   , m_ComponentMask{componentMask}
-{
-}*/
+#include "AtlasScene/ECS/Components/EcsManager.h"
 
 atlas::scene::EcsManager::EcsManager()
 {
@@ -152,6 +94,3 @@ atlas::scene::ArchetypeIndex atlas::scene::EcsManager::GetOrCreateArchetype(uint
 
     return ArchetypeIndex{static_cast<int32_t>(m_ArchetypePools.size()) - 1};
 }
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// ECS Manager

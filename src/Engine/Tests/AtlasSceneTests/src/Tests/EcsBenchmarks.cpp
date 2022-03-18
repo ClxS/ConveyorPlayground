@@ -1,6 +1,6 @@
 #include <benchmark/benchmark.h>
 
-#include "AtlasScene/ECS/EcsManager.h"
+#include "AtlasScene/ECS/Components/EcsManager.h"
 #include "TestComponents.h"
 
 static void Creating10MEntities(benchmark::State& state)
@@ -87,7 +87,7 @@ static void IterateAndUnpack10MTwoComponentDelegate(benchmark::State& state)
 
     for (auto _ : state)
     {
-        ecsManager.ForEachComponents<TransformComponent, SizeComponent>([](TransformComponent& transform, SizeComponent&)
+        ecsManager.ForEachComponents<TransformComponent, SizeComponent>([](atlas::scene::EntityId entity, TransformComponent& transform, SizeComponent&)
         {
             transform.m_X = 1;
         });

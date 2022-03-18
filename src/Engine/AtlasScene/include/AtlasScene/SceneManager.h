@@ -25,7 +25,21 @@ namespace atlas::scene
             }
 
             m_ActiveScene = std::make_unique<TScene>(std::forward<Args>(args)...);
-            return *m_ActiveScene;
+            m_ActiveScene->OnEntered();
+
+            return *static_cast<TScene*>(m_ActiveScene.get());
+        }
+
+        void Update()
+        {
+            if (m_InterstitialScene)
+            {
+                m_InterstitialScene->OnUpdate();
+            }
+            else if (m_ActiveScene)
+            {
+                m_ActiveScene->OnUpdate();
+            }
         }
 
         [[nodiscard]] const SceneBase& GetCurrentScene() const

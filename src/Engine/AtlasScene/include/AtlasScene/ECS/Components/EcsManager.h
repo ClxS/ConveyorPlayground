@@ -3,61 +3,16 @@
 #include <functional>
 #include <map>
 #include <memory>
-#include <ranges>
 #include <tuple>
 
 #include "ComponentRegistry.h"
-#include "Entity.h"
 #include "Pools.h"
+#include "AtlasScene/ECS/Entity.h"
 
 namespace atlas::scene
 {
     class EcsManager
     {
-        // class EntityComponentIterator
-        // {
-        // public:
-        //     class Iterator
-        //     {
-        //     public:
-        //         Iterator(const EntityPool& entityPool, const uint64_t componentMask, const bool bIsEnd = false);
-        //
-        //         using iterator_category = std::forward_iterator_tag;
-        //         using difference_type   = std::ptrdiff_t;
-        //         using value_type        = EntityId;
-        //         using pointer           = EntityId;
-        //         using reference         = EntityId;
-        //
-        //         reference operator*() const;
-        //         pointer operator->() const;
-        //
-        //         // Prefix increment
-        //         Iterator& operator++();
-        //
-        //         // Postfix increment
-        //         Iterator operator++(int);
-        //
-        //         friend bool operator== (const Iterator& a, const Iterator& b);
-        //         friend bool operator!= (const Iterator& a, const Iterator& b);
-        //
-        //     private:
-        //         const EntityPool& m_EntityPool;
-        //         const uint64_t m_ComponentMask;
-        //         int32_t m_CurrentIndex = -1;
-        //
-        //         [[nodiscard]] int32_t FindNextMatchingSlot(const int32_t current) const;
-        //     };
-        //
-        //     EntityComponentIterator(const EntityPool& entityPool, const uint64_t componentMask);
-        //
-        //     Iterator begin() { return { m_EntityPool, m_ComponentMask, false }; }
-        //     Iterator end()   { return { m_EntityPool, m_ComponentMask, true }; }
-        //
-        // private:
-        //     const EntityPool& m_EntityPool;
-        //     uint64_t m_ComponentMask;
-        // };
-
     public:
         EcsManager();
         EcsManager(const EcsManager&) = delete;
@@ -80,26 +35,31 @@ namespace atlas::scene
         template<typename TComponent>
         [[nodiscard]] bool DoesEntityHaveComponent(const EntityId entity);
 
+        [[nodiscard]] std::vector<EntityId> GetEmptyEntities() const
+        {
+            return m_ArchetypePools[0].m_EntityPool.GetData();
+        }
+
         template<typename TComponent, typename... TOtherComponents>
         [[nodiscard]] std::vector<EntityId> GetEntitiesWithComponents() const;
 
         template<typename TComponent>
-        TComponent& GetComponent(const EntityId entityId);
+        [[nodiscard]] TComponent& GetComponent(const EntityId entityId);
 
         template<typename TComponent>
-        const TComponent& GetComponent(const EntityId entityId) const;
+        [[nodiscard]] const TComponent& GetComponent(const EntityId entityId) const;
 
         template<typename... TComponent>
-        std::tuple<TComponent&...> GetComponents(const EntityId entityId);
+        [[nodiscard]] std::tuple<TComponent&...> GetComponents(const EntityId entityId);
 
         template<typename... TComponent>
-        std::tuple<const TComponent&...> GetComponents(const EntityId entityId) const;
+        [[nodiscard]] std::tuple<const TComponent&...> GetComponents(const EntityId entityId) const;
 
         template<typename... TComponent>
-        void ForEachComponents(std::function<void(TComponent&...)> callback);
+        void ForEachComponents(std::function<void(EntityId, TComponent&...)> callback);
 
         template<typename... TComponent>
-        void ForEachComponents(std::function<bool(const TComponent&...)> callback) const;
+        void ForEachComponents(std::function<bool(EntityId, const TComponent&...)> callback) const;
 
     private:
         struct MaskedComponentPool
@@ -110,7 +70,7 @@ namespace atlas::scene
 
         struct ArchetypePool
         {
-            ArchetypePool(const uint64_t archetypeComponentMask)
+            explicit ArchetypePool(const uint64_t archetypeComponentMask)
                 : m_ArchetypeComponentMask{archetypeComponentMask}
             {
             }
@@ -305,20 +265,20 @@ namespace atlas::scene
     }
 
     template <typename ... TComponent>
-    void EcsManager::ForEachComponents(std::function<void(TComponent&...)> callback)
+    void EcsManager::ForEachComponents(std::function<void(EntityId, TComponent&...)> callback)
     {
         for(auto entity : GetEntitiesWithComponents<TComponent...>())
         {
-            callback(GetComponent<TComponent>(entity)...);
+            callback(entity, GetComponent<TComponent>(entity)...);
         }
     }
 
     template <typename ... TComponent>
-    void EcsManager::ForEachComponents(std::function<bool(const TComponent&...)> callback) const
+    void EcsManager::ForEachComponents(std::function<bool(EntityId, const TComponent&...)> callback) const
     {
         for(auto entity : GetEntitiesWithComponents<TComponent...>())
         {
-            if (!callback(GetComponent<const TComponent>(entity)...))
+            if (!callback(entity, GetComponent<const TComponent>(entity)...))
             {
                 break;
             }
