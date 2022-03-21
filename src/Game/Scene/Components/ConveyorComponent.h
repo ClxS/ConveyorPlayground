@@ -32,7 +32,8 @@ namespace cpp_conv::components
         bool m_bIsCapped;
         int m_InnerMostChannel;
         Direction m_CornerDirection;
-
         std::array<Channel, c_conveyorChannels> m_Channels;
+
+        atlas::scene::EntityId m_Sequence;
     };
 }

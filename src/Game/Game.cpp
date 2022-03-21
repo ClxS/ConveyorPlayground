@@ -26,8 +26,10 @@
 #include <chrono>
 #include "WorldMap.h"
 #include "Factory.h"
+#include "GameMapLoadInterstitialScene.h"
 #include "AtlasAppHost/Application.h"
 #include "AtlasAppHost/Main.h"
+#include "AtlasScene/SceneManager.h"
 
 #undef max
 #undef min
@@ -42,7 +44,19 @@ int gameMain(int argc, char* argv[])
 
     registration::processSelfRegistrations();
 
-    cpp_conv::WorldMap worldMap;
+    atlas::scene::SceneManager sceneManager;
+    sceneManager.TransitionTo<cpp_conv::GameMapLoadInterstitialScene>(registry::maps::c_simple);
+
+    cpp_conv::FrameLimiter frameLimiter(60);
+    frameLimiter.Start();
+
+    while (true)
+    {
+        sceneManager.Update();
+        PROFILE(FrameCapSleep, frameLimiter.Limit());
+    }
+
+    /*cpp_conv::WorldMap worldMap;
     {
         const AssetPtr<Map> map = resource_manager::loadAssetUncached<Map>(registry::maps::c_simple);
         worldMap.Consume(map);
@@ -111,7 +125,7 @@ int gameMain(int argc, char* argv[])
         frameLimiter.EndFrame();
     }
 
-    cpp_conv::ui::shutdown();
+    cpp_conv::ui::shutdown();*/
     return 0;
 }
 
