@@ -12,60 +12,68 @@ namespace atlas::scene
         template<typename TScene, typename ...Args>
         TScene& TransitionTo(Args&&... args)
         {
-            if (m_InterstitialScene)
+            // Cannot transition when a follow up scene is already prepared.
+            assert(!m_FollowUpScene);
+
+            if (m_bIsUpdating)
             {
-                m_InterstitialScene->OnExited();
-                m_InterstitialScene.reset();
+                m_FollowUpScene = std::make_unique<TScene>(std::forward<Args>(args)...);
+                return *static_cast<TScene*>(m_FollowUpScene.get());
             }
-
-            if (m_ActiveScene)
+            else
             {
-                m_ActiveScene->OnExited();
-                m_ActiveScene.reset();
+                if (m_ActiveScene)
+                {
+                    m_ActiveScene->OnExited(*this);
+                    m_ActiveScene.reset();
+                }
+
+                m_ActiveScene = std::make_unique<TScene>(std::forward<Args>(args)...);
+                m_ActiveScene->OnEntered(*this);
+
+                return *static_cast<TScene*>(m_ActiveScene.get());
             }
-
-            m_ActiveScene = std::make_unique<TScene>(std::forward<Args>(args)...);
-            m_ActiveScene->OnEntered();
-
-            return *static_cast<TScene*>(m_ActiveScene.get());
         }
 
         void Update()
         {
-            if (m_InterstitialScene)
+            m_bIsUpdating = true;
+            if (m_ActiveScene)
             {
-                m_InterstitialScene->OnUpdate();
+                m_ActiveScene->OnUpdate(*this);
             }
-            else if (m_ActiveScene)
+            m_bIsUpdating = false;
+
+            if (m_FollowUpScene)
             {
-                m_ActiveScene->OnUpdate();
+                m_ActiveScene->OnExited(*this);
+                m_ActiveScene.reset();
+                m_ActiveScene = std::move(m_FollowUpScene);
+                m_ActiveScene->OnEntered(*this);
             }
         }
 
         [[nodiscard]] const SceneBase& GetCurrentScene() const
         {
-            if (m_InterstitialScene)
+            if (m_FollowUpScene)
             {
-                return *m_InterstitialScene;
+                return *m_FollowUpScene;
             }
 
             assert(m_ActiveScene);
             return *m_ActiveScene;
         }
 
-        [[nodiscard]] SceneBase& GetCurrentScene()
+        [[nodiscard]] SceneBase* GetCurrentScene()
         {
-            if (m_InterstitialScene)
-            {
-                return *m_InterstitialScene;
-            }
-
             assert(m_ActiveScene);
-            return *m_ActiveScene;
+            return m_ActiveScene.get();
         }
 
     private:
         std::unique_ptr<SceneBase> m_ActiveScene;
-        std::unique_ptr<SceneBase> m_InterstitialScene;
+        std::unique_ptr<SceneBase> m_FollowUpScene;
+
+        bool m_bIsUpdating = false;
     };
 }

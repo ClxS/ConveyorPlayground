@@ -79,6 +79,17 @@ namespace
         std::function<void()> m_BInit;
         std::function<void()> m_BUpdate;
     };
+    class TestScene2 final : public atlas::scene::SceneBase
+    {
+    };
+    class InterstitialScene final : public atlas::scene::SceneBase
+    {
+    public:
+        void OnUpdate(atlas::scene::SceneManager& sceneManager) override
+        {
+            sceneManager.TransitionTo<TestScene2>();
+        }
+    };
 }
 
 TEST(AtlasScene, SceneSystemsTest)
@@ -116,4 +127,15 @@ TEST(AtlasScene, SceneSystemsTest)
     ASSERT_EQ(bInitCount, 1);
     ASSERT_EQ(aUpdateCount, 3);
     ASSERT_EQ(bUpdateCount, 3);
+}
+
+TEST(AtlasScene, InterSceneTransition)
+{
+    using atlas::scene::SystemsBuilder;
+    using atlas::scene::SceneManager;
+
+    SceneManager sceneManager;
+    sceneManager.TransitionTo<InterstitialScene>();
+    sceneManager.Update();
+    ASSERT_TRUE(dynamic_cast<TestScene2*>(sceneManager.GetCurrentScene()) != nullptr);
 }

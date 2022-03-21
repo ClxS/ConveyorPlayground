@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include "AtlasScene/Scene.h"
 #include "AtlasScene/ECS/Components/EcsManager.h"
 #include "AtlasScene/ECS/Systems/SystemBase.h"
 #include "AtlasScene/ECS/Systems/SystemsManager.h"
@@ -43,7 +44,6 @@ public:
     explicit D(std::function<void(atlas::scene::EcsManager&)> callback)
         : TestSystemBase(std::forward<std::function<void(atlas::scene::EcsManager&)>>(callback)){}
 };
-
 TEST(AtlasScene, RegisterSystemsNoDependencies)
 {
     using atlas::scene::SystemsBuilder;

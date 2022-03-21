@@ -33,7 +33,7 @@ namespace atlas::scene
         TComponent& AddComponent(const EntityId entity, TComponent&& value);
 
         template<typename TComponent>
-        [[nodiscard]] bool DoesEntityHaveComponent(const EntityId entity);
+        [[nodiscard]] bool DoesEntityHaveComponent(const EntityId entity) const;
 
         [[nodiscard]] std::vector<EntityId> GetEmptyEntities() const
         {
@@ -200,7 +200,7 @@ namespace atlas::scene
     }
 
     template <typename TComponent>
-    bool EcsManager::DoesEntityHaveComponent(const EntityId entity)
+    bool EcsManager::DoesEntityHaveComponent(const EntityId entity) const
     {
         const auto [_, oldArchetypeIndex] = m_EntityIndices.GetCopy(entity.m_Value);
         assert(oldArchetypeIndex.m_ArchetypeIndex >= 0);

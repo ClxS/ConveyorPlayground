@@ -5,14 +5,16 @@
 
 namespace atlas::scene
 {
+    class SceneManager;
+
     class SceneBase
     {
     public:
         virtual ~SceneBase() = default;
-        virtual void OnEntered() {}
-        virtual void OnUpdate() {}
-        virtual void OnRender() {}
-        virtual void OnExited() {}
+        virtual void OnEntered(SceneManager& sceneManager) {}
+        virtual void OnUpdate(SceneManager& sceneManager) {}
+        virtual void OnRender(SceneManager& sceneManager) {}
+        virtual void OnExited(SceneManager& sceneManager) {}
     };
 
     class EcsScene : public SceneBase
@@ -20,7 +22,7 @@ namespace atlas::scene
     protected:
         virtual ~EcsScene() override = default;
 
-        void OnEntered() override
+        void OnEntered(SceneManager& sceneManager) override
         {
             SystemsBuilder builder;
             ConstructSystems(builder);
@@ -28,12 +30,14 @@ namespace atlas::scene
             m_SystemsManager.Initialise(builder, m_EcsManager);
         }
 
-        void OnUpdate() override
+        void OnUpdate(SceneManager& sceneManager) override
         {
             m_SystemsManager.Update(m_EcsManager);
         }
 
         virtual void ConstructSystems(SystemsBuilder& builder) = 0;
+
+        EcsManager& GetEcsManager() { return m_EcsManager; }
 
     private:
         SystemsManager m_SystemsManager;
