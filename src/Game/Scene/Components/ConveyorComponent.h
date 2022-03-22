@@ -1,6 +1,7 @@
 #pragma once
 #include "Direction.h"
 #include "ItemInstance.h"
+#include <Eigen/Core>
 
 namespace cpp_conv::components
 {
@@ -12,16 +13,12 @@ namespace cpp_conv::components
         struct Lane
         {
             ItemInstance m_Item;
-            Vector2F m_VisualPosition;
+            Eigen::Vector2f m_VisualPosition;
         };
 
         struct Channel
         {
-            // ReSharper disable once CppNonExplicitConvertingConstructor
-            Channel(int channelLane);
-
-            const int m_ChannelLane;
-
+            int m_ChannelLane;
             int m_LaneLength = 2;
             std::array<Lane, c_conveyorChannelSlots + 1> m_pSlots;
             std::array<ItemInstance, c_conveyorChannelSlots + 1> m_pPendingItems;
@@ -33,6 +30,8 @@ namespace cpp_conv::components
         int m_InnerMostChannel;
         Direction m_CornerDirection;
         std::array<Channel, c_conveyorChannels> m_Channels;
+
+        int m_MoveTick = 10;
 
         atlas::scene::EntityId m_Sequence;
     };

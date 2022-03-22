@@ -6,10 +6,9 @@ namespace atlas::scene
 {
     struct EntityId
     {
-        int32_t m_Value = -1;
+        static constexpr int c_invalidValue = -1;
 
         EntityId()
-            : m_Value{-1}
         {
         }
 
@@ -18,7 +17,9 @@ namespace atlas::scene
         {
         }
 
-        static EntityId Invalid() { return EntityId{ -1 }; }
+        static EntityId Invalid() { return EntityId{ c_invalidValue }; }
+
+        bool IsInvalid() const { return m_Value == c_invalidValue; }
 
         bool operator==(const EntityId other) const
         {
@@ -26,5 +27,7 @@ namespace atlas::scene
         }
 
         [[nodiscard]] bool IsValid() const { return m_Value >= 0; }
+
+        int32_t m_Value = -1;
     };
 }

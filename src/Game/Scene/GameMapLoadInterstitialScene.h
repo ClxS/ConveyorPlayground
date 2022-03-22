@@ -7,7 +7,7 @@
 
 namespace cpp_conv
 {
-    class GameMapLoadInterstitialScene : atlas::scene::SceneBase
+    class GameMapLoadInterstitialScene : public atlas::scene::SceneBase
     {
     public:
         explicit GameMapLoadInterstitialScene(resources::registry::RegistryId mapId)

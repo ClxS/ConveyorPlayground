@@ -27,13 +27,17 @@ namespace atlas::scene
         void RemoveEntity(EntityId entity);
 
         template<typename TComponent, typename... TArgs>
-        TComponent& AddComponent(const EntityId entity, TArgs&& ...args);
+        TComponent& AddComponent(EntityId entity, TArgs&& ...args);
 
         template<typename TComponent>
-        TComponent& AddComponent(const EntityId entity, TComponent&& value);
+        TComponent& AddComponent(EntityId entity, TComponent&& value);
 
         template<typename TComponent>
-        [[nodiscard]] bool DoesEntityHaveComponent(const EntityId entity) const;
+        [[nodiscard]] bool DoesEntityHaveComponent(EntityId entity) const;
+
+        template<typename TComponent, typename... TOtherComponents>
+        bool DoesEntityHaveComponents(EntityId entity) const;
+
 
         [[nodiscard]] std::vector<EntityId> GetEmptyEntities() const
         {
@@ -44,16 +48,16 @@ namespace atlas::scene
         [[nodiscard]] std::vector<EntityId> GetEntitiesWithComponents() const;
 
         template<typename TComponent>
-        [[nodiscard]] TComponent& GetComponent(const EntityId entityId);
+        [[nodiscard]] TComponent& GetComponent(EntityId entityId);
 
         template<typename TComponent>
-        [[nodiscard]] const TComponent& GetComponent(const EntityId entityId) const;
+        [[nodiscard]] const TComponent& GetComponent(EntityId entityId) const;
 
         template<typename... TComponent>
-        [[nodiscard]] std::tuple<TComponent&...> GetComponents(const EntityId entityId);
+        [[nodiscard]] std::tuple<TComponent&...> GetComponents(EntityId entityId);
 
         template<typename... TComponent>
-        [[nodiscard]] std::tuple<const TComponent&...> GetComponents(const EntityId entityId) const;
+        [[nodiscard]] std::tuple<const TComponent&...> GetComponents(EntityId entityId) const;
 
         template<typename... TComponent>
         void ForEachComponents(std::function<void(EntityId, TComponent&...)> callback);
@@ -211,6 +215,18 @@ namespace atlas::scene
         return pool.m_ArchetypeComponentMask & targetMask;
     }
 
+
+    template <typename TComponent, typename ... TOtherComponents>
+    bool EcsManager::DoesEntityHaveComponents(const EntityId entity) const
+    {
+        const auto [_, oldArchetypeIndex] = m_EntityIndices.GetCopy(entity.m_Value);
+        assert(oldArchetypeIndex.m_ArchetypeIndex >= 0);
+        const ArchetypePool& pool = GetPool(oldArchetypeIndex);
+
+        const uint64_t uiMask = MaskLookup<TComponent, TOtherComponents...>::GetComponentMask();
+        return pool.m_ArchetypeComponentMask & uiMask;
+    }
+
     template <typename TComponent, typename ... TOtherComponents>
     std::vector<EntityId> EcsManager::GetEntitiesWithComponents() const
     {
@@ -261,7 +277,7 @@ namespace atlas::scene
     template <typename ... TComponent>
     std::tuple<const TComponent&...> EcsManager::GetComponents(const EntityId entityId) const
     {
-        return { GetComponent<const TComponent>(entityId)... };
+        return { GetComponent<TComponent>(entityId)... };
     }
 
     template <typename ... TComponent>

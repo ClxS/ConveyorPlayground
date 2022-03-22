@@ -5,7 +5,7 @@
 
 namespace cpp_conv
 {
-    class SequenceFormationSystem : atlas::scene::SystemBase
+    class SequenceFormationSystem : public atlas::scene::SystemBase
     {
     public:
         explicit SequenceFormationSystem(EntityLookupGrid& lookupGrid)
@@ -20,6 +20,8 @@ namespace cpp_conv
         }
 
     private:
+        inline static constexpr int c_MaxSequenceLength = 32;
+
         EntityLookupGrid& m_LookupGrid;
     };
 }

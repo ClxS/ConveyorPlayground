@@ -6,6 +6,7 @@
 #include "DirectionComponent.h"
 #include "EntityLookupGrid.h"
 #include "PositionComponent.h"
+#include "WorldEntityInformationComponent.h"
 #include "WorldMap.h"
 #include "Systems/SequenceFormationSystem.h"
 
@@ -30,9 +31,10 @@ namespace cpp_conv
             for(const auto& entity : map.GetConveyors())
             {
                 const auto ecsEntity = ecs.AddEntity();
-                ecs.AddComponent<components::PositionComponent>(ecsEntity, entity->m_position);
+                ecs.AddComponent<components::PositionComponent>(ecsEntity, Eigen::Vector3i(entity->m_position.GetX(), entity->m_position.GetY(), entity->m_position.GetZ()));
                 ecs.AddComponent<components::DirectionComponent>(ecsEntity, entity->m_direction);
                 ecs.AddComponent<components::ConveyorComponent>(ecsEntity);
+                ecs.AddComponent<components::WorldEntityInformationComponent>(ecsEntity, entity->m_eEntityKind);
             }
         }
         void ConstructSystems(atlas::scene::SystemsBuilder& builder) override
