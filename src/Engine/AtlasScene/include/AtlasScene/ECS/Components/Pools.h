@@ -14,7 +14,6 @@ namespace atlas::scene
     public:
         virtual ~PoolBase() = default;
 
-        virtual void PushEmpty() = 0;
         virtual void Remove(int32_t uiIndex) = 0;
         virtual void SwapAndPop(int32_t uiRemovedIndex) = 0;
         virtual void Pop() = 0;
@@ -48,11 +47,6 @@ namespace atlas::scene
         {
             assert(uiIndex >= 0 && uiIndex < m_Data.size());
             return m_Data[uiIndex];
-        }
-
-        void PushEmpty() override
-        {
-            m_Data.push_back({});
         }
 
         TDataType& Push(TDataType data)

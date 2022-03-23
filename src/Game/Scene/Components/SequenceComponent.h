@@ -7,7 +7,7 @@ namespace cpp_conv::components
 {
     struct SequenceComponent
     {
-        /*struct SlotItem
+        struct SlotItem
         {
             ItemId m_Item;
             std::optional<Eigen::Vector2f> m_Position{};
@@ -33,7 +33,13 @@ namespace cpp_conv::components
             uint64_t m_PendingClears = {};
             uint64_t m_PendingRemovals = {};
             FixedCircularBuffer<SlotItem> m_NewItems;
-        };*/
+        };
+
+        SequenceComponent(
+            uint8_t length)
+            : m_Length(length)
+        {
+        }
 
         uint8_t m_Length;
 

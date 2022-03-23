@@ -26,6 +26,11 @@ namespace atlas::scene
             return m_Value == other.m_Value;
         }
 
+        bool operator<(const EntityId other) const
+        {
+            return m_Value < other.m_Value;
+        }
+
         [[nodiscard]] bool IsValid() const { return m_Value >= 0; }
 
         int32_t m_Value = -1;

@@ -12,7 +12,7 @@ namespace atlas::scene
     class ComponentRegistry
     {
     public:
-        using PoolFactory = scene::PoolBase* (*)(void);
+        using PoolFactory = atlas::scene::PoolBase* (*)(void);
 
         ComponentRegistry() = delete;
         ~ComponentRegistry() = delete;
@@ -33,9 +33,10 @@ namespace atlas::scene
             return m_ComponentPoolFactory;
         }
 
-        static const PoolFactory& GetFactoryForPoolWithMask(const uint64_t poolIndex)
+        static const PoolFactory& GetFactoryForPoolWithMask(const uint64_t mask)
         {
-            return m_ComponentPoolFactory[poolIndex];
+            auto index = std::countr_zero(mask);
+            return m_ComponentPoolFactory[index];
         }
 
         template<typename TComponent>

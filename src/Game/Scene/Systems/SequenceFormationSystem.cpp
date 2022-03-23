@@ -255,7 +255,10 @@ void cpp_conv::SequenceFormationSystem::Initialise(atlas::scene::EcsManager& ecs
             const auto& pTailConveyor = ecs.GetComponent<ConveyorComponent>(vSequenceConveyors.front());
 
             const EntityId sequenceId = ecs.AddEntity();
-            SequenceComponent& component = ecs.AddComponent<SequenceComponent>(sequenceId);
+            SequenceComponent& component = ecs.AddComponent<SequenceComponent>(
+                sequenceId,
+                SequenceComponent((uint8_t)vSequenceConveyors.size())
+            );
             /*component.m_HeadConveyor = vSequenceConveyors[vSequenceConveyors.size() - 1];
             component.m_LaneOneVisualPosition = pTailConveyor.m_Channels[0].m_pSlots[0].m_VisualPosition;
             component.m_LaneTwoVisualPosition = pTailConveyor.m_Channels[1].m_pSlots[0].m_VisualPosition;
