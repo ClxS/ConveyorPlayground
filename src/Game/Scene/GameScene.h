@@ -9,6 +9,7 @@
 #include "WorldEntityInformationComponent.h"
 #include "WorldMap.h"
 #include "Systems/SequenceFormationSystem.h"
+#include "Map.h"
 
 namespace cpp_conv
 {
@@ -25,10 +26,7 @@ namespace cpp_conv
         {
             atlas::scene::EcsManager& ecs = GetEcsManager();
 
-            WorldMap map;
-            map.Consume(m_InitialisationData.m_Map);
-
-            for(const auto& entity : map.GetConveyors())
+            for(const auto& entity : m_InitialisationData.m_Map->GetConveyors())
             {
                 const auto ecsEntity = ecs.AddEntity();
                 ecs.AddComponent<components::PositionComponent>(ecsEntity, Eigen::Vector3i(entity->m_position.GetX(), entity->m_position.GetY(), entity->m_position.GetZ()));
@@ -36,6 +34,10 @@ namespace cpp_conv
                 ecs.AddComponent<components::ConveyorComponent>(ecsEntity);
                 ecs.AddComponent<components::WorldEntityInformationComponent>(ecsEntity, entity->m_eEntityKind);
             }
+
+            m_InitialisationData.m_Map.reset();
+
+            atlas::scene::EcsScene::OnEntered(sceneManager);
         }
         void ConstructSystems(atlas::scene::SystemsBuilder& builder) override
         {
@@ -44,15 +46,15 @@ namespace cpp_conv
 
         void OnUpdate(atlas::scene::SceneManager& sceneManager) override
         {
-
+            atlas::scene::EcsScene::OnUpdate(sceneManager);
         }
         void OnRender(atlas::scene::SceneManager& sceneManager) override
         {
-
+            atlas::scene::EcsScene::OnRender(sceneManager);
         }
         void OnExited(atlas::scene::SceneManager& sceneManager) override
         {
-
+            atlas::scene::EcsScene::OnExited(sceneManager);
         }
 
     private:
