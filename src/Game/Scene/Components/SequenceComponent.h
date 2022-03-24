@@ -2,6 +2,8 @@
 
 #include "FixedCircularBuffer.h"
 #include <cstdint>
+#include <AtlasScene/ECS/Entity.h>
+#include <AtlasScene/ECS/Entity.h>
 
 namespace cpp_conv::components
 {
@@ -36,22 +38,32 @@ namespace cpp_conv::components
         };
 
         SequenceComponent(
-            uint8_t length)
+            uint8_t length,
+            atlas::scene::EntityId headConveyor,
+            Eigen::Vector2f laneOneVisualPosition,
+            Eigen::Vector2f laneTwoVisualPosition,
+            Eigen::Vector2f unitDirection,
+            uint32_t moveTick)
             : m_Length(length)
+            , m_HeadConveyor(headConveyor)
+            , m_LaneOneVisualPosition(laneOneVisualPosition)
+            , m_LaneTwoVisualPosition(laneTwoVisualPosition)
+            , m_UnitDirection(unitDirection)
+            , m_MoveTick(moveTick)             
         {
         }
 
         uint8_t m_Length;
 
-        /*atlas::scene::EntityId m_HeadConveyor;
+        atlas::scene::EntityId m_HeadConveyor;
 
         Eigen::Vector2f m_LaneOneVisualPosition;
 
         Eigen::Vector2f m_LaneTwoVisualPosition;
 
-        Eigen::Vector2f m_UnitDirection;*/
+        Eigen::Vector2f m_UnitDirection;
 
-        //uint32_t m_MoveTick;
+        uint32_t m_MoveTick;
         /*
 
 

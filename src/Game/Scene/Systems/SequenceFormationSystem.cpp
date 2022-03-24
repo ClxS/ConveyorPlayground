@@ -109,7 +109,7 @@ namespace
             Eigen::Vector3i forwardPosition = cpp_conv::grid::getForwardPosition(position.m_Position, direction.m_Direction);
             atlas::scene::EntityId targetEntity = grid.GetEntity(forwardPosition);
 
-            if (!ecs.DoesEntityHaveComponents<PositionComponent, DirectionComponent, ConveyorComponent>(targetEntity))
+            if (targetEntity.IsInvalid() || !ecs.DoesEntityHaveComponents<PositionComponent, DirectionComponent, ConveyorComponent>(targetEntity))
             {
                 break;
             }
@@ -130,14 +130,14 @@ namespace
                 for (auto neighbourCell : directionPriority)
                 {
                     auto neighbourEntity = grid.GetEntity(vPotentialNeighbours[static_cast<int>(neighbourCell)]);
-                    if (neighbourEntity != EntityId::Invalid() || !ecs.DoesEntityHaveComponents<PositionComponent, DirectionComponent, ConveyorComponent>(neighbourEntity))
+                    if (neighbourEntity == EntityId::Invalid() || !ecs.DoesEntityHaveComponents<PositionComponent, DirectionComponent, ConveyorComponent>(neighbourEntity))
                     {
                         continue;
                     }
 
-                    if (targetEntity == neighbourEntity)
+                    if (neighbourEntity == currentConveyor)
                     {
-                        continue;
+                        break;
                     }
 
                     const auto& [neighbourPosition, neighbourDirection] = ecs.GetComponents<PositionComponent, DirectionComponent>(neighbourEntity);
@@ -175,7 +175,7 @@ namespace
 
         while (true)
         {
-            const auto& [position, direction] = ecs.GetComponents<PositionComponent, DirectionComponent>(searchStart);
+            const auto& [position, direction] = ecs.GetComponents<PositionComponent, DirectionComponent>(currentConveyor);
             vOutConveyors.push_back(currentConveyor);
 
             RelativeDirection tmp;
@@ -184,7 +184,7 @@ namespace
             if (targetConveyor.IsInvalid() ||
                 targetConveyor == searchStart ||
                 targetConveyor == head ||
-                ecs.DoesEntityHaveComponents<PositionComponent, DirectionComponent, ConveyorComponent>(targetConveyor))
+                !ecs.DoesEntityHaveComponents<PositionComponent, DirectionComponent, ConveyorComponent>(targetConveyor))
             {
                 break;
             }
@@ -257,10 +257,15 @@ void cpp_conv::SequenceFormationSystem::Initialise(atlas::scene::EcsManager& ecs
             const EntityId sequenceId = ecs.AddEntity();
             SequenceComponent& component = ecs.AddComponent<SequenceComponent>(
                 sequenceId,
-                SequenceComponent((uint8_t)vSequenceConveyors.size())
+                (uint8_t)vSequenceConveyors.size(),
+                vSequenceConveyors[vSequenceConveyors.size() - 1],
+                pTailConveyor.m_Channels[0].m_pSlots[0].m_VisualPosition,
+                pTailConveyor.m_Channels[1].m_pSlots[0].m_VisualPosition,
+                pTailConveyor.m_Channels[0].m_pSlots[1].m_VisualPosition - pTailConveyor.m_Channels[0].m_pSlots[0].m_VisualPosition,
+                pTailConveyor.m_MoveTick
             );
-            /*component.m_HeadConveyor = vSequenceConveyors[vSequenceConveyors.size() - 1];
-            component.m_LaneOneVisualPosition = pTailConveyor.m_Channels[0].m_pSlots[0].m_VisualPosition;
+            /*component.m_HeadConveyor = 
+            component.m_LaneOneVisualPosition = ;
             component.m_LaneTwoVisualPosition = pTailConveyor.m_Channels[1].m_pSlots[0].m_VisualPosition;
             component.m_UnitDirection = pTailConveyor.m_Channels[0].m_pSlots[1].m_VisualPosition - pTailConveyor.m_Channels[0].m_pSlots[0].m_VisualPosition;
             component.m_MoveTick = pTailConveyor.m_MoveTick;*/

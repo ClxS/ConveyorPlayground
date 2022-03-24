@@ -29,10 +29,11 @@ namespace cpp_conv
             for(const auto& entity : m_InitialisationData.m_Map->GetConveyors())
             {
                 const auto ecsEntity = ecs.AddEntity();
-                ecs.AddComponent<components::PositionComponent>(ecsEntity, Eigen::Vector3i(entity->m_position.GetX(), entity->m_position.GetY(), entity->m_position.GetZ()));
+                auto& position = ecs.AddComponent<components::PositionComponent>(ecsEntity, Eigen::Vector3i(entity->m_position.GetX(), entity->m_position.GetY(), entity->m_position.GetZ()));
                 ecs.AddComponent<components::DirectionComponent>(ecsEntity, entity->m_direction);
                 ecs.AddComponent<components::ConveyorComponent>(ecsEntity);
                 ecs.AddComponent<components::WorldEntityInformationComponent>(ecsEntity, entity->m_eEntityKind);
+                m_SceneData.m_LookupGrid.PlaceEntity(position.m_Position, ecsEntity);
             }
 
             m_InitialisationData.m_Map.reset();
