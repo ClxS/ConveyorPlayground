@@ -224,7 +224,7 @@ namespace atlas::scene
         const ArchetypePool& pool = GetPool(oldArchetypeIndex);
 
         const uint64_t uiMask = MaskLookup<TComponent, TOtherComponents...>::GetComponentMask();
-        return pool.m_ArchetypeComponentMask & uiMask;
+        return (pool.m_ArchetypeComponentMask & uiMask) == uiMask;
     }
 
     template <typename TComponent, typename ... TOtherComponents>
