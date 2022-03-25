@@ -1,7 +1,9 @@
 #pragma once
+#include <Eigen/Core>
 #include "Direction.h"
 #include "ItemInstance.h"
-#include <Eigen/Core>
+
+#include "AtlasScene/ECS/Entity.h"
 
 namespace cpp_conv::components
 {

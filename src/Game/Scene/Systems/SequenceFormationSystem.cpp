@@ -1,6 +1,7 @@
 #include "SequenceFormationSystem.h"
 
 #include "ConveyorComponent.h"
+#include "ConveyorTracingUtility.h"
 #include "DirectionComponent.h"
 #include "EntityGrid.h"
 #include "FactoryComponent.h"
@@ -11,81 +12,6 @@
 
 namespace
 {
-    atlas::scene::EntityId findNextTailConveyor(
-        atlas::scene::EcsManager& ecs,
-        cpp_conv::EntityLookupGrid& grid,
-        Eigen::Vector3i position,
-        Direction direction,
-        RelativeDirection& outDirection)
-    {
-        using namespace cpp_conv::components;
-        using atlas::scene::EntityId;
-
-        static RelativeDirection directionPriority[] =
-        {
-            RelativeDirection::Backwards,
-            RelativeDirection::Right,
-            RelativeDirection::Left,
-        };
-
-        Eigen::Vector3i vPositions[4];
-        vPositions[static_cast<int>(RelativeDirection::Backwards)] = cpp_conv::grid::getBackwardsPosition(position, direction);
-        vPositions[static_cast<int>(RelativeDirection::Right)] = cpp_conv::grid::getRightPosition(position, direction);
-        vPositions[static_cast<int>(RelativeDirection::Left)] = cpp_conv::grid::getLeftPosition(position, direction);
-
-        EntityId pTargetConveyor = EntityId::Invalid();
-        for (auto d : directionPriority)
-        {
-            EntityId directionEntity = grid.GetEntity(vPositions[static_cast<int>(d)]);
-            if (directionEntity.IsInvalid() || !ecs.DoesEntityHaveComponents<PositionComponent, DirectionComponent, WorldEntityInformationComponent>(directionEntity))
-            {
-                continue;
-            }
-
-            auto& info = ecs.GetComponent<WorldEntityInformationComponent>(directionEntity);
-            switch (info.m_EntityKind)
-            {
-                case EntityKind::Stairs:
-                case EntityKind::Tunnel:
-                case EntityKind::Conveyor:
-                    {
-                        auto [targetPosition, targetDirection] = ecs.GetComponents<PositionComponent, DirectionComponent>(directionEntity);
-                        if (cpp_conv::grid::getForwardPosition(targetPosition.m_Position, targetDirection.m_Direction) == position)
-                        {
-                            pTargetConveyor = directionEntity;
-                        }
-                        break;
-                    }
-                case EntityKind::Junction:
-                    pTargetConveyor = directionEntity;
-                    break;
-                case EntityKind::Producer:
-                {
-                    const auto& [targetPosition, targetDirection, targetFactory] = ecs.GetComponents<PositionComponent, DirectionComponent, FactoryComponent>(directionEntity);
-                    if (targetFactory.m_OutputPipe.has_value() && vPositions[static_cast<int>(direction)] == targetPosition.m_Position + targetFactory.m_OutputPipe.value())
-                    {
-                        pTargetConveyor = directionEntity;
-                    }
-                    break;
-                }
-                case EntityKind::Inserter:
-                case EntityKind::Storage:
-                default:
-                    continue;
-                case EntityKind::MAX:
-                    break;
-            }
-
-            if (!pTargetConveyor.IsInvalid())
-            {
-                outDirection = d;
-                break;
-            }
-        }
-
-        return pTargetConveyor;
-    }
-
     atlas::scene::EntityId traceHeadConveyor(
         const atlas::scene::EcsManager& ecs,
         cpp_conv::EntityLookupGrid& grid,
@@ -179,7 +105,7 @@ namespace
             vOutConveyors.push_back(currentConveyor);
 
             RelativeDirection tmp;
-            const EntityId targetConveyor = findNextTailConveyor(ecs, grid, position.m_Position, direction.m_Direction, tmp);
+            const EntityId targetConveyor = cpp_conv::conveyor_tracing_utility::findNextTailConveyor(ecs, grid, position.m_Position, direction.m_Direction, tmp);
 
             if (targetConveyor.IsInvalid() ||
                 targetConveyor == searchStart ||
@@ -264,13 +190,8 @@ void cpp_conv::SequenceFormationSystem::Initialise(atlas::scene::EcsManager& ecs
                 pTailConveyor.m_Channels[0].m_pSlots[1].m_VisualPosition - pTailConveyor.m_Channels[0].m_pSlots[0].m_VisualPosition,
                 pTailConveyor.m_MoveTick
             );
-            /*component.m_HeadConveyor = 
-            component.m_LaneOneVisualPosition = ;
-            component.m_LaneTwoVisualPosition = pTailConveyor.m_Channels[1].m_pSlots[0].m_VisualPosition;
-            component.m_UnitDirection = pTailConveyor.m_Channels[0].m_pSlots[1].m_VisualPosition - pTailConveyor.m_Channels[0].m_pSlots[0].m_VisualPosition;
-            component.m_MoveTick = pTailConveyor.m_MoveTick;*/
 
-            for(size_t i = 0; i < vSequenceConveyors.size(); ++i)
+            for (size_t i = 0; i < vSequenceConveyors.size(); ++i)
             {
                 ecs.GetComponent<ConveyorComponent>(vSequenceConveyors[i]).m_Sequence = sequenceId;
                 alreadyProcessedConveyors.insert(vSequenceConveyors[i]);

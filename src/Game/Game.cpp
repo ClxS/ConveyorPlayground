@@ -29,6 +29,7 @@
 #include "FactoryComponent.h"
 #include "GameMapLoadInterstitialScene.h"
 #include "SequenceComponent.h"
+#include "SpriteComponent.h"
 #include "AtlasAppHost/Application.h"
 #include "AtlasAppHost/Main.h"
 #include "AtlasScene/SceneManager.h"
@@ -51,6 +52,7 @@ int gameMain(int argc, char* argv[])
     atlas::scene::ComponentRegistry::RegisterComponent<cpp_conv::components::FactoryComponent>();
     atlas::scene::ComponentRegistry::RegisterComponent<cpp_conv::components::PositionComponent>();
     atlas::scene::ComponentRegistry::RegisterComponent<cpp_conv::components::SequenceComponent>();
+    atlas::scene::ComponentRegistry::RegisterComponent<cpp_conv::components::SpriteComponent>();
     atlas::scene::ComponentRegistry::RegisterComponent<cpp_conv::components::WorldEntityInformationComponent>();
 
     atlas::scene::SceneManager sceneManager;

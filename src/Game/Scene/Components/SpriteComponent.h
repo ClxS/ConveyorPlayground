@@ -2,7 +2,8 @@
 
 namespace cpp_conv::components
 {
-    struct SequenceComponent
+    struct SpriteComponent
     {
+        resources::AssetPtr<resources::TileAsset> m_pTile;
     };
 }
