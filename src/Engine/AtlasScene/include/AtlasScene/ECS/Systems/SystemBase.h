@@ -11,5 +11,6 @@ namespace atlas::scene
 
         virtual void Initialise(EcsManager&) {}
         virtual void Update(EcsManager&) = 0;
+        virtual void Render(EcsManager&) {}
     };
 }

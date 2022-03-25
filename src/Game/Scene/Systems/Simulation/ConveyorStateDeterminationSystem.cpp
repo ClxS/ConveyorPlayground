@@ -8,7 +8,7 @@
 #include "EntityLookupGrid.h"
 #include "PositionComponent.h"
 #include "ResourceManager.h"
-#include "SpriteComponent.h"
+#include "SpriteLayerComponent.h"
 #include "TargetingUtility.h"
 #include "WorldEntityInformationComponent.h"
 #include "AtlasScene/ECS/Components/EcsManager.h"
@@ -175,12 +175,12 @@ void cpp_conv::ConveyorStateDeterminationSystem::Initialise(atlas::scene::EcsMan
     using namespace cpp_conv::components;
     using atlas::scene::EntityId;
 
-    const auto conveyorEntities = ecs.GetEntitiesWithComponents<WorldEntityInformationComponent, PositionComponent, DirectionComponent, ConveyorComponent, SpriteComponent>();
+    const auto conveyorEntities = ecs.GetEntitiesWithComponents<WorldEntityInformationComponent, PositionComponent, DirectionComponent, ConveyorComponent>();
 
     for(const auto entity : conveyorEntities)
     {
         // Good job this doesn't run frequently...
-        const auto& [info, position, direction, conveyor, sprite] = ecs.GetComponents<WorldEntityInformationComponent, PositionComponent, DirectionComponent, ConveyorComponent, SpriteComponent>(entity);
+        const auto& [info, position, direction, conveyor] = ecs.GetComponents<WorldEntityInformationComponent, PositionComponent, DirectionComponent, ConveyorComponent>(entity);
         const EntityId pEntity = m_LookupGrid.GetEntity(grid::getForwardPosition(position.m_Position, direction.m_Direction));
 
         conveyor.m_bIsCorner = isCornerConveyor(ecs, m_LookupGrid, position, direction);
@@ -203,26 +203,30 @@ void cpp_conv::ConveyorStateDeterminationSystem::Initialise(atlas::scene::EcsMan
             }
         }
 
-        if (!conveyor.m_bIsCorner)
+        if (ecs.DoesEntityHaveComponent<SpriteLayerComponent<1>>(entity))
         {
-            if (!conveyor.m_bIsCapped)
+            auto& sprite = ecs.GetComponent<SpriteLayerComponent<1>>(entity);
+            if (!conveyor.m_bIsCorner)
             {
-                sprite.m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::assets::conveyors::c_ConveyorStraight);
+                if (!conveyor.m_bIsCapped)
+                {
+                    sprite.m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::assets::conveyors::c_ConveyorStraight);
+                }
+                else
+                {
+                    sprite.m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::assets::conveyors::c_ConveyorStraightEnd);
+                }
             }
             else
             {
-                sprite.m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::assets::conveyors::c_ConveyorStraightEnd);
-            }
-        }
-        else
-        {
-            if (conveyor.m_bIsClockwise)
-            {
-                sprite.m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::assets::conveyors::c_ConveyorCornerClockwise);
-            }
-            else
-            {
-                sprite.m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::assets::conveyors::c_ConveyorCornerAntiClockwise);
+                if (conveyor.m_bIsClockwise)
+                {
+                    sprite.m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::assets::conveyors::c_ConveyorCornerClockwise);
+                }
+                else
+                {
+                    sprite.m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::assets::conveyors::c_ConveyorCornerAntiClockwise);
+                }
             }
         }
     }

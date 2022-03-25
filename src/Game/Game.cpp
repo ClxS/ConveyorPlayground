@@ -29,7 +29,7 @@
 #include "FactoryComponent.h"
 #include "GameMapLoadInterstitialScene.h"
 #include "SequenceComponent.h"
-#include "SpriteComponent.h"
+#include "SpriteLayerComponent.h"
 #include "AtlasAppHost/Application.h"
 #include "AtlasAppHost/Main.h"
 #include "AtlasScene/SceneManager.h"
@@ -38,6 +38,8 @@
 #undef min
 
 using namespace cpp_conv::resources;
+
+cpp_conv::RenderContext* g_renderContext;
 
 int gameMain(int argc, char* argv[])
 {
@@ -52,7 +54,9 @@ int gameMain(int argc, char* argv[])
     atlas::scene::ComponentRegistry::RegisterComponent<cpp_conv::components::FactoryComponent>();
     atlas::scene::ComponentRegistry::RegisterComponent<cpp_conv::components::PositionComponent>();
     atlas::scene::ComponentRegistry::RegisterComponent<cpp_conv::components::SequenceComponent>();
-    atlas::scene::ComponentRegistry::RegisterComponent<cpp_conv::components::SpriteComponent>();
+    atlas::scene::ComponentRegistry::RegisterComponent<cpp_conv::components::SpriteLayerComponent<1>>();
+    atlas::scene::ComponentRegistry::RegisterComponent<cpp_conv::components::SpriteLayerComponent<2>>();
+    atlas::scene::ComponentRegistry::RegisterComponent<cpp_conv::components::SpriteLayerComponent<3>>();
     atlas::scene::ComponentRegistry::RegisterComponent<cpp_conv::components::WorldEntityInformationComponent>();
 
     atlas::scene::SceneManager sceneManager;
@@ -61,10 +65,34 @@ int gameMain(int argc, char* argv[])
     cpp_conv::FrameLimiter frameLimiter(60);
     frameLimiter.Start();
 
+    cpp_conv::WorldMap worldMap;
+    // TODO REMOVE THIS
+    cpp_conv::RenderContext kRenderContext =
+    {
+        { 0.0f, 0.0f, 0.0f },
+        0,
+        { 0xFFFFFFFF },
+        0,
+        worldMap,
+        nullptr,
+        0.8f
+    };
+    g_renderContext = &kRenderContext;
+
+    cpp_conv::renderer::SwapChain swapChain(kRenderContext, iWidth, iHeight);
+    init(kRenderContext, swapChain);
+
     while (true)
     {
+        kRenderContext.m_uiDrawnItems = 0;
+
+        cpp_conv::input::receiveInput();
+
         sceneManager.Update();
-        PROFILE(FrameCapSleep, frameLimiter.Limit());
+        frameLimiter.Limit();
+
+        swapChain.SwapAndPresent();
+        frameLimiter.EndFrame();
     }
 
     /*cpp_conv::WorldMap worldMap;
@@ -87,16 +115,7 @@ int gameMain(int argc, char* argv[])
         }
     };
 
-    cpp_conv::RenderContext kRenderContext =
-    {
-        { 0.0f, 0.0f, 0.0f },
-        0,
-        { 0xFFFFFFFF },
-        0,
-        worldMap,
-        nullptr,
-        0.8f
-    };
+
 
     cpp_conv::renderer::SwapChain swapChain(kRenderContext, iWidth, iHeight);
     init(kRenderContext, swapChain);

@@ -9,9 +9,11 @@
 #include "PositionComponent.h"
 #include "WorldEntityInformationComponent.h"
 #include "WorldMap.h"
-#include "Systems/SequenceFormationSystem.h"
+#include "Systems/Simulation/SequenceFormationSystem.h"
 #include "Map.h"
-#include "SpriteComponent.h"
+#include "SequenceFormationSystem.h"
+#include "SpriteLayerComponent.h"
+#include "SpriteRenderSystem.h"
 
 namespace cpp_conv
 {
@@ -34,7 +36,7 @@ namespace cpp_conv
                 const auto& position = ecs.AddComponent<components::PositionComponent>(ecsEntity, Eigen::Vector3i(entity->m_position.GetX(), entity->m_position.GetY(), entity->m_position.GetZ()));
                 ecs.AddComponent<components::DirectionComponent>(ecsEntity, entity->m_direction);
                 ecs.AddComponent<components::ConveyorComponent>(ecsEntity);
-                ecs.AddComponent<components::SpriteComponent>(ecsEntity);
+                ecs.AddComponent<components::SpriteLayerComponent<1>>(ecsEntity);
                 ecs.AddComponent<components::WorldEntityInformationComponent>(ecsEntity, entity->m_eEntityKind);
                 m_SceneData.m_LookupGrid.PlaceEntity(position.m_Position, ecsEntity);
             }
@@ -47,6 +49,10 @@ namespace cpp_conv
         {
             builder.RegisterSystem<ConveyorStateDeterminationSystem>(m_SceneData.m_LookupGrid);
             builder.RegisterSystem<SequenceFormationSystem, ConveyorStateDeterminationSystem>(m_SceneData.m_LookupGrid);
+
+            builder.RegisterSystem<SpriteLayerRenderSystem<1>, SequenceFormationSystem>();
+            builder.RegisterSystem<SpriteLayerRenderSystem<2>, SpriteLayerRenderSystem<1>>();
+            builder.RegisterSystem<SpriteLayerRenderSystem<3>, SpriteLayerRenderSystem<2>>();
         }
 
         void OnUpdate(atlas::scene::SceneManager& sceneManager) override

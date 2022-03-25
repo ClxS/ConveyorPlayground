@@ -1,5 +1,7 @@
 #pragma once
 
+#include "RenderContext.h"
+
 #if defined(_CONSOLE)
 #include "TextTileRenderHandler.h"
 #elif defined(_SDL)

@@ -211,7 +211,7 @@ namespace atlas::scene
 
         const ArchetypePool& pool = GetPool(oldArchetypeIndex);
 
-        const uint32_t targetMask = ComponentRegistry::GetComponentMask<TComponent>();
+        const uint64_t targetMask = ComponentRegistry::GetComponentMask<TComponent>();
         return pool.m_ArchetypeComponentMask & targetMask;
     }
 

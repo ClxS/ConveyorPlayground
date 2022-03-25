@@ -1,14 +1,15 @@
 #pragma once
-#include "EntityLookupGrid.h"
-#include "AtlasScene/ECS/Components/EcsManager.h"
+
 #include "AtlasScene/ECS/Systems/SystemBase.h"
 
 namespace cpp_conv
 {
-    class SequenceFormationSystem : public atlas::scene::SystemBase
+    class EntityLookupGrid;
+
+    class ConveyorStateDeterminationSystem final : public atlas::scene::SystemBase
     {
     public:
-        explicit SequenceFormationSystem(EntityLookupGrid& lookupGrid)
+        explicit ConveyorStateDeterminationSystem(EntityLookupGrid& lookupGrid)
             : m_LookupGrid{lookupGrid}
         {
         }

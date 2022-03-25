@@ -33,8 +33,8 @@ void doZoom(cpp_conv::RenderContext& kRenderContext, float newZoom)
     kRenderContext.m_fZoom = newZoom;
 }
 
-void cpp_conv::input::receiveInput(SceneContext& kContext, RenderContext& kRenderContext, std::queue<
-                                       commands::CommandType>& commands)
+void cpp_conv::input::receiveInput(/*SceneContext& kContext, RenderContext& kRenderContext, std::queue<
+                                       commands::CommandType>& commands*/)
 {
     SDL_Event event;
     // TODO Consider DPI here
@@ -49,12 +49,12 @@ void cpp_conv::input::receiveInput(SceneContext& kContext, RenderContext& kRende
 
     while (SDL_PollEvent(&event))
     {
-        ImGui_ImplSDL2_ProcessEvent(&event);
+        //ImGui_ImplSDL2_ProcessEvent(&event);
         switch (event.type)
         {
         case SDL_QUIT:
             exit(0);
-        case SDL_KEYDOWN:
+        /*case SDL_KEYDOWN:
             switch (event.key.keysym.sym)
             {
                 case SDLK_PAGEUP:
@@ -117,7 +117,7 @@ void cpp_conv::input::receiveInput(SceneContext& kContext, RenderContext& kRende
             {
                 doZoom(kRenderContext, kRenderContext.m_fZoom * 0.9f);
             }
-            break;
+            break;*/
         default:
             break;
         }
