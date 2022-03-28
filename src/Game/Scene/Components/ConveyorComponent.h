@@ -12,9 +12,15 @@ namespace cpp_conv::components
 
     struct ConveyorComponent
     {
+        struct PlacedItem
+        {
+            ItemId m_Item;
+            std::optional<Eigen::Vector2f> m_PreviousPosition;
+        };
+
         struct Lane
         {
-            ItemInstance m_Item;
+            PlacedItem m_Item;
             Eigen::Vector2f m_VisualPosition;
         };
 
@@ -23,7 +29,7 @@ namespace cpp_conv::components
             int m_ChannelLane;
             int m_LaneLength = 2;
             std::array<Lane, c_conveyorChannelSlots + 1> m_pSlots;
-            std::array<ItemInstance, c_conveyorChannelSlots + 1> m_pPendingItems;
+            std::array<PlacedItem, c_conveyorChannelSlots + 1> m_pPendingItems;
         };
 
         bool m_bIsCorner;
@@ -36,5 +42,6 @@ namespace cpp_conv::components
         int m_MoveTick = 10;
 
         atlas::scene::EntityId m_Sequence;
+        uint8_t m_SequenceIndex;
     };
 }

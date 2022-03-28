@@ -1,7 +1,7 @@
 #include "ConveyorStateDeterminationSystem.h"
 
 #include "ConveyorComponent.h"
-#include "ConveyorTracingUtility.h"
+#include "ConveyorHelper.h"
 #include "DirectionComponent.h"
 #include "Entity.h"
 #include "EntityGrid.h"
@@ -28,7 +28,7 @@ namespace
         const cpp_conv::components::DirectionComponent& direction)
     {
         RelativeDirection outDirection;
-        const atlas::scene::EntityId tailConverter = cpp_conv::conveyor_tracing_utility::findNextTailConveyor(ecs, lookupGraph, position.m_Position, direction.m_Direction, outDirection);
+        const atlas::scene::EntityId tailConverter = cpp_conv::conveyor_helper::findNextTailConveyor(ecs, lookupGraph, position.m_Position, direction.m_Direction, outDirection);
         if (tailConverter.IsInvalid() || outDirection == RelativeDirection::Backwards || outDirection == RelativeDirection::Forward)
         {
             return false;
@@ -46,7 +46,7 @@ namespace
         const cpp_conv::components::DirectionComponent& direction)
     {
         RelativeDirection outDirection;
-        const atlas::scene::EntityId tailConverter = cpp_conv::conveyor_tracing_utility::findNextTailConveyor(ecs, lookupGraph, position.m_Position, direction.m_Direction, outDirection);
+        const atlas::scene::EntityId tailConverter = cpp_conv::conveyor_helper::findNextTailConveyor(ecs, lookupGraph, position.m_Position, direction.m_Direction, outDirection);
         if (tailConverter.IsInvalid() || outDirection == RelativeDirection::Backwards || outDirection == RelativeDirection::Forward)
         {
             return false;
@@ -72,7 +72,7 @@ namespace
         const cpp_conv::components::DirectionComponent& direction)
     {
         RelativeDirection outDirection;
-        const atlas::scene::EntityId tailConverter = cpp_conv::conveyor_tracing_utility::findNextTailConveyor(ecs, lookupGraph, position.m_Position, direction.m_Direction, outDirection);
+        const atlas::scene::EntityId tailConverter = cpp_conv::conveyor_helper::findNextTailConveyor(ecs, lookupGraph, position.m_Position, direction.m_Direction, outDirection);
         if (tailConverter.IsInvalid() || outDirection == RelativeDirection::Backwards || outDirection == RelativeDirection::Forward)
         {
             return std::make_tuple(-1, Direction::Up);

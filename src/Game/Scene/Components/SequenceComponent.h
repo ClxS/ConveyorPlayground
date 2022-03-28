@@ -1,9 +1,8 @@
 #pragma once
 
-#include "FixedCircularBuffer.h"
 #include <cstdint>
 #include <AtlasScene/ECS/Entity.h>
-#include <AtlasScene/ECS/Entity.h>
+#include "FixedCircularBuffer.h"
 
 namespace cpp_conv::components
 {
@@ -38,39 +37,35 @@ namespace cpp_conv::components
         };
 
         SequenceComponent(
-            uint8_t length,
-            atlas::scene::EntityId headConveyor,
-            Eigen::Vector2f laneOneVisualPosition,
-            Eigen::Vector2f laneTwoVisualPosition,
-            Eigen::Vector2f unitDirection,
-            uint32_t moveTick)
-            : m_Length(length)
+            const uint8_t length,
+            const atlas::scene::EntityId headConveyor,
+            const Eigen::Vector2f laneOneVisualPosition,
+            const Eigen::Vector2f laneTwoVisualPosition,
+            const Eigen::Vector2f unitDirection,
+            const uint32_t moveTick)
+            : m_UnitDirection(unitDirection)
+            , m_MoveTick(moveTick)
+            , m_CurrentTick{0}
             , m_HeadConveyor(headConveyor)
-            , m_LaneOneVisualPosition(laneOneVisualPosition)
-            , m_LaneTwoVisualPosition(laneTwoVisualPosition)
-            , m_UnitDirection(unitDirection)
-            , m_MoveTick(moveTick)             
+            , m_Length(length)
+            , m_LaneVisualOffsets{laneOneVisualPosition, laneTwoVisualPosition}
+            , m_RealizedStates { RealizedState(length * 2), RealizedState(length * 2) }
+            , m_PendingStates{ PendingState(length * 2), PendingState(length * 2) }
         {
         }
 
-        uint8_t m_Length;
-
-        atlas::scene::EntityId m_HeadConveyor;
-
-        Eigen::Vector2f m_LaneOneVisualPosition;
-
-        Eigen::Vector2f m_LaneTwoVisualPosition;
 
         Eigen::Vector2f m_UnitDirection;
 
         uint32_t m_MoveTick;
-        /*
+        uint32_t m_CurrentTick;
 
+        atlas::scene::EntityId m_HeadConveyor;
 
-        bool m_bNeedsRealization = false;
-             */
-   //std::array<RealizedState, c_conveyorChannels> m_RealizedStates;
+        uint8_t m_Length;
 
-        //std::array<PendingState, c_conveyorChannels> m_PendingStates;
+        std::array<Eigen::Vector2f, c_conveyorChannels> m_LaneVisualOffsets;
+        std::array<RealizedState, c_conveyorChannels> m_RealizedStates;
+        std::array<PendingState, c_conveyorChannels> m_PendingStates;
     };
 }

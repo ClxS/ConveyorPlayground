@@ -12,6 +12,7 @@
 #include "Systems/Simulation/SequenceFormationSystem.h"
 #include "Map.h"
 #include "SequenceFormationSystem.h"
+#include "SequenceProcessingSystem.h"
 #include "SpriteLayerComponent.h"
 #include "SpriteRenderSystem.h"
 
@@ -50,22 +51,25 @@ namespace cpp_conv
             builder.RegisterSystem<ConveyorStateDeterminationSystem>(m_SceneData.m_LookupGrid);
             builder.RegisterSystem<SequenceFormationSystem, ConveyorStateDeterminationSystem>(m_SceneData.m_LookupGrid);
 
-            builder.RegisterSystem<SpriteLayerRenderSystem<1>, SequenceFormationSystem>();
+            builder.RegisterSystem<SequenceProcessingSystem_Process, SequenceFormationSystem>(m_SceneData.m_LookupGrid);
+            builder.RegisterSystem<SequenceProcessingSystem_Realize, SequenceProcessingSystem_Process>();
+
+            builder.RegisterSystem<SpriteLayerRenderSystem<1>, SequenceProcessingSystem_Realize>();
             builder.RegisterSystem<SpriteLayerRenderSystem<2>, SpriteLayerRenderSystem<1>>();
             builder.RegisterSystem<SpriteLayerRenderSystem<3>, SpriteLayerRenderSystem<2>>();
         }
 
         void OnUpdate(atlas::scene::SceneManager& sceneManager) override
         {
-            atlas::scene::EcsScene::OnUpdate(sceneManager);
+            EcsScene::OnUpdate(sceneManager);
         }
         void OnRender(atlas::scene::SceneManager& sceneManager) override
         {
-            atlas::scene::EcsScene::OnRender(sceneManager);
+            EcsScene::OnRender(sceneManager);
         }
         void OnExited(atlas::scene::SceneManager& sceneManager) override
         {
-            atlas::scene::EcsScene::OnExited(sceneManager);
+            EcsScene::OnExited(sceneManager);
         }
 
     private:

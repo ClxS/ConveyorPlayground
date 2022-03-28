@@ -1,4 +1,4 @@
-#include "ConveyorTracingUtility.h"
+#include "ConveyorHelper.h"
 
 #include "DirectionComponent.h"
 #include "EntityGrid.h"
@@ -10,7 +10,7 @@
 #include "EntityLookupGrid.h"
 #include "FactoryComponent.h"
 
-atlas::scene::EntityId cpp_conv::conveyor_tracing_utility::findNextTailConveyor(
+atlas::scene::EntityId cpp_conv::conveyor_helper::findNextTailConveyor(
     const atlas::scene::EcsManager& ecs,
     const EntityLookupGrid& grid,
     const Eigen::Vector3i position,

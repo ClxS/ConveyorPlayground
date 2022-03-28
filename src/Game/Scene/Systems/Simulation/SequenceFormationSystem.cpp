@@ -1,14 +1,13 @@
 #include "SequenceFormationSystem.h"
 
 #include "ConveyorComponent.h"
-#include "ConveyorTracingUtility.h"
+#include "ConveyorHelper.h"
 #include "DirectionComponent.h"
 #include "EntityGrid.h"
 #include "FactoryComponent.h"
 #include "PositionComponent.h"
 #include "SequenceComponent.h"
 #include "vector_set.h"
-#include "WorldEntityInformationComponent.h"
 
 namespace
 {
@@ -105,7 +104,7 @@ namespace
             vOutConveyors.push_back(currentConveyor);
 
             RelativeDirection tmp;
-            const EntityId targetConveyor = cpp_conv::conveyor_tracing_utility::findNextTailConveyor(ecs, grid, position.m_Position, direction.m_Direction, tmp);
+            const EntityId targetConveyor = cpp_conv::conveyor_helper::findNextTailConveyor(ecs, grid, position.m_Position, direction.m_Direction, tmp);
 
             if (targetConveyor.IsInvalid() ||
                 targetConveyor == searchStart ||
@@ -183,7 +182,7 @@ void cpp_conv::SequenceFormationSystem::Initialise(atlas::scene::EcsManager& ecs
             const EntityId sequenceId = ecs.AddEntity();
             SequenceComponent& component = ecs.AddComponent<SequenceComponent>(
                 sequenceId,
-                (uint8_t)vSequenceConveyors.size(),
+                static_cast<uint8_t>(vSequenceConveyors.size()),
                 vSequenceConveyors[vSequenceConveyors.size() - 1],
                 pTailConveyor.m_Channels[0].m_pSlots[0].m_VisualPosition,
                 pTailConveyor.m_Channels[1].m_pSlots[0].m_VisualPosition,
@@ -193,7 +192,9 @@ void cpp_conv::SequenceFormationSystem::Initialise(atlas::scene::EcsManager& ecs
 
             for (size_t i = 0; i < vSequenceConveyors.size(); ++i)
             {
-                ecs.GetComponent<ConveyorComponent>(vSequenceConveyors[i]).m_Sequence = sequenceId;
+                auto& localConveyor = ecs.GetComponent<ConveyorComponent>(vSequenceConveyors[i]);
+                localConveyor.m_Sequence = sequenceId;
+                localConveyor.m_SequenceIndex = static_cast<uint8_t>(i);
                 alreadyProcessedConveyors.insert(vSequenceConveyors[i]);
             }
 
