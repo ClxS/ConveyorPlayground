@@ -4,13 +4,21 @@
 
 #include "ConveyorComponent.h"
 #include "ConveyorStateDeterminationSystem.h"
+#include "DescriptionComponent.h"
 #include "DirectionComponent.h"
 #include "EntityLookupGrid.h"
+#include "Factory.h"
+#include "FactoryComponent.h"
+#include "FactoryDefinition.h"
+#include "FactoryRegistry.h"
 #include "PositionComponent.h"
 #include "WorldEntityInformationComponent.h"
 #include "WorldMap.h"
 #include "Systems/Simulation/SequenceFormationSystem.h"
 #include "Map.h"
+#include "NameComponent.h"
+#include "RecipeRegistry.h"
+#include "ResourceManager.h"
 #include "SequenceFormationSystem.h"
 #include "SequenceProcessingSystem.h"
 #include "SpriteLayerComponent.h"
@@ -27,25 +35,8 @@ namespace cpp_conv
 
         }
 
-        void OnEntered(atlas::scene::SceneManager& sceneManager) override
-        {
-            atlas::scene::EcsManager& ecs = GetEcsManager();
+        void OnEntered(atlas::scene::SceneManager& sceneManager) override;
 
-            for(const auto& entity : m_InitialisationData.m_Map->GetConveyors())
-            {
-                const auto ecsEntity = ecs.AddEntity();
-                const auto& position = ecs.AddComponent<components::PositionComponent>(ecsEntity, Eigen::Vector3i(entity->m_position.GetX(), entity->m_position.GetY(), entity->m_position.GetZ()));
-                ecs.AddComponent<components::DirectionComponent>(ecsEntity, entity->m_direction);
-                ecs.AddComponent<components::ConveyorComponent>(ecsEntity);
-                ecs.AddComponent<components::SpriteLayerComponent<1>>(ecsEntity);
-                ecs.AddComponent<components::WorldEntityInformationComponent>(ecsEntity, entity->m_eEntityKind);
-                m_SceneData.m_LookupGrid.PlaceEntity(position.m_Position, ecsEntity);
-            }
-
-            m_InitialisationData.m_Map.reset();
-
-            atlas::scene::EcsScene::OnEntered(sceneManager);
-        }
         void ConstructSystems(atlas::scene::SystemsBuilder& builder) override
         {
             builder.RegisterSystem<ConveyorStateDeterminationSystem>(m_SceneData.m_LookupGrid);

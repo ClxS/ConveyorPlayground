@@ -49,6 +49,8 @@ int gameMain(int argc, char* argv[])
 
     registration::processSelfRegistrations();
 
+    atlas::scene::ComponentRegistry::RegisterComponent<cpp_conv::components::NameComponent>();
+    atlas::scene::ComponentRegistry::RegisterComponent<cpp_conv::components::DescriptionComponent>();
     atlas::scene::ComponentRegistry::RegisterComponent<cpp_conv::components::ConveyorComponent>();
     atlas::scene::ComponentRegistry::RegisterComponent<cpp_conv::components::DirectionComponent>();
     atlas::scene::ComponentRegistry::RegisterComponent<cpp_conv::components::FactoryComponent>();

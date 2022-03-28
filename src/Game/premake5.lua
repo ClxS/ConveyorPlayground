@@ -65,6 +65,7 @@ project "CppConveyor"
 	links {
 		"tomlcpp",
 		"eigen",
+		"fixed_string",
 
 		"AtlasAppHost",
 		"AtlasScene",

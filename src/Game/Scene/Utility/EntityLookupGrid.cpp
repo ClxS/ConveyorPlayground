@@ -116,26 +116,18 @@ atlas::scene::EntityId cpp_conv::EntityLookupGrid::GetEntity(const Eigen::Vector
     return pCell->GetEntity(coord);
 }
 
-bool cpp_conv::EntityLookupGrid::PlaceEntity(Eigen::Vector3i position, atlas::scene::EntityId entity)
+bool cpp_conv::EntityLookupGrid::PlaceEntity(Eigen::Vector3i position, Eigen::Vector3i size, atlas::scene::EntityId entity)
 {
-    if (!ValidateCanPlaceEntity(position, entity))
+    if (!ValidateCanPlaceEntity(position, size, entity))
     {
         return false;
     }
 
-    const CellCoordinate coord = ToCellSpace(position);
-    assert(!coord.IsInvalid());
-
-    Cell* pCell = GetOrCreateCell(coord);
-    assert(pCell != nullptr);
-
-    assert(pCell->SetEntity(coord, entity));
-
-    /*for (int32_t iXPosition = position.GetX(); iXPosition < (position.GetX() + entity->m_size.GetX()); ++iXPosition)
+    for (int32_t iXPosition = position.x(); iXPosition < (position.x() + size.x()); ++iXPosition)
     {
-        for (int32_t iYPosition = position.GetY(); iYPosition < (position.GetY() + entity->m_size.GetY()); ++iYPosition)
+        for (int32_t iYPosition = position.y(); iYPosition < (position.y() + size.y()); ++iYPosition)
         {
-            for (int32_t iDepthPosition = position.GetZ(); iDepthPosition < (position.GetZ() + entity->m_size.GetZ()); ++iDepthPosition)
+            for (int32_t iDepthPosition = position.z(); iDepthPosition < (position.z() + size.z()); ++iDepthPosition)
             {
                 CellCoordinate coord = ToCellSpace({ iXPosition, iYPosition, iDepthPosition });
                 assert(!coord.IsInvalid());
@@ -146,56 +138,44 @@ bool cpp_conv::EntityLookupGrid::PlaceEntity(Eigen::Vector3i position, atlas::sc
                 assert(pCell->SetEntity(coord, entity));
             }
         }
-    }*/
+    }
 
     return true;
 }
 
-bool cpp_conv::EntityLookupGrid::ValidateCanPlaceEntity(Eigen::Vector3i position, atlas::scene::EntityId pEntity) const
+bool cpp_conv::EntityLookupGrid::ValidateCanPlaceEntity(Eigen::Vector3i position, Eigen::Vector3i size, atlas::scene::EntityId pEntity) const
 {
-    const CellCoordinate coord = ToCellSpace(position);
-    if (coord.IsInvalid())
+    if (size.x() <= 0 || size.y() <= 0 || size.z() <= 0)
     {
         return false;
     }
 
-    const Cell* pCell = GetCell(coord);
-    if (!pCell)
+    for (int32_t iXPosition = position.x(); iXPosition < (position.x() + size.x()); ++iXPosition)
     {
-        return true;
-    }
-
-    if (pCell->GetEntity(coord) != atlas::scene::EntityId::Invalid())
-    {
-        return false;
-    }
-
-    /*for (int32_t iXPosition = position.GetX(); iXPosition < (position.GetX() + pEntity->m_size.GetX()); ++iXPosition)
-    {
-        for (int32_t iYPosition = position.GetY(); iYPosition < (position.GetY() + pEntity->m_size.GetY()); ++iYPosition)
+        for (int32_t iYPosition = position.y(); iYPosition < (position.y() + size.y()); ++iYPosition)
         {
-            for (int32_t iDepthPosition = position.GetZ(); iDepthPosition < (position.GetZ() + pEntity->m_size.GetZ()); ++iDepthPosition)
+            for (int32_t iDepthPosition = position.z(); iDepthPosition < (position.z() + size.z()); ++iDepthPosition)
             {
-                const Vector3 checkPosition = { iXPosition, iYPosition, iDepthPosition };
+                const Eigen::Vector3i checkPosition = { iXPosition, iYPosition, iDepthPosition };
                 CellCoordinate coord = ToCellSpace(checkPosition);
                 if (coord.IsInvalid())
                 {
                     return false;
                 }
 
-                Cell* pCell = GetCell(coord);
+                const Cell* pCell = GetCell(coord);
                 if (!pCell)
                 {
                     continue;
                 }
 
-                if (pCell->GetEntity(coord))
+                if (pCell->GetEntity(coord).IsValid())
                 {
                     return false;
                 }
             }
         }
-    }*/
+    }
 
     return true;
 }

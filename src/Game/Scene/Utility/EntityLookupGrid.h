@@ -57,7 +57,8 @@ namespace cpp_conv
         [[nodiscard]] atlas::scene::EntityId GetEntity(Eigen::Vector3i position) const;
         [[nodiscard]] Cell* GetCell(CellCoordinate coord) const;
 
-        bool PlaceEntity(Eigen::Vector3i position, atlas::scene::EntityId entity);
+        bool PlaceEntity(Eigen::Vector3i position, Eigen::Vector3i size, atlas::scene::EntityId entity);
+        bool ValidateCanPlaceEntity(Eigen::Vector3i position, Eigen::Vector3i size, atlas::scene::EntityId entity) const;
 
     private:
         using CellPtr = std::unique_ptr<Cell>;
@@ -65,7 +66,6 @@ namespace cpp_conv
         using EntityLookupGridStore = std::array<EntityLookupGridRow, c_uiMaximumMapSize>;
 
         Cell* GetOrCreateCell(CellCoordinate coord);
-        bool ValidateCanPlaceEntity(Eigen::Vector3i position, atlas::scene::EntityId entity) const;
 
          bool m_bSuppressAssess = false;
 

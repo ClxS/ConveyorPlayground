@@ -46,3 +46,6 @@
 [submodule "src/ThirdParty/optick"]
 	path = src/ThirdParty/optick
 	url = https://github.com/ClxS/optick
+[submodule "src/ThirdParty/fixed_string"]
+	path = src/ThirdParty/fixed_string
+	url = https://github.com/unterumarmung/fixed_string

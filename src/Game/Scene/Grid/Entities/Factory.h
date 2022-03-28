@@ -39,6 +39,8 @@ namespace cpp_conv
         [[nodiscard]] bool HasOutputPipe() const { return m_bHasOutputPipe; }
         [[nodiscard]] Vector3 GetOutputPipe() const { return m_OutputPipe; }
 
+        [[nodiscard]] FactoryId GetDefinitionId() const { return m_hFactoryId; }
+
     private:
         bool ProduceItems();
         void RunProductionCycle(const FactoryDefinition* pFactory);
