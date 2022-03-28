@@ -96,7 +96,7 @@ namespace atlas::scene
             new (&m_Data[uiIndex]) TDataType( std::forward<TArgs&&>(args)... );
         }
 
-        void SwapAndPop(int32_t uiRemovedIndex)
+        void SwapAndPop(int32_t uiRemovedIndex) override
         {
             m_Data[uiRemovedIndex] = m_Data[m_Data.size() - 1];
             m_Data.pop_back();

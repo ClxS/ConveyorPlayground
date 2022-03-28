@@ -156,10 +156,19 @@ bool tryInsertItemFactory(
     const atlas::scene::EntityId sourceEntity,
     const atlas::scene::EntityId targetEntity,
     const cpp_conv::ItemId& itemId,
-    int sourceChannel,
-    const Eigen::Vector2f& startPosition)
+    std::optional<int> sourceChannel,
+    const std::optional<Eigen::Vector2f>& startPosition)
 {
     return false;
+}
+
+bool cpp_conv::item_passing_utility::entitySupportsInsertion(
+    const atlas::scene::EcsManager& ecs,
+    const atlas::scene::EntityId targetEntity)
+{
+    return
+        ecs.DoesEntityHaveComponent<components::ConveyorComponent>(targetEntity) ||
+        ecs.DoesEntityHaveComponent<components::FactoryComponent>(targetEntity);
 }
 
 bool cpp_conv::item_passing_utility::tryInsertItem(
@@ -168,8 +177,8 @@ bool cpp_conv::item_passing_utility::tryInsertItem(
     const atlas::scene::EntityId sourceEntity,
     const atlas::scene::EntityId targetEntity,
     const ItemId itemId,
-    const int sourceChannel,
-    const Eigen::Vector2f startPosition)
+    const std::optional<int> sourceChannel,
+    const std::optional<Eigen::Vector2f> startPosition)
 {
     if (ecs.DoesEntityHaveComponent<components::ConveyorComponent>(targetEntity))
     {

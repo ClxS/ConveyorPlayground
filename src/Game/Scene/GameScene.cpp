@@ -1,5 +1,7 @@
 #include "GameScene.h"
 
+#include "RecipeDefinition.h"
+
 namespace
 {
     cpp_conv::components::FactoryComponent& loadFactory(atlas::scene::EcsManager& ecs, const atlas::scene::EntityId& ecsEntity, const cpp_conv::Entity* entity)
@@ -27,17 +29,20 @@ namespace
         const auto recipe = cpp_conv::resources::getRecipeDefinition(recipeId);
         if (recipe)
         {
-            factory.m_Recipe = {};
-            factory.m_Recipe->m_Effort = recipe->GetEffort();
+            cpp_conv::components::FactoryComponent::Recipe componentRecipe;
+            componentRecipe.m_Effort = recipe->GetEffort();
             for(auto& input : recipe->GetInputItems())
             {
-                factory.m_Recipe->m_InputItems.emplace_back(input.m_idItem, input.m_uiCount);
+                componentRecipe.m_InputItems.emplace_back(input.m_idItem, input.m_uiCount);
             }
 
             for(auto& output : recipe->GetOutputItems())
             {
-                factory.m_Recipe->m_OutputItems.emplace_back(output.m_idItem, output.m_uiCount);
+                componentRecipe.m_OutputItems.emplace_back(output.m_idItem, output.m_uiCount);
             }
+
+            factory.m_Recipe = componentRecipe;
+
         }
 
         return factory;

@@ -19,12 +19,16 @@ namespace atlas
 
 namespace cpp_conv::item_passing_utility
 {
+    bool entitySupportsInsertion(
+        const atlas::scene::EcsManager& ecs,
+        atlas::scene::EntityId targetEntity);
+
     bool tryInsertItem(
         atlas::scene::EcsManager& ecs,
         const EntityLookupGrid& grid,
         atlas::scene::EntityId sourceEntity,
         atlas::scene::EntityId targetEntity,
         ItemId itemId,
-        int sourceChannel,
-        Eigen::Vector2f startPosition);
+        std::optional<int> sourceChannel,
+        std::optional<Eigen::Vector2f> startPosition);
 }

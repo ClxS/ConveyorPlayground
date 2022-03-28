@@ -30,9 +30,9 @@ namespace cpp_conv
         [[nodiscard]] std::string GetDescription() const;
 
     private:
-        const uint32_t m_uiMaxCapacity;
-        const uint32_t m_uiMaxStackSize;
-        const bool m_bUniqueStacksOnly;
+        uint32_t m_uiMaxCapacity;
+        uint32_t m_uiMaxStackSize;
+        bool m_bUniqueStacksOnly;
 
         std::vector<ItemEntry> m_vItemEntries;
     };

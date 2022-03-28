@@ -191,6 +191,7 @@ void cpp_conv::ConveyorStateDeterminationSystem::Initialise(atlas::scene::EcsMan
 
         for (auto iLane = 0; iLane < conveyor.m_Channels.size(); iLane++)
         {
+            conveyor.m_Channels[iLane].m_ChannelLane = iLane;
             conveyor.m_Channels[iLane].m_LaneLength = 2;
             if (conveyor.m_bIsCorner)
             {

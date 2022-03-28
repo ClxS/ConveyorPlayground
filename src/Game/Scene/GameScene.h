@@ -11,6 +11,7 @@
 #include "FactoryComponent.h"
 #include "FactoryDefinition.h"
 #include "FactoryRegistry.h"
+#include "FactorySystem.h"
 #include "PositionComponent.h"
 #include "WorldEntityInformationComponent.h"
 #include "WorldMap.h"
@@ -45,7 +46,9 @@ namespace cpp_conv
             builder.RegisterSystem<SequenceProcessingSystem_Process, SequenceFormationSystem>(m_SceneData.m_LookupGrid);
             builder.RegisterSystem<SequenceProcessingSystem_Realize, SequenceProcessingSystem_Process>();
 
-            builder.RegisterSystem<SpriteLayerRenderSystem<1>, SequenceProcessingSystem_Realize>();
+            builder.RegisterSystem<FactorySystem, SequenceProcessingSystem_Realize>(m_SceneData.m_LookupGrid);
+
+            builder.RegisterSystem<SpriteLayerRenderSystem<1>, FactorySystem>();
             builder.RegisterSystem<SpriteLayerRenderSystem<2>, SpriteLayerRenderSystem<1>>();
             builder.RegisterSystem<SpriteLayerRenderSystem<3>, SpriteLayerRenderSystem<2>>();
         }
