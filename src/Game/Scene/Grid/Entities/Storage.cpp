@@ -1,12 +1,12 @@
 #include "Storage.h"
-#include "ResourceManager.h"
-#include "Renderer.h"
-#include "TileAsset.h"
 #include "Profiler.h"
+#include "Renderer.h"
+#include "ResourceManager.h"
+#include "TileAsset.h"
 
 cpp_conv::Storage::Storage(Vector3 position, Vector3 size, uint32_t uiMaxCapacity, uint32_t uiMaxStackSize)
     : Entity(position, size, EntityKind::Storage)
-    , m_itemContainer(uiMaxCapacity, uiMaxStackSize, false)
+      , m_itemContainer(uiMaxCapacity, uiMaxStackSize, false)
 {
 }
 
@@ -17,7 +17,8 @@ void cpp_conv::Storage::Tick(const SceneContext& kContext)
 
 void cpp_conv::Storage::Draw(RenderContext& kRenderContext) const
 {
-    const auto pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::assets::c_Storage);
+    const auto pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(
+        resources::registry::assets::c_Storage);
     if (!pTile)
     {
         return;
@@ -27,14 +28,15 @@ void cpp_conv::Storage::Draw(RenderContext& kRenderContext) const
         kRenderContext,
         pTile.get(),
         {
-            (float)m_position.GetX() * renderer::c_gridScale,
-            (float)m_position.GetY() * renderer::c_gridScale,
+            static_cast<float>(m_position.GetX()) * renderer::c_gridScale,
+            static_cast<float>(m_position.GetY()) * renderer::c_gridScale,
             Rotation::DegZero
         },
-        { 0xFFFFFF00 });
+        {0xFFFFFF00});
 }
 
-bool cpp_conv::Storage::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, const InsertInfo insertInfo)
+bool cpp_conv::Storage::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity,
+                                  const InsertInfo insertInfo)
 {
     return m_itemContainer.TryInsert(insertInfo.GetItem());
 }

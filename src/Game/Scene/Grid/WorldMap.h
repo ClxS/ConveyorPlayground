@@ -8,7 +8,9 @@
 #include "Entity.h"
 
 namespace cpp_conv::resources
-{ class Map; }
+{
+    class Map;
+}
 
 namespace cpp_conv
 {
@@ -64,10 +66,10 @@ namespace cpp_conv
 
         bool PlaceEntity(Vector3 position, Entity* pEntity);
 
-        template<typename T>
+        template <typename T>
         const T* GetEntity(Vector3 position, EntityKind kind) const;
 
-        template<typename T>
+        template <typename T>
         T* GetEntity(Vector3 position, EntityKind kind);
 
         void Consume(const resources::AssetPtr<resources::Map>& map);
@@ -85,7 +87,7 @@ namespace cpp_conv
         Cell* GetOrCreateCell(CellCoordinate coord);
         bool ValidateCanPlaceEntity(Vector3 position, Entity* pEntity) const;
 
-         bool m_bSuppressAssess = false;
+        bool m_bSuppressAssess = false;
 
         WorldMapStore m_WorldMap;
         std::vector<Conveyor*> m_vConveyors;
@@ -93,7 +95,7 @@ namespace cpp_conv
         std::vector<Entity*> m_vOtherEntities;
     };
 
-    template<typename T>
+    template <typename T>
     const T* WorldMap::GetEntity(Vector3 position, EntityKind kind) const
     {
         auto pEntity = GetEntity(position);
@@ -105,7 +107,7 @@ namespace cpp_conv
         return static_cast<const T*>(pEntity);
     }
 
-    template<typename T>
+    template <typename T>
     T* WorldMap::GetEntity(Vector3 position, EntityKind kind)
     {
         return const_cast<T*>(const_cast<const WorldMap*>(this)->GetEntity<T>(position, kind));

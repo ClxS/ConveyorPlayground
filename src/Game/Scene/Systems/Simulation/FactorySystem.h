@@ -17,6 +17,5 @@ namespace cpp_conv
 
     private:
         EntityLookupGrid& m_LookupGrid;
-
     };
 }

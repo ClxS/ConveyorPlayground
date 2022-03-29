@@ -2,12 +2,12 @@
 
 cpp_conv::renderer::SwapChain::SwapChain(RenderContext& kRenderContext, uint32_t uiWidth, uint32_t uiHeight)
     : m_uiCurrentBuffer(0)
-    , m_writeSurface(kRenderContext, uiWidth, uiHeight, true)
-    , m_colourBuffers
-    {
-        { ScreenBuffer(m_writeSurface) },
-        { ScreenBuffer(m_writeSurface) }
-    }
+      , m_writeSurface(kRenderContext, uiWidth, uiHeight, true)
+      , m_colourBuffers
+      {
+          {ScreenBuffer(m_writeSurface)},
+          {ScreenBuffer(m_writeSurface)}
+      }
 {
 }
 

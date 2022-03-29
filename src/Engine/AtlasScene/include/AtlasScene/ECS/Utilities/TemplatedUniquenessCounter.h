@@ -4,7 +4,7 @@
 
 namespace atlas::scene::utils
 {
-    template<typename TContext>
+    template <typename TContext>
     class ContextBasedIncrementer
     {
     public:
@@ -18,7 +18,7 @@ namespace atlas::scene::utils
         inline static int32_t ms_CurrentCount = 0;
     };
 
-    template<typename TComponent, typename TContext>
+    template <typename TComponent, typename TContext>
     class TemplatedUniquenessCounter
     {
     public:
@@ -41,4 +41,3 @@ namespace atlas::scene::utils
         inline static int32_t ms_Index = -1;
     };
 }
-

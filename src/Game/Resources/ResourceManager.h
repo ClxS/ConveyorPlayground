@@ -22,13 +22,13 @@ namespace cpp_conv::resources::resource_manager
     AssetPtr<ResourceAsset> loadAssetUncached(const std::type_info& type, registry::RegistryId kAssetId);
     AssetPtr<ResourceAsset> loadAsset(const std::type_info& type, registry::RegistryId kAssetId);
 
-    template<typename TType>
+    template <typename TType>
     void registerTypeHandler(std::function<ResourceAsset*(FileData& rData)> fHandler)
     {
         registerTypeHandler(typeid(TType), fHandler);
     }
 
-    template<typename TType>
+    template <typename TType>
     AssetPtr<TType> loadAsset(registry::RegistryId kAssetId)
     {
         const auto pAsset = loadAsset(typeid(TType), kAssetId);
@@ -40,7 +40,7 @@ namespace cpp_conv::resources::resource_manager
         return std::reinterpret_pointer_cast<TType>(pAsset);
     }
 
-    template<typename TType>
+    template <typename TType>
     AssetPtr<TType> loadAssetUncached(registry::RegistryId kAssetId)
     {
         const auto pAsset = loadAssetUncached(typeid(TType), kAssetId);

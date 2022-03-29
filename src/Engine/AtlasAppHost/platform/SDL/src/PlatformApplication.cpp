@@ -18,7 +18,8 @@ bool atlas::app_host::platform::PlatformApplication::Initialise()
 
 #if WINDOWED
     windowFlags = 0;
-    m_Sdl.m_Window = SDL_CreateWindow("Cpp Conveyor", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1200, 800, windowFlags);
+    m_Sdl.m_Window = SDL_CreateWindow("Cpp Conveyor", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1200, 800,
+                                      windowFlags);
 #else
     windowFlags = 0;
     m_Sdl.m_Window = SDL_CreateWindow("Cpp Conveyor", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 2560, 1080, windowFlags);

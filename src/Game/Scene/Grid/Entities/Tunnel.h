@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Entity.h"
 #include "Conveyor.h"
+#include "Entity.h"
 #include "EntityGrid.h"
 
 namespace cpp_conv

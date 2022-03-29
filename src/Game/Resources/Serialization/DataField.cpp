@@ -12,7 +12,8 @@ bool cpp_conv::TypedDataReader<bool>::Read(const toml::Table* value, const char*
     return true;
 }
 
-bool cpp_conv::TypedDataReader<int32_t>::Read(const toml::Table* value, const char* szPropertyName, int32_t& pTargetVariable)
+bool cpp_conv::TypedDataReader<int32_t>::Read(const toml::Table* value, const char* szPropertyName,
+                                              int32_t& pTargetVariable)
 {
     auto [bOk, iValue] = value->getInt(szPropertyName);
     if (!bOk)
@@ -24,7 +25,8 @@ bool cpp_conv::TypedDataReader<int32_t>::Read(const toml::Table* value, const ch
     return true;
 }
 
-bool cpp_conv::TypedDataReader<int64_t>::Read(const toml::Table* value, const char* szPropertyName, int64_t& pTargetVariable)
+bool cpp_conv::TypedDataReader<int64_t>::Read(const toml::Table* value, const char* szPropertyName,
+                                              int64_t& pTargetVariable)
 {
     auto [bOk, iValue] = value->getInt(szPropertyName);
     if (!bOk)
@@ -32,11 +34,12 @@ bool cpp_conv::TypedDataReader<int64_t>::Read(const toml::Table* value, const ch
         return false;
     }
 
-    pTargetVariable = static_cast<int64_t>(iValue);
+    pTargetVariable = iValue;
     return true;
 }
 
-bool cpp_conv::TypedDataReader<uint32_t>::Read(const toml::Table* value, const char* szPropertyName, uint32_t& pTargetVariable)
+bool cpp_conv::TypedDataReader<uint32_t>::Read(const toml::Table* value, const char* szPropertyName,
+                                               uint32_t& pTargetVariable)
 {
     auto [bOk, iValue] = value->getInt(szPropertyName);
     if (!bOk)
@@ -48,7 +51,8 @@ bool cpp_conv::TypedDataReader<uint32_t>::Read(const toml::Table* value, const c
     return true;
 }
 
-bool cpp_conv::TypedDataReader<uint64_t>::Read(const toml::Table* value, const char* szPropertyName, uint64_t& pTargetVariable)
+bool cpp_conv::TypedDataReader<uint64_t>::Read(const toml::Table* value, const char* szPropertyName,
+                                               uint64_t& pTargetVariable)
 {
     auto [bOk, iValue] = value->getInt(szPropertyName);
     if (!bOk)
@@ -60,7 +64,8 @@ bool cpp_conv::TypedDataReader<uint64_t>::Read(const toml::Table* value, const c
     return true;
 }
 
-bool cpp_conv::TypedDataReader<float>::Read(const toml::Table* value, const char* szPropertyName, float& pTargetVariable)
+bool cpp_conv::TypedDataReader<float>::Read(const toml::Table* value, const char* szPropertyName,
+                                            float& pTargetVariable)
 {
     auto [bOk, fValue] = value->getDouble(szPropertyName);
     if (!bOk)
@@ -72,7 +77,8 @@ bool cpp_conv::TypedDataReader<float>::Read(const toml::Table* value, const char
     return true;
 }
 
-bool cpp_conv::TypedDataReader<std::string>::Read(const toml::Table* value, const char* szPropertyName, std::string& pTargetVariable)
+bool cpp_conv::TypedDataReader<std::string>::Read(const toml::Table* value, const char* szPropertyName,
+                                                  std::string& pTargetVariable)
 {
     auto [bOk, strValue] = value->getString(szPropertyName);
     if (!bOk)
@@ -84,7 +90,8 @@ bool cpp_conv::TypedDataReader<std::string>::Read(const toml::Table* value, cons
     return true;
 }
 
-bool cpp_conv::TypedDataReader<Vector3>::Read(const toml::Table* value, const char* szPropertyName, Vector3& pTargetVariable)
+bool cpp_conv::TypedDataReader<Vector3>::Read(const toml::Table* value, const char* szPropertyName,
+                                              Vector3& pTargetVariable)
 {
     const auto vectorTable = value->getTable(szPropertyName);
     if (!vectorTable)
@@ -104,7 +111,8 @@ bool cpp_conv::TypedDataReader<Vector3>::Read(const toml::Table* value, const ch
     return true;
 }
 
-bool cpp_conv::TypedDataReader<cpp_conv::resources::registry::RegistryId>::Read(const toml::Table* value, const char* szPropertyName, resources::registry::RegistryId& pTargetVariable)
+bool cpp_conv::TypedDataReader<cpp_conv::resources::registry::RegistryId>::Read(
+    const toml::Table* value, const char* szPropertyName, resources::registry::RegistryId& pTargetVariable)
 {
     auto [bOk, strValue] = value->getString(szPropertyName);
     if (!bOk)

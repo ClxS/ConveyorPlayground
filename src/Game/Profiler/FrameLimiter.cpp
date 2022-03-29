@@ -11,9 +11,9 @@
 
 cpp_conv::FrameLimiter::FrameLimiter(const int targetFrameRate)
     : m_startTime({})
-    , m_targetFrameRate(1000000 / targetFrameRate)
-    , m_logDuration(std::chrono::seconds(5))
-    , m_uiFrameCounter(0)
+      , m_targetFrameRate(1000000 / targetFrameRate)
+      , m_logDuration(std::chrono::seconds(5))
+      , m_uiFrameCounter(0)
 {
 }
 
@@ -32,10 +32,13 @@ void cpp_conv::FrameLimiter::Limit()
 void cpp_conv::FrameLimiter::EndFrame()
 {
     m_uiFrameCounter++;
-    if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - m_startTime) >= m_logDuration)
+    if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - m_startTime) >=
+        m_logDuration)
     {
 #if _WIN32
-        OutputDebugStringA(std::format("\n\nFPS: {}", string_util::to_string_with_precision(m_uiFrameCounter / static_cast<double>(m_logDuration.count()), 0)).c_str());
+        OutputDebugStringA(std::format("\n\nFPS: {}",
+                                       string_util::to_string_with_precision(
+                                           m_uiFrameCounter / static_cast<double>(m_logDuration.count()), 0)).c_str());
 #endif
         profiler::logAndReset(static_cast<int>(m_uiFrameCounter));
 

@@ -11,16 +11,28 @@ namespace atlas::scene
     {
     public:
         virtual ~SceneBase() = default;
-        virtual void OnEntered(SceneManager& sceneManager) {}
-        virtual void OnUpdate(SceneManager& sceneManager) {}
-        virtual void OnRender(SceneManager& sceneManager) {}
-        virtual void OnExited(SceneManager& sceneManager) {}
+
+        virtual void OnEntered(SceneManager& sceneManager)
+        {
+        }
+
+        virtual void OnUpdate(SceneManager& sceneManager)
+        {
+        }
+
+        virtual void OnRender(SceneManager& sceneManager)
+        {
+        }
+
+        virtual void OnExited(SceneManager& sceneManager)
+        {
+        }
     };
 
     class EcsScene : public SceneBase
     {
     protected:
-        virtual ~EcsScene() override = default;
+        ~EcsScene() override = default;
 
         void OnEntered(SceneManager& sceneManager) override
         {

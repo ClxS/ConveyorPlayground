@@ -13,7 +13,8 @@
 #define USE_VALIDATION_CHECKS
 #endif
 
-const cpp_conv::components::SequenceComponent::RealizedState& getFreshRealizedStateForTick(cpp_conv::components::SequenceComponent& component, const uint8_t uiLane)
+const cpp_conv::components::SequenceComponent::RealizedState& getFreshRealizedStateForTick(
+    cpp_conv::components::SequenceComponent& component, const uint8_t uiLane)
 {
     cpp_conv::components::SequenceComponent::RealizedState& realizedState = component.m_RealizedStates[uiLane];
     realizedState.m_RealizedMovements = 0;
@@ -21,7 +22,8 @@ const cpp_conv::components::SequenceComponent::RealizedState& getFreshRealizedSt
     return realizedState;
 }
 
-Eigen::Vector2f getSlotPosition(const cpp_conv::components::SequenceComponent& component, const uint8_t uiSequenceIndex, const int lane, const int slot)
+Eigen::Vector2f getSlotPosition(const cpp_conv::components::SequenceComponent& component, const uint8_t uiSequenceIndex,
+                                const int lane, const int slot)
 {
     const Eigen::Vector2f visual = component.m_LaneVisualOffsets[lane];
     return visual + component.m_UnitDirection * (uiSequenceIndex * 2.0f + slot);
@@ -42,27 +44,31 @@ bool moveItemToForwardsNode(
 
     const Eigen::Vector2f startPosition = getSlotPosition(component, component.m_Length - 1, lane, 1);
 
-    if (!ecs.DoesEntityHaveComponents<cpp_conv::components::PositionComponent, cpp_conv::components::DirectionComponent>(component.m_HeadConveyor))
+    if (!ecs.DoesEntityHaveComponents<cpp_conv::components::PositionComponent,
+                                      cpp_conv::components::DirectionComponent>(component.m_HeadConveyor))
     {
         return false;
     }
 
-    const auto& [position, direction] = ecs.GetComponents<cpp_conv::components::PositionComponent, cpp_conv::components::DirectionComponent>(component.m_HeadConveyor);
+    const auto& [position, direction] = ecs.GetComponents<
+        cpp_conv::components::PositionComponent, cpp_conv::components::DirectionComponent>(component.m_HeadConveyor);
 
-    const auto forwardEntity = grid.GetEntity(cpp_conv::grid::getForwardPosition(position.m_Position, direction.m_Direction));
+    const auto forwardEntity = grid.GetEntity(
+        cpp_conv::grid::getForwardPosition(position.m_Position, direction.m_Direction));
     if (forwardEntity.IsInvalid())
     {
         return false;
     }
 
-    return cpp_conv::item_passing_utility::tryInsertItem(ecs, grid, currentEntity, forwardEntity, item.m_Item, lane, startPosition);
+    return cpp_conv::item_passing_utility::tryInsertItem(ecs, grid, currentEntity, forwardEntity, item.m_Item, lane,
+                                                         startPosition);
 }
 
 void cpp_conv::SequenceProcessingSystem_Process::Update(atlas::scene::EcsManager& ecs)
 {
     using components::SequenceComponent;
 
-    for(const auto entity : ecs.GetEntitiesWithComponents<SequenceComponent>())
+    for (const auto entity : ecs.GetEntitiesWithComponents<SequenceComponent>())
     {
         auto& sequence = ecs.GetComponent<SequenceComponent>(entity);
 
@@ -149,10 +155,12 @@ void cpp_conv::SequenceProcessingSystem_Process::Update(atlas::scene::EcsManager
                     //
                     {
                         // We can't move anything else until the following 0 bit
-                        const uint64_t uiConsecutiveCollisions = std::countr_one(uiMoveCandidates >> (uiCollisionBit + 1));
+                        const uint64_t uiConsecutiveCollisions = std::countr_one(
+                            uiMoveCandidates >> (uiCollisionBit + 1));
                         const uint64_t uiClearRange = (1ULL << uiConsecutiveCollisions) - 1;
 
-                        uiMoveCandidates = (uiMoveCandidates >> (uiCollisionBit + 1) & ~uiClearRange) << (uiCollisionBit + 1);
+                        uiMoveCandidates = (uiMoveCandidates >> (uiCollisionBit + 1) & ~uiClearRange) << (uiCollisionBit
+                            + 1);
                     }
                 }
                 while (uiOverlaps != 0);
@@ -171,7 +179,7 @@ void cpp_conv::SequenceProcessingSystem_Realize::Update(atlas::scene::EcsManager
 {
     using components::SequenceComponent;
 
-    for(const auto entity : ecs.GetEntitiesWithComponents<SequenceComponent>())
+    for (const auto entity : ecs.GetEntitiesWithComponents<SequenceComponent>())
     {
         auto& sequence = ecs.GetComponent<SequenceComponent>(entity);
 
@@ -183,7 +191,7 @@ void cpp_conv::SequenceProcessingSystem_Realize::Update(atlas::scene::EcsManager
             if (pendingState.m_PendingRemovals != 0)
             {
                 uint64_t mutableRealizedLane = realizedState.m_Lanes;
-                while(pendingState.m_PendingRemovals != 0)
+                while (pendingState.m_PendingRemovals != 0)
                 {
                     const uint64_t uiClearIndex = 1ULL << std::countr_zero(pendingState.m_PendingRemovals);
                     const uint64_t uiEarlierItemsMask = uiClearIndex - 1;

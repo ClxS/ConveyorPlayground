@@ -1,12 +1,12 @@
 #pragma once
 
 #include <string>
-#include "ResourceAsset.h"
-#include "TileAsset.h"
-#include "DataId.h"
 #include "AssetPtr.h"
 #include "AssetRegistry.h"
+#include "DataId.h"
+#include "ResourceAsset.h"
 #include "Serializable.h"
+#include "TileAsset.h"
 #include "TileAsset.h"
 #include "TomlSerializer.h"
 
@@ -14,7 +14,7 @@ namespace cpp_conv
 {
     class InserterDefinition : public Serializable<InserterDefinition, TomlSerializer, resources::ResourceAsset>
     {
-        inline static TomlSerializer::Config ms_ConveyorConfig = { "inserter" };
+        inline static TomlSerializer::Config ms_ConveyorConfig = {"inserter"};
     public:
         InserterDefinition()
             : Serializable(

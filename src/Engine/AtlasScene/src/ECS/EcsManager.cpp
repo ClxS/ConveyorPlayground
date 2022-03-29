@@ -8,9 +8,9 @@ atlas::scene::EcsManager::EcsManager()
 
 atlas::scene::EcsManager::~EcsManager()
 {
-    for(auto& [_1, _2, components] : m_ArchetypePools)
+    for (auto& [_1, _2, components] : m_ArchetypePools)
     {
-        for(auto [_, pool] : components)
+        for (auto [_, pool] : components)
         {
             delete pool;
         }
@@ -23,7 +23,7 @@ atlas::scene::EcsManager::~EcsManager()
 
 atlas::scene::EntityId atlas::scene::EcsManager::AddEntity()
 {
-    const EntityId id { m_EntityIndices.Size() };
+    const EntityId id{m_EntityIndices.Size()};
     ArchetypeIndex archetypeIndex = ArchetypeIndex::Empty();
     auto& [_1, pool, _2] = GetPool(archetypeIndex);
 
@@ -45,7 +45,7 @@ void atlas::scene::EcsManager::RemoveEntity(const EntityId entity)
             m_EntityIndices.Remove(entity.m_Value);
             m_EntityIndices.Set(endEntityId.m_Value, removedIndex);
             entityPool.SwapAndPop(removedIndex.m_EntityIndex);
-            for(const auto& [poolMask, pool] : components)
+            for (const auto& [poolMask, pool] : components)
             {
                 pool->SwapAndPop(removedIndex.m_EntityIndex);
             }
@@ -54,7 +54,7 @@ void atlas::scene::EcsManager::RemoveEntity(const EntityId entity)
         {
             m_EntityIndices.Remove(entity.m_Value);
             entityPool.Pop();
-            for(const auto& [_, pool] : components)
+            for (const auto& [_, pool] : components)
             {
                 pool->Pop();
             }
@@ -64,7 +64,7 @@ void atlas::scene::EcsManager::RemoveEntity(const EntityId entity)
     {
         m_EntityIndices.Remove(entity.m_Value);
         entityPool.Pop();
-        for(const auto& [_, pool] : components)
+        for (const auto& [_, pool] : components)
         {
             pool->Pop();
         }
@@ -73,7 +73,7 @@ void atlas::scene::EcsManager::RemoveEntity(const EntityId entity)
 
 atlas::scene::ArchetypeIndex atlas::scene::EcsManager::GetOrCreateArchetype(uint64_t archetypeMask)
 {
-    for(int i = 0; i < m_ArchetypePools.size(); ++i)
+    for (int i = 0; i < m_ArchetypePools.size(); ++i)
     {
         if (m_ArchetypePools[i].m_ArchetypeComponentMask == archetypeMask)
         {
@@ -84,9 +84,9 @@ atlas::scene::ArchetypeIndex atlas::scene::EcsManager::GetOrCreateArchetype(uint
     m_ArchetypePools.emplace_back(archetypeMask);
     auto& [mask, entityPool, componentPools] = m_ArchetypePools.back();
 
-    while(archetypeMask > 0)
+    while (archetypeMask > 0)
     {
-        const uint64_t componentMask = (1ULL <<  std::countr_zero(archetypeMask));
+        const uint64_t componentMask = (1ULL << std::countr_zero(archetypeMask));
         archetypeMask &= ~componentMask;
 
         componentPools.emplace_back(componentMask, ComponentRegistry::GetFactoryForPoolWithMask(componentMask)());

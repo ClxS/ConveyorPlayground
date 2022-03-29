@@ -13,7 +13,7 @@ namespace atlas::scene
         {
         }
 
-        static ArchetypeIndex Empty() { return ArchetypeIndex{ 0 }; }
+        static ArchetypeIndex Empty() { return ArchetypeIndex{0}; }
 
         bool operator==(const ArchetypeIndex other) const
         {

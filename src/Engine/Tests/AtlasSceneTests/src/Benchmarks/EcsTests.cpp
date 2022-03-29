@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include "AtlasScene/ECS/Components/EcsManager.h"
 #include "TestComponents.h"
+#include "AtlasScene/ECS/Components/EcsManager.h"
 
 TEST(AtlasScene, EcsAddEntity)
 {
@@ -15,21 +15,21 @@ TEST(AtlasScene, EcsAddEntity)
     ecsManager.AddComponent<SizeComponent>(e1, SizeComponent{78});
 
     int foundCount = 0;
-    for(atlas::scene::EntityId entity : ecsManager.GetEntitiesWithComponents<TransformComponent, SizeComponent>())
+    for (atlas::scene::EntityId entity : ecsManager.GetEntitiesWithComponents<TransformComponent, SizeComponent>())
     {
         foundCount++;
     }
     ASSERT_EQ(foundCount, 1);
 
     foundCount = 0;
-    for(atlas::scene::EntityId entity : ecsManager.GetEntitiesWithComponents<TransformComponent>())
+    for (atlas::scene::EntityId entity : ecsManager.GetEntitiesWithComponents<TransformComponent>())
     {
         foundCount++;
     }
     ASSERT_EQ(foundCount, 1);
 
     foundCount = 0;
-    for(atlas::scene::EntityId entity : ecsManager.GetEntitiesWithComponents<TransformComponent, TestComponent>())
+    for (atlas::scene::EntityId entity : ecsManager.GetEntitiesWithComponents<TransformComponent, TestComponent>())
     {
         foundCount++;
     }
@@ -79,10 +79,11 @@ TEST(AtlasScene, DelegateGetEntites)
     ecsManager.AddComponent<TransformComponent>(e4, 0);
 
     int count = 0;
-    ecsManager.ForEachComponents<TransformComponent>([&](atlas::scene::EntityId entity, const TransformComponent& transforms)
-    {
-        count++;
-    });
+    ecsManager.ForEachComponents<TransformComponent>(
+        [&](atlas::scene::EntityId entity, const TransformComponent& transforms)
+        {
+            count++;
+        });
 
     ASSERT_EQ(count, 4);
 }

@@ -2,34 +2,34 @@
 #include "Conveyor.h"
 #include "SceneContext.h"
 
-#include "Renderer.h"
 #include "RenderContext.h"
+#include "Renderer.h"
 
 #include <array>
 #include <random>
+#include <vector>
+#include "AssetPtr.h"
+#include "DataId.h"
+#include "Direction.h"
+#include "FactoryDefinition.h"
+#include "FactoryRegistry.h"
+#include "GeneralItemContainer.h"
+#include "Profiler.h"
+#include "RecipeDefinition.h"
+#include "RecipeRegistry.h"
 #include "ResourceManager.h"
 #include "TileAsset.h"
-#include "DataId.h"
-#include "AssetPtr.h"
-#include "FactoryRegistry.h"
-#include "FactoryDefinition.h"
-#include "RecipeRegistry.h"
-#include "RecipeDefinition.h"
-#include <vector>
-#include "Profiler.h"
-#include "GeneralItemContainer.h"
-#include "Direction.h"
 
 cpp_conv::Factory::Factory(Vector3 position, Direction direction, FactoryId factoryId, uint32_t uiMaxStackSize)
-    : Entity(position, { 1, 1, 1 }, EntityKind::Producer)
-    , m_hFactoryId(factoryId)
-    , m_hActiveRecipeId(RecipeIds::None)
-    , m_direction(direction)
-    , m_uiRemainingCurrentProductionEffort(0)
-    , m_bIsRecipeDemandSatisfied(false)
-    , m_inputItems(8, uiMaxStackSize, true)
-    , m_outputItems(8, uiMaxStackSize, true)
-    , m_uiTick(0)
+    : Entity(position, {1, 1, 1}, EntityKind::Producer)
+      , m_inputItems(8, uiMaxStackSize, true)
+      , m_outputItems(8, uiMaxStackSize, true)
+      , m_hFactoryId(factoryId)
+      , m_hActiveRecipeId(RecipeIds::None)
+      , m_direction(direction)
+      , m_uiRemainingCurrentProductionEffort(0)
+      , m_uiTick(0)
+      , m_bIsRecipeDemandSatisfied(false)
 {
     const resources::AssetPtr<FactoryDefinition> pFactory = resources::getFactoryDefinition(factoryId);
     if (!pFactory)
@@ -109,11 +109,11 @@ void cpp_conv::Factory::Draw(RenderContext& kRenderContext) const
         kRenderContext,
         pTile.get(),
         {
-            (float)m_position.GetX() * renderer::c_gridScale,
-            (float)m_position.GetY() * renderer::c_gridScale,
+            static_cast<float>(m_position.GetX()) * renderer::c_gridScale,
+            static_cast<float>(m_position.GetY()) * renderer::c_gridScale,
             rotationFromDirection(m_direction)
         },
-        { 0xFFFFFF00 });
+        {0xFFFFFF00});
 }
 
 bool cpp_conv::Factory::TryGrab(const SceneContext& kContext, bool bSingle, std::tuple<ItemId, uint32_t>& outItem)
@@ -132,7 +132,8 @@ std::string cpp_conv::Factory::GetDescription() const
     return std::format("Producing {}", pRecipe->GetName());
 }
 
-bool cpp_conv::Factory::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, const InsertInfo insertInfo)
+bool cpp_conv::Factory::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity,
+                                  const InsertInfo insertInfo)
 {
     if (pSourceEntity.m_eEntityKind != EntityKind::Inserter)
     {
@@ -203,7 +204,10 @@ void cpp_conv::Factory::RunOutputCycle(const SceneContext& kContext, const Facto
         return;
     }
 
-    Vector3 pipe = { pFactory->GetOutputPipe().GetXY().Rotate(rotationFromDirection(m_direction), m_size.GetXY()), pFactory->GetOutputPipe().GetZ() };
+    Vector3 pipe = {
+        pFactory->GetOutputPipe().GetXY().Rotate(rotationFromDirection(m_direction), m_size.GetXY()),
+        pFactory->GetOutputPipe().GetZ()
+    };
     pipe += m_position;
 
     Entity* pEntity = kContext.m_rMap.GetEntity(grid::getForwardPosition(pipe, m_direction));
@@ -214,7 +218,7 @@ void cpp_conv::Factory::RunOutputCycle(const SceneContext& kContext, const Facto
 
     auto& vContainerItems = m_outputItems.GetItems();
     auto itItems = vContainerItems.begin();
-    while(itItems != vContainerItems.end())
+    while (itItems != vContainerItems.end())
     {
         for (uint32_t i = 0; i < itItems->m_pCount; ++i)
         {

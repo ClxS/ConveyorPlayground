@@ -3,8 +3,8 @@
 
 #include "ConveyorComponent.h"
 #include "ConveyorHelper.h"
-#include "FactoryComponent.h"
 #include "DirectionComponent.h"
+#include "FactoryComponent.h"
 #include "PositionComponent.h"
 #include "WorldEntityInformationComponent.h"
 
@@ -26,8 +26,10 @@ namespace
             return nullptr;
         }
 
-        const auto& [sourceInfo, sourceDirection] = ecs.GetComponents<WorldEntityInformationComponent, DirectionComponent>(sourceEntity);
-        const auto& [targetPosition, targetDirection] = ecs.GetComponents<PositionComponent, DirectionComponent>(targetEntity);
+        const auto& [sourceInfo, sourceDirection] = ecs.GetComponents<
+            WorldEntityInformationComponent, DirectionComponent>(sourceEntity);
+        const auto& [targetPosition, targetDirection] = ecs.GetComponents<PositionComponent, DirectionComponent>(
+            targetEntity);
 
         const int mask = static_cast<int>(sourceDirection.m_Direction) | static_cast<int>(targetDirection.m_Direction);
         if (sourceInfo.m_EntityKind != EntityKind::Junction && (mask == 0b11 || (mask >> 2) == 0b11))
@@ -39,7 +41,8 @@ namespace
         if (targetNode.m_bIsCorner)
         {
             RelativeDirection direction;
-            if (findNextTailConveyor(ecs, grid, targetPosition.m_Position, targetDirection.m_Direction, direction) == sourceEntity)
+            if (findNextTailConveyor(ecs, grid, targetPosition.m_Position, targetDirection.m_Direction, direction) ==
+                sourceEntity)
             {
                 return &targetNode.m_Channels[sourceChannel.value_or(0)];
             }
@@ -56,10 +59,18 @@ namespace
 
         switch (sourceDirection.m_Direction)
         {
-        case Direction::Up: return targetDirection.m_Direction == Direction::Left ? &targetNode.m_Channels[1] : &targetNode.m_Channels[0];
-        case Direction::Down: return targetDirection.m_Direction == Direction::Left ? &targetNode.m_Channels[0] : &targetNode.m_Channels[1];
-        case Direction::Left: return targetDirection.m_Direction == Direction::Up ? &targetNode.m_Channels[0] : &targetNode.m_Channels[1];
-        case Direction::Right: return targetDirection.m_Direction == Direction::Up ? &targetNode.m_Channels[1] : &targetNode.m_Channels[0];
+        case Direction::Up: return targetDirection.m_Direction == Direction::Left
+                                       ? &targetNode.m_Channels[1]
+                                       : &targetNode.m_Channels[0];
+        case Direction::Down: return targetDirection.m_Direction == Direction::Left
+                                         ? &targetNode.m_Channels[0]
+                                         : &targetNode.m_Channels[1];
+        case Direction::Left: return targetDirection.m_Direction == Direction::Up
+                                         ? &targetNode.m_Channels[0]
+                                         : &targetNode.m_Channels[1];
+        case Direction::Right: return targetDirection.m_Direction == Direction::Up
+                                          ? &targetNode.m_Channels[1]
+                                          : &targetNode.m_Channels[0];
         }
 
         return nullptr;
@@ -76,8 +87,10 @@ namespace
         using namespace cpp_conv::conveyor_helper;
         using namespace cpp_conv::components;
 
-        const auto& [sourceInfo, sourceDirection] = ecs.GetComponents<WorldEntityInformationComponent, DirectionComponent>(sourceEntity);
-        const auto& [targetPosition, targetDirection] = ecs.GetComponents<PositionComponent, DirectionComponent>(targetEntity);
+        const auto& [sourceInfo, sourceDirection] = ecs.GetComponents<
+            WorldEntityInformationComponent, DirectionComponent>(sourceEntity);
+        const auto& [targetPosition, targetDirection] = ecs.GetComponents<PositionComponent, DirectionComponent>(
+            targetEntity);
 
         const Direction eSourceDirection = sourceDirection.m_Direction;
         if (eSourceDirection == targetDirection.m_Direction)
@@ -88,7 +101,8 @@ namespace
         int result = 0;
 
         RelativeDirection direction;
-        if (targetNode.m_bIsCorner && sourceEntity == findNextTailConveyor(ecs, grid, targetPosition.m_Position, targetDirection.m_Direction, direction))
+        if (targetNode.m_bIsCorner && sourceEntity == findNextTailConveyor(
+            ecs, grid, targetPosition.m_Position, targetDirection.m_Direction, direction))
         {
             return 0;
         }
@@ -96,10 +110,22 @@ namespace
         const int sourceChannelValue = sourceChannel.value_or(0);
         switch (eSourceDirection)
         {
-        case Direction::Up: result = targetDirection.m_Direction == Direction::Left ? sourceChannelValue : c_conveyorChannels - 1 - sourceChannelValue; break;
-        case Direction::Down: result = targetDirection.m_Direction == Direction::Left ? c_conveyorChannels - 1 - sourceChannelValue : sourceChannelValue; break;
-        case Direction::Left: result = targetDirection.m_Direction == Direction::Up ? c_conveyorChannels - 1 - sourceChannelValue : sourceChannelValue; break;
-        case Direction::Right: result = targetDirection.m_Direction == Direction::Up ? sourceChannelValue : c_conveyorChannels - 1 - sourceChannelValue; break;
+        case Direction::Up: result = targetDirection.m_Direction == Direction::Left
+                                         ? sourceChannelValue
+                                         : c_conveyorChannels - 1 - sourceChannelValue;
+            break;
+        case Direction::Down: result = targetDirection.m_Direction == Direction::Left
+                                           ? c_conveyorChannels - 1 - sourceChannelValue
+                                           : sourceChannelValue;
+            break;
+        case Direction::Left: result = targetDirection.m_Direction == Direction::Up
+                                           ? c_conveyorChannels - 1 - sourceChannelValue
+                                           : sourceChannelValue;
+            break;
+        case Direction::Right: result = targetDirection.m_Direction == Direction::Up
+                                            ? sourceChannelValue
+                                            : c_conveyorChannels - 1 - sourceChannelValue;
+            break;
         }
 
         if (targetNode.m_bIsCorner)
@@ -135,18 +161,19 @@ bool tryInsertItemConveyor(
         return false;
     }
 
-    const int forwardTargetItemSlot = getChannelTargetSlot(ecs, grid, sourceEntity, targetEntity, conveyor, sourceChannel);
+    const int forwardTargetItemSlot = getChannelTargetSlot(ecs, grid, sourceEntity, targetEntity, conveyor,
+                                                           sourceChannel);
     if (cpp_conv::conveyor_helper::hasItemInSlot(ecs, conveyor, pTargetChannel->m_ChannelLane, forwardTargetItemSlot))
     {
         return false;
     }
 
     cpp_conv::conveyor_helper::placeItemInSlot(ecs, conveyor, pTargetChannel->m_ChannelLane, forwardTargetItemSlot,
-    {
-            itemId,
-            sourceChannel,
-            sourcePosition
-        });
+                                               {
+                                                   itemId,
+                                                   sourceChannel,
+                                                   sourcePosition
+                                               });
     return true;
 }
 
@@ -173,7 +200,7 @@ bool cpp_conv::item_passing_utility::entitySupportsInsertion(
 
 bool cpp_conv::item_passing_utility::tryInsertItem(
     atlas::scene::EcsManager& ecs,
-    const cpp_conv::EntityLookupGrid& grid,
+    const EntityLookupGrid& grid,
     const atlas::scene::EntityId sourceEntity,
     const atlas::scene::EntityId targetEntity,
     const ItemId itemId,

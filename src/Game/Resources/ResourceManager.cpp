@@ -1,18 +1,18 @@
 #include "ResourceManager.h"
-#include "ResourceAsset.h"
 #include "Profiler.h"
+#include "ResourceAsset.h"
 
+#include "FactoryRegistry.h"
+#include "ItemRegistry.h"
 #include "MapLoadHandler.h"
 #include "TileLoadHandler.h"
-#include "ItemRegistry.h"
-#include "FactoryRegistry.h"
 
+#include <chrono>
+#include <filesystem>
+#include <fstream>
 #include <map>
 #include <memory>
 #include <mutex>
-#include <fstream>
-#include <chrono>
-#include <filesystem>
 
 using FileData = cpp_conv::resources::resource_manager::FileData;
 using RegistryId = cpp_conv::resources::registry::RegistryId;
@@ -26,7 +26,7 @@ struct LoadedAsset
 };
 
 using LoadedAssetContainer = std::map<RegistryId, LoadedAsset>;
-static std::map<TypeId, std::function<cpp_conv::resources::ResourceAsset* (FileData&)>*> g_typeHandlers;
+static std::map<TypeId, std::function<cpp_conv::resources::ResourceAsset*(FileData&)>*> g_typeHandlers;
 static std::map<TypeId, LoadedAssetContainer*> g_loadedTypes = {};
 static constexpr std::chrono::steady_clock::duration g_cacheInvalidationTime(std::chrono::seconds(10));
 
@@ -38,7 +38,7 @@ namespace
         return s_stateMutex;
     }
 
-    std::function<cpp_conv::resources::ResourceAsset* (FileData&)>* getTypeHandler(const std::type_info& type)
+    std::function<cpp_conv::resources::ResourceAsset*(FileData&)>* getTypeHandler(const std::type_info& type)
     {
         // No need to lock here, this is only called in the context of an existing lock
         const auto iter = g_typeHandlers.find(type.hash_code());
@@ -51,10 +51,11 @@ namespace
     }
 }
 
-void cpp_conv::resources::resource_manager::registerTypeHandler(const std::type_info& type, std::function<ResourceAsset*(FileData&)> fHandler)
+void cpp_conv::resources::resource_manager::registerTypeHandler(const std::type_info& type,
+                                                                std::function<ResourceAsset*(FileData&)> fHandler)
 {
     std::lock_guard<std::mutex> lock(getStateMutex());
-    g_typeHandlers[type.hash_code()] = new std::function<ResourceAsset* (FileData&)>(fHandler);
+    g_typeHandlers[type.hash_code()] = new std::function<ResourceAsset*(FileData&)>(fHandler);
     g_loadedTypes[type.hash_code()] = new LoadedAssetContainer();
 }
 
@@ -71,7 +72,7 @@ cpp_conv::resources::resource_manager::FileData getFileData(cpp_conv::resources:
     file.open(filePath, std::ios::binary | std::ios::ate);
     if (file.fail())
     {
-        return { RegistryId::Invalid(), nullptr, 0 };
+        return {RegistryId::Invalid(), nullptr, 0};
     }
 
     // ReSharper disable once CppRedundantCastExpression
@@ -82,16 +83,17 @@ cpp_conv::resources::resource_manager::FileData getFileData(cpp_conv::resources:
 
     if (uiLength == 0)
     {
-        return { RegistryId::Invalid(), nullptr, 0 };
+        return {RegistryId::Invalid(), nullptr, 0};
     }
 
-    uint8_t* pData = new uint8_t[uiLength];
+    auto pData = new uint8_t[uiLength];
     file.read(reinterpret_cast<char*>(pData), uiLength);
 
-    return { kAssetId, pData, uiLength };
+    return {kAssetId, pData, uiLength};
 }
 
-cpp_conv::resources::AssetPtr<cpp_conv::resources::ResourceAsset> cpp_conv::resources::resource_manager::loadAsset(const std::type_info& type,
+cpp_conv::resources::AssetPtr<cpp_conv::resources::ResourceAsset> cpp_conv::resources::resource_manager::loadAsset(
+    const std::type_info& type,
     registry::RegistryId kAssetId)
 {
     PROFILE_FUNC();
@@ -109,7 +111,7 @@ cpp_conv::resources::AssetPtr<cpp_conv::resources::ResourceAsset> cpp_conv::reso
         return existingAssetEntry->second.m_ptr;
     }
 
-    const std::function<ResourceAsset* (FileData&)>* fHandler = getTypeHandler(type);
+    const std::function<ResourceAsset*(FileData&)>* fHandler = getTypeHandler(type);
     if (!fHandler || !(*fHandler))
     {
         return nullptr;
@@ -131,13 +133,14 @@ cpp_conv::resources::AssetPtr<cpp_conv::resources::ResourceAsset> cpp_conv::reso
     }
 
     AssetPtr<ResourceAsset> pSharedAsset(pAsset);
-    (*loadedContainerIter->second)[kAssetId] = { pSharedAsset, std::chrono::steady_clock::now() };
+    (*loadedContainerIter->second)[kAssetId] = {pSharedAsset, std::chrono::steady_clock::now()};
     return pSharedAsset;
 }
 
-cpp_conv::resources::AssetPtr<cpp_conv::resources::ResourceAsset> cpp_conv::resources::resource_manager::loadAssetUncached(const std::type_info& type, registry::RegistryId kAssetId)
+cpp_conv::resources::AssetPtr<cpp_conv::resources::ResourceAsset>
+cpp_conv::resources::resource_manager::loadAssetUncached(const std::type_info& type, registry::RegistryId kAssetId)
 {
-    const std::function<ResourceAsset* (FileData&)>* fHandler = getTypeHandler(type);
+    const std::function<ResourceAsset*(FileData&)>* fHandler = getTypeHandler(type);
     if (!fHandler || !(*fHandler))
     {
         return nullptr;
@@ -172,7 +175,8 @@ void cpp_conv::resources::resource_manager::updatePersistenceStore()
         auto containerIterator = pTypeContainer.second->begin();
         while (containerIterator != pTypeContainer.second->end())
         {
-            if (containerIterator->second.m_ptr.use_count() == 1 && containerIterator->second.m_lastAccess - now > g_cacheInvalidationTime)
+            if (containerIterator->second.m_ptr.use_count() == 1 && containerIterator->second.m_lastAccess - now >
+                g_cacheInvalidationTime)
             {
                 containerIterator = pTypeContainer.second->erase(containerIterator);
             }

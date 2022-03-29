@@ -11,12 +11,12 @@ namespace
         A(
             std::function<void()> aInit,
             std::function<void()> aUpdate)
-                : m_AInit{std::move(aInit)}
-                , m_AUpdate{std::move(aUpdate)}
+            : m_AInit{std::move(aInit)}
+              , m_AUpdate{std::move(aUpdate)}
         {
         }
 
-        void Initialise(atlas::scene::EcsManager&)
+        void Initialise(atlas::scene::EcsManager&) override
         {
             m_AInit();
         }
@@ -35,12 +35,12 @@ namespace
         B(
             std::function<void()> bInit,
             std::function<void()> bUpdate)
-                : m_BInit{std::move(bInit)}
-                , m_BUpdate{std::move(bUpdate)}
+            : m_BInit{std::move(bInit)}
+              , m_BUpdate{std::move(bUpdate)}
         {
         }
 
-        void Initialise(atlas::scene::EcsManager&)
+        void Initialise(atlas::scene::EcsManager&) override
         {
             m_BInit();
         }
@@ -61,10 +61,10 @@ namespace
             std::function<void()> aUpdate,
             std::function<void()> bInit,
             std::function<void()> bUpdate)
-                : m_AInit{std::move(aInit)}
-                , m_AUpdate{std::move(aUpdate)}
-                , m_BInit{std::move(bInit)}
-                , m_BUpdate{std::move(bUpdate)}
+            : m_AInit{std::move(aInit)}
+              , m_AUpdate{std::move(aUpdate)}
+              , m_BInit{std::move(bInit)}
+              , m_BUpdate{std::move(bUpdate)}
         {
         }
 
@@ -79,9 +79,11 @@ namespace
         std::function<void()> m_BInit;
         std::function<void()> m_BUpdate;
     };
+
     class TestScene2 final : public atlas::scene::SceneBase
     {
     };
+
     class InterstitialScene final : public atlas::scene::SceneBase
     {
     public:
@@ -104,21 +106,21 @@ TEST(AtlasScene, SceneSystemsTest)
 
     SceneManager sceneManager;
     sceneManager.TransitionTo<TestScene>([&]()
-    {
-        aInitCount++;
-    },
-    [&]()
-    {
-        aUpdateCount++;
-    },
-    [&]()
-    {
-        bInitCount++;
-    },
-    [&]()
-    {
-        bUpdateCount++;
-    });
+                                         {
+                                             aInitCount++;
+                                         },
+                                         [&]()
+                                         {
+                                             aUpdateCount++;
+                                         },
+                                         [&]()
+                                         {
+                                             bInitCount++;
+                                         },
+                                         [&]()
+                                         {
+                                             bUpdateCount++;
+                                         });
     sceneManager.Update();
     sceneManager.Update();
     sceneManager.Update();

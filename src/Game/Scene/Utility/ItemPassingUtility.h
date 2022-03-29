@@ -9,12 +9,9 @@ namespace cpp_conv
     class EntityLookupGrid;
 }
 
-namespace atlas
+namespace atlas::scene
 {
-    namespace scene
-    {
-        class EcsManager;
-    }
+    class EcsManager;
 }
 
 namespace cpp_conv::item_passing_utility

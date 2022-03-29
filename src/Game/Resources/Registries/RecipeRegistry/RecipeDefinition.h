@@ -1,13 +1,13 @@
 #pragma once
 
+#include "AssetPtr.h"
+#include "DataId.h"
 #include "ResourceAsset.h"
 #include "TileAsset.h"
-#include "DataId.h"
-#include "AssetPtr.h"
 #include "TileAsset.h"
 
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "AssetRegistry.h"
 #include "Serializable.h"
@@ -17,7 +17,7 @@ namespace cpp_conv
 {
     class RecipeDefinition : public Serializable<RecipeDefinition, TomlSerializer, resources::ResourceAsset>
     {
-        inline static TomlSerializer::Config ms_ConveyorConfig = { "recipe" };
+        inline static TomlSerializer::Config ms_ConveyorConfig = {"recipe"};
     public:
         struct RecipeItem
         {
@@ -57,15 +57,17 @@ namespace cpp_conv
         DataField<std::vector<RecipeItem>, "output"> m_OutputItems;
     };
 
-    template<>
+    template <>
     struct TypedDataReader<RecipeDefinition::RecipeItem>
     {
-        static bool Read(const toml::Table* value, const char* szPropertyName, RecipeDefinition::RecipeItem& pTargetVariable);
+        static bool Read(const toml::Table* value, const char* szPropertyName,
+                         RecipeDefinition::RecipeItem& pTargetVariable);
     };
 
-    template<>
+    template <>
     struct TypedDataReader<std::vector<RecipeDefinition::RecipeItem>>
     {
-        static bool Read(const toml::Table* value, const char* szPropertyName, std::vector<RecipeDefinition::RecipeItem>& pTargetVariable);
+        static bool Read(const toml::Table* value, const char* szPropertyName,
+                         std::vector<RecipeDefinition::RecipeItem>& pTargetVariable);
     };
 }

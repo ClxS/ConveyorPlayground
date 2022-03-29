@@ -17,7 +17,7 @@ namespace atlas::scene
         {
         }
 
-        static EntityId Invalid() { return EntityId{ c_invalidValue }; }
+        static EntityId Invalid() { return EntityId{c_invalidValue}; }
 
         bool IsInvalid() const { return m_Value == c_invalidValue; }
 

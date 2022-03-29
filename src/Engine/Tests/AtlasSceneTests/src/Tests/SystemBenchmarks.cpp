@@ -1,4 +1,3 @@
-
 #include "AtlasScene/ECS/Components/EcsManager.h"
 #include "AtlasScene/ECS/Systems/SystemBase.h"
 #include "AtlasScene/ECS/Systems/SystemsManager.h"
@@ -17,8 +16,8 @@ namespace
                 m_X++;
             }
         }
-
     };
+
     struct B final : public atlas::scene::SystemBase
     {
         int m_X = 0;
@@ -40,7 +39,7 @@ static void doNUpdates(benchmark::State& state, const int count)
 
     EcsManager ecsManager;
 
-    for(int i = 0; i < count; i++)
+    for (int i = 0; i < count; i++)
     {
         ecsManager.AddEntity();
     }

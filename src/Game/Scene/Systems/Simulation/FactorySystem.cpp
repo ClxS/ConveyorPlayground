@@ -118,9 +118,9 @@ namespace
         size -= c_offset;
         switch (rotation)
         {
-        case Rotation::Deg90: return { size.y() - input.y(), input.x() };
-        case Rotation::Deg180: return { size.x() - input.x(), size.y() - input.y() };
-        case Rotation::Deg270: return { size.y() - input.y(), size.x() - input.x() };
+        case Rotation::Deg90: return {size.y() - input.y(), input.x()};
+        case Rotation::Deg180: return {size.x() - input.x(), size.y() - input.y()};
+        case Rotation::Deg270: return {size.y() - input.y(), size.x() - input.x()};
         case Rotation::DegZero: break;
         }
 
@@ -129,7 +129,7 @@ namespace
 
     [[nodiscard]] Eigen::Vector2i getXy(Eigen::Vector3i input)
     {
-        return { input.x(), input.y() };
+        return {input.x(), input.y()};
     }
 
     void runOutputCycle(
@@ -140,7 +140,8 @@ namespace
     {
         if (!factory.m_OutputPipe.has_value() ||
             factory.m_OutputItems.IsEmpty() ||
-            !ecs.DoesEntityHaveComponents<cpp_conv::components::PositionComponent, cpp_conv::components::DirectionComponent>(entity))
+            !ecs.DoesEntityHaveComponents<cpp_conv::components::PositionComponent,
+                                          cpp_conv::components::DirectionComponent>(entity))
         {
             return;
         }
@@ -157,7 +158,8 @@ namespace
         Eigen::Vector3i pipe = {
             rotatedXy.x(),
             rotatedXy.y(),
-            factory.m_OutputPipe.value().z() };
+            factory.m_OutputPipe.value().z()
+        };
         pipe += position.m_Position;
 
         const auto targetEntity = grid.GetEntity(cpp_conv::grid::getForwardPosition(pipe, direction.m_Direction));
@@ -168,7 +170,7 @@ namespace
 
         auto& vContainerItems = factory.m_OutputItems.GetItems();
         auto itItems = vContainerItems.begin();
-        while(itItems != vContainerItems.end())
+        while (itItems != vContainerItems.end())
         {
             for (uint32_t i = 0; i < itItems->m_pCount; ++i)
             {
@@ -181,7 +183,9 @@ namespace
                     (factory.m_Tick + i) % cpp_conv::components::c_conveyorChannels,
                     {}))
 
-                itItems->m_pCount--;
+                {
+                    itItems->m_pCount--;
+                }
             }
 
             if (itItems->m_pCount == 0)
@@ -198,7 +202,7 @@ namespace
 
 void cpp_conv::FactorySystem::Update(atlas::scene::EcsManager& ecs)
 {
-    for(const auto entity : ecs.GetEntitiesWithComponents<components::FactoryComponent>())
+    for (const auto entity : ecs.GetEntitiesWithComponents<components::FactoryComponent>())
     {
         auto& factory = ecs.GetComponent<components::FactoryComponent>(entity);
         factory.m_Tick++;

@@ -1,15 +1,16 @@
 #include "GeneralItemContainer.h"
-#include "Profiler.h"
-#include "DataId.h"
 #include <map>
 #include "AssetPtr.h"
+#include "DataId.h"
 #include "ItemDefinition.h"
 #include "ItemRegistry.h"
+#include "Profiler.h"
 
-cpp_conv::GeneralItemContainer::GeneralItemContainer(uint32_t uiMaxCapacity, uint32_t uiMaxStackSize, bool bUniqueStacksOnly)
+cpp_conv::GeneralItemContainer::GeneralItemContainer(uint32_t uiMaxCapacity, uint32_t uiMaxStackSize,
+                                                     bool bUniqueStacksOnly)
     : m_uiMaxCapacity(uiMaxCapacity)
-    , m_uiMaxStackSize(uiMaxStackSize)
-    , m_bUniqueStacksOnly(bUniqueStacksOnly)
+      , m_uiMaxStackSize(uiMaxStackSize)
+      , m_bUniqueStacksOnly(bUniqueStacksOnly)
 {
 }
 
@@ -176,7 +177,7 @@ std::string cpp_conv::GeneralItemContainer::GetDescription() const
 {
     std::map<ItemId, int> storedItems;
 
-    for(const ItemEntry& itemEntry : m_vItemEntries)
+    for (const ItemEntry& itemEntry : m_vItemEntries)
     {
         ItemId item = itemEntry.m_pItem;
         if (!item.IsEmpty())

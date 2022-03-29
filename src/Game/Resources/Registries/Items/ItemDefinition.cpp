@@ -10,6 +10,6 @@ cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> cpp_conv::ItemDefi
     }
 
     // TODO[CJones] Need to add some multi-threaded protection here if I'm going to abuse mutable like that.
-    m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(m_AssetId.m_Value);
+    m_pTile = resources::resource_manager::loadAsset<resources::TileAsset>(m_AssetId.m_Value);
     return m_pTile;
 }

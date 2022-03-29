@@ -2,8 +2,8 @@
 #include "StringUtility.h"
 
 #include <map>
-#include <unordered_map>
 #include <mutex>
+#include <unordered_map>
 #if _WIN32
 #include <Windows.h>
 #endif
@@ -47,15 +47,17 @@ void cpp_conv::profiler::logAndReset(int factor)
 
     std::sort(
         sortableTimings.begin(),
-        sortableTimings.end(), 
-        [](const std::pair<const char*, std::chrono::nanoseconds>& a, const std::pair<const char*, std::chrono::nanoseconds>& b)
+        sortableTimings.end(),
+        [](const std::pair<const char*, std::chrono::nanoseconds>& a,
+           const std::pair<const char*, std::chrono::nanoseconds>& b)
         {
             return a.second > b.second;
         });
 
     for (auto& kvp : sortableTimings)
     {
-        const auto percentage = ((double)kvp.second.count() / (double)totalDuration.count()) * 100;
+        const auto percentage = (static_cast<double>(kvp.second.count()) / static_cast<double>(totalDuration.count())) *
+            100;
         // Last than 1%? We don't care.
         if (percentage < 1.0)
         {
@@ -67,7 +69,8 @@ void cpp_conv::profiler::logAndReset(int factor)
             std::format(
                 "\n{}: {} ({}%)",
                 kvp.first,
-                string_util::to_string_with_precision(std::chrono::duration_cast<std::chrono::milliseconds>(kvp.second / factor)),
+                string_util::to_string_with_precision(
+                    std::chrono::duration_cast<std::chrono::milliseconds>(kvp.second / factor)),
                 string_util::to_string_with_precision(percentage)).c_str());
 #endif
     }

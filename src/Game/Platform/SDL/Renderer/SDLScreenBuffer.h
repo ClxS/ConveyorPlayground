@@ -4,7 +4,11 @@
 #error Invalid Include
 #endif
 
-namespace cpp_conv { struct RenderContext; }
+namespace cpp_conv
+{
+    struct RenderContext;
+}
+
 namespace cpp_conv::renderer
 {
     class SDLWriteSurface;
@@ -18,16 +22,24 @@ namespace cpp_conv::renderer
     public:
         explicit SDLScreenBuffer(SDLWriteSurface& rWriteSurface)
             : m_RWriteSurface(rWriteSurface)
-        {}
+        {
+        }
+
         ~SDLScreenBuffer() = default;
 
-        void Initialize(RenderContext& kRenderContext, SDLScreenBufferInitArgs& rArgs) {}
+        void Initialize(RenderContext& kRenderContext, SDLScreenBufferInitArgs& rArgs)
+        {
+        }
 
         void Present() const;
 
-        void Shutdown() {}
+        void Shutdown()
+        {
+        }
 
-        void RecreateBuffer(RenderContext& kRenderContext) {}
+        void RecreateBuffer(RenderContext& kRenderContext)
+        {
+        }
 
     private:
         SDLWriteSurface& m_RWriteSurface;

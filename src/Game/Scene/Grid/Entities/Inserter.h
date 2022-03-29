@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Entity.h"
 #include "Conveyor.h"
-#include "EntityGrid.h"
 #include "DataId.h"
+#include "Entity.h"
+#include "EntityGrid.h"
 
 namespace cpp_conv
 {
@@ -13,7 +13,7 @@ namespace cpp_conv
     constexpr int c_maxInserterLength = 6;
 
     class Inserter : public Entity
-    { 
+    {
     public:
         Inserter(Vector3 position, Vector3 size, Direction direction, InserterId inserterId);
 

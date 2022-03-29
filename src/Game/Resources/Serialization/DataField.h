@@ -1,13 +1,13 @@
 #pragma once
 
+#include "AssetRegistry.h"
 #include "tomlcpp.hpp"
 #include "Vector3.h"
-#include "AssetRegistry.h"
 
 namespace cpp_conv
 {
-    template<typename TReadType>
-   struct TypedDataReader;
+    template <typename TReadType>
+    struct TypedDataReader;
 
 #define DEFINE_DATA_TYPE_HANDLER(TYPE) \
 template<>\
@@ -17,21 +17,29 @@ static bool Read(const toml::Table* value, const char* szPropertyName, TYPE& pTa
 };
 
     DEFINE_DATA_TYPE_HANDLER(bool);
+
     DEFINE_DATA_TYPE_HANDLER(int32_t);
+
     DEFINE_DATA_TYPE_HANDLER(int64_t);
+
     DEFINE_DATA_TYPE_HANDLER(uint32_t);
+
     DEFINE_DATA_TYPE_HANDLER(uint64_t);
+
     DEFINE_DATA_TYPE_HANDLER(float);
+
     DEFINE_DATA_TYPE_HANDLER(Vector3);
+
     DEFINE_DATA_TYPE_HANDLER(std::string);
+
     DEFINE_DATA_TYPE_HANDLER(resources::registry::RegistryId);
 
     struct DataFieldBase
     {
         DataFieldBase(const char* fieldName, bool bIsRequired)
             : m_FieldName{fieldName}
-            , m_bIsRequired{bIsRequired}
-            , m_bIsSet{false}
+              , m_bIsRequired{bIsRequired}
+              , m_bIsSet{false}
         {
         }
 
@@ -43,7 +51,7 @@ static bool Read(const toml::Table* value, const char* szPropertyName, TYPE& pTa
         bool m_bIsSet;
     };
 
-    template<size_t N>
+    template <size_t N>
     struct TemplateLiteralString
     {
         // ReSharper disable once CppNonExplicitConvertingConstructor
@@ -55,7 +63,7 @@ static bool Read(const toml::Table* value, const char* szPropertyName, TYPE& pTa
         char m_Value[N];
     };
 
-    template<typename TDataType, TemplateLiteralString DataEntryName, bool IsRequired = true>
+    template <typename TDataType, TemplateLiteralString DataEntryName, bool IsRequired = true>
     struct DataField : public DataFieldBase
     {
         DataField()
@@ -65,7 +73,7 @@ static bool Read(const toml::Table* value, const char* szPropertyName, TYPE& pTa
 
         explicit DataField(TDataType initialValue)
             : DataFieldBase(DataEntryName.m_Value, IsRequired)
-            , m_Value{initialValue}
+              , m_Value{initialValue}
         {
         }
 
@@ -85,4 +93,3 @@ static bool Read(const toml::Table* value, const char* szPropertyName, TYPE& pTa
         TDataType m_Value;
     };
 }
-

@@ -23,33 +23,46 @@ class A final : public TestSystemBase
 {
 public:
     explicit A(std::function<void(atlas::scene::EcsManager&)> callback)
-        : TestSystemBase(std::forward<std::function<void(atlas::scene::EcsManager&)>>(callback)){}
-
+        : TestSystemBase(std::forward<std::function<void(atlas::scene::EcsManager&)>>(callback))
+    {
+    }
 };
+
 class B final : public TestSystemBase
 {
 public:
     explicit B(std::function<void(atlas::scene::EcsManager&)> callback)
-        : TestSystemBase(std::forward<std::function<void(atlas::scene::EcsManager&)>>(callback)){}
+        : TestSystemBase(std::forward<std::function<void(atlas::scene::EcsManager&)>>(callback))
+    {
+    }
 };
+
 class C final : public TestSystemBase
 {
 public:
     explicit C(std::function<void(atlas::scene::EcsManager&)> callback)
-        : TestSystemBase(std::forward<std::function<void(atlas::scene::EcsManager&)>>(callback)){}
+        : TestSystemBase(std::forward<std::function<void(atlas::scene::EcsManager&)>>(callback))
+    {
+    }
 };
+
 class D final : public TestSystemBase
 {
 public:
     explicit D(std::function<void(atlas::scene::EcsManager&)> callback)
-        : TestSystemBase(std::forward<std::function<void(atlas::scene::EcsManager&)>>(callback)){}
+        : TestSystemBase(std::forward<std::function<void(atlas::scene::EcsManager&)>>(callback))
+    {
+    }
 };
+
 TEST(AtlasScene, RegisterSystemsNoDependencies)
 {
     using atlas::scene::SystemsBuilder;
 
     SystemsBuilder systemsBuilder;
-    systemsBuilder.RegisterSystem<A>([](atlas::scene::EcsManager&){});
+    systemsBuilder.RegisterSystem<A>([](atlas::scene::EcsManager&)
+    {
+    });
 }
 
 TEST(AtlasScene, SystemDependencyOrderRespected)
@@ -65,10 +78,10 @@ TEST(AtlasScene, SystemDependencyOrderRespected)
     int dIndex = -1;
 
     SystemsBuilder systemsBuilder;
-    systemsBuilder.RegisterSystem<B, A>([&](EcsManager&){ bIndex = counter++; });
-    systemsBuilder.RegisterSystem<A>([&](EcsManager&){ aIndex = counter++; });
-    systemsBuilder.RegisterSystem<C, B>([&](EcsManager&){ cIndex = counter++; });
-    systemsBuilder.RegisterSystem<D, C, A, B>([&](EcsManager&){ dIndex = counter++; });
+    systemsBuilder.RegisterSystem<B, A>([&](EcsManager&) { bIndex = counter++; });
+    systemsBuilder.RegisterSystem<A>([&](EcsManager&) { aIndex = counter++; });
+    systemsBuilder.RegisterSystem<C, B>([&](EcsManager&) { cIndex = counter++; });
+    systemsBuilder.RegisterSystem<D, C, A, B>([&](EcsManager&) { dIndex = counter++; });
 
     EcsManager ecsManager;
     SystemsManager sysManager;

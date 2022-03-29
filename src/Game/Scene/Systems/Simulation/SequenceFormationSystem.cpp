@@ -31,15 +31,18 @@ namespace
         while (true)
         {
             auto [position, direction] = ecs.GetComponents<PositionComponent, DirectionComponent>(currentConveyor);
-            Eigen::Vector3i forwardPosition = cpp_conv::grid::getForwardPosition(position.m_Position, direction.m_Direction);
-            atlas::scene::EntityId targetEntity = grid.GetEntity(forwardPosition);
+            Eigen::Vector3i forwardPosition = cpp_conv::grid::getForwardPosition(
+                position.m_Position, direction.m_Direction);
+            EntityId targetEntity = grid.GetEntity(forwardPosition);
 
-            if (targetEntity.IsInvalid() || !ecs.DoesEntityHaveComponents<PositionComponent, DirectionComponent, ConveyorComponent>(targetEntity))
+            if (targetEntity.IsInvalid() || !ecs.DoesEntityHaveComponents<
+                PositionComponent, DirectionComponent, ConveyorComponent>(targetEntity))
             {
                 break;
             }
 
-            auto [targetPosition, targetDirection, targetConveyor] = ecs.GetComponents<PositionComponent, DirectionComponent, ConveyorComponent>(targetEntity);
+            auto [targetPosition, targetDirection, targetConveyor] = ecs.GetComponents<
+                PositionComponent, DirectionComponent, ConveyorComponent>(targetEntity);
             if (targetConveyor.m_bIsCorner)
             {
                 break;
@@ -48,14 +51,18 @@ namespace
             // Check that the route ahead of us doesn't have another potential chain which would take priority over this
             {
                 Eigen::Vector3i vPotentialNeighbours[4];
-                vPotentialNeighbours[static_cast<int>(RelativeDirection::Backwards)] = cpp_conv::grid::getBackwardsPosition(targetPosition.m_Position, targetDirection.m_Direction);
-                vPotentialNeighbours[static_cast<int>(RelativeDirection::Right)] = cpp_conv::grid::getRightPosition(targetPosition.m_Position, targetDirection.m_Direction);
-                vPotentialNeighbours[static_cast<int>(RelativeDirection::Left)] = cpp_conv::grid::getLeftPosition(targetPosition.m_Position, targetDirection.m_Direction);
+                vPotentialNeighbours[static_cast<int>(RelativeDirection::Backwards)] =
+                    cpp_conv::grid::getBackwardsPosition(targetPosition.m_Position, targetDirection.m_Direction);
+                vPotentialNeighbours[static_cast<int>(RelativeDirection::Right)] = cpp_conv::grid::getRightPosition(
+                    targetPosition.m_Position, targetDirection.m_Direction);
+                vPotentialNeighbours[static_cast<int>(RelativeDirection::Left)] = cpp_conv::grid::getLeftPosition(
+                    targetPosition.m_Position, targetDirection.m_Direction);
 
                 for (auto neighbourCell : directionPriority)
                 {
                     auto neighbourEntity = grid.GetEntity(vPotentialNeighbours[static_cast<int>(neighbourCell)]);
-                    if (neighbourEntity == EntityId::Invalid() || !ecs.DoesEntityHaveComponents<PositionComponent, DirectionComponent, ConveyorComponent>(neighbourEntity))
+                    if (neighbourEntity == EntityId::Invalid() || !ecs.DoesEntityHaveComponents<
+                        PositionComponent, DirectionComponent, ConveyorComponent>(neighbourEntity))
                     {
                         continue;
                     }
@@ -65,10 +72,12 @@ namespace
                         break;
                     }
 
-                    const auto& [neighbourPosition, neighbourDirection] = ecs.GetComponents<PositionComponent, DirectionComponent>(neighbourEntity);
+                    const auto& [neighbourPosition, neighbourDirection] = ecs.GetComponents<
+                        PositionComponent, DirectionComponent>(neighbourEntity);
 
                     // Node ahead of has a better candidate, meaning we are the terminus.
-                    if (cpp_conv::grid::getForwardPosition(neighbourPosition.m_Position, neighbourDirection.m_Direction) == forwardPosition)
+                    if (cpp_conv::grid::getForwardPosition(neighbourPosition.m_Position, neighbourDirection.m_Direction)
+                        == forwardPosition)
                     {
                         return currentConveyor;
                     }
@@ -100,11 +109,13 @@ namespace
 
         while (true)
         {
-            const auto& [position, direction] = ecs.GetComponents<PositionComponent, DirectionComponent>(currentConveyor);
+            const auto& [position, direction] = ecs.GetComponents<PositionComponent, DirectionComponent>(
+                currentConveyor);
             vOutConveyors.push_back(currentConveyor);
 
             RelativeDirection tmp;
-            const EntityId targetConveyor = cpp_conv::conveyor_helper::findNextTailConveyor(ecs, grid, position.m_Position, direction.m_Direction, tmp);
+            const EntityId targetConveyor = cpp_conv::conveyor_helper::findNextTailConveyor(
+                ecs, grid, position.m_Position, direction.m_Direction, tmp);
 
             if (targetConveyor.IsInvalid() ||
                 targetConveyor == searchStart ||
@@ -133,23 +144,25 @@ void cpp_conv::SequenceFormationSystem::Initialise(atlas::scene::EcsManager& ecs
     using namespace components;
     using atlas::scene::EntityId;
 
-    const auto conveyorEntities = ecs.GetEntitiesWithComponents<PositionComponent, DirectionComponent, ConveyorComponent>();
+    const auto conveyorEntities = ecs.GetEntitiesWithComponents<
+        PositionComponent, DirectionComponent, ConveyorComponent>();
     cpp_conveyor::vector_set<EntityId> alreadyProcessedConveyors(conveyorEntities.size());
 
     // Remove existing sequences
-    for(const auto sequence : ecs.GetEntitiesWithComponents<SequenceComponent>())
+    for (const auto sequence : ecs.GetEntitiesWithComponents<SequenceComponent>())
     {
         ecs.RemoveEntity(sequence);
     }
 
-    for(auto entity : conveyorEntities)
+    for (auto entity : conveyorEntities)
     {
         if (alreadyProcessedConveyors.contains(entity))
         {
             continue;
         }
 
-        const auto& [position, direction, conveyor] = ecs.GetComponents<PositionComponent, DirectionComponent, ConveyorComponent>(entity);
+        const auto& [position, direction, conveyor] = ecs.GetComponents<
+            PositionComponent, DirectionComponent, ConveyorComponent>(entity);
 
         if (conveyor.m_bIsCorner)
         {
@@ -186,7 +199,8 @@ void cpp_conv::SequenceFormationSystem::Initialise(atlas::scene::EcsManager& ecs
                 vSequenceConveyors[vSequenceConveyors.size() - 1],
                 pTailConveyor.m_Channels[0].m_pSlots[0].m_VisualPosition,
                 pTailConveyor.m_Channels[1].m_pSlots[0].m_VisualPosition,
-                pTailConveyor.m_Channels[0].m_pSlots[1].m_VisualPosition - pTailConveyor.m_Channels[0].m_pSlots[0].m_VisualPosition,
+                pTailConveyor.m_Channels[0].m_pSlots[1].m_VisualPosition - pTailConveyor.m_Channels[0].m_pSlots[0].
+                m_VisualPosition,
                 pTailConveyor.m_MoveTick
             );
 

@@ -3,20 +3,29 @@
 
 struct TransformComponent
 {
-    TransformComponent(): m_X{0} {}
+    TransformComponent(): m_X{0}
+    {
+    }
+
     explicit TransformComponent(const int x)
         : m_X(x)
-    {}
+    {
+    }
 
     int m_X;
 };
 
 struct SizeComponent
 {
-    SizeComponent(): m_X{0} {}
+    SizeComponent(): m_X{0}
+    {
+    }
+
     explicit SizeComponent(const int x)
         : m_X(x)
-    {}
+    {
+    }
+
     int m_X;
 };
 

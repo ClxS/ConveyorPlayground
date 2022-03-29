@@ -3,6 +3,4 @@
 class TemplatedMaskResolver
 {
 public:
-    
 };
-

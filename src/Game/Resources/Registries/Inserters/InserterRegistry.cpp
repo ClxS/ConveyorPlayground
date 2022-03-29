@@ -1,15 +1,15 @@
 #include "InserterRegistry.h"
-#include "ResourceManager.h"
-#include "InserterDefinition.h"
 #include "AssetPtr.h"
+#include "InserterDefinition.h"
+#include "ResourceManager.h"
 
-#include <vector>
+#include <iostream>
 #include <memory>
 #include <sstream>
-#include <iostream>
-#include "SelfRegistration.h"
+#include <vector>
 #include "DataId.h"
 #include "Profiler.h"
+#include "SelfRegistration.h"
 
 using RegistryId = cpp_conv::resources::registry::RegistryId;
 static std::vector<cpp_conv::resources::AssetPtr<cpp_conv::InserterDefinition>> g_vInsertersItems;
@@ -18,7 +18,7 @@ namespace
 {
     void loadItems()
     {
-        for(const RegistryId asset : cpp_conv::resources::registry::data::inserters::c_AllAssets)
+        for (const RegistryId asset : cpp_conv::resources::registry::data::inserters::c_AllAssets)
         {
             auto pAsset = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::InserterDefinition>(asset);
             if (!pAsset)
@@ -65,4 +65,5 @@ cpp_conv::resources::AssetPtr<cpp_conv::InserterDefinition> cpp_conv::resources:
 }
 
 REGISTER_ASSET_LOAD_HANDLER(cpp_conv::InserterDefinition, inserterAssetHandler);
+
 REGISTER_LOAD_HANDLER(loadItems);

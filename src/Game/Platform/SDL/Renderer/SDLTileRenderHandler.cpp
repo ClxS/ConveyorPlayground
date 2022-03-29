@@ -95,7 +95,8 @@ void tileRenderer(
         if ((dest.x + dest.w >= 0 || dest.x <= windowWidth) && (dest.y + dest.h >= 0 || dest.y <= windowHeight))
         {
             SDL_SetTextureAlphaMod(pTexture, kContext.m_LayerColour.m_argb.m_a);
-            SDL_RenderCopyEx(platform.GetSDLContext().m_Renderer, pTexture, nullptr, &dest, angle, &rotatePivot,  // NOLINT(clang-diagnostic-double-promotion)
+            SDL_RenderCopyEx(platform.GetSDLContext().m_Renderer, pTexture, nullptr, &dest, angle, &rotatePivot,
+                             // NOLINT(clang-diagnostic-double-promotion)
                              SDL_FLIP_NONE);
 
             if (bTrack)
@@ -107,4 +108,3 @@ void tileRenderer(
 }
 
 REGISTER_RENDER_HANDLER(cpp_conv::resources::SDLTile2DAsset, tileRenderer);
-

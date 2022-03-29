@@ -2,21 +2,21 @@
 
 #include <cassert>
 
-#include "ResourceManager.h"
-#include "ConveyorDefinition.h"
 #include "AssetPtr.h"
+#include "ConveyorDefinition.h"
+#include "ResourceManager.h"
 
-#include <vector>
+#include <iostream>
 #include <memory>
 #include <sstream>
-#include <iostream>
+#include <vector>
 
-#include <tuple>
 #include <tomlcpp.hpp>
+#include <tuple>
 
-#include "SelfRegistration.h"
 #include "DataId.h"
 #include "Profiler.h"
+#include "SelfRegistration.h"
 
 using RegistryId = cpp_conv::resources::registry::RegistryId;
 static std::vector<cpp_conv::resources::AssetPtr<cpp_conv::ConveyorDefinition>> g_vConveyors;
@@ -25,7 +25,7 @@ namespace
 {
     void loadItems()
     {
-        for(const RegistryId asset : cpp_conv::resources::registry::data::conveyors::c_AllAssets)
+        for (const RegistryId asset : cpp_conv::resources::registry::data::conveyors::c_AllAssets)
         {
             auto pAsset = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::ConveyorDefinition>(asset);
             if (!pAsset)
@@ -71,4 +71,5 @@ cpp_conv::resources::AssetPtr<cpp_conv::ConveyorDefinition> cpp_conv::resources:
 }
 
 REGISTER_ASSET_LOAD_HANDLER(cpp_conv::ConveyorDefinition, conveyorAssetHandler);
+
 REGISTER_LOAD_HANDLER(loadItems);

@@ -2,20 +2,29 @@
 
 #include <functional>
 #include <memory>
+#include "Colour.h"
 #include "ResourceAsset.h"
 #include "ResourceManager.h"
-#include "Colour.h"
 
-namespace cpp_conv { struct Transform2D; }
+namespace cpp_conv
+{
+    struct Transform2D;
+}
+
 namespace cpp_conv::resources
-{ class RenderableAsset; }
+{
+    class RenderableAsset;
+}
 
-namespace cpp_conv { struct RenderContext; }
+namespace cpp_conv
+{
+    struct RenderContext;
+}
 
 namespace cpp_conv::resources::registration
 {
     using TypeInfo = std::type_info;
-    using AssetLoadFunc = std::function<ResourceAsset* (resource_manager::FileData&)>;
+    using AssetLoadFunc = std::function<ResourceAsset*(resource_manager::FileData&)>;
     using AssetRenderFunc = std::function<void(RenderContext& kContext, const RenderableAsset* pAsset,
                                                const Transform2D& kTransform, Colour kColourOverride, bool bTrack)>;
     using LoadFunc = std::function<void(void)>;
@@ -29,7 +38,7 @@ namespace cpp_conv::resources::registration
     {
         AssetLoadHandler(const TypeInfo& type, AssetLoadFunc func)
             : m_rType(type)
-            , m_rFunc(func)
+              , m_rFunc(func)
         {
             registerAssetLoadHandler(this);
         }
@@ -42,7 +51,7 @@ namespace cpp_conv::resources::registration
     {
         AssetRenderHandler(const TypeInfo& type, AssetRenderFunc func)
             : m_rType(type)
-            , m_rFunc(func)
+              , m_rFunc(func)
         {
             registerAssetRenderHandler(this);
         }

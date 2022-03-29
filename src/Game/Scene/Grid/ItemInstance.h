@@ -8,17 +8,17 @@ namespace cpp_conv
     {
         ItemInstance()
             : m_Item{}
-            , m_PreviousX{}
-            , m_PreviousY{}
-            , m_bShouldAnimate{}
+              , m_PreviousX{}
+              , m_PreviousY{}
+              , m_bShouldAnimate{}
         {
         }
 
         ItemInstance(const ItemId item, const float previousX, const float previousY, const bool bShouldAnimate)
             : m_Item(item)
-            , m_PreviousX(previousX)
-            , m_PreviousY(previousY)
-            , m_bShouldAnimate(bShouldAnimate)
+              , m_PreviousX(previousX)
+              , m_PreviousY(previousY)
+              , m_bShouldAnimate(bShouldAnimate)
         {
         }
 
@@ -41,4 +41,3 @@ namespace cpp_conv
         }
     };
 }
-

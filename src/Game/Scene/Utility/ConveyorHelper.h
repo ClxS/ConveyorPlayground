@@ -86,7 +86,7 @@ namespace cpp_conv::conveyor_helper
         // Gets all bits below the current insertion point
         const uint64_t uiPreviousInsertMask = pendingState.m_PendingInsertions & (uiSetMask - 1);
         const int uiPreviousCount = std::popcount(uiPreviousInsertMask);
-        pendingState.m_NewItems.Insert(uiPreviousCount, { info.m_Item, info.m_OriginPosition });
+        pendingState.m_NewItems.Insert(uiPreviousCount, {info.m_Item, info.m_OriginPosition});
     }
 
     inline void placeItemInSlot(
@@ -107,9 +107,9 @@ namespace cpp_conv::conveyor_helper
         }
 
         components::ConveyorComponent::PlacedItem& forwardTargetItem =
-            (bShouldSetDirectly
-                ? conveyor.m_Channels[targetChannel].m_pSlots[targetSlot].m_Item
-                : conveyor.m_Channels[targetChannel].m_pPendingItems[targetSlot]);
+        (bShouldSetDirectly
+             ? conveyor.m_Channels[targetChannel].m_pSlots[targetSlot].m_Item
+             : conveyor.m_Channels[targetChannel].m_pPendingItems[targetSlot]);
 
         forwardTargetItem =
         {

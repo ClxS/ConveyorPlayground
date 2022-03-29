@@ -21,7 +21,7 @@ namespace atlas::scene
         virtual void ClaimFromOtherPool(PoolBase* pOther, int32_t otherIndex) = 0;
     };
 
-    template<typename TDataType, bool TIsSparse, uint32_t TInitialSize>
+    template <typename TDataType, bool TIsSparse, uint32_t TInitialSize>
     class Pool : public PoolBase
     {
     public:
@@ -29,7 +29,8 @@ namespace atlas::scene
         {
             m_Data.reserve(TInitialSize);
         }
-        virtual ~Pool() = default;
+
+        ~Pool() override = default;
 
         [[nodiscard]] TDataType& GetReference(int32_t uiIndex)
         {
@@ -55,14 +56,14 @@ namespace atlas::scene
             return m_Data.back();
         }
 
-        template<typename...TValues>
+        template <typename...TValues>
         TDataType& Push(TValues&&... data)
         {
             m_Data.emplace_back(std::forward<TValues&&>(data)...);
             return m_Data.back();
         }
 
-        void Pop()
+        void Pop() override
         {
             m_Data.pop_back();
         }
@@ -90,10 +91,10 @@ namespace atlas::scene
             m_Data[uiIndex] = value;
         }
 
-        template<typename... TArgs>
+        template <typename... TArgs>
         void PlacementSet(uint32_t uiIndex, TArgs&&... args)
         {
-            new (&m_Data[uiIndex]) TDataType( std::forward<TArgs&&>(args)... );
+            new(&m_Data[uiIndex]) TDataType(std::forward<TArgs&&>(args)...);
         }
 
         void SwapAndPop(int32_t uiRemovedIndex) override
@@ -134,7 +135,7 @@ namespace atlas::scene
         ArchetypeIndex m_ArchetypeIndex = ArchetypeIndex::Empty();
     };
 
-    template<typename TComponentType>
+    template <typename TComponentType>
     using ComponentPool = Pool<TComponentType, false, 1 << 8>;
 
     using EntityPool = Pool<EntityId, false, 1 << 8>;

@@ -5,13 +5,13 @@
 #include <ostream>
 #include "Rotation.h"
 
-template<int32_t TLength, typename TType, typename TCrtp>
+template <int32_t TLength, typename TType, typename TCrtp>
 struct Vector
 {
     std::array<TType, TLength> m_Data;
 
     template <typename ... TTypes>
-    Vector(TTypes... args) : m_Data{ args... }
+    Vector(TTypes ... args) : m_Data{args...}
     {
     }
 
@@ -162,8 +162,13 @@ struct Vector
 
 struct Vector2 : public Vector<2, int32_t, Vector2>
 {
-    Vector2() : Vector(0, 0) {}
-    Vector2(const int32_t x, const int32_t y) : Vector(x, y) {}
+    Vector2() : Vector(0, 0)
+    {
+    }
+
+    Vector2(const int32_t x, const int32_t y) : Vector(x, y)
+    {
+    }
 
     [[nodiscard]] int32_t GetX() const { return m_Data[0]; }
     [[nodiscard]] int32_t GetY() const { return m_Data[1]; }
@@ -177,9 +182,9 @@ struct Vector2 : public Vector<2, int32_t, Vector2>
         size -= c_offset;
         switch (rotation)
         {
-        case Rotation::Deg90: return { size.GetY() - GetY(), GetX() };
-        case Rotation::Deg180: return { size.GetX() - GetX(), size.GetY() - GetY() };
-        case Rotation::Deg270: return { size.GetY() - GetY(), size.GetX() - GetX() };
+        case Rotation::Deg90: return {size.GetY() - GetY(), GetX()};
+        case Rotation::Deg180: return {size.GetX() - GetX(), size.GetY() - GetY()};
+        case Rotation::Deg270: return {size.GetY() - GetY(), size.GetX() - GetX()};
         case Rotation::DegZero: break;
         }
 
@@ -189,8 +194,13 @@ struct Vector2 : public Vector<2, int32_t, Vector2>
 
 struct Vector2F : public Vector<2, float, Vector2F>
 {
-    Vector2F() : Vector2F(0.0f, 0.0f) {}
-    Vector2F(const float x, const float y) : Vector(x, y) {}
+    Vector2F() : Vector2F(0.0f, 0.0f)
+    {
+    }
+
+    Vector2F(const float x, const float y) : Vector(x, y)
+    {
+    }
 
     [[nodiscard]] float GetX() const { return m_Data[0]; }
     [[nodiscard]] float GetY() const { return m_Data[1]; }
@@ -201,14 +211,14 @@ struct Vector2F : public Vector<2, float, Vector2F>
     {
         switch (rotation)
         {
-        case Rotation::Deg90: return { size.GetY() - GetY() - 1, GetX() };
+        case Rotation::Deg90: return {size.GetY() - GetY() - 1, GetX()};
         case Rotation::Deg180:
             return Rotate(Rotation::Deg90, size)
                 .Rotate(Rotation::Deg90, size);
         case Rotation::Deg270:
             return Rotate(Rotation::Deg90, size)
-                .Rotate(Rotation::Deg90, size)
-                .Rotate(Rotation::Deg90, size);
+                   .Rotate(Rotation::Deg90, size)
+                   .Rotate(Rotation::Deg90, size);
         case Rotation::DegZero: break;
         }
 
@@ -218,9 +228,17 @@ struct Vector2F : public Vector<2, float, Vector2F>
 
 struct Vector3F : public Vector<3, float, Vector3F>
 {
-    Vector3F() : Vector3F(0.0f, 0.0f, 0.0f) {}
-    Vector3F(const float x, const float y, const float z) : Vector(x, y, z) {}
-    Vector3F(const Vector2F& xy, const float z) : Vector(xy.GetX(), xy.GetY(), z) {}
+    Vector3F() : Vector3F(0.0f, 0.0f, 0.0f)
+    {
+    }
+
+    Vector3F(const float x, const float y, const float z) : Vector(x, y, z)
+    {
+    }
+
+    Vector3F(const Vector2F& xy, const float z) : Vector(xy.GetX(), xy.GetY(), z)
+    {
+    }
 
     [[nodiscard]] float GetX() const { return m_Data[0]; }
     [[nodiscard]] float GetY() const { return m_Data[1]; }
@@ -229,14 +247,20 @@ struct Vector3F : public Vector<3, float, Vector3F>
     void SetY(const float value) { m_Data[1] = value; }
     void SetZ(const float value) { m_Data[2] = value; }
 
-    [[nodiscard]] Vector2F GetXY() const { return { m_Data[0], m_Data[1] }; }
+    [[nodiscard]] Vector2F GetXY() const { return {m_Data[0], m_Data[1]}; }
 };
 
 struct Vector3 : public Vector<3, int32_t, Vector3>
 {
     Vector3() = default;
-    Vector3(const int32_t x, const int32_t y, const int32_t z) : Vector(x, y, z) {}
-    Vector3(const Vector2 xy, const int32_t z) : Vector(xy.GetX(), xy.GetY(), z) {}
+
+    Vector3(const int32_t x, const int32_t y, const int32_t z) : Vector(x, y, z)
+    {
+    }
+
+    Vector3(const Vector2 xy, const int32_t z) : Vector(xy.GetX(), xy.GetY(), z)
+    {
+    }
 
     [[nodiscard]] int32_t GetX() const { return m_Data[0]; }
     [[nodiscard]] int32_t GetY() const { return m_Data[1]; }
@@ -248,7 +272,8 @@ struct Vector3 : public Vector<3, int32_t, Vector3>
     void SetY(const int32_t value) { m_Data[1] = value; }
     void SetZ(const int32_t value) { m_Data[2] = value; }
 
-    [[nodiscard]] Vector2 GetXY() const { return { m_Data[0], m_Data[1] }; }
+    [[nodiscard]] Vector2 GetXY() const { return {m_Data[0], m_Data[1]}; }
+
     void SetXY(const Vector2 value)
     {
         m_Data[0] = value.m_Data[0];

@@ -2,15 +2,18 @@
 
 #include <array>
 
-#include "Renderer.h"
+#include "AssetPtr.h"
+#include "DataId.h"
 #include "Entity.h"
 #include "Enums.h"
-#include "DataId.h"
 #include "ItemInstance.h"
-#include "AssetPtr.h"
+#include "Renderer.h"
 #include "TileAsset.h"
 
-namespace cpp_conv { class WorldMap; }
+namespace cpp_conv
+{
+    class WorldMap;
+}
 
 namespace cpp_conv
 {

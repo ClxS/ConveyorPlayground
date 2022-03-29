@@ -4,6 +4,6 @@
 
 namespace cpp_conv::resources
 {
-    template<typename T>
+    template <typename T>
     using AssetPtr = std::shared_ptr<T>;
 }

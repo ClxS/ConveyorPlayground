@@ -1,14 +1,14 @@
 #include <benchmark/benchmark.h>
 
-#include "AtlasScene/ECS/Components/EcsManager.h"
 #include "TestComponents.h"
+#include "AtlasScene/ECS/Components/EcsManager.h"
 
 static void Creating10MEntities(benchmark::State& state)
 {
     atlas::scene::EcsManager ecsManager;
     for (auto _ : state)
     {
-        for(int i = 0; i < 10000000; i++)
+        for (int i = 0; i < 10000000; i++)
         {
             ecsManager.AddEntity();
         }
@@ -19,16 +19,16 @@ static void Deleting10MEntities(benchmark::State& state)
 {
     atlas::scene::EcsManager ecsManager;
 
-    for(int i = 0; i < 10000000; i++)
+    for (int i = 0; i < 10000000; i++)
     {
         ecsManager.AddEntity();
     }
 
     for (auto _ : state)
     {
-        for(int i = 0; i < 10000000; i++)
+        for (int i = 0; i < 10000000; i++)
         {
-            ecsManager.RemoveEntity(atlas::scene::EntityId { i });
+            ecsManager.RemoveEntity(atlas::scene::EntityId{i});
         }
     }
 }
@@ -37,7 +37,7 @@ static void IterateAndUnpack10MOneComponent(benchmark::State& state)
 {
     atlas::scene::EcsManager ecsManager;
 
-    for(int i = 0; i < 10000000; i++)
+    for (int i = 0; i < 10000000; i++)
     {
         auto e = ecsManager.AddEntity();
         ecsManager.AddComponent<TransformComponent>(e);
@@ -45,7 +45,7 @@ static void IterateAndUnpack10MOneComponent(benchmark::State& state)
 
     for (auto _ : state)
     {
-        for(const auto entity : ecsManager.GetEntitiesWithComponents<TransformComponent>())
+        for (const auto entity : ecsManager.GetEntitiesWithComponents<TransformComponent>())
         {
             auto& transform = ecsManager.GetComponent<TransformComponent>(entity);
             //transform.m_X = 1;
@@ -57,7 +57,7 @@ static void IterateAndUnpack10MTwoComponent(benchmark::State& state)
 {
     atlas::scene::EcsManager ecsManager;
 
-    for(int i = 0; i < 10000000; i++)
+    for (int i = 0; i < 10000000; i++)
     {
         auto e = ecsManager.AddEntity();
         ecsManager.AddComponent<TransformComponent>(e);
@@ -66,7 +66,7 @@ static void IterateAndUnpack10MTwoComponent(benchmark::State& state)
 
     for (auto _ : state)
     {
-        for(const auto entity : ecsManager.GetEntitiesWithComponents<TransformComponent, SizeComponent>())
+        for (const auto entity : ecsManager.GetEntitiesWithComponents<TransformComponent, SizeComponent>())
         {
             auto [transform, size] = ecsManager.GetComponents<TransformComponent, SizeComponent>(entity);
             //transform.m_X = 1;
@@ -78,7 +78,7 @@ static void IterateAndUnpack10MTwoComponentDelegate(benchmark::State& state)
 {
     atlas::scene::EcsManager ecsManager;
 
-    for(int i = 0; i < 10000000; i++)
+    for (int i = 0; i < 10000000; i++)
     {
         auto e = ecsManager.AddEntity();
         ecsManager.AddComponent<TransformComponent>(e);
@@ -87,10 +87,11 @@ static void IterateAndUnpack10MTwoComponentDelegate(benchmark::State& state)
 
     for (auto _ : state)
     {
-        ecsManager.ForEachComponents<TransformComponent, SizeComponent>([](atlas::scene::EntityId entity, TransformComponent& transform, SizeComponent&)
-        {
-            transform.m_X = 1;
-        });
+        ecsManager.ForEachComponents<TransformComponent, SizeComponent>(
+            [](atlas::scene::EntityId entity, TransformComponent& transform, SizeComponent&)
+            {
+                transform.m_X = 1;
+            });
     }
 }
 

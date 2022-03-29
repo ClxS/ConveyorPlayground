@@ -1,19 +1,19 @@
 #include "FactoryRegistry.h"
-#include "ResourceManager.h"
-#include "FactoryDefinition.h"
 #include "AssetPtr.h"
+#include "FactoryDefinition.h"
 #include "ItemRegistry.h"
+#include "ResourceManager.h"
 
-#include <vector>
+#include <iostream>
 #include <memory>
 #include <sstream>
-#include <iostream>
-#include "SelfRegistration.h"
+#include <vector>
 #include "DataId.h"
 #include "Profiler.h"
+#include "SelfRegistration.h"
 
-#include <tuple>
 #include <tomlcpp.hpp>
+#include <tuple>
 
 using RegistryId = cpp_conv::resources::registry::RegistryId;
 static std::vector<cpp_conv::resources::AssetPtr<cpp_conv::FactoryDefinition>> g_vFactories;
@@ -22,7 +22,7 @@ namespace
 {
     void loadFactories()
     {
-        for(const RegistryId asset : cpp_conv::resources::registry::data::factories::c_AllAssets)
+        for (const RegistryId asset : cpp_conv::resources::registry::data::factories::c_AllAssets)
         {
             auto pAsset = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::FactoryDefinition>(asset);
             if (!pAsset)
@@ -68,4 +68,5 @@ const cpp_conv::resources::AssetPtr<cpp_conv::FactoryDefinition> cpp_conv::resou
 }
 
 REGISTER_ASSET_LOAD_HANDLER(cpp_conv::FactoryDefinition, factoryAssetHandler);
+
 REGISTER_LOAD_HANDLER(loadFactories);

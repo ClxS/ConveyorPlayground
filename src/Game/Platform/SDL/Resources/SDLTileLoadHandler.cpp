@@ -1,6 +1,6 @@
-#include "SelfRegistration.h"
-#include "SDLTileAsset.h"
 #include "SDLAppHost.h"
+#include "SDLTileAsset.h"
+#include "SelfRegistration.h"
 
 #include <SDL.h>
 #include <SDL_image.h>

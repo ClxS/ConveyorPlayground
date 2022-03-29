@@ -26,6 +26,6 @@ namespace atlas::app_host::platform
         [[nodiscard]] SdlContext& GetSDLContext() { return m_Sdl; }
 
     private:
-        SdlContext m_Sdl {};
+        SdlContext m_Sdl{};
     };
 }

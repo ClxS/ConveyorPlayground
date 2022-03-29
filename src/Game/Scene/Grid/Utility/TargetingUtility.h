@@ -13,13 +13,16 @@ namespace cpp_conv::targeting_util
         int32_t m_Channel;
     };
 
-    Entity* findNextTailConveyor(const WorldMap& map, const Conveyor& rCurrentConveyor, RelativeDirection& outDirection);
+    Entity* findNextTailConveyor(const WorldMap& map, const Conveyor& rCurrentConveyor,
+                                 RelativeDirection& outDirection);
     bool isCornerConveyor(const WorldMap& map, const Conveyor& rConveyor);
     bool isClockwiseCorner(const WorldMap& map, const Conveyor& rConveyor);
 
-    Conveyor::Channel* getTargetChannel(const WorldMap& map, const Entity& sourceNode, Conveyor& targetNode, int iSourceChannel);
+    Conveyor::Channel* getTargetChannel(const WorldMap& map, const Entity& sourceNode, Conveyor& targetNode,
+                                        int iSourceChannel);
 
-    int getChannelTargetSlot(const WorldMap& map, const Entity& sourceNode, const Conveyor& targetNode, int iSourceChannel);
+    int getChannelTargetSlot(const WorldMap& map, const Entity& sourceNode, const Conveyor& targetNode,
+                             int iSourceChannel);
 
     Vector2F getTilePosition(
         const WorldMap& map,

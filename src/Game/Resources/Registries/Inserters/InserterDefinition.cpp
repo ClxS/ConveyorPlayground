@@ -4,5 +4,5 @@
 
 cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> cpp_conv::InserterDefinition::GetTile() const
 {
-    return cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(m_AssetId.m_Value);
+    return resources::resource_manager::loadAsset<resources::TileAsset>(m_AssetId.m_Value);
 }

@@ -12,5 +12,6 @@ namespace cpp_conv
 
 namespace cpp_conv::command
 {
-    void processCommands(SceneContext& kContext, RenderContext& kRenderContext, std::queue<commands::CommandType>& commands);
+    void processCommands(SceneContext& kContext, RenderContext& kRenderContext,
+                         std::queue<commands::CommandType>& commands);
 }

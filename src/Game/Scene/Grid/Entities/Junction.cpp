@@ -2,15 +2,15 @@
 #include "Conveyor.h"
 #include "SceneContext.h"
 
-#include "Renderer.h"
 #include "RenderContext.h"
+#include "Renderer.h"
 
 #include <algorithm>
 #include <array>
-#include <random>
 #include <chrono>
-#include "TileAsset.h"
+#include <random>
 #include "ResourceManager.h"
+#include "TileAsset.h"
 
 template <class RandomAccessIterator, class URNG>
 void shuffle(RandomAccessIterator first, RandomAccessIterator last, URNG&& g)
@@ -24,8 +24,8 @@ void shuffle(RandomAccessIterator first, RandomAccessIterator last, URNG&& g)
 
 cpp_conv::Junction::Junction(Vector3 position, Vector3 size)
     : Entity(position, size, EntityKind::Junction)
-    , m_pItem(ItemIds::None)
-    , m_uiTick(0)
+      , m_pItem(ItemIds::None)
+      , m_uiTick(0)
 {
 }
 
@@ -40,9 +40,12 @@ void cpp_conv::Junction::Tick(const SceneContext& kContext)
     std::array<std::tuple<Entity*, Direction>, 4> arrDirectionEntities =
     {
         std::make_tuple(kContext.m_rMap.GetEntity(grid::getForwardPosition(m_position, Direction::Up)), Direction::Up),
-        std::make_tuple(kContext.m_rMap.GetEntity(grid::getForwardPosition(m_position, Direction::Right)), Direction::Right),
-        std::make_tuple(kContext.m_rMap.GetEntity(grid::getForwardPosition(m_position, Direction::Down)), Direction::Down),
-        std::make_tuple(kContext.m_rMap.GetEntity(grid::getForwardPosition(m_position, Direction::Left)), Direction::Left),
+        std::make_tuple(kContext.m_rMap.GetEntity(grid::getForwardPosition(m_position, Direction::Right)),
+                        Direction::Right),
+        std::make_tuple(kContext.m_rMap.GetEntity(grid::getForwardPosition(m_position, Direction::Down)),
+                        Direction::Down),
+        std::make_tuple(kContext.m_rMap.GetEntity(grid::getForwardPosition(m_position, Direction::Left)),
+                        Direction::Left),
     };
 
     std::default_random_engine engine(m_uiTick % 256);
@@ -95,7 +98,8 @@ void cpp_conv::Junction::Tick(const SceneContext& kContext)
 
 void cpp_conv::Junction::Draw(RenderContext& kRenderContext) const
 {
-    const auto pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::assets::conveyors::c_Junction);
+    const auto pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(
+        resources::registry::assets::conveyors::c_Junction);
     if (!pTile)
     {
         return;
@@ -109,10 +113,11 @@ void cpp_conv::Junction::Draw(RenderContext& kRenderContext) const
             static_cast<float>(m_position.GetY()) * renderer::c_gridScale,
             Rotation::DegZero
         },
-        { 0xFFFF00FF });
+        {0xFFFF00FF});
 }
 
-bool cpp_conv::Junction::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, const InsertInfo insertInfo)
+bool cpp_conv::Junction::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity,
+                                   const InsertInfo insertInfo)
 {
     if (!m_pItem.IsEmpty())
     {

@@ -1,12 +1,15 @@
 #pragma once
 
-#include <vector>
 #include <chrono>
+#include <vector>
 #include "EntityGrid.h"
-#include "Sequence.h"
 #include "Enums.h"
+#include "Sequence.h"
 
-namespace cpp_conv { class WorldMap; }
+namespace cpp_conv
+{
+    class WorldMap;
+}
 
 namespace cpp_conv
 {

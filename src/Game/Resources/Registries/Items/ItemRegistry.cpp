@@ -1,15 +1,15 @@
 #include "ItemRegistry.h"
-#include "ResourceManager.h"
-#include "ItemDefinition.h"
 #include "AssetPtr.h"
+#include "ItemDefinition.h"
+#include "ResourceManager.h"
 
-#include <vector>
+#include <iostream>
 #include <memory>
 #include <sstream>
-#include <iostream>
-#include "SelfRegistration.h"
+#include <vector>
 #include "DataId.h"
 #include "Profiler.h"
+#include "SelfRegistration.h"
 
 using RegistryId = cpp_conv::resources::registry::RegistryId;
 static std::vector<cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition>> g_vItems;
@@ -18,7 +18,7 @@ namespace
 {
     void loadItems()
     {
-        for(const RegistryId asset : cpp_conv::resources::registry::data::items::c_AllAssets)
+        for (const RegistryId asset : cpp_conv::resources::registry::data::items::c_AllAssets)
         {
             auto pAsset = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::ItemDefinition>(asset);
             if (!pAsset)
@@ -64,4 +64,5 @@ cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> cpp_conv::resources::get
 }
 
 REGISTER_ASSET_LOAD_HANDLER(cpp_conv::ItemDefinition, itemAssetHandler);
+
 REGISTER_LOAD_HANDLER(loadItems);

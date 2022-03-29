@@ -24,11 +24,11 @@ namespace cpp_conv::components
 
         FactoryComponent()
             : m_InputItems{256, 64, true}
-            , m_OutputItems{256, 64, true}
-            , m_ProductionRate{0}
-            , m_Tick{0}
-            , m_RemainingCurrentProductionEffort{0}
-            , m_bIsDemandSatisfied{false}
+              , m_OutputItems{256, 64, true}
+              , m_ProductionRate{0}
+              , m_Tick{0}
+              , m_RemainingCurrentProductionEffort{0}
+              , m_bIsDemandSatisfied{false}
         {
         }
 

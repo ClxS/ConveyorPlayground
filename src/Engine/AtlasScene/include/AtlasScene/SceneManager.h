@@ -9,7 +9,7 @@ namespace atlas::scene
     class SceneManager
     {
     public:
-        template<typename TScene, typename ...Args>
+        template <typename TScene, typename ...Args>
         TScene& TransitionTo(Args&&... args)
         {
             // Cannot transition when a follow up scene is already prepared.
@@ -20,19 +20,16 @@ namespace atlas::scene
                 m_FollowUpScene = std::make_unique<TScene>(std::forward<Args>(args)...);
                 return *static_cast<TScene*>(m_FollowUpScene.get());
             }
-            else
+            if (m_ActiveScene)
             {
-                if (m_ActiveScene)
-                {
-                    m_ActiveScene->OnExited(*this);
-                    m_ActiveScene.reset();
-                }
-
-                m_ActiveScene = std::make_unique<TScene>(std::forward<Args>(args)...);
-                m_ActiveScene->OnEntered(*this);
-
-                return *static_cast<TScene*>(m_ActiveScene.get());
+                m_ActiveScene->OnExited(*this);
+                m_ActiveScene.reset();
             }
+
+            m_ActiveScene = std::make_unique<TScene>(std::forward<Args>(args)...);
+            m_ActiveScene->OnEntered(*this);
+
+            return *static_cast<TScene*>(m_ActiveScene.get());
         }
 
         void Update()

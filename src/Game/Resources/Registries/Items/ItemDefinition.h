@@ -4,10 +4,10 @@
 
 #include "AssetPtr.h"
 #include "AssetRegistry.h"
-#include "ResourceAsset.h"
-#include "TileAsset.h"
 #include "DataId.h"
+#include "ResourceAsset.h"
 #include "Serializable.h"
+#include "TileAsset.h"
 #include "TileAsset.h"
 #include "TomlSerializer.h"
 
@@ -15,7 +15,7 @@ namespace cpp_conv
 {
     class ItemDefinition : public Serializable<ItemDefinition, TomlSerializer, resources::ResourceAsset>
     {
-        inline static TomlSerializer::Config ms_ConveyorConfig = { "item" };
+        inline static TomlSerializer::Config ms_ConveyorConfig = {"item"};
     public:
         ItemDefinition()
             : Serializable(

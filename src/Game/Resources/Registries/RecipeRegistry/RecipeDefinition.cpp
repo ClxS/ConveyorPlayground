@@ -3,7 +3,9 @@
 #include "ResourceManager.h"
 
 bool cpp_conv::TypedDataReader<cpp_conv::RecipeDefinition::RecipeItem>::Read(const toml::Table* value,
-    const char* szPropertyName, RecipeDefinition::RecipeItem& pTargetVariable)
+                                                                             const char* szPropertyName,
+                                                                             RecipeDefinition::RecipeItem&
+                                                                             pTargetVariable)
 {
     uint32_t iValue;
     const bool bResult = TypedDataReader<uint32_t>::Read(value, szPropertyName, iValue);
@@ -27,7 +29,7 @@ bool cpp_conv::TypedDataReader<std::vector<cpp_conv::RecipeDefinition::RecipeIte
         return false;
     }
 
-    for(auto& key : recipeTable->keys())
+    for (auto& key : recipeTable->keys())
     {
         RecipeDefinition::RecipeItem item;
         const bool bResult = TypedDataReader<RecipeDefinition::RecipeItem>::Read(recipeTable.get(), key.c_str(), item);

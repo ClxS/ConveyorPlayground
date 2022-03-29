@@ -8,9 +8,9 @@
 #include "SDL_events.h"
 
 #include <backends/imgui_impl_sdl.h>
+#include "AssetRegistry.h"
 #include "RenderContext.h"
 #include "Vector3.h"
-#include "AssetRegistry.h"
 #include "AtlasAppHost/Application.h"
 
 void doZoom(cpp_conv::RenderContext& kRenderContext, float newZoom)
@@ -18,11 +18,11 @@ void doZoom(cpp_conv::RenderContext& kRenderContext, float newZoom)
     newZoom = std::max(newZoom, 0.25f);
     newZoom = std::min(newZoom, 2.0f);
 
-    auto [w, h]  = atlas::app_host::Application::Get().GetAppDimensions();
+    auto [w, h] = atlas::app_host::Application::Get().GetAppDimensions();
     auto [x, y] = cpp_conv::apphost::getCursorPosition();
 
     // ReSharper disable once CppRedundantCastExpression
-    Vector2F screenCoords((float)x, (float)y);
+    Vector2F screenCoords((float)x, (y));
     screenCoords = screenCoords;
 
     const Vector2F offset = screenCoords + kRenderContext.m_CameraPosition.GetXY();

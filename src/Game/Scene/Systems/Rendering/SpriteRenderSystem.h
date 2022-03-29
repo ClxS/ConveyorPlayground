@@ -7,8 +7,8 @@
 
 #include "TileRenderHandler.h"
 
-#include "RenderContext.h"
 #include "PositionComponent.h"
+#include "RenderContext.h"
 #include "SpriteLayerComponent.h"
 
 // TODO REMOVE THIS. This needs to go once we move to Atlas Render
@@ -16,7 +16,7 @@ extern cpp_conv::RenderContext* g_renderContext;
 
 namespace cpp_conv
 {
-    template<int32_t Layer>
+    template <int32_t Layer>
     class SpriteLayerRenderSystem final : public atlas::scene::SystemBase
     {
     public:
@@ -26,9 +26,11 @@ namespace cpp_conv
 
         void Update(atlas::scene::EcsManager& ecs) override
         {
-            for(const atlas::scene::EntityId entity : ecs.GetEntitiesWithComponents<components::PositionComponent, components::SpriteLayerComponent<Layer>>())
+            for (const atlas::scene::EntityId entity : ecs.GetEntitiesWithComponents<
+                     components::PositionComponent, components::SpriteLayerComponent<Layer>>())
             {
-                const auto& [position, sprite] = ecs.GetComponents<components::PositionComponent, components::SpriteLayerComponent<Layer>>(entity);
+                const auto& [position, sprite] = ecs.GetComponents<
+                    components::PositionComponent, components::SpriteLayerComponent<Layer>>(entity);
                 if (!sprite.m_pTile)
                 {
                     continue;
@@ -37,8 +39,8 @@ namespace cpp_conv
                 tileRenderer(
                     *g_renderContext,
                     sprite.m_pTile.get(),
-                    { static_cast<float>(position.m_Position.x()) * 4, static_cast<float>(position.m_Position.y()) * 4 },
-                    { 0xFFFFFFFF },
+                    {static_cast<float>(position.m_Position.x()) * 4, static_cast<float>(position.m_Position.y()) * 4},
+                    {0xFFFFFFFF},
                     true);
             }
         }

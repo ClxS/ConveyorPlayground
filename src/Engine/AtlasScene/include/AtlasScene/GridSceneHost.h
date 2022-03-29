@@ -4,6 +4,5 @@ namespace atlas::scene
 {
     class GridSceneHost
     {
-
     };
 }

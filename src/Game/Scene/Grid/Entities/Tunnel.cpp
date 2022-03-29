@@ -23,7 +23,8 @@ void shuffle(RandomAccessIterator first, RandomAccessIterator last, URNG&& g)
     }
 }
 
-std::tuple<int, Vector3> GetUndergroundLength(const cpp_conv::WorldMap& map, const cpp_conv::Entity* pStart, Direction direction)
+std::tuple<int, Vector3> GetUndergroundLength(const cpp_conv::WorldMap& map, const cpp_conv::Entity* pStart,
+                                              Direction direction)
 {
     Vector3 kTargetPosition;
     int iTargetUnderground = -1;
@@ -51,9 +52,9 @@ std::tuple<int, Vector3> GetUndergroundLength(const cpp_conv::WorldMap& map, con
 
 cpp_conv::Tunnel::Tunnel(const Vector3 position, const Vector3 size, const Direction direction)
     : Entity(position, size, EntityKind::Tunnel)
-    , m_pOtherSide{nullptr}
-    , m_pSequence{nullptr}
-    , m_Direction(direction)
+      , m_pOtherSide{nullptr}
+      , m_pSequence{nullptr}
+      , m_Direction(direction)
 {
 }
 
@@ -79,7 +80,8 @@ void cpp_conv::Tunnel::Realize()
 
 void cpp_conv::Tunnel::Draw(RenderContext& kRenderContext) const
 {
-    const auto pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(resources::registry::assets::conveyors::c_Tunnel);
+    const auto pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(
+        resources::registry::assets::conveyors::c_Tunnel);
     if (!pTile)
     {
         return;
@@ -103,7 +105,7 @@ void cpp_conv::Tunnel::Draw(RenderContext& kRenderContext) const
             static_cast<float>(m_position.GetY()) * renderer::c_gridScale,
             eDirection
         },
-        { 0xFF0000FF });
+        {0xFF0000FF});
 }
 
 bool cpp_conv::Tunnel::TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, const InsertInfo insertInfo)
@@ -153,10 +155,11 @@ void cpp_conv::Tunnel::OnLocalityUpdate(const WorldMap& map)
         }
 
         m_pSequence = new Sequence(this, uiDistance + 2,
-            targeting_util::getTilePosition(map, *pOtherTunnel, { 0, 0 }),
-            targeting_util::getTilePosition(map, *pOtherTunnel, { 1, 0 }),
-            targeting_util::getTilePosition(map, *pOtherTunnel, { 0, 1 }) - targeting_util::getTilePosition(map, *pOtherTunnel, { 0, 0 }),
-            m_uiMoveTick);
+                                   targeting_util::getTilePosition(map, *pOtherTunnel, {0, 0}),
+                                   targeting_util::getTilePosition(map, *pOtherTunnel, {1, 0}),
+                                   targeting_util::getTilePosition(map, *pOtherTunnel, {0, 1}) -
+                                   targeting_util::getTilePosition(map, *pOtherTunnel, {0, 0}),
+                                   m_uiMoveTick);
         pOtherTunnel->m_pSequence = m_pSequence;
 
         pOtherTunnel->m_pOtherSide = this;

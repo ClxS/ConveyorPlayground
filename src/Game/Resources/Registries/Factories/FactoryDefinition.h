@@ -1,22 +1,22 @@
 #pragma once
 
 #include <string>
-#include "ResourceAsset.h"
-#include "TileAsset.h"
-#include "DataId.h"
 #include "AssetPtr.h"
 #include "AssetRegistry.h"
-#include "TileAsset.h"
-#include "Vector3.h"
 #include "DataField.h"
+#include "DataId.h"
+#include "ResourceAsset.h"
 #include "Serializable.h"
+#include "TileAsset.h"
+#include "TileAsset.h"
 #include "TomlSerializer.h"
+#include "Vector3.h"
 
 namespace cpp_conv
 {
     class FactoryDefinition : public Serializable<FactoryDefinition, TomlSerializer, resources::ResourceAsset>
     {
-        inline static TomlSerializer::Config ms_ConveyorConfig = { "factory" };
+        inline static TomlSerializer::Config ms_ConveyorConfig = {"factory"};
     public:
         FactoryDefinition()
             : Serializable(

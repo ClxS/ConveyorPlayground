@@ -1,9 +1,9 @@
 #pragma once
 
 #include <cstdint>
+#include "DataId.h"
 #include "Enums.h"
 #include "Vector3.h"
-#include "DataId.h"
 
 namespace cpp_conv
 {
@@ -24,21 +24,25 @@ namespace cpp_conv
 
         public:
             explicit InsertInfo(const ItemId item)
-                : m_Item(item) {}
+                : m_Item(item)
+            {
+            }
 
             explicit InsertInfo(const ItemId item, const uint8_t sourceChannel)
                 : m_Item(item)
-                , m_SourceChannel{sourceChannel}
-                , m_bHasChannelInfo(true)
-            {}
+                  , m_SourceChannel{sourceChannel}
+                  , m_bHasChannelInfo(true)
+            {
+            }
 
             explicit InsertInfo(const ItemId item, const uint8_t sourceChannel, Vector2F originPosition)
                 : m_Item(item)
-                , m_SourceChannel{sourceChannel}
-                , m_bHasChannelInfo(true)
-                , m_bHasPosition{true}
-                , m_OriginPosition{originPosition}
-            {}
+                  , m_SourceChannel{sourceChannel}
+                  , m_bHasChannelInfo(true)
+                  , m_bHasPosition{true}
+                  , m_OriginPosition{originPosition}
+            {
+            }
 
             [[nodiscard]] ItemId GetItem() const { return m_Item; }
             [[nodiscard]] uint8_t GetSourceChannel() const { return m_SourceChannel; }
@@ -49,14 +53,19 @@ namespace cpp_conv
 
         Entity(const Vector3 position, const Vector3 size, const EntityKind eEntityKind)
             : m_position(position)
-            , m_size(size)
-            , m_eEntityKind(eEntityKind)
+              , m_size(size)
+              , m_eEntityKind(eEntityKind)
         {
         }
+
         virtual ~Entity() = default;
 
         virtual void Tick(const SceneContext& kContext) = 0;
-        virtual void Realize() {}
+
+        virtual void Realize()
+        {
+        }
+
         virtual void Draw(RenderContext& kContext) const = 0;
 
         virtual bool TryInsert(
@@ -83,7 +92,10 @@ namespace cpp_conv
         [[nodiscard]] virtual uint32_t GetDrawPassCount() const { return 1; }
 
         [[nodiscard]] virtual bool RequiresPlacementLocalityChecks() const { return false; }
-        virtual void OnLocalityUpdate(const WorldMap&) {};
+
+        virtual void OnLocalityUpdate(const WorldMap&)
+        {
+        };
 
         Vector3 m_position;
         Vector3 m_size;

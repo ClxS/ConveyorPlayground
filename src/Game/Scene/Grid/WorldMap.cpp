@@ -1,7 +1,7 @@
 #include "WorldMap.h"
-#include "Map.h"
-#include "Conveyor.h"
 #include <cassert>
+#include "Conveyor.h"
+#include "Map.h"
 
 bool cpp_conv::WorldMap::Cell::HasFloor(uint32_t uiFloor) const
 {
@@ -86,22 +86,22 @@ bool cpp_conv::WorldMap::Cell::SetEntity(const CellCoordinate coord, Entity* pEn
 cpp_conv::WorldMap::CellCoordinate cpp_conv::WorldMap::ToCellSpace(Vector3 position)
 {
     constexpr int32_t worldToGridSpaceValue = (c_uiMaximumMapSize / 2) * c_uiCellSize;
-    const Vector3 worldToGridSpaceTransform = { worldToGridSpaceValue, worldToGridSpaceValue, 0 };
+    const Vector3 worldToGridSpaceTransform = {worldToGridSpaceValue, worldToGridSpaceValue, 0};
     position += worldToGridSpaceTransform;
 
     constexpr int32_t axisSize = c_uiMaximumMapSize * c_uiCellSize;
     if (position.GetX() < 0 || position.GetY() < 0 || position.GetX() >= axisSize || position.GetY() >= axisSize)
     {
-        return { -1, -1, -1, -1, position.GetZ() };
+        return {-1, -1, -1, -1, position.GetZ()};
     }
 
-    const auto iHorizontalCell = static_cast<int32_t>(position.GetX() / c_uiCellSize);
-    const auto iHorizontalSlot = static_cast<int32_t>(position.GetX() % c_uiCellSize);
+    const auto iHorizontalCell = position.GetX() / c_uiCellSize;
+    const auto iHorizontalSlot = position.GetX() % c_uiCellSize;
 
-    const auto iVerticalCell = static_cast<int32_t>(position.GetY() / c_uiCellSize);
-    const auto iVerticalSlot = static_cast<int32_t>(position.GetY() % c_uiCellSize);
+    const auto iVerticalCell = position.GetY() / c_uiCellSize;
+    const auto iVerticalSlot = position.GetY() % c_uiCellSize;
 
-    return { iHorizontalCell, iVerticalCell, iHorizontalSlot, iVerticalSlot, position.GetZ() };
+    return {iHorizontalCell, iVerticalCell, iHorizontalSlot, iVerticalSlot, position.GetZ()};
 }
 
 cpp_conv::Entity* cpp_conv::WorldMap::GetEntity(const Vector3 position) const
@@ -144,7 +144,7 @@ void cpp_conv::WorldMap::Consume(const resources::AssetPtr<resources::Map>& map)
     map->GetOtherEntities().clear();
     m_bSuppressAssess = false;
 
-    for(Entity* pEntity : this->GetConveyors())
+    for (Entity* pEntity : this->GetConveyors())
     {
         if (pEntity->RequiresPlacementLocalityChecks())
         {
@@ -152,7 +152,7 @@ void cpp_conv::WorldMap::Consume(const resources::AssetPtr<resources::Map>& map)
         }
     }
 
-    for(Entity* pEntity : this->GetOtherEntities())
+    for (Entity* pEntity : this->GetOtherEntities())
     {
         if (pEntity->RequiresPlacementLocalityChecks())
         {
@@ -181,11 +181,13 @@ bool cpp_conv::WorldMap::PlaceEntity(Vector3 position, Entity* pEntity)
 
     for (int32_t iXPosition = position.GetX(); iXPosition < (position.GetX() + pEntity->m_size.GetX()); ++iXPosition)
     {
-        for (int32_t iYPosition = position.GetY(); iYPosition < (position.GetY() + pEntity->m_size.GetY()); ++iYPosition)
+        for (int32_t iYPosition = position.GetY(); iYPosition < (position.GetY() + pEntity->m_size.GetY()); ++
+             iYPosition)
         {
-            for (int32_t iDepthPosition = position.GetZ(); iDepthPosition < (position.GetZ() + pEntity->m_size.GetZ()); ++iDepthPosition)
+            for (int32_t iDepthPosition = position.GetZ(); iDepthPosition < (position.GetZ() + pEntity->m_size.GetZ());
+                 ++iDepthPosition)
             {
-                CellCoordinate coord = ToCellSpace({ iXPosition, iYPosition, iDepthPosition });
+                CellCoordinate coord = ToCellSpace({iXPosition, iYPosition, iDepthPosition});
                 assert(!coord.IsInvalid());
 
                 Cell* pCell = GetOrCreateCell(coord);
@@ -211,7 +213,7 @@ bool cpp_conv::WorldMap::PlaceEntity(Vector3 position, Entity* pEntity)
         {
             for (int z = position.GetZ() - 1; z <= position.GetZ() + pEntity->m_size.GetZ(); z++)
             {
-                CellCoordinate coord = ToCellSpace({ x, y, z });
+                CellCoordinate coord = ToCellSpace({x, y, z});
                 if (coord.IsInvalid())
                 {
                     continue;
@@ -244,11 +246,13 @@ bool cpp_conv::WorldMap::ValidateCanPlaceEntity(Vector3 position, Entity* pEntit
 {
     for (int32_t iXPosition = position.GetX(); iXPosition < (position.GetX() + pEntity->m_size.GetX()); ++iXPosition)
     {
-        for (int32_t iYPosition = position.GetY(); iYPosition < (position.GetY() + pEntity->m_size.GetY()); ++iYPosition)
+        for (int32_t iYPosition = position.GetY(); iYPosition < (position.GetY() + pEntity->m_size.GetY()); ++
+             iYPosition)
         {
-            for (int32_t iDepthPosition = position.GetZ(); iDepthPosition < (position.GetZ() + pEntity->m_size.GetZ()); ++iDepthPosition)
+            for (int32_t iDepthPosition = position.GetZ(); iDepthPosition < (position.GetZ() + pEntity->m_size.GetZ());
+                 ++iDepthPosition)
             {
-                const Vector3 checkPosition = { iXPosition, iYPosition, iDepthPosition };
+                const Vector3 checkPosition = {iXPosition, iYPosition, iDepthPosition};
                 CellCoordinate coord = ToCellSpace(checkPosition);
                 if (coord.IsInvalid())
                 {

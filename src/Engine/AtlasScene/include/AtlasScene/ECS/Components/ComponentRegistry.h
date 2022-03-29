@@ -12,7 +12,7 @@ namespace atlas::scene
     class ComponentRegistry
     {
     public:
-        using PoolFactory = atlas::scene::PoolBase* (*)(void);
+        using PoolFactory = PoolBase* (*)(void);
 
         ComponentRegistry() = delete;
         ~ComponentRegistry() = delete;
@@ -21,7 +21,7 @@ namespace atlas::scene
         ComponentRegistry operator=(const ComponentRegistry&) = delete;
         ComponentRegistry operator=(const ComponentRegistry&&) = delete;
 
-        template<typename TComponent>
+        template <typename TComponent>
         static void RegisterComponent()
         {
             utils::TemplatedUniquenessCounter<TComponent, ComponentRegistry>::Ensure();
@@ -39,7 +39,7 @@ namespace atlas::scene
             return m_ComponentPoolFactory[index];
         }
 
-        template<typename TComponent>
+        template <typename TComponent>
         static uint64_t GetComponentMask()
         {
             const uint64_t index = utils::TemplatedUniquenessCounter<TComponent, ComponentRegistry>::GetTypeValue();

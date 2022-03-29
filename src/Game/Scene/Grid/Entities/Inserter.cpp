@@ -1,34 +1,34 @@
 #include "Inserter.h"
 #include "Conveyor.h"
-#include "Sequence.h"
 #include "SceneContext.h"
+#include "Sequence.h"
 
-#include "Renderer.h"
 #include "RenderContext.h"
+#include "Renderer.h"
 
 #include <algorithm>
 #include <array>
-#include <random>
 #include <chrono>
-#include "ResourceManager.h"
-#include "TileAsset.h"
+#include <random>
+#include "EntityGrid.h"
 #include "InserterDefinition.h"
 #include "InserterRegistry.h"
-#include "EntityGrid.h"
-#include "ItemRegistry.h"
 #include "ItemDefinition.h"
+#include "ItemRegistry.h"
+#include "ResourceManager.h"
+#include "TileAsset.h"
 
 cpp_conv::Inserter::Inserter(Vector3 position, Vector3 size, Direction direction, InserterId inserterId)
     : Entity(position, size, EntityKind::Inserter)
-    , m_inserterId(inserterId)
-    , m_direction(direction)
-    , m_transitTime(9999999)
-    , m_cooldownTime(9999999)
-    , m_supportsStacks(false)
-    , m_currentItem(ItemIds::None)
-    , m_currentStackSize(0)
-    , m_uiTicksRemainingInState(0)
-    , m_eCurrentState(State::WaitingPickup)
+      , m_inserterId(inserterId)
+      , m_direction(direction)
+      , m_transitTime(9999999)
+      , m_cooldownTime(9999999)
+      , m_supportsStacks(false)
+      , m_currentItem(ItemIds::None)
+      , m_currentStackSize(0)
+      , m_uiTicksRemainingInState(0)
+      , m_eCurrentState(State::WaitingPickup)
 {
     const resources::AssetPtr<InserterDefinition> pFactory = resources::getInserterDefinition(inserterId);
     if (!pFactory)
@@ -96,11 +96,11 @@ void cpp_conv::Inserter::Draw(RenderContext& kRenderContext) const
         kRenderContext,
         pTile.get(),
         {
-            (float)m_position.GetX() * renderer::c_gridScale,
-            (float)m_position.GetY() * renderer::c_gridScale,
+            static_cast<float>(m_position.GetX()) * renderer::c_gridScale,
+            static_cast<float>(m_position.GetY()) * renderer::c_gridScale,
             rotationFromDirection(m_direction)
         },
-        { 0xFF0000FF });
+        {0xFF0000FF});
 }
 
 std::string cpp_conv::Inserter::GetDescription() const
@@ -111,17 +111,16 @@ std::string cpp_conv::Inserter::GetDescription() const
         return "Waiting for item to pickup";
         break;
     case State::Transfering:
-    {
-        const resources::AssetPtr<ItemDefinition> pItem = resources::getItemDefinition(m_currentItem);
-        return std::format("Transfering {}", pItem == nullptr ? "Unknown item" : pItem->GetName());
-        break;
-    }
+        {
+            const resources::AssetPtr<ItemDefinition> pItem = resources::getItemDefinition(m_currentItem);
+            return std::format("Transfering {}", pItem == nullptr ? "Unknown item" : pItem->GetName());
+            break;
+        }
     case State::Cooldown:
         return "Cooling down";
         break;
     default:
         break;
-
     }
     return "";
 }
@@ -152,7 +151,8 @@ bool cpp_conv::Inserter::TryInsertItem(const SceneContext& kContext)
         return false;
     }
 
-    if (!pTargetEntity->TryInsert(kContext, *this, InsertInfo(m_currentItem, 0)) && !pTargetEntity->TryInsert(kContext, *this, InsertInfo(m_currentItem, 1)))
+    if (!pTargetEntity->TryInsert(kContext, *this, InsertInfo(m_currentItem, 0)) && !pTargetEntity->TryInsert(
+        kContext, *this, InsertInfo(m_currentItem, 1)))
     {
         return false;
     }
