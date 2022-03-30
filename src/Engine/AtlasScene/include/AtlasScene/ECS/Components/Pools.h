@@ -14,6 +14,7 @@ namespace atlas::scene
     public:
         virtual ~PoolBase() = default;
 
+        [[nodiscard]] virtual int32_t Size() const = 0;
         virtual void Remove(int32_t uiIndex) = 0;
         virtual void SwapAndPop(int32_t uiRemovedIndex) = 0;
         virtual void Pop() = 0;

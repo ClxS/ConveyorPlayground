@@ -33,6 +33,9 @@ namespace atlas::scene
         TComponent& AddComponent(EntityId entity, TComponent&& value);
 
         template <typename TComponent>
+        void RemoveComponent(const EntityId entity);
+
+        template <typename TComponent>
         [[nodiscard]] bool DoesEntityHaveComponent(EntityId entity) const;
 
         template <typename TComponent, typename... TOtherComponents>
@@ -176,6 +179,16 @@ namespace atlas::scene
         newEntityPool.Push({entity});
         if (oldPool.m_EntityPool.Size() > 1 || oldEntityIndex != oldPool.m_EntityPool.Size() - 1)
         {
+            // We need to also move our swapees sparse set index
+            const auto oldIndices = m_EntityIndices.GetCopy(oldPool.m_EntityPool.Size() - 1);
+            m_EntityIndices.Set(
+                oldPool.m_EntityPool.Size() - 1,
+                EntityIndex
+                {
+                    oldEntityIndex,
+                    oldIndices.m_ArchetypeIndex
+                });
+
             oldPool.m_EntityPool.SwapAndPop(oldEntityIndex);
         }
         else
@@ -203,6 +216,61 @@ namespace atlas::scene
         {
             return &pool->Push(value);
         });
+    }
+
+    template <typename TComponent>
+    void EcsManager::RemoveComponent(const EntityId entity)
+    {
+        const auto [oldEntityIndex, oldArchetypeIndex] = m_EntityIndices.GetCopy(entity.m_Value);
+        assert(oldEntityIndex >= 0);
+        assert(oldArchetypeIndex.m_ArchetypeIndex >= 0);
+
+        const uint64_t removedComponentMask = ComponentRegistry::GetComponentMask<TComponent>();
+        ArchetypeIndex newArchetypeIndex = ArchetypeIndex::Empty();
+        {
+            const uint64_t currentMask = m_ArchetypePools[oldArchetypeIndex.m_ArchetypeIndex].m_ArchetypeComponentMask;
+            assert((currentMask & removedComponentMask) != 0);
+
+            const uint64_t newMask = currentMask & (~removedComponentMask);
+            newArchetypeIndex = GetOrCreateArchetype(newMask);
+        }
+
+        // Important! We need to re-obtain the old pool in case the GetOrCreateArchetype caused an expansion (and thus moved it)
+        ArchetypePool& oldPool = GetPool(oldArchetypeIndex);
+
+        auto& [newArchetypeMask, newEntityPool, newComponentPools] = GetPool(newArchetypeIndex);
+
+        m_EntityIndices.Set(entity.m_Value, EntityIndex{newEntityPool.Size(), newArchetypeIndex});
+
+        // Move components over to new archetype
+        for (auto [poolMask, componentPool] : newComponentPools)
+        {
+            assert((oldPool.m_ArchetypeComponentMask & poolMask) != 0);
+            componentPool->ClaimFromOtherPool(oldPool.GetComponentPool(poolMask).m_Pool, oldEntityIndex);
+        }
+
+        // Remove from the removed component type, as the above wont have migrated it.
+        {
+            auto* pOtherPool = oldPool.GetComponentPool(removedComponentMask).m_Pool;
+            if (pOtherPool->Size() > 1 || oldEntityIndex != pOtherPool->Size() - 1)
+            {
+                pOtherPool->SwapAndPop(oldEntityIndex);
+            }
+            else
+            {
+                pOtherPool->Pop();
+            }
+        }
+
+        newEntityPool.Push({entity});
+        if (oldPool.m_EntityPool.Size() > 1 || oldEntityIndex != oldPool.m_EntityPool.Size() - 1)
+        {
+            oldPool.m_EntityPool.SwapAndPop(oldEntityIndex);
+        }
+        else
+        {
+            oldPool.m_EntityPool.Pop();
+        }
     }
 
     template <typename TComponent>
@@ -249,13 +317,13 @@ namespace atlas::scene
     template <typename TComponent>
     TComponent& EcsManager::GetComponent(const EntityId entityId)
     {
-        const auto [_, oldArchetypeIndex] = m_EntityIndices.GetCopy(entityId.m_Value);
+        const auto [entityIndex, oldArchetypeIndex] = m_EntityIndices.GetCopy(entityId.m_Value);
         assert(oldArchetypeIndex.m_ArchetypeIndex >= 0);
 
         auto& archetypePool = GetPool(oldArchetypeIndex);
         auto& componentPool = archetypePool.GetComponentPool(ComponentRegistry::GetComponentMask<TComponent>());
         ComponentPool<TComponent>* pTypedPool = static_cast<ComponentPool<TComponent>*>(componentPool.m_Pool);
-        return pTypedPool->GetReference(m_EntityIndices.GetCopy(entityId.m_Value).m_EntityIndex);
+        return pTypedPool->GetReference(entityIndex);
     }
 
     template <typename TComponent>
