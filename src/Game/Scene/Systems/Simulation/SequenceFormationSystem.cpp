@@ -139,6 +139,10 @@ namespace
     }
 }
 
+cpp_conv::SequenceFormationSystem::SequenceFormationSystem(EntityLookupGrid& lookupGrid): m_LookupGrid{lookupGrid}
+{
+}
+
 void cpp_conv::SequenceFormationSystem::Initialise(atlas::scene::EcsManager& ecs)
 {
     using namespace components;
@@ -216,4 +220,8 @@ void cpp_conv::SequenceFormationSystem::Initialise(atlas::scene::EcsManager& ecs
         }
         while (std::distance(chunk_begin, end) > 0);
     }
+}
+
+void cpp_conv::SequenceFormationSystem::Update(atlas::scene::EcsManager&)
+{
 }

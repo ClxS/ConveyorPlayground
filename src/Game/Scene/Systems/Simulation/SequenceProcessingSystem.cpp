@@ -64,6 +64,10 @@ bool moveItemToForwardsNode(
                                                          startPosition);
 }
 
+cpp_conv::SequenceProcessingSystem_Process::SequenceProcessingSystem_Process(EntityLookupGrid& lookupGrid): m_LookupGrid{lookupGrid}
+{
+}
+
 void cpp_conv::SequenceProcessingSystem_Process::Update(atlas::scene::EcsManager& ecs)
 {
     using components::SequenceComponent;

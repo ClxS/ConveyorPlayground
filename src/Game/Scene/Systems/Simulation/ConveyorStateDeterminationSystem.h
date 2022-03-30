@@ -9,16 +9,9 @@ namespace cpp_conv
     class ConveyorStateDeterminationSystem final : public atlas::scene::SystemBase
     {
     public:
-        explicit ConveyorStateDeterminationSystem(EntityLookupGrid& lookupGrid)
-            : m_LookupGrid{lookupGrid}
-        {
-        }
-
+        explicit ConveyorStateDeterminationSystem(EntityLookupGrid& lookupGrid);
         void Initialise(atlas::scene::EcsManager& ecs) override;
-
-        void Update(atlas::scene::EcsManager&) override
-        {
-        }
+        void Update(atlas::scene::EcsManager&) override;
 
     private:
         inline static constexpr int c_MaxSequenceLength = 32;

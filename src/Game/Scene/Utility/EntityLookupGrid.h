@@ -23,15 +23,7 @@ namespace cpp_conv
             int32_t m_CellSlotY;
             int32_t m_Depth;
 
-            [[nodiscard]] bool IsInvalid() const
-            {
-                return
-                    m_CellX < 0 || m_CellY < 0 ||
-                    m_CellX >= c_uiMaximumMapSize || m_CellY >= c_uiMaximumMapSize ||
-                    m_CellSlotX < 0 || m_CellSlotY < 0 ||
-                    m_CellSlotX >= c_uiCellSize || m_CellSlotY >= c_uiCellSize ||
-                    m_Depth < 0 || m_Depth >= c_uiMaximumLevel;
-            }
+            [[nodiscard]] bool IsInvalid() const;
         };
 
         struct Cell

@@ -200,6 +200,10 @@ namespace
     }
 }
 
+cpp_conv::FactorySystem::FactorySystem(EntityLookupGrid& lookupGrid): m_LookupGrid{lookupGrid}
+{
+}
+
 void cpp_conv::FactorySystem::Update(atlas::scene::EcsManager& ecs)
 {
     for (const auto entity : ecs.GetEntitiesWithComponents<components::FactoryComponent>())

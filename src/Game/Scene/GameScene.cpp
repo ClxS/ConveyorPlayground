@@ -102,3 +102,43 @@ void cpp_conv::GameScene::OnEntered(atlas::scene::SceneManager& sceneManager)
 
     EcsScene::OnEntered(sceneManager);
 }
+
+void cpp_conv::GameScene::ConstructSystems(atlas::scene::SystemsBuilder& builder)
+{
+    auto conveyorProcessingGroup = builder.RegisterGroup<>(
+        "Conveyor Processing",
+        [this](atlas::scene::SystemsBuilder& groupBuilder)
+        {
+            groupBuilder.RegisterSystem<ConveyorStateDeterminationSystem>(m_SceneData.m_LookupGrid);
+            groupBuilder.RegisterSystem<SequenceFormationSystem, ConveyorStateDeterminationSystem>(
+                m_SceneData.m_LookupGrid);
+            groupBuilder.RegisterSystem<SequenceProcessingSystem_Process, SequenceFormationSystem>(
+                m_SceneData.m_LookupGrid);
+            groupBuilder.RegisterSystem<StandaloneConveyorSystem_Process, SequenceFormationSystem>(
+                m_SceneData.m_LookupGrid);
+        });
+
+    auto conveyorRealizeGroup = builder.RegisterGroup<>(
+        "Conveyor Realization",
+        {conveyorProcessingGroup},
+        [this](atlas::scene::SystemsBuilder& groupBuilder)
+        {
+            groupBuilder.RegisterSystem<SequenceProcessingSystem_Realize>();
+            groupBuilder.RegisterSystem<StandaloneConveyorSystem_Realize>();
+        });
+
+    auto sceneSystems = builder.RegisterGroup<>(
+        "General Scene Systems",
+        {conveyorRealizeGroup},
+        [this](atlas::scene::SystemsBuilder& groupBuilder)
+        {
+            groupBuilder.RegisterSystem<FactorySystem>(m_SceneData.m_LookupGrid);
+        });
+
+    builder.RegisterGroup("SpriteRendering", {sceneSystems}, [](atlas::scene::SystemsBuilder& groupBuilder)
+    {
+        groupBuilder.RegisterSystem<SpriteLayerRenderSystem<1>>();
+        groupBuilder.RegisterSystem<SpriteLayerRenderSystem<2>, SpriteLayerRenderSystem<1>>();
+        groupBuilder.RegisterSystem<SpriteLayerRenderSystem<3>, SpriteLayerRenderSystem<2>>();
+    });
+}

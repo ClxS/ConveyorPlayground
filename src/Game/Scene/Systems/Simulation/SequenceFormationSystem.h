@@ -8,16 +8,9 @@ namespace cpp_conv
     class SequenceFormationSystem final : public atlas::scene::SystemBase
     {
     public:
-        explicit SequenceFormationSystem(EntityLookupGrid& lookupGrid)
-            : m_LookupGrid{lookupGrid}
-        {
-        }
-
+        explicit SequenceFormationSystem(EntityLookupGrid& lookupGrid);
         void Initialise(atlas::scene::EcsManager& ecs) override;
-
-        void Update(atlas::scene::EcsManager&) override
-        {
-        }
+        void Update(atlas::scene::EcsManager&) override;
 
     private:
         inline static constexpr int c_MaxSequenceLength = 32;

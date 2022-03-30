@@ -8,11 +8,7 @@ namespace cpp_conv
     class FactorySystem final : public atlas::scene::SystemBase
     {
     public:
-        explicit FactorySystem(EntityLookupGrid& lookupGrid)
-            : m_LookupGrid{lookupGrid}
-        {
-        }
-
+        explicit FactorySystem(EntityLookupGrid& lookupGrid);
         void Update(atlas::scene::EcsManager&) override;
 
     private:

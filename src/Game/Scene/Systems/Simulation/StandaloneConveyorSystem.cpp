@@ -9,6 +9,10 @@
 #include "PositionComponent.h"
 #include "AtlasScene/ECS/Components/EcsManager.h"
 
+cpp_conv::StandaloneConveyorSystem_Process::StandaloneConveyorSystem_Process(EntityLookupGrid& lookupGrid): m_LookupGrid{lookupGrid}
+{
+}
+
 void cpp_conv::StandaloneConveyorSystem_Process::Update(atlas::scene::EcsManager& ecs)
 {
     for (const auto& entity : ecs.GetEntitiesWithComponents<

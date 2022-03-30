@@ -185,6 +185,10 @@ namespace
     }
 }
 
+cpp_conv::ConveyorStateDeterminationSystem::ConveyorStateDeterminationSystem(EntityLookupGrid& lookupGrid): m_LookupGrid{lookupGrid}
+{
+}
+
 void cpp_conv::ConveyorStateDeterminationSystem::Initialise(atlas::scene::EcsManager& ecs)
 {
     using namespace components;
@@ -267,4 +271,8 @@ void cpp_conv::ConveyorStateDeterminationSystem::Initialise(atlas::scene::EcsMan
             ecs.RemoveComponent<IndividuallyProcessableConveyorComponent>(entity);
         }
     }
+}
+
+void cpp_conv::ConveyorStateDeterminationSystem::Update(atlas::scene::EcsManager&)
+{
 }

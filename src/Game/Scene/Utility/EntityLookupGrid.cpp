@@ -3,6 +3,16 @@
 #include "Conveyor.h"
 #include "Map.h"
 
+bool cpp_conv::EntityLookupGrid::CellCoordinate::IsInvalid() const
+{
+    return
+        m_CellX < 0 || m_CellY < 0 ||
+        m_CellX >= c_uiMaximumMapSize || m_CellY >= c_uiMaximumMapSize ||
+        m_CellSlotX < 0 || m_CellSlotY < 0 ||
+        m_CellSlotX >= c_uiCellSize || m_CellSlotY >= c_uiCellSize ||
+        m_Depth < 0 || m_Depth >= c_uiMaximumLevel;
+}
+
 bool cpp_conv::EntityLookupGrid::Cell::HasFloor(uint32_t uiFloor) const
 {
     if (uiFloor >= m_CellGrid.size())
