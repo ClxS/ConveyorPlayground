@@ -179,17 +179,13 @@ namespace atlas::scene
         newEntityPool.Push({entity});
         if (oldPool.m_EntityPool.Size() > 1 || oldEntityIndex != oldPool.m_EntityPool.Size() - 1)
         {
-            // We need to also move our swapees sparse set index
-            const auto oldIndices = m_EntityIndices.GetCopy(oldPool.m_EntityPool.Size() - 1);
-            m_EntityIndices.Set(
-                oldPool.m_EntityPool.Size() - 1,
-                EntityIndex
-                {
-                    oldEntityIndex,
-                    oldIndices.m_ArchetypeIndex
-                });
-
             oldPool.m_EntityPool.SwapAndPop(oldEntityIndex);
+            m_EntityIndices.Set(
+                oldPool.m_EntityPool.GetCopy(oldEntityIndex).m_Value,
+        {
+                    oldEntityIndex,
+                    oldArchetypeIndex
+                });
         }
         else
         {
