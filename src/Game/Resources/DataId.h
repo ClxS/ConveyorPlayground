@@ -21,7 +21,7 @@ namespace cpp_conv
 #define DEFINE_UNIQUE_DATA_TYPE(NAME)\
     struct NAME##Id\
     {\
-        uint64_t m_uiItemId;\
+        uint64_t m_uiItemId = 0;\
         static ItemId Empty() { return {0}; }\
         bool IsValid() const { return m_uiItemId != 0; }\
         bool IsEmpty() const { return m_uiItemId == 0; }\

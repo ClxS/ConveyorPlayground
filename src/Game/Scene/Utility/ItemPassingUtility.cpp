@@ -168,12 +168,15 @@ bool tryInsertItemConveyor(
         return false;
     }
 
-    cpp_conv::conveyor_helper::placeItemInSlot(ecs, conveyor, pTargetChannel->m_ChannelLane, forwardTargetItemSlot,
-                                               {
-                                                   itemId,
-                                                   sourceChannel,
-                                                   sourcePosition
-                                               });
+    cpp_conv::conveyor_helper::placeItemInSlot(
+        ecs,
+        conveyor,
+        pTargetChannel->m_ChannelLane,
+        forwardTargetItemSlot,
+        {
+            itemId,
+            sourcePosition
+        });
     return true;
 }
 

@@ -193,6 +193,8 @@ void cpp_conv::ConveyorStateDeterminationSystem::Initialise(atlas::scene::EcsMan
     const auto conveyorEntities = ecs.GetEntitiesWithComponents<
         WorldEntityInformationComponent, PositionComponent, DirectionComponent, ConveyorComponent>();
 
+    std::vector<EntityId> toAddIndividualTag;
+    std::vector<EntityId> toRemoveIndividualTag;
     for (const auto entity : conveyorEntities)
     {
         // Good job this doesn't run frequently...
@@ -253,6 +255,16 @@ void cpp_conv::ConveyorStateDeterminationSystem::Initialise(atlas::scene::EcsMan
                         resources::registry::assets::conveyors::c_ConveyorCornerAntiClockwise);
                 }
             }
+        }
+
+        const bool bAlreadyHasIndividual = ecs.DoesEntityHaveComponent<IndividuallyProcessableConveyorComponent>(entity);
+        if (conveyor.m_bIsCorner && !bAlreadyHasIndividual)
+        {
+            ecs.AddComponent<IndividuallyProcessableConveyorComponent>(entity);
+        }
+        else if (!conveyor.m_bIsCorner && bAlreadyHasIndividual)
+        {
+            ecs.RemoveComponent<IndividuallyProcessableConveyorComponent>(entity);
         }
     }
 }

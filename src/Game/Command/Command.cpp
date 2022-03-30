@@ -93,7 +93,7 @@ void cpp_conv::command::processCommands(SceneContext& kContext, RenderContext& k
                 auto [x, y] = apphost::getCursorPosition();
 
                 // ReSharper disable once CppRedundantCastExpression
-                Vector2F position(static_cast<float>(x), (y));
+                Vector2F position(static_cast<float>(x), static_cast<float>(y));
                 position += kRenderContext.m_CameraPosition.GetXY();
 
                 Vector2F prePosition = position * kRenderContext.m_fZoom;

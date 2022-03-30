@@ -22,7 +22,7 @@ void doZoom(cpp_conv::RenderContext& kRenderContext, float newZoom)
     auto [x, y] = cpp_conv::apphost::getCursorPosition();
 
     // ReSharper disable once CppRedundantCastExpression
-    Vector2F screenCoords((float)x, (y));
+    Vector2F screenCoords(static_cast<float>(x), static_cast<float>(y));
     screenCoords = screenCoords;
 
     const Vector2F offset = screenCoords + kRenderContext.m_CameraPosition.GetXY();

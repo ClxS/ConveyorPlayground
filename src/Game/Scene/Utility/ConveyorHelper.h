@@ -24,7 +24,6 @@ namespace cpp_conv::conveyor_helper
     struct InsertInfo
     {
         ItemId m_Item{};
-        std::optional<uint8_t> m_SourceChannel{};
         std::optional<Eigen::Vector2f> m_OriginPosition{};
     };
 
