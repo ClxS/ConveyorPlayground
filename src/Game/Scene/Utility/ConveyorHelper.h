@@ -27,6 +27,13 @@ namespace cpp_conv::conveyor_helper
         std::optional<Eigen::Vector2f> m_OriginPosition{};
     };
 
+    struct ItemInformation
+    {
+        ItemId m_Item;
+        Eigen::Vector2f m_PreviousVisualLocation;
+        bool m_bIsAnimated;
+    };
+
     atlas::scene::EntityId findNextTailConveyor(
         const atlas::scene::EcsManager& ecs,
         const EntityLookupGrid& grid,
@@ -34,19 +41,29 @@ namespace cpp_conv::conveyor_helper
         Direction direction,
         RelativeDirection& outDirection);
 
-    inline bool hasItemInSlot(
+    bool hasItemInSlot(
+        const components::SequenceComponent& sequence,
+        uint8_t sequenceIndex,
+        int channel,
+        int slot);
+
+    inline bool hasRealizedItemInSlot(
         const components::SequenceComponent& sequence,
         const uint8_t sequenceIndex,
         const int channel,
-        const int slot);
+        const int slot)
+    {
+        const uint64_t slotOffset = sequence.m_Length * 2 - sequenceIndex * 2 - slot - 1;
+        return (sequence.m_RealizedStates[channel].m_Lanes & (1ULL << slotOffset)) != 0;
+    }
 
-    inline bool hasItemInSlot(
+    bool hasItemInSlot(
         const atlas::scene::EcsManager& ecs,
         const components::ConveyorComponent& conveyor,
         int lane,
         int slot);
 
-    inline void placeItemInSlot(
+    void placeItemInSlot(
         atlas::scene::EcsManager& ecs,
         components::SequenceComponent& sequence,
         uint8_t sequenceIndex,
@@ -54,11 +71,23 @@ namespace cpp_conv::conveyor_helper
         int targetSlot,
         const InsertInfo& info);
 
-    inline void placeItemInSlot(
+    void placeItemInSlot(
         atlas::scene::EcsManager& ecs,
         components::ConveyorComponent& conveyor,
         int targetChannel,
         int targetSlot,
         const InsertInfo& info,
         bool bShouldSetDirectly = false);
+
+    Eigen::Vector2f getSlotPosition(
+        const components::SequenceComponent& component,
+        uint8_t uiSequenceIndex,
+        int lane,
+        int slot);
+
+    std::optional<ItemInformation> getItemInSlot(
+        const components::SequenceComponent& sequence,
+        uint8_t sequenceIndex,
+        int channel,
+        int slot);
 }

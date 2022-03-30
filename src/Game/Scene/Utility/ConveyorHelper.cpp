@@ -92,7 +92,8 @@ atlas::scene::EntityId cpp_conv::conveyor_helper::findNextTailConveyor(
 bool cpp_conv::conveyor_helper::hasItemInSlot(const components::SequenceComponent& sequence,
     const uint8_t sequenceIndex, const int channel, const int slot)
 {
-    const int uiSetMask = 1ULL << (sequence.m_Length * 2 - sequenceIndex * 2 - slot - 1);
+    const uint64_t slotOffset = sequence.m_Length * 2 - sequenceIndex * 2 - slot - 1;
+    const uint64_t uiSetMask = 1ULL << slotOffset;
     return
         (sequence.m_RealizedStates[channel].m_Lanes & uiSetMask) != 0 ||
         (sequence.m_PendingStates[channel].m_PendingMoves & uiSetMask) != 0 ||
@@ -154,4 +155,54 @@ void cpp_conv::conveyor_helper::placeItemInSlot(atlas::scene::EcsManager& ecs, c
         info.m_Item,
         info.m_OriginPosition,
     };
+}
+
+Eigen::Vector2f cpp_conv::conveyor_helper::getSlotPosition(const cpp_conv::components::SequenceComponent& component,
+    const uint8_t uiSequenceIndex, const int lane, const int slot)
+{
+    const Eigen::Vector2f visual = component.m_LaneVisualOffsets[lane];
+    return visual + component.m_UnitDirection * (uiSequenceIndex * 2.0f + slot);
+}
+
+std::optional<cpp_conv::conveyor_helper::ItemInformation> cpp_conv::conveyor_helper::getItemInSlot(
+    const components::SequenceComponent& sequence,
+    const uint8_t sequenceIndex,
+    const int channel,
+    const int slot)
+{
+    const uint64_t slotOffset = sequence.m_Length * 2 - sequenceIndex * 2 - slot - 1;
+    const uint64_t uiSetMask = 1ULL << slotOffset;
+    const bool bHasObtainableItem = (sequence.m_RealizedStates[channel].m_Lanes & uiSetMask) != 0;
+    if (!bHasObtainableItem)
+    {
+        return {};
+    }
+
+    const components::SequenceComponent::RealizedState& realizedState = sequence.m_RealizedStates[channel];
+    const uint64_t uiPreviousInsertMask = realizedState.m_Lanes & (uiSetMask - 1);
+    const int uiPreviousCount = std::popcount(uiPreviousInsertMask);
+    const components::SequenceComponent::SlotItem item = realizedState.m_Items.Peek(uiPreviousCount);
+
+    if (!item.m_Item.IsValid())
+    {
+        return {};
+    }
+
+    const bool bDidItemMostLastFrame = ((realizedState.m_RealizedMovements >> slotOffset) & 0b1) == 1;
+    const bool bHasOverridePosition = ((realizedState.m_HasOverridePosition >> slotOffset) & 0b1) == 1;
+
+    if (bHasOverridePosition)
+    {
+        return {{
+            item.m_Item,
+            item.m_Position.value(),
+            bDidItemMostLastFrame
+        }};
+    }
+
+    return {{
+        item.m_Item,
+        getSlotPosition(sequence, sequenceIndex, channel, slot - 1),
+        bDidItemMostLastFrame
+    }};
 }

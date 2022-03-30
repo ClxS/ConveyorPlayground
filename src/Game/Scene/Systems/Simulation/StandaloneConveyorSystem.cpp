@@ -30,7 +30,7 @@ void cpp_conv::StandaloneConveyorSystem_Process::Update(atlas::scene::EcsManager
         conveyor.m_CurrentTick++;
         if (conveyor.m_CurrentTick < conveyor.m_MoveTick)
         {
-            return;
+            continue;
         }
 
         const auto& [position, direction] = ecs.GetComponents<components::PositionComponent, components::DirectionComponent>(entity);

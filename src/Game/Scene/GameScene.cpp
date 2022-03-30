@@ -1,5 +1,6 @@
 #include "GameScene.h"
 
+#include "ConveyorItemRenderingSystem.h"
 #include "RecipeDefinition.h"
 
 namespace
@@ -105,7 +106,7 @@ void cpp_conv::GameScene::OnEntered(atlas::scene::SceneManager& sceneManager)
 
 void cpp_conv::GameScene::ConstructSystems(atlas::scene::SystemsBuilder& builder)
 {
-    auto conveyorProcessingGroup = builder.RegisterGroup<>(
+    auto conveyorProcessingGroup = builder.RegisterGroup(
         "Conveyor Processing",
         [this](atlas::scene::SystemsBuilder& groupBuilder)
         {
@@ -118,7 +119,7 @@ void cpp_conv::GameScene::ConstructSystems(atlas::scene::SystemsBuilder& builder
                 m_SceneData.m_LookupGrid);
         });
 
-    auto conveyorRealizeGroup = builder.RegisterGroup<>(
+    auto conveyorRealizeGroup = builder.RegisterGroup(
         "Conveyor Realization",
         {conveyorProcessingGroup},
         [this](atlas::scene::SystemsBuilder& groupBuilder)
@@ -127,7 +128,7 @@ void cpp_conv::GameScene::ConstructSystems(atlas::scene::SystemsBuilder& builder
             groupBuilder.RegisterSystem<StandaloneConveyorSystem_Realize>();
         });
 
-    auto sceneSystems = builder.RegisterGroup<>(
+    auto sceneSystems = builder.RegisterGroup(
         "General Scene Systems",
         {conveyorRealizeGroup},
         [this](atlas::scene::SystemsBuilder& groupBuilder)
@@ -135,10 +136,19 @@ void cpp_conv::GameScene::ConstructSystems(atlas::scene::SystemsBuilder& builder
             groupBuilder.RegisterSystem<FactorySystem>(m_SceneData.m_LookupGrid);
         });
 
-    builder.RegisterGroup("SpriteRendering", {sceneSystems}, [](atlas::scene::SystemsBuilder& groupBuilder)
+    auto layer1 = builder.RegisterGroup("SpriteRendering_Layer1", {sceneSystems}, [](atlas::scene::SystemsBuilder& groupBuilder)
     {
         groupBuilder.RegisterSystem<SpriteLayerRenderSystem<1>>();
-        groupBuilder.RegisterSystem<SpriteLayerRenderSystem<2>, SpriteLayerRenderSystem<1>>();
-        groupBuilder.RegisterSystem<SpriteLayerRenderSystem<3>, SpriteLayerRenderSystem<2>>();
+    });
+
+    auto layer2 = builder.RegisterGroup("SpriteRendering_Layer2", {layer1}, [](atlas::scene::SystemsBuilder& groupBuilder)
+    {
+        groupBuilder.RegisterSystem<SpriteLayerRenderSystem<2>>();
+        groupBuilder.RegisterSystem<ConveyorItemRenderingSystem>();
+    });
+
+    auto layer3 = builder.RegisterGroup("SpriteRendering_Layer3", {layer2}, [](atlas::scene::SystemsBuilder& groupBuilder)
+    {
+        groupBuilder.RegisterSystem<SpriteLayerRenderSystem<3>>();
     });
 }

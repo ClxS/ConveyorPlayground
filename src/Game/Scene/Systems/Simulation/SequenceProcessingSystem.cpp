@@ -1,6 +1,7 @@
 #include "SequenceProcessingSystem.h"
 
 #include "ConveyorComponent.h"
+#include "ConveyorHelper.h"
 #include "DirectionComponent.h"
 #include "EntityGrid.h"
 #include "EntityLookupGrid.h"
@@ -22,13 +23,6 @@ const cpp_conv::components::SequenceComponent::RealizedState& getFreshRealizedSt
     return realizedState;
 }
 
-Eigen::Vector2f getSlotPosition(const cpp_conv::components::SequenceComponent& component, const uint8_t uiSequenceIndex,
-                                const int lane, const int slot)
-{
-    const Eigen::Vector2f visual = component.m_LaneVisualOffsets[lane];
-    return visual + component.m_UnitDirection * (uiSequenceIndex * 2.0f + slot);
-}
-
 bool moveItemToForwardsNode(
     atlas::scene::EcsManager& ecs,
     const cpp_conv::EntityLookupGrid& grid,
@@ -42,7 +36,7 @@ bool moveItemToForwardsNode(
         return false;
     }
 
-    const Eigen::Vector2f startPosition = getSlotPosition(component, component.m_Length - 1, lane, 1);
+    const Eigen::Vector2f startPosition = cpp_conv::conveyor_helper::getSlotPosition(component, component.m_Length - 1, lane, 1);
 
     if (!ecs.DoesEntityHaveComponents<cpp_conv::components::PositionComponent,
                                       cpp_conv::components::DirectionComponent>(component.m_HeadConveyor))
@@ -60,7 +54,7 @@ bool moveItemToForwardsNode(
         return false;
     }
 
-    return cpp_conv::item_passing_utility::tryInsertItem(ecs, grid, currentEntity, forwardEntity, item.m_Item, lane,
+    return cpp_conv::item_passing_utility::tryInsertItem(ecs, grid, component.m_HeadConveyor, forwardEntity, item.m_Item, lane,
                                                          startPosition);
 }
 
@@ -79,7 +73,7 @@ void cpp_conv::SequenceProcessingSystem_Process::Update(atlas::scene::EcsManager
         sequence.m_CurrentTick++;
         if (sequence.m_CurrentTick < sequence.m_MoveTick)
         {
-            return;
+            continue;
         }
 
         sequence.m_CurrentTick = 0;
