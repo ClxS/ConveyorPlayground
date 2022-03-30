@@ -18,7 +18,7 @@ namespace cpp_conv
         void OnEntered(atlas::scene::SceneManager& sceneManager) override
         {
             const resources::AssetPtr<resources::Map> map = resources::resource_manager::loadAssetUncached<
-                resources::Map>(resources::registry::maps::c_simple);
+                resources::Map>(m_MapId);
             sceneManager.TransitionTo<GameScene>(map);
         }
 
