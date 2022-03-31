@@ -9,5 +9,6 @@ namespace cpp_conv::components
     struct SpriteLayerComponent
     {
         resources::AssetPtr<resources::TileAsset> m_pTile;
+        float m_RotationRadians = 0.0f;
     };
 }

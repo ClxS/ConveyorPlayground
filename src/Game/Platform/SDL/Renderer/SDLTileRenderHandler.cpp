@@ -60,22 +60,8 @@ void tileRenderer(
     }
     else
     {
-        float angle = 0.0f;
-        switch (kTransform.m_rotation)
-        {
-        case Rotation::DegZero:
-            angle = 0.0f;
-            break;
-        case Rotation::Deg90:
-            angle = 90.0f;
-            break;
-        case Rotation::Deg180:
-            angle = 180.0f;
-            break;
-        case Rotation::Deg270:
-            angle = 270.0f;
-            break;
-        }
+        constexpr float c_pi = 3.14159265358979323846f;  /* pi */
+        const float angle = kTransform.m_rotation * (180.0f / c_pi);
 
         dest.x = static_cast<int>((kTransform.m_x * 16 + kContext.m_CameraPosition.GetX()) * kContext.m_fZoom);
         dest.y = static_cast<int>((kTransform.m_y * 16 + kContext.m_CameraPosition.GetY()) * kContext.m_fZoom);

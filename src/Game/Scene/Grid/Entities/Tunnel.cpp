@@ -103,7 +103,6 @@ void cpp_conv::Tunnel::Draw(RenderContext& kRenderContext) const
         {
             static_cast<float>(m_position.GetX()) * renderer::c_gridScale,
             static_cast<float>(m_position.GetY()) * renderer::c_gridScale,
-            eDirection
         },
         {0xFF0000FF});
 }

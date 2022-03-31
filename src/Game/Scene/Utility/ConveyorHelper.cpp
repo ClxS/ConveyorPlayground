@@ -36,6 +36,12 @@ atlas::scene::EntityId cpp_conv::conveyor_helper::findNextTailConveyor(
     for (auto d : directionPriority)
     {
         EntityId directionEntity = grid.GetEntity(vPositions[static_cast<int>(d)]);
+        if (directionEntity.m_Value == 12995)
+        {
+            int i = 0;
+            i++;
+        }
+
         if (directionEntity.IsInvalid() || !ecs.DoesEntityHaveComponents<
             PositionComponent, DirectionComponent, WorldEntityInformationComponent>(directionEntity))
         {
@@ -124,6 +130,12 @@ void cpp_conv::conveyor_helper::placeItemInSlot(atlas::scene::EcsManager& ecs, c
     assert((pendingState.m_PendingMoves & uiSetMask) == 0);
     assert((pendingState.m_PendingInsertions & uiSetMask) == 0);
 
+    if (sequence.m_RealizedStates[targetChannel].m_Items.GetSize() == 63)
+    {
+        int i = 0;
+        i++;
+    }
+
     pendingState.m_PendingInsertions |= uiSetMask;
     pendingState.m_PendingMoves |= uiSetMask;
 
@@ -154,6 +166,7 @@ void cpp_conv::conveyor_helper::placeItemInSlot(atlas::scene::EcsManager& ecs, c
     {
         info.m_Item,
         info.m_OriginPosition,
+        info.m_OriginPosition.has_value()
     };
 }
 
@@ -162,6 +175,35 @@ Eigen::Vector2f cpp_conv::conveyor_helper::getSlotPosition(const cpp_conv::compo
 {
     const Eigen::Vector2f visual = component.m_LaneVisualOffsets[lane];
     return visual + component.m_UnitDirection * (uiSequenceIndex * 2.0f + slot);
+}
+
+std::optional<cpp_conv::conveyor_helper::ItemInformation> cpp_conv::conveyor_helper::getItemInSlot(
+    const components::ConveyorComponent& conveyor,
+    const int channel,
+    const int slot)
+{
+    const auto& rTargetChannel = conveyor.m_Channels[channel];
+    const auto& forwardTargetItem = rTargetChannel.m_pSlots[slot].m_Item;
+
+    if (forwardTargetItem.m_Item.IsEmpty())
+    {
+        return {};
+    }
+
+    if (forwardTargetItem.m_bShouldAnimate && forwardTargetItem.m_PreviousPosition.has_value())
+    {
+        return {{
+            forwardTargetItem.m_Item,
+            forwardTargetItem.m_PreviousPosition.value(),
+            forwardTargetItem.m_bShouldAnimate
+        }};
+    }
+
+    return {{
+        forwardTargetItem.m_Item,
+        rTargetChannel.m_pSlots[slot].m_VisualPosition,
+        forwardTargetItem.m_bShouldAnimate
+    }};
 }
 
 std::optional<cpp_conv::conveyor_helper::ItemInformation> cpp_conv::conveyor_helper::getItemInSlot(

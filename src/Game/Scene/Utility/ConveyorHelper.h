@@ -86,6 +86,11 @@ namespace cpp_conv::conveyor_helper
         int slot);
 
     std::optional<ItemInformation> getItemInSlot(
+        const components::ConveyorComponent& conveyor,
+        int channel,
+        int slot);
+
+    std::optional<ItemInformation> getItemInSlot(
         const components::SequenceComponent& sequence,
         uint8_t sequenceIndex,
         int channel,

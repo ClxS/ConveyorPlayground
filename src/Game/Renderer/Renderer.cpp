@@ -62,7 +62,6 @@ void drawPlayer(const cpp_conv::SceneContext& kSceneContext, cpp_conv::RenderCon
         {
             (kRenderContext.m_CameraPosition.GetX()),
             (kRenderContext.m_CameraPosition.GetY()),
-            Rotation::DegZero
         },
         {0xFFFFFFFF});
 }
@@ -195,8 +194,6 @@ void cpp_conv::renderer::drawBackground(const SceneContext& kSceneContext, Rende
         {
             (kContext.m_CameraPosition.GetX()),
             (kContext.m_CameraPosition.GetY()),
-            Rotation::DegZero,
-            true
         },
         {0xFFFFFFFF});
 }

@@ -46,7 +46,7 @@ namespace cpp_conv
             tileRenderer(
                 *g_renderContext,
                 sprite.m_pTile.get(),
-                {static_cast<float>(position.m_Position.x()) * 4, static_cast<float>(position.m_Position.y()) * 4},
+                {static_cast<float>(position.m_Position.x()) * 4, static_cast<float>(position.m_Position.y()) * 4, sprite.m_RotationRadians},
                 {0xFFFFFFFF},
                 true);
         }

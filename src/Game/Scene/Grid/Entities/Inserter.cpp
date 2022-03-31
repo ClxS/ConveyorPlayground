@@ -98,7 +98,6 @@ void cpp_conv::Inserter::Draw(RenderContext& kRenderContext) const
         {
             static_cast<float>(m_position.GetX()) * renderer::c_gridScale,
             static_cast<float>(m_position.GetY()) * renderer::c_gridScale,
-            rotationFromDirection(m_direction)
         },
         {0xFF0000FF});
 }

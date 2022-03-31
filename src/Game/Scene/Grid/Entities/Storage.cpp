@@ -30,7 +30,6 @@ void cpp_conv::Storage::Draw(RenderContext& kRenderContext) const
         {
             static_cast<float>(m_position.GetX()) * renderer::c_gridScale,
             static_cast<float>(m_position.GetY()) * renderer::c_gridScale,
-            Rotation::DegZero
         },
         {0xFFFFFF00});
 }

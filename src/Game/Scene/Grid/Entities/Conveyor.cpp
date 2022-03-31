@@ -75,7 +75,7 @@ void DrawConveyor(
     Direction cornerSourceDirection)
 {
     const cpp_conv::Transform2D transform = {
-        static_cast<float>(x), static_cast<float>(y), cpp_conv::rotationFromDirection(direction)
+        static_cast<float>(x), static_cast<float>(y)
     };
     const auto pTile = rConveyor.GetTile();
     if (pTile)
@@ -416,7 +416,7 @@ void cpp_conv::Conveyor::OnLocalityUpdate(const WorldMap& map)
         else
         {
             m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(
-                resources::registry::assets::conveyors::c_ConveyorStraightEnd);
+                resources::registry::assets::conveyors::c_ConveyorStraightCappedFront);
         }
     }
     else
