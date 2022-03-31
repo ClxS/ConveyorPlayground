@@ -8,6 +8,10 @@ function lib(name)
     		"src/**",
     		"platform/SDL/**",
     	}
+        includedirs {
+            ".",
+            "**",
+        }
 
     	flags { "FatalWarnings" }
     	pchsource("src/" .. name .. "PCH.cpp")
