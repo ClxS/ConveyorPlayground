@@ -177,12 +177,12 @@ namespace atlas::scene
         }
 
         newEntityPool.Push({entity});
-        if (oldPool.m_EntityPool.Size() > 1 || oldEntityIndex != oldPool.m_EntityPool.Size() - 1)
+        if (oldPool.m_EntityPool.Size() > 1 && oldEntityIndex != oldPool.m_EntityPool.Size() - 1)
         {
             oldPool.m_EntityPool.SwapAndPop(oldEntityIndex);
             m_EntityIndices.Set(
                 oldPool.m_EntityPool.GetCopy(oldEntityIndex).m_Value,
-        {
+            {
                     oldEntityIndex,
                     oldArchetypeIndex
                 });
@@ -259,9 +259,15 @@ namespace atlas::scene
         }
 
         newEntityPool.Push({entity});
-        if (oldPool.m_EntityPool.Size() > 1 || oldEntityIndex != oldPool.m_EntityPool.Size() - 1)
+        if (oldPool.m_EntityPool.Size() > 1 && oldEntityIndex != oldPool.m_EntityPool.Size() - 1)
         {
             oldPool.m_EntityPool.SwapAndPop(oldEntityIndex);
+            m_EntityIndices.Set(
+                oldPool.m_EntityPool.GetCopy(oldEntityIndex).m_Value,
+            {
+                    oldEntityIndex,
+                    oldArchetypeIndex
+                });
         }
         else
         {

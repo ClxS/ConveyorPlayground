@@ -63,7 +63,7 @@ int gameMain(int argc, char* argv[])
     atlas::scene::ComponentRegistry::RegisterComponent<cpp_conv::components::WorldEntityInformationComponent>();
 
     atlas::scene::SceneManager sceneManager;
-    sceneManager.TransitionTo<cpp_conv::GameMapLoadInterstitialScene>(registry::maps::c_simple);
+    sceneManager.TransitionTo<cpp_conv::GameMapLoadInterstitialScene>(registry::maps::c_bigmap);
 
     cpp_conv::FrameLimiter frameLimiter(120);
     frameLimiter.Start();
