@@ -2,7 +2,7 @@
 
 #include "AssetRegistry.h"
 #include "tomlcpp.hpp"
-#include "Vector3.h"
+#include "Eigen/Core"
 
 namespace cpp_conv
 {
@@ -28,7 +28,7 @@ static bool Read(const toml::Table* value, const char* szPropertyName, TYPE& pTa
 
     DEFINE_DATA_TYPE_HANDLER(float);
 
-    DEFINE_DATA_TYPE_HANDLER(Vector3);
+    DEFINE_DATA_TYPE_HANDLER(Eigen::Vector3i);
 
     DEFINE_DATA_TYPE_HANDLER(std::string);
 

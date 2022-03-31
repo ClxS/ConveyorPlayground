@@ -39,8 +39,10 @@ void tileRenderer(
         SDL_GetWindowSize(platform.GetSDLContext().m_Window, &windowWidth, &windowHeight);
         SDL_QueryTexture(pTexture, nullptr, nullptr, &dest.w, &dest.h);
 
-        const int screenCameraX = static_cast<int>(kContext.m_CameraPosition.GetX() * kContext.m_fZoom);
-        const int screenCameraY = static_cast<int>(kContext.m_CameraPosition.GetY() * kContext.m_fZoom);
+        //const int screenCameraX = static_cast<int>(kContext.m_CameraPosition.x() * kContext.m_fZoom);
+        ///const int screenCameraY = static_cast<int>(kContext.m_CameraPosition.y() * kContext.m_fZoom);
+        const int screenCameraX = 0;
+        const int screenCameraY = 0;
         dest.w = static_cast<int>(static_cast<float>(dest.w) * kContext.m_fZoom);
         dest.h = static_cast<int>(static_cast<float>(dest.h) * kContext.m_fZoom);
         for (int y = -dest.h + (screenCameraY % dest.h); y < windowHeight; y += dest.h)
@@ -60,11 +62,13 @@ void tileRenderer(
     }
     else
     {
+        const int screenCameraX = 0;
+        const int screenCameraY = 0;
         constexpr float c_pi = 3.14159265358979323846f;  /* pi */
         const float angle = kTransform.m_rotation * (180.0f / c_pi);
 
-        dest.x = static_cast<int>((kTransform.m_x * 16 + kContext.m_CameraPosition.GetX()) * kContext.m_fZoom);
-        dest.y = static_cast<int>((kTransform.m_y * 16 + kContext.m_CameraPosition.GetY()) * kContext.m_fZoom);
+        dest.x = static_cast<int>((kTransform.m_x * 16 + screenCameraX) * kContext.m_fZoom);
+        dest.y = static_cast<int>((kTransform.m_y * 16 + screenCameraY) * kContext.m_fZoom);
         SDL_QueryTexture(pTexture, nullptr, nullptr, &dest.w, &dest.h);
 
         const SDL_Point rotatePivot =

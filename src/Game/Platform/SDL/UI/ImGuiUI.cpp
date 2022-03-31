@@ -1,6 +1,5 @@
 #include <cstdint>
 
-#include "AppHost.h"
 #include "Gui.h"
 #include "RenderContext.h"
 

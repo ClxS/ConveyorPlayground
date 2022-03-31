@@ -9,7 +9,6 @@
 #include "ItemRegistry.h"
 #include "RenderContext.h"
 #include "SequenceComponent.h"
-#include "TargetingUtility.h"
 #include "TileRenderHandler.h"
 
 // TODO REMOVE THIS. This needs to go once we move to Atlas Render

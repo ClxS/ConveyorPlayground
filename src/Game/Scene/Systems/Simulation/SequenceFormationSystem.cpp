@@ -3,9 +3,9 @@
 #include "ConveyorComponent.h"
 #include "ConveyorHelper.h"
 #include "DirectionComponent.h"
-#include "EntityGrid.h"
 #include "FactoryComponent.h"
 #include "PositionComponent.h"
+#include "PositionHelper.h"
 #include "SequenceComponent.h"
 #include "vector_set.h"
 
@@ -31,7 +31,7 @@ namespace
         while (true)
         {
             auto [position, direction] = ecs.GetComponents<PositionComponent, DirectionComponent>(currentConveyor);
-            Eigen::Vector3i forwardPosition = cpp_conv::grid::getForwardPosition(
+            Eigen::Vector3i forwardPosition = cpp_conv::position_helper::getForwardPosition(
                 position.m_Position, direction.m_Direction);
             EntityId targetEntity = grid.GetEntity(forwardPosition);
 
@@ -52,10 +52,10 @@ namespace
             {
                 Eigen::Vector3i vPotentialNeighbours[4];
                 vPotentialNeighbours[static_cast<int>(RelativeDirection::Backwards)] =
-                    cpp_conv::grid::getBackwardsPosition(targetPosition.m_Position, targetDirection.m_Direction);
-                vPotentialNeighbours[static_cast<int>(RelativeDirection::Right)] = cpp_conv::grid::getRightPosition(
+                    cpp_conv::position_helper::getBackwardsPosition(targetPosition.m_Position, targetDirection.m_Direction);
+                vPotentialNeighbours[static_cast<int>(RelativeDirection::Right)] = cpp_conv::position_helper::getRightPosition(
                     targetPosition.m_Position, targetDirection.m_Direction);
-                vPotentialNeighbours[static_cast<int>(RelativeDirection::Left)] = cpp_conv::grid::getLeftPosition(
+                vPotentialNeighbours[static_cast<int>(RelativeDirection::Left)] = cpp_conv::position_helper::getLeftPosition(
                     targetPosition.m_Position, targetDirection.m_Direction);
 
                 for (auto neighbourCell : directionPriority)
@@ -76,7 +76,7 @@ namespace
                         PositionComponent, DirectionComponent>(neighbourEntity);
 
                     // Node ahead of has a better candidate, meaning we are the terminus.
-                    if (cpp_conv::grid::getForwardPosition(neighbourPosition.m_Position, neighbourDirection.m_Direction)
+                    if (cpp_conv::position_helper::getForwardPosition(neighbourPosition.m_Position, neighbourDirection.m_Direction)
                         == forwardPosition)
                     {
                         return currentConveyor;

@@ -1,7 +1,6 @@
 #include "ConveyorHelper.h"
 
 #include "DirectionComponent.h"
-#include "EntityGrid.h"
 #include "PositionComponent.h"
 #include "WorldEntityInformationComponent.h"
 
@@ -9,6 +8,7 @@
 
 #include "EntityLookupGrid.h"
 #include "FactoryComponent.h"
+#include "PositionHelper.h"
 
 atlas::scene::EntityId cpp_conv::conveyor_helper::findNextTailConveyor(
     const atlas::scene::EcsManager& ecs,
@@ -28,9 +28,9 @@ atlas::scene::EntityId cpp_conv::conveyor_helper::findNextTailConveyor(
     };
 
     Eigen::Vector3i vPositions[4];
-    vPositions[static_cast<int>(RelativeDirection::Backwards)] = grid::getBackwardsPosition(position, direction);
-    vPositions[static_cast<int>(RelativeDirection::Right)] = grid::getRightPosition(position, direction);
-    vPositions[static_cast<int>(RelativeDirection::Left)] = grid::getLeftPosition(position, direction);
+    vPositions[static_cast<int>(RelativeDirection::Backwards)] = position_helper::getBackwardsPosition(position, direction);
+    vPositions[static_cast<int>(RelativeDirection::Right)] = position_helper::getRightPosition(position, direction);
+    vPositions[static_cast<int>(RelativeDirection::Left)] = position_helper::getLeftPosition(position, direction);
 
     EntityId pTargetConveyor = EntityId::Invalid();
     for (auto d : directionPriority)
@@ -57,7 +57,7 @@ atlas::scene::EntityId cpp_conv::conveyor_helper::findNextTailConveyor(
             {
                 auto [targetPosition, targetDirection] = ecs.GetComponents<PositionComponent, DirectionComponent>(
                     directionEntity);
-                if (grid::getForwardPosition(targetPosition.m_Position, targetDirection.m_Direction) == position)
+                if (position_helper::getForwardPosition(targetPosition.m_Position, targetDirection.m_Direction) == position)
                 {
                     pTargetConveyor = directionEntity;
                 }

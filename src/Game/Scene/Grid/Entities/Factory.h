@@ -15,49 +15,34 @@ namespace cpp_conv
     {
     public:
         Factory(
-            Vector3 position,
+            Eigen::Vector3i position,
             Direction direction,
-            FactoryId factoryId,
-            uint32_t uiMaxStackSize = 99);
+            FactoryId factoryId)
+        : Entity(position, {1, 1, 1}, EntityKind::Producer, direction)
+          , m_hFactoryId(factoryId)
+          , m_hActiveRecipeId(RecipeIds::None)
+          , m_uiRemainingCurrentProductionEffort(0)
+          , m_uiTick(0)
+          , m_bIsRecipeDemandSatisfied(false)
+        {
+        }
 
-        [[nodiscard]] bool IsReadyToProduce() const;
-
-        void Tick(const SceneContext& kContext) override;
-        void Draw(RenderContext& kRenderContext) const override;
-
-        [[nodiscard]] bool SupportsInsertion() const override { return true; }
-        bool TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, InsertInfo insertInfo) override;
-
-        [[nodiscard]] bool SupportsProvidingItem() const override { return true; }
-        bool TryGrab(const SceneContext& kContext, bool bSingle, std::tuple<ItemId, uint32_t>& outItem) override;
-
-        [[nodiscard]] Direction GetDirection() const override { return m_direction; }
-
-        [[nodiscard]] const char* GetName() const override { return "Factory"; }
-        [[nodiscard]] std::string GetDescription() const override;
+        [[nodiscard]] const char* GetName() const { return "Factory"; }
+        [[nodiscard]] std::string GetDescription() const;
 
         [[nodiscard]] bool HasOutputPipe() const { return m_bHasOutputPipe; }
-        [[nodiscard]] Vector3 GetOutputPipe() const { return m_OutputPipe; }
+        [[nodiscard]] Eigen::Vector3i GetOutputPipe() const { return m_OutputPipe; }
 
         [[nodiscard]] FactoryId GetDefinitionId() const { return m_hFactoryId; }
 
     private:
-        bool ProduceItems();
-        void RunProductionCycle(const FactoryDefinition* pFactory);
-        bool TrySatisfyRecipeInput(const FactoryDefinition* pFactory, uint64_t& uiOutEffort);
-        void RunOutputCycle(const SceneContext& kContext, const FactoryDefinition* pFactory);
-
-        GeneralItemContainer m_inputItems;
-        GeneralItemContainer m_outputItems;
-
         FactoryId m_hFactoryId;
         RecipeId m_hActiveRecipeId;
-        Direction m_direction;
 
         uint64_t m_uiRemainingCurrentProductionEffort;
         uint64_t m_uiTick;
 
-        Vector3 m_OutputPipe;
+        Eigen::Vector3i m_OutputPipe;
         bool m_bHasOutputPipe;
 
         bool m_bIsRecipeDemandSatisfied;

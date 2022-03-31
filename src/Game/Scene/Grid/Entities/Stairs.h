@@ -10,17 +10,19 @@ namespace cpp_conv
     class Stairs : public Entity
     {
     public:
-        Stairs(Vector3 position, Vector3 size, Direction direction, bool bIsUp);
+        Stairs(Eigen::Vector3i position, Eigen::Vector3i size, Direction direction, bool bIsUp)
+            : Entity(position, size, EntityKind::Stairs)
+              , m_pItem(ItemIds::None)
+              , m_uiTick(0)
+              , m_direction(direction)
+              , m_bIsUp(bIsUp)
+        {
+        }
 
-        void Tick(const SceneContext& kContext) override;
-        void Draw(RenderContext& kRenderContext) const override;
-        [[nodiscard]] bool SupportsInsertion() const override { return true; }
-        bool TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, InsertInfo insertInfo) override;
+        [[nodiscard]] const char* GetName() const { return m_bIsUp ? "Stairs (Up)" : "Stairs (Down)"; }
+        [[nodiscard]] std::string GetDescription() const { return ""; }
 
-        [[nodiscard]] const char* GetName() const override { return m_bIsUp ? "Stairs (Up)" : "Stairs (Down)"; }
-        [[nodiscard]] std::string GetDescription() const override { return ""; }
-
-        [[nodiscard]] Direction GetDirection() const override { return m_direction; }
+        [[nodiscard]] Direction GetDirection() const { return m_direction; }
 
     private:
         ItemId m_pItem;

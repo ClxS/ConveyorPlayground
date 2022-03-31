@@ -90,8 +90,8 @@ bool cpp_conv::TypedDataReader<std::string>::Read(const toml::Table* value, cons
     return true;
 }
 
-bool cpp_conv::TypedDataReader<Vector3>::Read(const toml::Table* value, const char* szPropertyName,
-                                              Vector3& pTargetVariable)
+bool cpp_conv::TypedDataReader<Eigen::Vector3i>::Read(const toml::Table* value, const char* szPropertyName,
+                                              Eigen::Vector3i& pTargetVariable)
 {
     const auto vectorTable = value->getTable(szPropertyName);
     if (!vectorTable)
@@ -107,7 +107,7 @@ bool cpp_conv::TypedDataReader<Vector3>::Read(const toml::Table* value, const ch
         return false;
     }
 
-    pTargetVariable = Vector3(static_cast<int32_t>(x), static_cast<int32_t>(y), static_cast<int32_t>(z));
+    pTargetVariable = {static_cast<int32_t>(x), static_cast<int32_t>(y), static_cast<int32_t>(z)};
     return true;
 }
 

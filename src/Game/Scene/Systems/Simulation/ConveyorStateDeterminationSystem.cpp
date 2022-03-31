@@ -4,12 +4,11 @@
 #include "ConveyorHelper.h"
 #include "DirectionComponent.h"
 #include "Entity.h"
-#include "EntityGrid.h"
 #include "EntityLookupGrid.h"
 #include "PositionComponent.h"
+#include "PositionHelper.h"
 #include "ResourceManager.h"
 #include "SpriteLayerComponent.h"
-#include "TargetingUtility.h"
 #include "WorldEntityInformationComponent.h"
 #include "AtlasScene/ECS/Components/EcsManager.h"
 
@@ -110,6 +109,20 @@ namespace
         return std::make_tuple(backDirection == Direction::Right ? 1 : 0, otherDirection.m_Direction);
     }
 
+    [[nodiscard]] Eigen::Vector2f rotate(const Eigen::Vector2f in, const Rotation rotation, Eigen::Vector2f size)
+    {
+        const Eigen::Vector2f c_offset(1, 1);
+        size -= c_offset;
+        switch (rotation)
+        {
+        case Rotation::Deg90: return {size.y() - in.y(), in.x()};
+        case Rotation::Deg180: return {size.x() - in.x(), size.y() - in.y()};
+        case Rotation::Deg270: return {size.y() - in.y(), size.x() - in.x()};
+        case Rotation::DegZero: break;
+        }
+        return in;
+    }
+
     Eigen::Vector2f getRenderPosition(
         const cpp_conv::components::PositionComponent& positionComponent,
         const cpp_conv::components::DirectionComponent& directionComponent,
@@ -117,7 +130,7 @@ namespace
         const ConveyorSlot slot,
         const bool bAnimate = false,
         const float fLerpFactor = 1.0f,
-        const Vector2F previousPosition = {})
+        const Eigen::Vector2f previousPosition = {})
     {
         // This method translates the current direction in Right-facing space, determines the offsets, then rotates the offsets back to their original
         // direction-facing space.
@@ -130,7 +143,7 @@ namespace
             stepsRequired++;
         }
 
-        Vector2F position;
+        Eigen::Vector2f position;
         if (conveyor.m_bIsCorner)
         {
             if (conveyor.m_bIsClockwise)
@@ -178,22 +191,23 @@ namespace
         }
 
         constexpr float c_fBlockSize = 4;
-        const Vector2F blockSize(c_fBlockSize, c_fBlockSize);
+        const Eigen::Vector2f blockSize(c_fBlockSize, c_fBlockSize);
         const auto backToOrigin = static_cast<Rotation>((4 - stepsRequired) % 4);
-        position = position.Rotate(backToOrigin, blockSize);
+        position = rotate(position, backToOrigin, blockSize);
 
-        const Vector2F offset = position * 0.5f * c_fBlockSize - Vector2F(1.0f, 1.0f) - (cpp_conv::renderer::c_gridScale
-            / c_fBlockSize);
+        const Eigen::Vector2f scale{cpp_conv::renderer::c_gridScale / c_fBlockSize, cpp_conv::renderer::c_gridScale / c_fBlockSize};
+        const Eigen::Vector2f offset = position * 0.5f * c_fBlockSize - Eigen::Vector2f(1.0f, 1.0f) - scale;
 
-        const Vector2F end = (Vector2F(static_cast<float>(positionComponent.m_Position.x()),
-                                       static_cast<float>(positionComponent.m_Position.y())) * blockSize) + offset;
+        const float x = positionComponent.m_Position.x() * blockSize.x() + offset.x();
+        const float y = positionComponent.m_Position.y() * blockSize.y() + offset.y();
+        const Eigen::Vector2f end = { x, y };
         if (!bAnimate)
         {
-            return Eigen::Vector2f(end.GetX(), end.GetY());
+            return Eigen::Vector2f(end.x(), end.y());
         }
 
         const auto outValue = previousPosition + ((end - previousPosition) * fLerpFactor);
-        return {outValue.GetX(), outValue.GetY()};
+        return {outValue.x(), outValue.y()};
     }
 }
 
@@ -216,8 +230,8 @@ void cpp_conv::ConveyorStateDeterminationSystem::Initialise(atlas::scene::EcsMan
         // Good job this doesn't run frequently...
         const auto& [info, position, direction, conveyor] = ecs.GetComponents<
             WorldEntityInformationComponent, PositionComponent, DirectionComponent, ConveyorComponent>(entity);
-        const EntityId forwardEntity = m_LookupGrid.GetEntity(grid::getForwardPosition(position.m_Position, direction.m_Direction));
-        const EntityId backwardsEntity = m_LookupGrid.GetEntity(grid::getBackwardsPosition(position.m_Position, direction.m_Direction));
+        const EntityId forwardEntity = m_LookupGrid.GetEntity(position_helper::getForwardPosition(position.m_Position, direction.m_Direction));
+        const EntityId backwardsEntity = m_LookupGrid.GetEntity(position_helper::getBackwardsPosition(position.m_Position, direction.m_Direction));
 
         conveyor.m_bIsCorner = isCornerConveyor(ecs, m_LookupGrid, position, direction);
         conveyor.m_bIsClockwise = conveyor.m_bIsCorner && isClockwiseCorner(ecs, m_LookupGrid, position, direction);

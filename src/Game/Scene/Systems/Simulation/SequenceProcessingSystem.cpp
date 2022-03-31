@@ -3,10 +3,10 @@
 #include "ConveyorComponent.h"
 #include "ConveyorHelper.h"
 #include "DirectionComponent.h"
-#include "EntityGrid.h"
 #include "EntityLookupGrid.h"
 #include "ItemPassingUtility.h"
 #include "PositionComponent.h"
+#include "PositionHelper.h"
 #include "SequenceComponent.h"
 #include "AtlasScene/ECS/Components/EcsManager.h"
 
@@ -48,7 +48,7 @@ bool moveItemToForwardsNode(
         cpp_conv::components::PositionComponent, cpp_conv::components::DirectionComponent>(component.m_HeadConveyor);
 
     const auto forwardEntity = grid.GetEntity(
-        cpp_conv::grid::getForwardPosition(position.m_Position, direction.m_Direction));
+        cpp_conv::position_helper::getForwardPosition(position.m_Position, direction.m_Direction));
     if (forwardEntity.IsInvalid())
     {
         return false;

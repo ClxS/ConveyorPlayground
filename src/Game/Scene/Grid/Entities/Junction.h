@@ -10,15 +10,15 @@ namespace cpp_conv
     class Junction : public Entity
     {
     public:
-        Junction(Vector3 position, Vector3 size);
+        Junction(Eigen::Vector3i position, Eigen::Vector3i size)
+            : Entity(position, size, EntityKind::Junction)
+              , m_pItem(ItemIds::None)
+              , m_uiTick(0)
+        {
+        }
 
-        void Tick(const SceneContext& kContext) override;
-        void Draw(RenderContext& kRenderContext) const override;
-        [[nodiscard]] bool SupportsInsertion() const override { return true; }
-        bool TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, InsertInfo insertInfo) override;
-
-        [[nodiscard]] const char* GetName() const override { return "Junction"; }
-        [[nodiscard]] std::string GetDescription() const override { return ""; }
+        [[nodiscard]] const char* GetName() const { return "Junction"; }
+        [[nodiscard]] std::string GetDescription() const { return ""; }
 
     private:
         ItemId m_pItem;

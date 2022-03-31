@@ -15,18 +15,18 @@ namespace
         {
             auto& sprite = ecs.AddComponent<cpp_conv::components::SpriteLayerComponent<1>>(ecsEntity);
             sprite.m_pTile = definition->GetTile();
-            sprite.m_RotationRadians = cpp_conv::rotationRadiansFromDirection(entity->GetDirection());
+            sprite.m_RotationRadians = cpp_conv::rotationRadiansFromDirection(entity->m_Direction);
         }
 
         ecs.AddComponent<cpp_conv::components::NameComponent>(ecsEntity, definition->GetName().c_str());
         auto& factory = ecs.AddComponent<cpp_conv::components::FactoryComponent>(ecsEntity);
         auto size = definition->GetSize();
 
-        factory.m_Size = {size.GetX(), size.GetY(), size.GetZ()};
+        factory.m_Size = {size.x(), size.y(), size.z()};
         if (definition->HasOwnOutputPipe())
         {
             auto outputPipe = definition->GetOutputPipe();
-            factory.m_OutputPipe = {outputPipe.GetX(), outputPipe.GetY(), outputPipe.GetZ()};
+            factory.m_OutputPipe = {outputPipe.x(), outputPipe.y(), outputPipe.z()};
         }
 
         const auto recipeId = definition->GetProducedRecipe();
@@ -60,11 +60,11 @@ void cpp_conv::GameScene::OnEntered(atlas::scene::SceneManager& sceneManager)
     {
         const auto ecsEntity = ecs.AddEntity();
         const auto& position = ecs.AddComponent<components::PositionComponent>(
-            ecsEntity, Eigen::Vector3i(entity->m_position.GetX(), entity->m_position.GetY(),
-                                       entity->m_position.GetZ()));
+            ecsEntity, Eigen::Vector3i(entity->m_position.x(), entity->m_position.y(),
+                                       entity->m_position.z()));
         ecs.AddComponent<components::NameComponent>(ecsEntity, "Basic Conveyor");
         ecs.AddComponent<components::DescriptionComponent>(ecsEntity, "The wheels of invention");
-        ecs.AddComponent<components::DirectionComponent>(ecsEntity, entity->m_direction);
+        ecs.AddComponent<components::DirectionComponent>(ecsEntity, entity->m_Direction);
         ecs.AddComponent<components::ConveyorComponent>(ecsEntity);
         ecs.AddComponent<components::SpriteLayerComponent<1>>(ecsEntity);
         ecs.AddComponent<components::WorldEntityInformationComponent>(ecsEntity, entity->m_eEntityKind);
@@ -77,8 +77,8 @@ void cpp_conv::GameScene::OnEntered(atlas::scene::SceneManager& sceneManager)
         ecs.AddComponent<components::WorldEntityInformationComponent>(ecsEntity, entity->m_eEntityKind);
         const auto& position = ecs.AddComponent<components::PositionComponent>(
             ecsEntity,
-            Eigen::Vector3i(entity->m_position.GetX(), entity->m_position.GetY(), entity->m_position.GetZ()));
-        ecs.AddComponent<components::DirectionComponent>(ecsEntity, entity->GetDirection());
+            Eigen::Vector3i(entity->m_position.x(), entity->m_position.y(), entity->m_position.z()));
+        ecs.AddComponent<components::DirectionComponent>(ecsEntity, entity->m_Direction);
 
         switch (entity->m_eEntityKind)
         {

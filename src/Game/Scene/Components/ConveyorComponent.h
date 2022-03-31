@@ -1,7 +1,8 @@
 #pragma once
 #include <Eigen/Core>
+
+#include "DataId.h"
 #include "Direction.h"
-#include "ItemInstance.h"
 
 #include "AtlasScene/ECS/Entity.h"
 

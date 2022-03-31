@@ -1,7 +1,8 @@
 #pragma once
 
 #include <vector>
-#include "EntityGrid.h"
+
+#include "Conveyor.h"
 #include "ResourceAsset.h"
 
 namespace cpp_conv::resources

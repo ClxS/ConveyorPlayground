@@ -7,6 +7,9 @@ project "CppConveyor"
 		"**.h",
 		"**.cpp",
 	}
+	filter {"files:Scene/Grid/**"}
+	    flags{"ExcludeFromBuild"}
+	filter{}
 	flags { "FatalWarnings" }
 	dependson {
 		"AssetBuilder"

@@ -2,11 +2,11 @@
 
 #include "ConveyorComponent.h"
 #include "DirectionComponent.h"
-#include "EntityGrid.h"
 #include "EntityLookupGrid.h"
 #include "FactoryComponent.h"
 #include "ItemPassingUtility.h"
 #include "PositionComponent.h"
+#include "PositionHelper.h"
 #include "Transform2D.h"
 #include "AtlasScene/ECS/Components/EcsManager.h"
 
@@ -162,7 +162,7 @@ namespace
         };
         pipe += position.m_Position;
 
-        const auto targetEntity = grid.GetEntity(cpp_conv::grid::getForwardPosition(pipe, direction.m_Direction));
+        const auto targetEntity = grid.GetEntity(cpp_conv::position_helper::getForwardPosition(pipe, direction.m_Direction));
         if (targetEntity.IsInvalid() || !cpp_conv::item_passing_utility::entitySupportsInsertion(ecs, targetEntity))
         {
             return;

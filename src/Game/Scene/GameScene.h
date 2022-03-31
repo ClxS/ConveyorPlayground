@@ -23,7 +23,6 @@
 #include "SpriteRenderSystem.h"
 #include "StandaloneConveyorSystem.h"
 #include "WorldEntityInformationComponent.h"
-#include "WorldMap.h"
 #include "Systems/Simulation/SequenceFormationSystem.h"
 
 namespace cpp_conv

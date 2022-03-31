@@ -10,7 +10,6 @@
 #include "TileAsset.h"
 #include "TileAsset.h"
 #include "TomlSerializer.h"
-#include "Vector3.h"
 
 namespace cpp_conv
 {
@@ -35,10 +34,10 @@ namespace cpp_conv
 
         [[nodiscard]] FactoryId GetInternalId() const { return m_InternalId.m_Value; }
         [[nodiscard]] const std::string& GetName() const { return m_Name.m_Value; }
-        [[nodiscard]] Vector3 GetSize() const { return m_Size.m_Value; }
+        [[nodiscard]] Eigen::Vector3i GetSize() const { return m_Size.m_Value; }
         [[nodiscard]] uint32_t GetProductionRate() const { return m_ProductionRate.m_Value; }
         [[nodiscard]] bool HasOwnOutputPipe() const { return m_OutputPipe.m_bIsSet; }
-        [[nodiscard]] Vector3 GetOutputPipe() const { return m_OutputPipe.m_Value; }
+        [[nodiscard]] Eigen::Vector3i GetOutputPipe() const { return m_OutputPipe.m_Value; }
         [[nodiscard]] RecipeId GetProducedRecipe() const { return m_ProducedRecipe.m_Value; }
 
         [[nodiscard]] resources::AssetPtr<resources::TileAsset> GetTile() const;
@@ -50,7 +49,7 @@ namespace cpp_conv
         DataField<RecipeId, "recipe"> m_ProducedRecipe{};
         DataField<uint32_t, "rate"> m_ProductionRate{};
 
-        DataField<Vector3, "size"> m_Size{};
-        DataField<Vector3, "output", false> m_OutputPipe{};
+        DataField<Eigen::Vector3i, "size"> m_Size{};
+        DataField<Eigen::Vector3i, "output", false> m_OutputPipe{};
     };
 }

@@ -3,7 +3,6 @@
 #include <cstdint>
 #include "DataId.h"
 #include "Enums.h"
-#include "Vector3.h"
 
 namespace cpp_conv
 {
@@ -20,7 +19,7 @@ namespace cpp_conv
             uint8_t m_SourceChannel = {};
             bool m_bHasChannelInfo = {};
             bool m_bHasPosition = {};
-            Vector2F m_OriginPosition = {};
+            Eigen::Vector2f m_OriginPosition = {};
 
         public:
             explicit InsertInfo(const ItemId item)
@@ -35,7 +34,7 @@ namespace cpp_conv
             {
             }
 
-            explicit InsertInfo(const ItemId item, const uint8_t sourceChannel, Vector2F originPosition)
+            explicit InsertInfo(const ItemId item, const uint8_t sourceChannel, Eigen::Vector2f originPosition)
                 : m_Item(item)
                   , m_SourceChannel{sourceChannel}
                   , m_bHasChannelInfo(true)
@@ -48,57 +47,23 @@ namespace cpp_conv
             [[nodiscard]] uint8_t GetSourceChannel() const { return m_SourceChannel; }
             [[nodiscard]] bool HasChannelInformation() const { return m_bHasChannelInfo; }
             [[nodiscard]] bool HasOriginPosition() const { return m_bHasPosition; }
-            [[nodiscard]] Vector2F GetOriginPosition() const { return m_OriginPosition; }
+            [[nodiscard]] Eigen::Vector2f GetOriginPosition() const { return m_OriginPosition; }
         };
 
-        Entity(const Vector3 position, const Vector3 size, const EntityKind eEntityKind)
+        Entity(const Eigen::Vector3i position, const Eigen::Vector3i size, const EntityKind eEntityKind,
+               const Direction direction = Direction::Right)
             : m_position(position)
               , m_size(size)
               , m_eEntityKind(eEntityKind)
+              , m_Direction{direction}
         {
         }
 
         virtual ~Entity() = default;
 
-        virtual void Tick(const SceneContext& kContext) = 0;
-
-        virtual void Realize()
-        {
-        }
-
-        virtual void Draw(RenderContext& kContext) const = 0;
-
-        virtual bool TryInsert(
-            const SceneContext& kContext,
-            const Entity& pSourceEntity,
-            InsertInfo insertInfo)
-        {
-            return false;
-        }
-
-        virtual bool TryGrab(
-            const SceneContext& kContext,
-            bool bSingle,
-            std::tuple<ItemId, uint32_t>& outItem)
-        {
-            return false;
-        }
-
-        [[nodiscard]] virtual bool SupportsInsertion() const { return false; }
-        [[nodiscard]] virtual bool SupportsProvidingItem() const { return false; }
-        [[nodiscard]] virtual Direction GetDirection() const { return Direction::Left; }
-        [[nodiscard]] virtual const char* GetName() const = 0;
-        [[nodiscard]] virtual std::string GetDescription() const = 0;
-        [[nodiscard]] virtual uint32_t GetDrawPassCount() const { return 1; }
-
-        [[nodiscard]] virtual bool RequiresPlacementLocalityChecks() const { return false; }
-
-        virtual void OnLocalityUpdate(const WorldMap&)
-        {
-        };
-
-        Vector3 m_position;
-        Vector3 m_size;
-        const EntityKind m_eEntityKind;
+        Eigen::Vector3i m_position;
+        Eigen::Vector3i m_size;
+        EntityKind m_eEntityKind;
+        Direction m_Direction;
     };
 }

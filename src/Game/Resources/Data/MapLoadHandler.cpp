@@ -29,7 +29,7 @@ cpp_conv::resources::ResourceAsset* mapAssetHandler(const cpp_conv::resources::r
     const auto pMap = new cpp_conv::resources::Map();
     int iRow = 0;
 
-    const Vector3 size1x1 = {1, 1, 1};
+    const Eigen::Vector3i size1x1 = {1, 1, 1};
     while (std::getline(ss, strLine))
     {
         for (size_t iCol = 0; iCol < strLine.size(); iCol++)

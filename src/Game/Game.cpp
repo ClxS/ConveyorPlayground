@@ -1,35 +1,16 @@
 #include "Game.h"
-#include "AppHost.h"
-#include "Command.h"
-#include "EntityGrid.h"
 #include "FrameLimiter.h"
-#include "Input.h"
-#include "Map.h"
-#include "Profiler.h"
 #include "RenderContext.h"
 #include "Renderer.h"
-#include "Renderer.h"
-#include "ResourceManager.h"
-#include "SceneContext.h"
 #include "SelfRegistration.h"
-#include "Sequence.h"
-#include "Simulator.h"
 #include "SwapChain.h"
 
-#include "FactoryRegistry.h"
-#include "Gui.h"
-#include "ItemRegistry.h"
-
 #include <chrono>
-#include <queue>
 #include <tuple>
-#include <vector>
-#include "Factory.h"
 #include "FactoryComponent.h"
 #include "GameMapLoadInterstitialScene.h"
 #include "SequenceComponent.h"
 #include "SpriteLayerComponent.h"
-#include "WorldMap.h"
 #include "AtlasAppHost/Application.h"
 #include "AtlasAppHost/Main.h"
 #include "AtlasScene/SceneManager.h"
@@ -68,15 +49,12 @@ int gameMain(int argc, char* argv[])
     cpp_conv::FrameLimiter frameLimiter(120);
     frameLimiter.Start();
 
-    cpp_conv::WorldMap worldMap;
     // TODO REMOVE THIS
     cpp_conv::RenderContext kRenderContext =
     {
-        {0.0f, 0.0f, 0.0f},
         0,
         {0xFFFFFFFF},
         0,
-        worldMap,
         nullptr,
         0.8f
     };
@@ -88,8 +66,6 @@ int gameMain(int argc, char* argv[])
     while (true)
     {
         kRenderContext.m_uiDrawnItems = 0;
-
-        cpp_conv::input::receiveInput();
 
         sceneManager.Update();
         frameLimiter.Limit();

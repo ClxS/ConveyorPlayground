@@ -3,10 +3,10 @@
 #include "ConveyorComponent.h"
 #include "ConveyorHelper.h"
 #include "DirectionComponent.h"
-#include "EntityGrid.h"
 #include "EntityLookupGrid.h"
 #include "ItemPassingUtility.h"
 #include "PositionComponent.h"
+#include "PositionHelper.h"
 #include "AtlasScene/ECS/Components/EcsManager.h"
 
 cpp_conv::StandaloneConveyorSystem_Process::StandaloneConveyorSystem_Process(EntityLookupGrid& lookupGrid): m_LookupGrid{lookupGrid}
@@ -49,7 +49,7 @@ void cpp_conv::StandaloneConveyorSystem_Process::Update(atlas::scene::EcsManager
             components::ConveyorComponent::PlacedItem& rLeadingItem = rChannel.m_pSlots[iChannelLength - 1].m_Item;
             if (!rLeadingItem.m_Item.IsEmpty())
             {
-                const auto pForwardEntity = m_LookupGrid.GetEntity(grid::getForwardPosition(position.m_Position, direction.m_Direction));
+                const auto pForwardEntity = m_LookupGrid.GetEntity(position_helper::getForwardPosition(position.m_Position, direction.m_Direction));
                 if (item_passing_utility::tryInsertItem(
                     ecs,
                     m_LookupGrid,
