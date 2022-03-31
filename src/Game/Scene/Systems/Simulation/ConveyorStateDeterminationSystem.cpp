@@ -15,6 +15,18 @@
 
 namespace
 {
+    namespace ConveyorVisualState
+    {
+        enum
+        {
+            None = 0,
+            Corner = 1 << 0,
+            Capped = 1 << 1,
+            CappedBack = 1 << 2,
+            Clockwise = 1 << 3,
+        };
+    }
+
     struct ConveyorSlot
     {
         int32_t m_Lane;
@@ -57,7 +69,7 @@ namespace
             return false;
         }
 
-        return (outDirection == RelativeDirection::Left) || (outDirection == RelativeDirection::Right);
+        return outDirection == RelativeDirection::Left;
     }
 
     bool isInsertableEntity(const EntityKind kind)
@@ -204,12 +216,25 @@ void cpp_conv::ConveyorStateDeterminationSystem::Initialise(atlas::scene::EcsMan
         // Good job this doesn't run frequently...
         const auto& [info, position, direction, conveyor] = ecs.GetComponents<
             WorldEntityInformationComponent, PositionComponent, DirectionComponent, ConveyorComponent>(entity);
-        const EntityId pEntity = m_LookupGrid.GetEntity(
-            grid::getForwardPosition(position.m_Position, direction.m_Direction));
+        const EntityId forwardEntity = m_LookupGrid.GetEntity(grid::getForwardPosition(position.m_Position, direction.m_Direction));
+        const EntityId backwardsEntity = m_LookupGrid.GetEntity(grid::getBackwardsPosition(position.m_Position, direction.m_Direction));
 
         conveyor.m_bIsCorner = isCornerConveyor(ecs, m_LookupGrid, position, direction);
-        conveyor.m_bIsClockwise = isClockwiseCorner(ecs, m_LookupGrid, position, direction);
-        conveyor.m_bIsCapped = pEntity.IsInvalid() || !isInsertableEntity(info.m_EntityKind);
+        conveyor.m_bIsClockwise = conveyor.m_bIsCorner && isClockwiseCorner(ecs, m_LookupGrid, position, direction);
+
+        bool bIsCapped = true;
+        if (forwardEntity.IsValid() && ecs.DoesEntityHaveComponent<WorldEntityInformationComponent>(forwardEntity))
+        {
+            const auto& neighbourInfo = ecs.GetComponent<WorldEntityInformationComponent>(forwardEntity);
+            bIsCapped = !isInsertableEntity(neighbourInfo.m_EntityKind);
+        }
+
+        bool bIsBackCapped = !conveyor.m_bIsCorner;
+        if (!conveyor.m_bIsCorner && backwardsEntity.IsValid() && ecs.DoesEntityHaveComponent<WorldEntityInformationComponent>(backwardsEntity))
+        {
+            const auto& neighbourInfo = ecs.GetComponent<WorldEntityInformationComponent>(backwardsEntity);
+            bIsBackCapped = !isInsertableEntity(neighbourInfo.m_EntityKind);
+        }
 
         std::tie(conveyor.m_InnerMostChannel, conveyor.m_CornerDirection) = getInnerMostCornerChannel(
             ecs, m_LookupGrid, position, direction);
@@ -230,35 +255,56 @@ void cpp_conv::ConveyorStateDeterminationSystem::Initialise(atlas::scene::EcsMan
             }
         }
 
+
+
         if (ecs.DoesEntityHaveComponent<SpriteLayerComponent<1>>(entity))
         {
             auto& sprite = ecs.GetComponent<SpriteLayerComponent<1>>(entity);
-            if (!conveyor.m_bIsCorner)
+
+            int conveyorVisualState = ConveyorVisualState::None;
+            conveyorVisualState |= conveyor.m_bIsCorner ? ConveyorVisualState::Corner : 0;
+            conveyorVisualState |= conveyor.m_bIsClockwise ? ConveyorVisualState::Clockwise : 0;
+            conveyorVisualState |= bIsCapped ? ConveyorVisualState::Capped : 0;
+            conveyorVisualState |= bIsBackCapped ? ConveyorVisualState::CappedBack : 0;
+
+            auto test = ConveyorVisualState::Corner | ConveyorVisualState::Clockwise | ConveyorVisualState::Capped;
+            switch(conveyorVisualState)
             {
-                if (!conveyor.m_bIsCapped)
-                {
-                    sprite.m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(
-                        resources::registry::assets::conveyors::c_ConveyorStraight);
-                }
-                else
-                {
-                    sprite.m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(
-                        resources::registry::assets::conveyors::c_ConveyorStraightEnd);
-                }
-            }
-            else
-            {
-                if (conveyor.m_bIsClockwise)
-                {
-                    sprite.m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(
-                        resources::registry::assets::conveyors::c_ConveyorCornerClockwise);
-                }
-                else
-                {
-                    sprite.m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(
+            case ConveyorVisualState::Corner:
+                sprite.m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(
                         resources::registry::assets::conveyors::c_ConveyorCornerAntiClockwise);
-                }
+                break;
+            case ConveyorVisualState::Corner | ConveyorVisualState::Clockwise:
+                sprite.m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(
+                        resources::registry::assets::conveyors::c_ConveyorCornerClockwise);
+                break;
+            case ConveyorVisualState::Corner | ConveyorVisualState::Capped:
+                sprite.m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(
+                        resources::registry::assets::conveyors::c_ConveyorCornerAntiClockwiseCapped);
+                break;
+            case ConveyorVisualState::Corner | ConveyorVisualState::Clockwise | ConveyorVisualState::Capped:
+                sprite.m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(
+                        resources::registry::assets::conveyors::c_ConveyorCornerClockwiseCapped);
+                break;
+            case ConveyorVisualState::Capped:
+                sprite.m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(
+                        resources::registry::assets::conveyors::c_ConveyorStraightCappedFront);
+                break;
+            case ConveyorVisualState::CappedBack:
+                sprite.m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(
+                        resources::registry::assets::conveyors::c_ConveyorStraightCappedBack);
+                break;
+            case ConveyorVisualState::Capped | ConveyorVisualState::CappedBack:
+                sprite.m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(
+                        resources::registry::assets::conveyors::c_ConveyorStraightCapped);
+                break;
+            default:
+                sprite.m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(
+                        resources::registry::assets::conveyors::c_ConveyorStraight);
+                break;
             }
+
+            sprite.m_RotationRadians = rotationRadiansFromDirection(direction.m_Direction);
         }
 
         const bool bAlreadyHasIndividual = ecs.DoesEntityHaveComponent<IndividuallyProcessableConveyorComponent>(entity);

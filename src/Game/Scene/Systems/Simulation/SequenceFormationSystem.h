@@ -13,7 +13,7 @@ namespace cpp_conv
         void Update(atlas::scene::EcsManager&) override;
 
     private:
-        inline static constexpr int c_MaxSequenceLength = 32;
+        inline static constexpr int c_MaxSequenceLength = 31;
 
         EntityLookupGrid& m_LookupGrid;
     };

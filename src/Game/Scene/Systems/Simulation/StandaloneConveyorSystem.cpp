@@ -81,9 +81,9 @@ void cpp_conv::StandaloneConveyorSystem_Process::Update(atlas::scene::EcsManager
                             conveyor,
                             rChannel.m_ChannelLane,
                             iChannelSlot + 1,
-                     {
+                            {
                                 currentItem.m_Item,
-                                rChannel.m_pSlots[iChannelSlot].m_VisualPosition
+                                rChannel.m_pSlots[iChannelSlot].m_VisualPosition,
                             },
                             true);
                         currentItem = {};

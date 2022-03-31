@@ -110,4 +110,48 @@ void ConveyorItemRenderingSystem::Update(atlas::scene::EcsManager& ecs)
             }
         }
     }
+
+    for(const auto entity : ecs.GetEntitiesWithComponents<cpp_conv::components::ConveyorComponent, cpp_conv::components::IndividuallyProcessableConveyorComponent>())
+    {
+        const auto& conveyor = ecs.GetComponent<cpp_conv::components::ConveyorComponent>(entity);
+        const float fLerpFactor = conveyor.m_CurrentTick / static_cast<float>(conveyor.m_MoveTick);
+
+        for (int channel = 0; channel < cpp_conv::components::c_conveyorChannels; channel++)
+        {
+            int iChannelLength = cpp_conv::components::c_conveyorChannelSlots;
+            if (conveyor.m_bIsCorner)
+            {
+                iChannelLength += conveyor.m_InnerMostChannel == channel ? -1 : 1;
+            }
+
+            for (int slot = 0; slot < iChannelLength; slot++)
+            {
+                auto itemSlot = cpp_conv::conveyor_helper::getItemInSlot(
+                    conveyor,
+                    channel,
+                    slot);
+
+                if (!itemSlot.has_value())
+                {
+                    continue;
+                }
+
+                // TODO: This should be cached better, the constant item definition lookups get expensive
+                const cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> itemAsset = cpp_conv::resources::getItemDefinition(itemSlot->m_Item);
+                if (!itemAsset || !itemAsset->GetTile())
+                {
+                    continue;
+                }
+
+                const auto& rTargetChannel = conveyor.m_Channels[channel];
+                drawItem(
+                   itemAsset->GetTile().get(),
+                   rTargetChannel.m_pSlots[slot].m_VisualPosition,
+                   {{
+                       itemSlot->m_PreviousVisualLocation,
+                       fLerpFactor
+                   }});
+            }
+        }
+    }
 }
