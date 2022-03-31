@@ -15,6 +15,7 @@ namespace
         {
             auto& sprite = ecs.AddComponent<cpp_conv::components::SpriteLayerComponent<1>>(ecsEntity);
             sprite.m_pTile = definition->GetTile();
+            sprite.m_RotationRadians = cpp_conv::rotationRadiansFromDirection(entity->GetDirection());
         }
 
         ecs.AddComponent<cpp_conv::components::NameComponent>(ecsEntity, definition->GetName().c_str());
