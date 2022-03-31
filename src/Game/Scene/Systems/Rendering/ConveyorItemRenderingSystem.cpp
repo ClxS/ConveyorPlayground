@@ -59,16 +59,20 @@ void ConveyorItemRenderingSystem::Update(atlas::scene::EcsManager& ecs)
 
         for(int channel = 0; channel < cpp_conv::components::c_conveyorChannels; channel++)
         {
-            for(int slot = 0; slot < sequence.m_Length * 2; slot++)
+            auto lanes = sequence.m_RealizedStates[channel].m_Lanes;
+            if (sequence.m_RealizedStates[channel].m_Lanes == 0)
             {
-                const auto sequenceIndex = slot / 2;
-                const auto sequenceSlot = slot % 2;
+                continue;
+            }
 
-                // Redundant since getItemInSlot will double check, but this will probably get inlined and be faster
-                if (!cpp_conv::conveyor_helper::hasRealizedItemInSlot(sequence, sequenceIndex, channel, sequenceSlot))
-                {
-                    continue;
-                }
+            while (lanes != 0)
+            {
+                const auto nextItemBit = std::countr_zero(lanes);
+                const auto nextSlot = (sequence.m_Length * 2) - nextItemBit - 1;
+                lanes &= ~(1ULL << nextItemBit);
+
+                const auto sequenceIndex = nextSlot / 2;
+                const auto sequenceSlot = nextSlot % 2;
 
                 auto itemSlot = cpp_conv::conveyor_helper::getItemInSlot(
                     sequence,

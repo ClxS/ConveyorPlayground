@@ -221,13 +221,14 @@ void cpp_conv::SequenceProcessingSystem_Realize::Update(atlas::scene::EcsManager
             while (uiInsertions != 0)
             {
                 const SequenceComponent::SlotItem item = pendingState.m_NewItems.Pop();
-                const uint32_t uiCurrentInsertIndex = 1U << std::countr_zero(uiInsertions);
+                auto test = std::countr_zero(uiInsertions);
+                const uint64_t uiCurrentInsertIndex = 1ULL << std::countr_zero(uiInsertions);
                 if (item.m_Position.has_value())
                 {
                     realizedState.m_HasOverridePosition |= uiCurrentInsertIndex;
                 }
 
-                const uint32_t uiEarlierItemsMask = uiCurrentInsertIndex - 1;
+                const uint64_t uiEarlierItemsMask = uiCurrentInsertIndex - 1;
                 uiInsertions &= ~static_cast<uint64_t>(uiCurrentInsertIndex);
                 const uint64_t previousItemCount = std::popcount(realizedState.m_Lanes & uiEarlierItemsMask);
                 realizedState.m_Items.Insert(previousItemCount, item);
