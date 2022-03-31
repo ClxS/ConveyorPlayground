@@ -2,7 +2,7 @@ project "bx"
 	kind "StaticLib"
 	files {
 		"bx.lua",
-		"bx/src/**",
+		"bx/src/amalgamated.cpp",
 		"bx/include/**",
 	}
 	removefiles {
