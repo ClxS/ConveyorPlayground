@@ -22,6 +22,10 @@ function importLinkExports()
     local wks = premake.global.getWorkspace(1)
     if wks then
         for prj in p.workspace.eachproject(wks) do
+            --if prj.name == "AssetBuilder" then
+            --    diagnosticLogging = true
+            --end
+
             diagLog(prj)
             diagLog(prj.name)
 
@@ -112,6 +116,8 @@ function importLinkExports()
 
                 ::skip_config::
             end
+
+            diagnosticLogging = false
         end
     end
 end
