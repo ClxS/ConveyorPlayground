@@ -9,6 +9,7 @@ project "AssetBuilder"
 		"**",
 	}
 	links {
+		"tomlcpp_tools",
 		"ToolsCore",
 	}
 	flags { "FatalWarnings" }
