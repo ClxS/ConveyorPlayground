@@ -13,6 +13,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <ranges>
 
 using FileData = cpp_conv::resources::resource_manager::FileData;
 using RegistryId = cpp_conv::resources::registry::RegistryId;
@@ -165,20 +166,20 @@ void cpp_conv::resources::resource_manager::updatePersistenceStore()
     std::lock_guard<std::mutex> lock(getStateMutex());
 
     const auto now = std::chrono::steady_clock::now();
-    for (const auto& pTypeContainer : g_loadedTypes)
+    for (const auto& type : g_loadedTypes | std::views::values)
     {
-        if (!pTypeContainer.second)
+        if (!type)
         {
             continue;
         }
 
-        auto containerIterator = pTypeContainer.second->begin();
-        while (containerIterator != pTypeContainer.second->end())
+        auto containerIterator = type->begin();
+        while (containerIterator != type->end())
         {
             if (containerIterator->second.m_ptr.use_count() == 1 && containerIterator->second.m_lastAccess - now >
                 g_cacheInvalidationTime)
             {
-                containerIterator = pTypeContainer.second->erase(containerIterator);
+                containerIterator = type->erase(containerIterator);
             }
             else
             {
