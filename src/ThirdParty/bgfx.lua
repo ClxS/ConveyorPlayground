@@ -2,21 +2,29 @@ project "bgfx"
 	kind "StaticLib"
 	files {
 		"bgfx.lua",
-		"bgfx/src/**",
+	    "bgfx/src/amalgamated.**",
 		"bgfx/include/**",
 	}
-	removefiles {
-	    "bgfx/src/renderer*",
-	    "bgfx/src/debug_renderdoc*",
-	    "bgfx/src/gl*",
-	    "bgfx/src/amalgamated.**",
-	}
+	includedirs {
+		"bx/include",
+        "bx/include/compat/msvc",
+    }
 	exports {
-		["includedirs"]	= path.getabsolute("bgfx/include"),
+		["includedirs"]	= {
+		    path.getabsolute("bgfx/include"),
+        },
+        ["links"] = {
+            "bx",
+        }
 	}
 	links {
-		"bx",
-		"bimg",
+        "bimg",
+        "bx",
+	}
+	defines {
+        "BGFX_CONFIG_RENDERER_OPENGL=0",
+        "BGFX_CONFIG_RENDERER_OPENGLES=0",
+        "BGFX_CONFIG_RENDERER_WEBGPU=0",
 	}
     filter { "configurations:Debug" }
         defines {
@@ -27,13 +35,3 @@ project "bgfx"
             "BX_CONFIG_DEBUG=0",
         }
     filter {}
-
-    filter { "system:windows" }
-        files {
-            "bgfx/src/renderer_d3d*",
-            "bgfx/src/renderer_dx*",
-        }
-        removefiles {
-            "bgfx/src/renderer_d3d12*", -- No DX12 yet
-        }
-	filter {}

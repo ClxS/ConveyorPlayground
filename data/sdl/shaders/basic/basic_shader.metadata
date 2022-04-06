@@ -1,3 +1,0 @@
-[shaderProgram]
-vertex = "vert.sc"
-fragment = "frag.sc"

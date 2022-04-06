@@ -10,6 +10,7 @@
 #include "RenderContext.h"
 #include "SequenceComponent.h"
 #include "TileRenderHandler.h"
+#include "../../../../Engine/AtlasRender/include/AtlasRender/Renderer.h"
 
 // TODO REMOVE THIS. This needs to go once we move to Atlas Render
 extern cpp_conv::RenderContext* g_renderContext;
@@ -94,17 +95,17 @@ void ConveyorItemRenderingSystem::Update(atlas::scene::EcsManager& ecs)
                 const auto tileAsset = itemAsset->GetTile().get();
                 if (itemSlot->m_bIsAnimated)
                 {
-                    drawItem(
+                    /*drawItem(
                         tileAsset,
                         cpp_conv::conveyor_helper::getSlotPosition(sequence, sequenceIndex, channel, sequenceSlot),
                         {{
                             itemSlot->m_PreviousVisualLocation,
                             fLerpFactor
-                        }});
+                        }});*/
                 }
                 else
                 {
-                    drawItem(tileAsset,cpp_conv::conveyor_helper::getSlotPosition(sequence, sequenceIndex, channel, sequenceSlot));
+                    //drawItem(tileAsset,cpp_conv::conveyor_helper::getSlotPosition(sequence, sequenceIndex, channel, sequenceSlot));
                 }
             }
         }
@@ -153,4 +154,10 @@ void ConveyorItemRenderingSystem::Update(atlas::scene::EcsManager& ecs)
             }
         }
     }
+
+    atlas::render::addToFrameGraph_oneOff("ConveyorRenderer", []()
+    {
+        int i = 0;
+        i++;
+    });
 }

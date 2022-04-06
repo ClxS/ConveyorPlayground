@@ -1,1 +1,4 @@
 lib "AtlasRender"
+    links {
+        "bgfx"
+    }

@@ -9,11 +9,14 @@
 #include <tuple>
 #include "FactoryComponent.h"
 #include "GameMapLoadInterstitialScene.h"
+#include "SDL_syswm.h"
 #include "SequenceComponent.h"
 #include "SpriteLayerComponent.h"
+#include "../Engine/AtlasRender/include/AtlasRender/Renderer.h"
 #include "AtlasAppHost/Application.h"
 #include "AtlasAppHost/Main.h"
 #include "AtlasScene/SceneManager.h"
+#include "bgfx/platform.h"
 
 #undef max
 #undef min
@@ -61,13 +64,44 @@ int gameMain(int argc, char* argv[])
     g_renderContext = &kRenderContext;
 
     cpp_conv::renderer::SwapChain swapChain(kRenderContext, iWidth, iHeight);
-    init(kRenderContext, swapChain);
+
+#if !BX_PLATFORM_EMSCRIPTEN
+    const auto& platform = atlas::app_host::Application::Get().GetPlatform();
+    const auto dimensions = platform.GetAppDimensions();
+    auto window = atlas::app_host::Application::Get().GetPlatform().GetSDLContext().m_Window;
+    SDL_SysWMinfo wmi;
+    SDL_VERSION(&wmi.version);
+    if (!SDL_GetWindowWMInfo(window, &wmi)) {
+        printf(
+            "SDL_SysWMinfo could not be retrieved. SDL_Error: %s\n",
+            SDL_GetError());
+        return 1;
+    }
+    #endif // !BX_PLATFORM_EMSCRIPTEN
+
+    atlas::render::RendererInitArgs args;
+    args.m_Width = std::get<0>(dimensions);
+    args.m_Height = std::get<1>(dimensions);
+
+#if BX_PLATFORM_WINDOWS
+    args.m_WindowHandle = wmi.info.win.window;
+#elif BX_PLATFORM_OSX
+    args.m_WindowHandle = wmi.info.cocoa.window;
+#elif BX_PLATFORM_LINUX
+    args.m_WindowHandle = (void*)(uintptr_t)wmi.info.x11.window;
+#elif BX_PLATFORM_EMSCRIPTEN
+    args.m_WindowHandle = (void*)"#canvas";
+#endif
+
+    atlas::render::init(args);
 
     while (true)
     {
         kRenderContext.m_uiDrawnItems = 0;
 
         sceneManager.Update();
+
+        atlas::render::sync();
         frameLimiter.Limit();
 
         swapChain.SwapAndPresent();

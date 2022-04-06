@@ -69,9 +69,11 @@ project "CppConveyor"
 		"tomlcpp",
 		"eigen",
 		"fixed_string",
+		"bgfx",
 
 		"AtlasAppHost",
 		"AtlasScene",
+		"AtlasRender",
 	}
 	includedirs {
 		".",

@@ -8,6 +8,9 @@ project "AssetBuilder"
 	files {
 		"**",
 	}
+	includedirs {
+	    "**",
+	}
 	links {
 		"tomlcpp_tools",
 		"ToolsCore",
