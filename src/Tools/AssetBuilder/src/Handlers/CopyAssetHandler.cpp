@@ -2,6 +2,8 @@
 #include "Asset.h"
 #include <fstream>
 
+#include "Cook.h"
+#include "FileUtility.h"
 #include "tomlcpp.hpp"
 
 std::filesystem::path CopyAssetHandler::GetAssetRelativeOutputPath(const Asset& fullPath)
@@ -11,36 +13,13 @@ std::filesystem::path CopyAssetHandler::GetAssetRelativeOutputPath(const Asset& 
 
 std::variant<std::vector<OutputArtifact>, ErrorString> CopyAssetHandler::Cook(const Asset& asset)
 {
-    std::ifstream file;
-    file.open(asset.m_SourceAssetPath, std::ios::binary | std::ios::ate);
-    if (file.fail())
+    const auto result = asset_builder::utility::file_utility::readTomlFromFile(asset.m_SourceAssetPath);
+    if (std::holds_alternative<std::string>(result))
     {
-        return std::format("{} is missing", asset.m_SourceAssetPath.string());
+        return std::format("Failed to read TOML: {} - {}\n", std::get<1>(result), asset.m_SourceAssetPath.string());
     }
 
-    // ReSharper disable once CppRedundantCastExpression
-    const uint32_t uiLength = static_cast<uint32_t>(file.tellg());
-
-    // ReSharper disable once CppRedundantCastExpression
-    file.seekg((std::streamoff)0, std::ios::beg);
-
-    if (uiLength == 0)
-    {
-        return std::format("{} was zero sized", asset.m_SourceAssetPath.string());
-    }
-
-    std::unique_ptr<uint8_t[]> pData(new uint8_t[uiLength]);
-    file.read(reinterpret_cast<char*>(pData.get()), uiLength);
-
-    const auto pStrData = reinterpret_cast<const char*>(pData.get());
-    const std::string input(pStrData, (int)(uiLength / sizeof(char)));
-
-    const auto [table, errors] = toml::parse(input);
-    if (!table)
-    {
-        return std::format("Failed to read TOML: {} - {}\n", errors, asset.m_SourceAssetPath.string());
-    }
-
+    auto table = std::get<0>(result);
     const auto keys = table->keys();
     if (keys.size() != 1)
     {

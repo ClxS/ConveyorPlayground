@@ -1,3 +1,4 @@
 [shader]
 type = "fragment"
 model = "5_0"
+source = "frag.sc"

@@ -1,5 +1,6 @@
 #include "AssetTree.h"
 
+#include <iostream>
 #include <stack>
 
 #include "Asset.h"
@@ -107,6 +108,10 @@ AssetTree AssetTree::CreateFromFileStructure(const std::string& root, const std:
                         if (handler)
                         {
                             node.AddAsset(entry, relativePath, handler);
+                        }
+                        else
+                        {
+                            std::cerr << "No handler found for " << entry << "\n";
                         }
                     }
                 }
