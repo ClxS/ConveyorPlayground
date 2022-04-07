@@ -15,7 +15,7 @@ namespace
 {
     bool doesFileContentsMatch(const std::filesystem::path& path, std::string contents)
     {
-        if (std::filesystem::exists(path))
+        if (exists(path))
         {
             std::ifstream existingFile(path, std::ios::in | std::ios::binary);
             if (existingFile.is_open())
@@ -95,15 +95,6 @@ namespace
         outStream << std::string(depth * 4, ' ') << "}\n";
     }
 
-    std::string getAssetRelativeName(std::filesystem::path relativePath)
-    {
-        relativePath = relativePath.replace_extension();
-        std::string namespaceName = relativePath.string();
-        namespaceName = replaceAll(namespaceName, "\\", "::");
-        namespaceName = replaceAll(namespaceName, "/", "::");
-        return namespaceName;
-    }
-
     void writeAssets(std::stringstream& outStream, const AssetTree::TreeNode& node, const int depth, int& index)
     {
         for(auto& group : node.m_ChildNodes)
@@ -117,7 +108,7 @@ namespace
             outStream << std::string((depth + 1) * 4, ' ') << "{ std::filesystem::path(R\"("
                 << asset.m_pAssociatedHandler->GetAssetRelativeOutputPath(asset).string()
                 << ")\"),"
-                << "\"" << getAssetRelativeName(asset.m_RelativePath) << "\""
+                << "\"" << asset_builder::actions::getAssetRelativeName(asset.m_RelativePath) << "\""
                 << "},\n";
         }
     }
@@ -164,6 +155,15 @@ namespace
         outFile << "}";
         return outFile.str();
     }
+}
+
+std::string asset_builder::actions::getAssetRelativeName(std::filesystem::path relativePath)
+{
+    relativePath = relativePath.replace_extension();
+    std::string namespaceName = relativePath.string();
+    namespaceName = replaceAll(namespaceName, "\\", "::");
+    namespaceName = replaceAll(namespaceName, "/", "::");
+    return namespaceName;
 }
 
 ExitCode asset_builder::actions::generateSpec(const Arguments& args)

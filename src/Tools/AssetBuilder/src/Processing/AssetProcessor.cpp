@@ -6,6 +6,7 @@
 #include "DataAssetHandler.h"
 #include "MapAssetHandler.h"
 #include "ShaderAssetHandler.h"
+#include "ShaderProgramAssetHandler.h"
 #include "Texture2dAsssetHandler.h"
 
 std::unordered_map<std::string, std::unique_ptr<AssetHandler>> s_handlers;
@@ -15,6 +16,7 @@ void AssetProcessor::initDefaults()
     registerHandler<DataAssetHandler>();
     registerHandler<MapAssetHandler>();
     registerHandler<ShaderAssetHandler>();
+    registerHandler<ShaderProgramAssetHandler>();
     registerHandler<Texture2DAssetHandler>();
 }
 
