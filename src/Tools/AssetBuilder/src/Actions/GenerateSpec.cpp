@@ -76,7 +76,7 @@ namespace
         {
             outStream
                 << std::string((depth + 1) * 4, ' ')
-                << "inline constexpr RegistryId c_"
+                << "inline constexpr atlas::resource::RegistryId c_"
                 << sanitizeAssetNameForVariable(relativePath)
                 << " = " << index << ";\n";
             index++;
@@ -84,7 +84,7 @@ namespace
 
         if (!node.m_Assets.empty())
         {
-            outStream << std::string((depth + 1) * 4, ' ') << "inline constexpr std::array<RegistryId, " << node.m_Assets.size() << "> c_AllAssets {{ \n";
+            outStream << std::string((depth + 1) * 4, ' ') << "inline constexpr std::array<atlas::resource::RegistryId, " << node.m_Assets.size() << "> c_AllAssets {{ \n";
             for(const auto& [fullPath, relativePath, _] : node.m_Assets)
             {
                 outStream << std::string((depth + 2) * 4, ' ') << "c_" << sanitizeAssetNameForVariable(relativePath) << ",\n";
@@ -105,11 +105,11 @@ namespace
         for(const auto& asset : node.m_Assets)
         {
             assert(asset.m_pAssociatedHandler);
-            outStream << std::string((depth + 1) * 4, ' ') << "{ std::filesystem::path(R\"("
+            outStream << std::string((depth + 1) * 4, ' ') << "atlas::resource::AssetRegistryEntry(std::filesystem::path(R\"("
                 << asset.m_pAssociatedHandler->GetAssetRelativeOutputPath(asset).string()
                 << ")\"),"
                 << "\"" << asset_builder::actions::getAssetRelativeName(asset.m_RelativePath) << "\""
-                << "},\n";
+                << "),\n";
         }
     }
 
@@ -119,39 +119,39 @@ namespace
         outFile << "#pragma once\n";
         outFile << "#include <array>\n";
         outFile << "#include <filesystem>\n";
-        outFile << "#include <string>\n";
+        outFile << "#include <AtlasResource/AssetRegistryEntry.h>\n";
+        outFile << "#include <AtlasResource/RegistryBundle.h>\n";
+        outFile << "#include <AtlasResource/RegistryId.h>\n";
         outFile << "namespace " << fileNamespace << " {\n";
-        outFile << std::string(1 * 4, ' ') << "struct RegistryId\n";
-        outFile << std::string(1 * 4, ' ') << "{\n";
-        outFile << std::string(2 * 4, ' ') << "constexpr RegistryId(uint32_t value) : m_Value(value) {}\n";
-        outFile << std::string(2 * 4, ' ') << "static RegistryId Invalid() { return 0xFFFFFFFF; }\n";
-        outFile << std::string(2 * 4, ' ') << "bool operator<(const RegistryId& other) const { return m_Value < other.m_Value; }\n";
-        outFile << std::string(2 * 4, ' ') << "uint32_t m_Value;\n";
-        outFile << std::string(1 * 4, ' ') << "};\n";
-        outFile << std::string(1 * 4, ' ') << "struct Asset { std::filesystem::path m_Path; std::string m_RelativeName; };\n";
-
-
+        outFile << std::string(1 * 4, ' ') << "namespace core_bundle {\n";
         int index = 0;
         for(auto& group : tree.GetRoot().m_ChildNodes)
         {
-            writeGroup(outFile, *group, 1, index);
+            writeGroup(outFile, *group, 2, index);
         }
 
-        outFile << std::string(1 * 4, ' ') << "const std::array<Asset, " << index + 1 << "> c_Files = {{\n";
+        outFile << std::string(2 * 4, ' ') << "const std::array c_Files = {\n";
         for(auto& group : tree.GetRoot().m_ChildNodes)
         {
-            writeAssets(outFile, *group, 1, index);
+            writeAssets(outFile, *group, 2, index);
         }
-        outFile << std::string(1 * 4, ' ') << "}};\n";
-
-        outFile << std::string(1 * 4, ' ') << "inline bool tryLookUpId(const std::string_view& str, RegistryId* outId) {\n";
-        outFile << std::string(2 * 4, ' ') << "if (!outId) return false;\n";
-        outFile << std::string(2 * 4, ' ') << "for(uint32_t i = 0; i < c_Files.size(); i++) {\n";
-        outFile << std::string(3 * 4, ' ') << "if (c_Files[i].m_RelativeName == str) { *outId = i; return true; }\n";
-        outFile << std::string(2 * 4, ' ') << "}\n";
-        outFile << std::string(2 * 4, ' ') << "return false;\n";
-        outFile << std::string(1 * 4, ' ') << "}\n";
-
+        outFile << std::string(2 * 4, ' ') << "};\n";
+        outFile << std::string(1 * 4, ' ') << "};\n";
+        outFile << std::string(1 * 4, ' ') << "class CoreBundle final : public atlas::resource::RegistryBundle\n";
+        outFile << std::string(1 * 4, ' ') << "{\n";
+        outFile << std::string(2 * 4, ' ') << "static int32_t GetSize() { return " << index << "; }\n";
+        outFile << std::string(2 * 4, ' ') << "std::optional<atlas::resource::AssetRegistryEntry> GetAsset(atlas::resource::RegistryId id) override\n";
+        outFile << std::string(2 * 4, ' ') << "{\n";
+        outFile << std::string(3 * 4, ' ') << "return core_bundle::c_Files[id.m_Value];\n";
+        outFile << std::string(2 * 4, ' ') << "};\n";
+        outFile << std::string(2 * 4, ' ') << "std::optional<atlas::resource::AssetRegistryEntry> TryLookupId(uint64_t relativeNameHash) override\n";
+        outFile << std::string(2 * 4, ' ') << "{\n";
+        outFile << std::string(3 * 4, ' ') << "for(uint32_t i = 0; i < core_bundle::c_Files.size(); i++) {\n";
+        outFile << std::string(4 * 4, ' ') << "if (core_bundle::c_Files[i].m_RelativeNameHash == relativeNameHash) { return core_bundle::c_Files[i]; }\n";
+        outFile << std::string(3 * 4, ' ') << "}\n";
+        outFile << std::string(3 * 4, ' ') << "return {};\n";
+        outFile << std::string(2 * 4, ' ') << "};\n";
+        outFile << std::string(1 * 4, ' ') << "};\n";
         outFile << "}";
         return outFile.str();
     }

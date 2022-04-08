@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace atlas::scene::utils
+namespace atlas::core
 {
     template <typename TContext>
     class ContextBasedIncrementer

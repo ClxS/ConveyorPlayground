@@ -5,7 +5,7 @@
 #include <unordered_map>
 
 #include "Pools.h"
-#include "AtlasScene/ECS/Utilities/TemplatedUniquenessCounter.h"
+#include "AtlasCore/TemplatedUniquenessCounter.h"
 
 namespace atlas::scene
 {
@@ -24,7 +24,7 @@ namespace atlas::scene
         template <typename TComponent>
         static void RegisterComponent()
         {
-            utils::TemplatedUniquenessCounter<TComponent, ComponentRegistry>::Ensure();
+            core::TemplatedUniquenessCounter<TComponent, ComponentRegistry>::Ensure();
             m_ComponentPoolFactory.push_back([]() { return static_cast<PoolBase*>(new ComponentPool<TComponent>()); });
         }
 
@@ -42,7 +42,7 @@ namespace atlas::scene
         template <typename TComponent>
         static uint64_t GetComponentMask()
         {
-            const uint64_t index = utils::TemplatedUniquenessCounter<TComponent, ComponentRegistry>::GetTypeValue();
+            const uint64_t index = core::TemplatedUniquenessCounter<TComponent, ComponentRegistry>::GetTypeValue();
             assert(index != -1); // Component has not been registered
             return 1ULL << index;
         }

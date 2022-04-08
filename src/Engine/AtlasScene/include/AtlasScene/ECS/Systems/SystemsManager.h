@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "SystemBase.h"
-#include "AtlasScene/ECS/Utilities/TemplatedUniquenessCounter.h"
+#include "AtlasCore/TemplatedUniquenessCounter.h"
 
 namespace atlas::scene
 {
@@ -116,7 +116,7 @@ namespace atlas::scene
     int32_t SystemsBuilder::GetSystemIndex()
     {
         // Slow but infrequently used
-        const int32_t uniquenessValue = utils::TemplatedUniquenessCounter<TSystem, SystemsBuilder>::GetTypeValue();
+        const int32_t uniquenessValue = core::TemplatedUniquenessCounter<TSystem, SystemsBuilder>::GetTypeValue();
         for (size_t i = 0; i < m_Systems.size(); ++i)
         {
             if (m_Systems[i].m_UniquenessValue == uniquenessValue)
@@ -169,7 +169,7 @@ namespace atlas::scene
     template <typename TSystem, typename ... DependsOn, typename... TArgs>
     void SystemsBuilder::RegisterSystem(std::vector<GroupId> dependentGroups, TArgs&&... args)
     {
-        utils::TemplatedUniquenessCounter<TSystem, SystemsBuilder>::Ensure();
+        core::TemplatedUniquenessCounter<TSystem, SystemsBuilder>::Ensure();
 
         std::vector<int32_t> dependencyIndices{GetSystemIndex<DependsOn>()...};
         std::erase(dependencyIndices, -1);
@@ -178,7 +178,7 @@ namespace atlas::scene
         minimumIndex = std::max(minimumIndex, GetMaximumGroupIndex(dependentGroups));
 
         const int32_t maximumIndex = GetMinimumDependencyIndex(
-            utils::TemplatedUniquenessCounter<TSystem, SystemsBuilder>::GetTypeValue());
+            core::TemplatedUniquenessCounter<TSystem, SystemsBuilder>::GetTypeValue());
 
         assert(minimumIndex < maximumIndex); // If we hit this, we have a circular dependency issue
 
@@ -188,8 +188,8 @@ namespace atlas::scene
                 typeid(TSystem).name(),
                 new TSystem(std::forward<TArgs&&>(args)...),
                 {0},
-                utils::TemplatedUniquenessCounter<TSystem, SystemsManager>::Ensure(),
-                {utils::TemplatedUniquenessCounter<DependsOn, SystemsManager>::GetTypeValue()...}));
+                core::TemplatedUniquenessCounter<TSystem, SystemsManager>::Ensure(),
+                {core::TemplatedUniquenessCounter<DependsOn, SystemsManager>::GetTypeValue()...}));
     }
 
     template <typename ... DependsOn>
