@@ -4,6 +4,11 @@ Discrete positioning based ~~console driven~~ Conveyor System.
 
 Basic proof of concept thrown together in a couple of hours. Code is messy and not suitable for use!
 
+# Licence
+
+No Licence is currently provided. Code should only be used as reference material.
+This will probably change in the future! :)
+
 # Build Process
 
 Currently I only target Windows. More platforms might come at some point.
