@@ -9,8 +9,10 @@
 #include "SequenceComponent.h"
 #include "TileRenderHandler.h"
 #include "AtlasRender/Renderer.h"
+#include "AtlasRender/AssetTypes/ShaderAsset.h"
 #include "AtlasResource/AssetPtr.h"
 #include "AtlasResource/ResourceLoader.h"
+#include "bgfx/bgfx.h"
 
 /*
 *
@@ -165,6 +167,8 @@ void ConveyorItemRenderingSystem::Update(atlas::scene::EcsManager& ecs)
 
     atlas::render::addToFrameGraph_oneOff("ConveyorRenderer", []()
     {
+        atlas::resource::ResourceLoader::LoadAsset<cpp_conv::resources::registry::CoreBundle, atlas::render::ShaderProgram>(
+            cpp_conv::resources::registry::core_bundle::shaders::c_basic);
         int i = 0;
         i++;
     });

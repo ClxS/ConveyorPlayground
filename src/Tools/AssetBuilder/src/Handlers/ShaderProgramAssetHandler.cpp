@@ -25,8 +25,8 @@ namespace
     {
         struct Chunk
         {
-            size_t m_Start;
-            size_t m_End;
+            uint32_t m_Start;
+            uint32_t m_End;
         };
 
         Chunk m_VertexShader;

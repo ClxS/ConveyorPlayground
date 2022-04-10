@@ -55,8 +55,6 @@ namespace atlas::game
             srand(static_cast<unsigned>(time(nullptr)));
             auto [iWidth, iHeight] = atlas::app_host::Application::Get().GetAppDimensions();
 
-            m_Game.OnStartup();
-
             utility::FrameLimiter frameLimiter(120);
             frameLimiter.Start();
 
@@ -90,6 +88,7 @@ namespace atlas::game
 #endif
 
             render::init(args);
+            m_Game.OnStartup();
 
             while(true)
             {

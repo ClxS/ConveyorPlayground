@@ -19,6 +19,7 @@
 #include "SpriteLayerComponent.h"
 #include "WorldEntityInformationComponent.h"
 #include "AtlasGame/GameHost.h"
+#include "AtlasRender/AssetTypes/ShaderAsset.h"
 
 #undef max
 #undef min
@@ -60,6 +61,10 @@ void registerTypeHandlers()
     ResourceLoader::RegisterTypeHandler<cpp_conv::ItemDefinition>(itemAssetHandler);
     ResourceLoader::RegisterTypeHandler<cpp_conv::RecipeDefinition>(recipeAssetHandler);
     ResourceLoader::RegisterTypeHandler<TileAsset>(cpp_conv::textTileLoadHandler);
+
+    ResourceLoader::RegisterTypeHandler<atlas::render::VertexShader>(atlas::render::vertexShaderLoadHandler);
+    ResourceLoader::RegisterTypeHandler<atlas::render::FragmentShader>(atlas::render::fragmentShaderLoadHandler);
+    ResourceLoader::RegisterTypeHandler<atlas::render::ShaderProgram>(atlas::render::shaderProgramLoadHandler);
 }
 
 void loadDataAssets()
@@ -69,6 +74,11 @@ void loadDataAssets()
     loadInserters();
     loadItems();
     loadRecipes();
+}
+
+void setBgfxSettings()
+{
+    bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x6495EDFF, 1.0f, 0);
 }
 
 class CppConveyor final : public atlas::game::GameImplementation
@@ -83,6 +93,7 @@ public:
         registerTypeHandlers();
         registerAssetBundles();
         loadDataAssets();
+        setBgfxSettings();
 
         m_SceneManager.TransitionTo<cpp_conv::GameMapLoadInterstitialScene>(
             ResourceLoader::CreateBundleRegistryId<registry::CoreBundle>(registry::core_bundle::maps::c_bigmap));

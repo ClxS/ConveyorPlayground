@@ -169,7 +169,7 @@ namespace atlas::resource
             core::StringHash m_StringId;
         };
 
-        inline static std::mutex ms_StateMutex;
+        inline static std::recursive_mutex ms_StateMutex;
 
         inline static std::vector<Bundle> ms_Bundles;
         inline static std::vector<LoaderFunc> ms_TypeHandlers;
