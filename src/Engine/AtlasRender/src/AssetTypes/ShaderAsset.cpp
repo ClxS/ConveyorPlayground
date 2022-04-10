@@ -19,6 +19,7 @@ namespace
 
         ProgramChunk m_VertexShader;
         ProgramChunk m_FragmentShader;
+        int32_t m_TextureSlotCount;
     };
 }
 
@@ -108,5 +109,5 @@ atlas::resource::AssetPtr<atlas::resource::ResourceAsset> atlas::render::shaderP
     }
 
     auto programHandle = bgfx::createProgram(vertexShader->GetHandle(), fragmentShader->GetHandle(), false);
-    return std::make_shared<ShaderProgram>(programHandle, vertexShader, fragmentShader);
+    return std::make_shared<ShaderProgram>(programHandle, vertexShader, fragmentShader, program->m_TextureSlotCount);
 }

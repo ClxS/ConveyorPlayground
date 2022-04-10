@@ -1,3 +1,4 @@
 [shaderProgram]
 vertex = "basic/basic_vert.metadata"
 fragment = "basic/basic_frag.metadata"
+textureSlotCount = 2

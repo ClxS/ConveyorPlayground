@@ -47,10 +47,12 @@ namespace atlas::render
         explicit ShaderProgram(
             bgfx::ProgramHandle handle,
             resource::AssetPtr<VertexShader> vertex,
-            resource::AssetPtr<FragmentShader> fragment)
+            resource::AssetPtr<FragmentShader> fragment,
+            int32_t textureSlotCount)
             : m_ProgramHandle{handle}
             , m_Vertex{std::move(vertex)}
             , m_Fragment{std::move(fragment)}
+            , m_TextureSlotCount{textureSlotCount}
         {
 
         }
@@ -62,10 +64,13 @@ namespace atlas::render
 
         [[nodiscard]] bgfx::ProgramHandle GetHandle() const { return m_ProgramHandle; }
 
+        [[nodiscard]] int32_t GetTextureSlotCount() const { return m_TextureSlotCount; }
+
     private:
         bgfx::ProgramHandle m_ProgramHandle;
         resource::AssetPtr<VertexShader> m_Vertex;
         resource::AssetPtr<FragmentShader> m_Fragment;
+        int32_t m_TextureSlotCount;
     };
 
     resource::AssetPtr<resource::ResourceAsset> vertexShaderLoadHandler(const resource::FileData& data);

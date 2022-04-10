@@ -31,6 +31,7 @@ namespace
 
         Chunk m_VertexShader;
         Chunk m_FragmentShader;
+        int32_t m_TextureSlotCount;
     };
 
     std::variant<ShaderProgramMetadata, ErrorString> readMetadata(const std::filesystem::path& path, const std::filesystem::path& relativePath)
