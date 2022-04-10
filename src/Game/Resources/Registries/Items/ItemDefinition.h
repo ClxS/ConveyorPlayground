@@ -2,18 +2,15 @@
 
 #include <string>
 
-#include "AssetPtr.h"
 #include "AssetRegistry.h"
 #include "DataId.h"
-#include "ResourceAsset.h"
 #include "Serializable.h"
-#include "TileAsset.h"
 #include "TileAsset.h"
 #include "TomlSerializer.h"
 
 namespace cpp_conv
 {
-    class ItemDefinition : public Serializable<ItemDefinition, TomlSerializer, resources::ResourceAsset>
+    class ItemDefinition : public Serializable<ItemDefinition, TomlSerializer, atlas::resource::ResourceAsset>
     {
         inline static TomlSerializer::Config ms_ConveyorConfig = {"item"};
     public:
@@ -33,14 +30,13 @@ namespace cpp_conv
 
         const std::string& GetName() const { return m_Name.m_Value; }
         const std::string& GetDescription() const { return m_Description.m_Value; }
-        resources::AssetPtr<resources::TileAsset> GetTile() const;
+
+        [[nodiscard]] atlas::resource::BundleRegistryId GetAssetId() const { return m_AssetId.m_Value; }
 
     private:
         DataField<ItemId, "id"> m_InternalId{};
         DataField<std::string, "name"> m_Name{};
         DataField<std::string, "description", false> m_Description{};
-        DataField<resources::registry::RegistryId, "asset"> m_AssetId{resources::registry::RegistryId::Invalid()};
-
-        mutable resources::AssetPtr<resources::TileAsset> m_pTile;
+        DataField<atlas::resource::BundleRegistryId, "asset"> m_AssetId{atlas::resource::BundleRegistryId::Invalid()};
     };
 }

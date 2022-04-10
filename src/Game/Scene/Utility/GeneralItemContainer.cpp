@@ -1,6 +1,6 @@
 #include "GeneralItemContainer.h"
 #include <map>
-#include "AssetPtr.h"
+#include "AtlasResource/AssetPtr.h"
 #include "DataId.h"
 #include "ItemDefinition.h"
 #include "ItemRegistry.h"
@@ -168,7 +168,7 @@ bool cpp_conv::GeneralItemContainer::HasItems(ItemId item, uint32_t count)
     return false;
 }
 
-bool cpp_conv::GeneralItemContainer::IsEmpty()
+bool cpp_conv::GeneralItemContainer::IsEmpty() const
 {
     return m_vItemEntries.empty();
 }
@@ -202,7 +202,7 @@ std::string cpp_conv::GeneralItemContainer::GetDescription() const
                 str += ", ";
             }
 
-            resources::AssetPtr<ItemDefinition> pItem = resources::getItemDefinition(item.first);
+            atlas::resource::AssetPtr<ItemDefinition> pItem = resources::getItemDefinition(item.first);
             if (pItem)
             {
                 str += std::format("{} {}", item.second, pItem->GetName());

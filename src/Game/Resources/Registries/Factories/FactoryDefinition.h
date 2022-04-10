@@ -1,11 +1,10 @@
 #pragma once
 
 #include <string>
-#include "AssetPtr.h"
+#include "AtlasResource/AssetPtr.h"
 #include "AssetRegistry.h"
 #include "DataField.h"
 #include "DataId.h"
-#include "ResourceAsset.h"
 #include "Serializable.h"
 #include "TileAsset.h"
 #include "TileAsset.h"
@@ -13,7 +12,7 @@
 
 namespace cpp_conv
 {
-    class FactoryDefinition : public Serializable<FactoryDefinition, TomlSerializer, resources::ResourceAsset>
+    class FactoryDefinition : public Serializable<FactoryDefinition, TomlSerializer, atlas::resource::ResourceAsset>
     {
         inline static TomlSerializer::Config ms_ConveyorConfig = {"factory"};
     public:
@@ -40,12 +39,12 @@ namespace cpp_conv
         [[nodiscard]] Eigen::Vector3i GetOutputPipe() const { return m_OutputPipe.m_Value; }
         [[nodiscard]] RecipeId GetProducedRecipe() const { return m_ProducedRecipe.m_Value; }
 
-        [[nodiscard]] resources::AssetPtr<resources::TileAsset> GetTile() const;
+        [[nodiscard]] atlas::resource::AssetPtr<resources::TileAsset> GetTile() const;
 
     private:
         DataField<FactoryId, "id"> m_InternalId{};
         DataField<std::string, "name"> m_Name{};
-        DataField<resources::registry::RegistryId, "asset"> m_AssetId{resources::registry::RegistryId::Invalid()};
+        DataField<atlas::resource::BundleRegistryId, "asset"> m_AssetId{atlas::resource::BundleRegistryId::Invalid()};
         DataField<RecipeId, "recipe"> m_ProducedRecipe{};
         DataField<uint32_t, "rate"> m_ProductionRate{};
 

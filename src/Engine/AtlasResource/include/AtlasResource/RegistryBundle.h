@@ -13,13 +13,13 @@ namespace atlas::resource
         virtual ~RegistryBundle() {}
         virtual std::optional<AssetRegistryEntry> GetAsset(RegistryId id) = 0;
 
-        std::optional<AssetRegistryEntry> TryLookupId(const std::string_view id)
+        std::optional<RegistryId> LookupId(const std::string_view id)
         {
             const auto hash = core::hashing::fnv1(id);
             return TryLookupId(hash);
         }
 
     protected:
-        virtual std::optional<AssetRegistryEntry> TryLookupId(uint64_t relativeNameHash) = 0;
+        virtual std::optional<RegistryId> TryLookupId(uint64_t relativeNameHash) = 0;
     };
 }

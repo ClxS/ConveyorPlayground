@@ -1,14 +1,14 @@
 #pragma once
 
-#include "AssetPtr.h"
 #include "TileAsset.h"
+#include "AtlasResource/AssetPtr.h"
 
 namespace cpp_conv::components
 {
     template <int32_t Layer>
     struct SpriteLayerComponent
     {
-        resources::AssetPtr<resources::TileAsset> m_pTile;
+        atlas::resource::AssetPtr<resources::TileAsset> m_pTile;
         float m_RotationRadians = 0.0f;
     };
 }

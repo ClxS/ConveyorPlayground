@@ -1,10 +1,6 @@
 #pragma once
 
-#include "AssetPtr.h"
 #include "DataId.h"
-#include "ResourceAsset.h"
-#include "TileAsset.h"
-#include "TileAsset.h"
 
 #include <string>
 #include <vector>
@@ -12,10 +8,11 @@
 #include "AssetRegistry.h"
 #include "Serializable.h"
 #include "TomlSerializer.h"
+#include "AtlasResource/ResourceAsset.h"
 
 namespace cpp_conv
 {
-    class RecipeDefinition : public Serializable<RecipeDefinition, TomlSerializer, resources::ResourceAsset>
+    class RecipeDefinition : public Serializable<RecipeDefinition, TomlSerializer, atlas::resource::ResourceAsset>
     {
         inline static TomlSerializer::Config ms_ConveyorConfig = {"recipe"};
     public:

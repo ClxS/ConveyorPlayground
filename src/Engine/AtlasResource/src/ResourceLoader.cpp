@@ -1,6 +1,7 @@
 #include "AtlasResourcePCH.h"
 #include "ResourceLoader.h"
 
+#include <cassert>
 #include <fstream>
 #include <iostream>
 #include <mutex>

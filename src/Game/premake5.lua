@@ -73,6 +73,7 @@ project "CppConveyor"
 
 		"AtlasAppHost",
 		"AtlasScene",
+		"AtlasResource",
 		"AtlasRender",
 	}
 	includedirs {

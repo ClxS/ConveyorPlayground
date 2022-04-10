@@ -1,6 +1,5 @@
 #include "RecipeDefinition.h"
-#include "AssetPtr.h"
-#include "ResourceManager.h"
+#include "AtlasResource/AssetPtr.h"
 
 bool cpp_conv::TypedDataReader<cpp_conv::RecipeDefinition::RecipeItem>::Read(const toml::Table* value,
                                                                              const char* szPropertyName,

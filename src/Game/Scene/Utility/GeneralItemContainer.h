@@ -22,7 +22,7 @@ namespace cpp_conv
         bool TryInsert(ItemId pItem, uint32_t count = 1);
         bool CouldInsert(ItemId pItem, uint32_t count = 1);
         bool HasItems(ItemId item, uint32_t count = 1);
-        bool IsEmpty();
+        bool IsEmpty() const;
 
         std::vector<ItemEntry>& GetItems() { return m_vItemEntries; }
         [[nodiscard]] const std::vector<ItemEntry>& GetItems() const { return m_vItemEntries; }

@@ -62,6 +62,6 @@ void atlas::render::sync()
         }
     }
 
-    bgfx::renderFrame();
+    bgfx::frame();
     std::erase_if(m_RenderMethods, [](const Task& t) { return t.m_IsOneOff; });
 }

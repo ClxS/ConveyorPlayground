@@ -1,8 +1,6 @@
 #include "ConveyorItemRenderingSystem.h"
 #include <array>
-#include <cstdint>
 
-#include "AssetPtr.h"
 #include "ConveyorComponent.h"
 #include "ConveyorHelper.h"
 #include "ItemDefinition.h"
@@ -10,7 +8,9 @@
 #include "RenderContext.h"
 #include "SequenceComponent.h"
 #include "TileRenderHandler.h"
-#include "../../../../Engine/AtlasRender/include/AtlasRender/Renderer.h"
+#include "AtlasRender/Renderer.h"
+#include "AtlasResource/AssetPtr.h"
+#include "AtlasResource/ResourceLoader.h"
 
 // TODO REMOVE THIS. This needs to go once we move to Atlas Render
 extern cpp_conv::RenderContext* g_renderContext;
@@ -41,12 +41,12 @@ void drawItem(
         renderPosition = lerp->m_PreviousPosition + ((renderPosition - lerp->m_PreviousPosition) * lerp->m_LerpFactor);
     }
 
-    tileRenderer(
+    /*tileRenderer(
         *g_renderContext,
         pTile,
         { renderPosition.x(), renderPosition.y() },
         {0xFFFFFFFF},
-        true);
+        true);*/
 }
 
 void ConveyorItemRenderingSystem::Update(atlas::scene::EcsManager& ecs)
@@ -86,13 +86,18 @@ void ConveyorItemRenderingSystem::Update(atlas::scene::EcsManager& ecs)
                 }
 
                 // TODO: This should be cached better, the constant item definition lookups get expensive
-                const cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> itemAsset = cpp_conv::resources::getItemDefinition(itemSlot->m_Item);
-                if (!itemAsset || !itemAsset->GetTile())
+                const atlas::resource::AssetPtr<cpp_conv::ItemDefinition> itemAsset = cpp_conv::resources::getItemDefinition(itemSlot->m_Item);
+                if (!itemAsset || !itemAsset->GetAssetId().IsValid())
                 {
                     continue;
                 }
 
-                const auto tileAsset = itemAsset->GetTile().get();
+                const auto tileAsset = atlas::resource::ResourceLoader::LoadAsset<cpp_conv::resources::TileAsset>(itemAsset->GetAssetId());
+                if (!tileAsset)
+                {
+                    continue;
+                }
+
                 if (itemSlot->m_bIsAnimated)
                 {
                     /*drawItem(
@@ -137,15 +142,21 @@ void ConveyorItemRenderingSystem::Update(atlas::scene::EcsManager& ecs)
                 }
 
                 // TODO: This should be cached better, the constant item definition lookups get expensive
-                const cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> itemAsset = cpp_conv::resources::getItemDefinition(itemSlot->m_Item);
-                if (!itemAsset || !itemAsset->GetTile())
+                const atlas::resource::AssetPtr<cpp_conv::ItemDefinition> itemAsset = cpp_conv::resources::getItemDefinition(itemSlot->m_Item);
+                if (!itemAsset || !itemAsset->GetAssetId().IsValid())
+                {
+                    continue;
+                }
+
+                const auto tileAsset = atlas::resource::ResourceLoader::LoadAsset<cpp_conv::resources::TileAsset>(itemAsset->GetAssetId());
+                if (!tileAsset)
                 {
                     continue;
                 }
 
                 const auto& rTargetChannel = conveyor.m_Channels[channel];
                 drawItem(
-                   itemAsset->GetTile().get(),
+                   tileAsset.get(),
                    rTargetChannel.m_pSlots[slot].m_VisualPosition,
                    {{
                        itemSlot->m_PreviousVisualLocation,

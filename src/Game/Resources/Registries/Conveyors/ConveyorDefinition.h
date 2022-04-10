@@ -1,11 +1,11 @@
 #pragma once
 
 #include <string>
-#include "AssetPtr.h"
+#include "AtlasResource/AssetPtr.h"
 #include "AssetRegistry.h"
 #include "DataField.h"
 #include "DataId.h"
-#include "ResourceAsset.h"
+#include <AtlasResource/ResourceAsset.h>
 #include "Serializable.h"
 #include "TileAsset.h"
 #include "TileAsset.h"
@@ -13,7 +13,7 @@
 
 namespace cpp_conv
 {
-    class ConveyorDefinition final : public Serializable<ConveyorDefinition, TomlSerializer, resources::ResourceAsset>
+    class ConveyorDefinition final : public Serializable<ConveyorDefinition, TomlSerializer, atlas::resource::ResourceAsset>
     {
         inline static TomlSerializer::Config ms_ConveyorConfig = {"conveyor"};
     public:

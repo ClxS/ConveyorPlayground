@@ -2,7 +2,7 @@
 
 #include <array>
 
-#include "AssetPtr.h"
+#include "AtlasResource/AssetPtr.h"
 #include "DataId.h"
 #include "Entity.h"
 #include "Enums.h"
@@ -39,14 +39,12 @@ namespace cpp_conv
         [[nodiscard]] bool IsCapped() const { return m_bIsCapped; }
         [[nodiscard]] int GetInnerMostChannel() const { return m_iInnerMostChannel; }
         [[nodiscard]] uint32_t GetMoveTick() const { return m_uiMoveTick; }
-        [[nodiscard]] resources::AssetPtr<resources::TileAsset> GetTile() const { return m_pTile; }
     private:
         uint32_t m_uiMoveTick = 10;
         bool m_bIsCorner;
         bool m_bIsClockwise;
         bool m_bIsCapped;
         int m_iInnerMostChannel;
-        resources::AssetPtr<resources::TileAsset> m_pTile;
 
     };
 }

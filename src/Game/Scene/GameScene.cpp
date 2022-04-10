@@ -1,7 +1,24 @@
 #include "GameScene.h"
 
+#include "ConveyorComponent.h"
 #include "ConveyorItemRenderingSystem.h"
+#include "ConveyorStateDeterminationSystem.h"
+#include "DescriptionComponent.h"
+#include "DirectionComponent.h"
+#include "Factory.h"
+#include "FactoryComponent.h"
+#include "FactoryRegistry.h"
+#include "FactorySystem.h"
+#include "NameComponent.h"
+#include "PositionComponent.h"
 #include "RecipeDefinition.h"
+#include "RecipeRegistry.h"
+#include "SequenceFormationSystem.h"
+#include "SequenceProcessingSystem.h"
+#include "SpriteLayerComponent.h"
+#include "SpriteRenderSystem.h"
+#include "StandaloneConveyorSystem.h"
+#include "WorldEntityInformationComponent.h"
 
 namespace
 {

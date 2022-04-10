@@ -1,55 +1,50 @@
 #include "RecipeRegistry.h"
-#include "AssetPtr.h"
+#include "AtlasResource/AssetPtr.h"
 #include "RecipeDefinition.h"
-#include "ResourceManager.h"
 
 #include <iostream>
 #include <memory>
-#include <sstream>
 #include <vector>
 #include "DataId.h"
 #include "Profiler.h"
-#include "SelfRegistration.h"
+#include "AtlasResource/ResourceLoader.h"
 
-using RegistryId = cpp_conv::resources::registry::RegistryId;
-static std::vector<cpp_conv::resources::AssetPtr<cpp_conv::RecipeDefinition>> g_vRecipes;
+static std::vector<atlas::resource::AssetPtr<cpp_conv::RecipeDefinition>> g_vRecipes;
 
-namespace
+void cpp_conv::resources::loadRecipes()
 {
-    void loadItems()
+    for (const atlas::resource::RegistryId asset : cpp_conv::resources::registry::core_bundle::data::recipes::c_AllAssets)
     {
-        for (const RegistryId asset : cpp_conv::resources::registry::data::recipes::c_AllAssets)
+        auto pAsset = atlas::resource::ResourceLoader::LoadAsset<cpp_conv::resources::registry::CoreBundle, cpp_conv::RecipeDefinition>(asset);
+        if (!pAsset)
         {
-            auto pAsset = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::RecipeDefinition>(asset);
-            if (!pAsset)
-            {
-                continue;
-            }
-
-            g_vRecipes.push_back(pAsset);
-        }
-    }
-
-    cpp_conv::resources::ResourceAsset* recipeAssetHandler(cpp_conv::resources::resource_manager::FileData& rData)
-    {
-        const auto pStrData = reinterpret_cast<const char*>(rData.m_pData);
-
-        // ReSharper disable once CppRedundantCastExpression
-        const std::string copy(pStrData, (int)(rData.m_uiSize / sizeof(char)));
-
-        std::string errors;
-        auto pDefinition = cpp_conv::RecipeDefinition::Deserialize(copy, &errors);
-        if (!pDefinition)
-        {
-            std::cerr << errors;
-            return nullptr;
+            continue;
         }
 
-        return pDefinition.release();
+        g_vRecipes.push_back(pAsset);
     }
 }
 
-cpp_conv::resources::AssetPtr<cpp_conv::RecipeDefinition> cpp_conv::resources::getRecipeDefinition(const RecipeId id)
+atlas::resource::AssetPtr<atlas::resource::ResourceAsset> cpp_conv::resources::recipeAssetHandler(const atlas::resource::FileData& rData)
+{
+    const auto pStrData = reinterpret_cast<const char*>(rData.m_pData.get());
+
+    // ReSharper disable once CppRedundantCastExpression
+    const std::string copy(pStrData, (int)(rData.m_Size / sizeof(char)));
+
+    std::string errors;
+    auto pDefinition = cpp_conv::RecipeDefinition::Deserialize(copy, &errors);
+    if (!pDefinition)
+    {
+        std::cerr << errors;
+        return nullptr;
+    }
+
+    atlas::resource::AssetPtr<atlas::resource::ResourceAsset> out {pDefinition.release()};
+    return out;
+}
+
+atlas::resource::AssetPtr<cpp_conv::RecipeDefinition> cpp_conv::resources::getRecipeDefinition(const RecipeId id)
 {
     PROFILE_FUNC();
     for (auto item : g_vRecipes)
@@ -62,7 +57,3 @@ cpp_conv::resources::AssetPtr<cpp_conv::RecipeDefinition> cpp_conv::resources::g
 
     return nullptr;
 }
-
-REGISTER_ASSET_LOAD_HANDLER(cpp_conv::RecipeDefinition, recipeAssetHandler);
-
-REGISTER_LOAD_HANDLER(loadItems);

@@ -32,7 +32,7 @@ static bool Read(const toml::Table* value, const char* szPropertyName, TYPE& pTa
 
     DEFINE_DATA_TYPE_HANDLER(std::string);
 
-    DEFINE_DATA_TYPE_HANDLER(resources::registry::RegistryId);
+    DEFINE_DATA_TYPE_HANDLER(atlas::resource::BundleRegistryId);
 
     struct DataFieldBase
     {

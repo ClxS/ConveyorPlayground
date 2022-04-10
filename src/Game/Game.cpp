@@ -2,19 +2,35 @@
 #include "FrameLimiter.h"
 #include "RenderContext.h"
 #include "Renderer.h"
-#include "SelfRegistration.h"
 #include "SwapChain.h"
 
 #include <chrono>
 #include <tuple>
+
+#include "ConveyorComponent.h"
+#include "ConveyorDefinition.h"
+#include "ConveyorRegistry.h"
+#include "DescriptionComponent.h"
+#include "DirectionComponent.h"
 #include "FactoryComponent.h"
+#include "FactoryRegistry.h"
 #include "GameMapLoadInterstitialScene.h"
+#include "InserterRegistry.h"
+#include "ItemRegistry.h"
+#include "MapLoadHandler.h"
+#include "NameComponent.h"
+#include "PositionComponent.h"
+#include "RecipeDefinition.h"
+#include "RecipeRegistry.h"
+#include "SDLTileLoadHandler.h"
 #include "SDL_syswm.h"
 #include "SequenceComponent.h"
 #include "SpriteLayerComponent.h"
+#include "WorldEntityInformationComponent.h"
 #include "../Engine/AtlasRender/include/AtlasRender/Renderer.h"
 #include "AtlasAppHost/Application.h"
 #include "AtlasAppHost/Main.h"
+#include "AtlasResource/ResourceLoader.h"
 #include "AtlasScene/SceneManager.h"
 #include "bgfx/platform.h"
 
@@ -25,29 +41,69 @@ using namespace cpp_conv::resources;
 
 cpp_conv::RenderContext* g_renderContext;
 
+void registerComponents()
+{
+    using namespace atlas::resource;
+    using namespace atlas::scene;
+    using namespace cpp_conv::components;
+    ComponentRegistry::RegisterComponent<NameComponent>();
+    ComponentRegistry::RegisterComponent<DescriptionComponent>();
+    ComponentRegistry::RegisterComponent<ConveyorComponent>();
+    ComponentRegistry::RegisterComponent<IndividuallyProcessableConveyorComponent>();
+    ComponentRegistry::RegisterComponent<DirectionComponent>();
+    ComponentRegistry::RegisterComponent<FactoryComponent>();
+    ComponentRegistry::RegisterComponent<PositionComponent>();
+    ComponentRegistry::RegisterComponent<SequenceComponent>();
+    ComponentRegistry::RegisterComponent<SpriteLayerComponent<1>>();
+    ComponentRegistry::RegisterComponent<SpriteLayerComponent<2>>();
+    ComponentRegistry::RegisterComponent<SpriteLayerComponent<3>>();
+    ComponentRegistry::RegisterComponent<WorldEntityInformationComponent>();
+}
+
+void registerAssetBundles()
+{
+    using namespace atlas::resource;
+    ResourceLoader::RegisterBundle<registry::CoreBundle>();
+}
+
+void registerTypeHandlers()
+{
+    using namespace atlas::resource;
+    ResourceLoader::RegisterTypeHandler<Map>(mapAssetHandler);
+    ResourceLoader::RegisterTypeHandler<cpp_conv::ConveyorDefinition>(conveyorAssetHandler);
+    ResourceLoader::RegisterTypeHandler<cpp_conv::FactoryDefinition>(factoryAssetHandler);
+    ResourceLoader::RegisterTypeHandler<cpp_conv::InserterDefinition>(inserterAssetHandler);
+    ResourceLoader::RegisterTypeHandler<cpp_conv::ItemDefinition>(itemAssetHandler);
+    ResourceLoader::RegisterTypeHandler<cpp_conv::RecipeDefinition>(recipeAssetHandler);
+    ResourceLoader::RegisterTypeHandler<TileAsset>(cpp_conv::textTileLoadHandler);
+}
+
+void loadDataAssets()
+{
+    loadConveyors();
+    loadFactories();
+    loadInserters();
+    loadItems();
+    loadRecipes();
+}
+
 int gameMain(int argc, char* argv[])
 {
+    using namespace atlas::resource;
+    using namespace atlas::scene;
+
     logStartUp();
     srand(static_cast<unsigned>(time(nullptr)));
     auto [iWidth, iHeight] = atlas::app_host::Application::Get().GetAppDimensions();
 
-    registration::processSelfRegistrations();
+    registerComponents();
+    registerTypeHandlers();
+    registerAssetBundles();
+    loadDataAssets();
 
-    atlas::scene::ComponentRegistry::RegisterComponent<cpp_conv::components::NameComponent>();
-    atlas::scene::ComponentRegistry::RegisterComponent<cpp_conv::components::DescriptionComponent>();
-    atlas::scene::ComponentRegistry::RegisterComponent<cpp_conv::components::ConveyorComponent>();
-    atlas::scene::ComponentRegistry::RegisterComponent<cpp_conv::components::IndividuallyProcessableConveyorComponent>();
-    atlas::scene::ComponentRegistry::RegisterComponent<cpp_conv::components::DirectionComponent>();
-    atlas::scene::ComponentRegistry::RegisterComponent<cpp_conv::components::FactoryComponent>();
-    atlas::scene::ComponentRegistry::RegisterComponent<cpp_conv::components::PositionComponent>();
-    atlas::scene::ComponentRegistry::RegisterComponent<cpp_conv::components::SequenceComponent>();
-    atlas::scene::ComponentRegistry::RegisterComponent<cpp_conv::components::SpriteLayerComponent<1>>();
-    atlas::scene::ComponentRegistry::RegisterComponent<cpp_conv::components::SpriteLayerComponent<2>>();
-    atlas::scene::ComponentRegistry::RegisterComponent<cpp_conv::components::SpriteLayerComponent<3>>();
-    atlas::scene::ComponentRegistry::RegisterComponent<cpp_conv::components::WorldEntityInformationComponent>();
-
-    atlas::scene::SceneManager sceneManager;
-    sceneManager.TransitionTo<cpp_conv::GameMapLoadInterstitialScene>(registry::maps::c_bigmap);
+    SceneManager sceneManager;
+    sceneManager.TransitionTo<cpp_conv::GameMapLoadInterstitialScene>(
+        ResourceLoader::CreateBundleRegistryId<registry::CoreBundle>(registry::core_bundle::maps::c_bigmap));
 
     cpp_conv::FrameLimiter frameLimiter(120);
     frameLimiter.Start();
@@ -93,7 +149,7 @@ int gameMain(int argc, char* argv[])
     args.m_WindowHandle = (void*)"#canvas";
 #endif
 
-    atlas::render::init(args);
+    init(args);
 
     while (true)
     {

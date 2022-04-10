@@ -1,5 +1,7 @@
 #include "DataField.h"
 
+#include "AtlasResource/ResourceLoader.h"
+
 bool cpp_conv::TypedDataReader<bool>::Read(const toml::Table* value, const char* szPropertyName, bool& pTargetVariable)
 {
     auto [bOk, bValue] = value->getBool(szPropertyName);
@@ -111,8 +113,8 @@ bool cpp_conv::TypedDataReader<Eigen::Vector3i>::Read(const toml::Table* value, 
     return true;
 }
 
-bool cpp_conv::TypedDataReader<cpp_conv::resources::registry::RegistryId>::Read(
-    const toml::Table* value, const char* szPropertyName, resources::registry::RegistryId& pTargetVariable)
+bool cpp_conv::TypedDataReader<atlas::resource::BundleRegistryId>::Read(
+    const toml::Table* value, const char* szPropertyName, atlas::resource::BundleRegistryId& pTargetVariable)
 {
     auto [bOk, strValue] = value->getString(szPropertyName);
     if (!bOk)
@@ -120,12 +122,12 @@ bool cpp_conv::TypedDataReader<cpp_conv::resources::registry::RegistryId>::Read(
         return false;
     }
 
-    resources::registry::RegistryId id(resources::registry::RegistryId::Invalid());
-    if (!tryLookUpId(strValue, &id))
+    const auto id = atlas::resource::ResourceLoader::LookupId(strValue);
+    if (!id.has_value())
     {
         return false;
     }
 
-    pTargetVariable = id;
+    pTargetVariable = id.value();
     return true;
 }

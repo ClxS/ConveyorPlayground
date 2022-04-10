@@ -1,9 +1,9 @@
 #pragma once
 
-#include <cstdint>
-#include <string>
-#include "AssetPtr.h"
 #include "DataId.h"
+#include "AtlasResource/AssetPtr.h"
+#include "AtlasResource/FileData.h"
+#include "AtlasResource/ResourceAsset.h"
 
 namespace cpp_conv
 {
@@ -12,5 +12,9 @@ namespace cpp_conv
 
 namespace cpp_conv::resources
 {
-    AssetPtr<ItemDefinition> getItemDefinition(ItemId id);
+    void loadItems();
+
+    atlas::resource::AssetPtr<ItemDefinition> getItemDefinition(ItemId id);
+
+    atlas::resource::AssetPtr<atlas::resource::ResourceAsset> itemAssetHandler(const atlas::resource::FileData& rData);
 }

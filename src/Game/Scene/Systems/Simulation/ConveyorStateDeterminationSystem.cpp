@@ -1,5 +1,6 @@
 #include "ConveyorStateDeterminationSystem.h"
 
+#include "Constants.h"
 #include "ConveyorComponent.h"
 #include "ConveyorHelper.h"
 #include "DirectionComponent.h"
@@ -7,9 +8,9 @@
 #include "EntityLookupGrid.h"
 #include "PositionComponent.h"
 #include "PositionHelper.h"
-#include "ResourceManager.h"
 #include "SpriteLayerComponent.h"
 #include "WorldEntityInformationComponent.h"
+#include "AtlasResource/ResourceLoader.h"
 #include "AtlasScene/ECS/Components/EcsManager.h"
 
 namespace
@@ -158,6 +159,7 @@ namespace
                         break;
                     case 2: position = {2.0f, 1.0f};
                         break;
+                    default: ;
                     }
                 }
                 else
@@ -181,6 +183,7 @@ namespace
                         break;
                     case 2: position = {2.0f, 2.0f};
                         break;
+                    default: ;
                     }
                 }
             }
@@ -195,7 +198,7 @@ namespace
         const auto backToOrigin = static_cast<Rotation>((4 - stepsRequired) % 4);
         position = rotate(position, backToOrigin, blockSize);
 
-        const Eigen::Vector2f scale{cpp_conv::renderer::c_gridScale / c_fBlockSize, cpp_conv::renderer::c_gridScale / c_fBlockSize};
+        const Eigen::Vector2f scale{cpp_conv::constants::c_gridScale / c_fBlockSize, cpp_conv::constants::c_gridScale / c_fBlockSize};
         const Eigen::Vector2f offset = position * 0.5f * c_fBlockSize - Eigen::Vector2f(1.0f, 1.0f) - scale;
 
         const float x = positionComponent.m_Position.x() * blockSize.x() + offset.x();
@@ -285,36 +288,36 @@ void cpp_conv::ConveyorStateDeterminationSystem::Initialise(atlas::scene::EcsMan
             switch(conveyorVisualState)
             {
             case ConveyorVisualState::Corner:
-                sprite.m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(
-                        resources::registry::assets::conveyors::c_ConveyorCornerAntiClockwise);
+                sprite.m_pTile = atlas::resource::ResourceLoader::LoadAsset<resources::registry::CoreBundle, resources::TileAsset>(
+                        resources::registry::core_bundle::assets::conveyors::c_ConveyorCornerAntiClockwise);
                 break;
             case ConveyorVisualState::Corner | ConveyorVisualState::Clockwise:
-                sprite.m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(
-                        resources::registry::assets::conveyors::c_ConveyorCornerClockwise);
+                sprite.m_pTile = atlas::resource::ResourceLoader::LoadAsset<resources::registry::CoreBundle, resources::TileAsset>(
+                        resources::registry::core_bundle::assets::conveyors::c_ConveyorCornerClockwise);
                 break;
             case ConveyorVisualState::Corner | ConveyorVisualState::Capped:
-                sprite.m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(
-                        resources::registry::assets::conveyors::c_ConveyorCornerAntiClockwiseCapped);
+                sprite.m_pTile = atlas::resource::ResourceLoader::LoadAsset<resources::registry::CoreBundle, resources::TileAsset>(
+                        resources::registry::core_bundle::assets::conveyors::c_ConveyorCornerAntiClockwiseCapped);
                 break;
             case ConveyorVisualState::Corner | ConveyorVisualState::Clockwise | ConveyorVisualState::Capped:
-                sprite.m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(
-                        resources::registry::assets::conveyors::c_ConveyorCornerClockwiseCapped);
+                sprite.m_pTile = atlas::resource::ResourceLoader::LoadAsset<resources::registry::CoreBundle, resources::TileAsset>(
+                        resources::registry::core_bundle::assets::conveyors::c_ConveyorCornerClockwiseCapped);
                 break;
             case ConveyorVisualState::Capped:
-                sprite.m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(
-                        resources::registry::assets::conveyors::c_ConveyorStraightCappedFront);
+                sprite.m_pTile = atlas::resource::ResourceLoader::LoadAsset<resources::registry::CoreBundle, resources::TileAsset>(
+                        resources::registry::core_bundle::assets::conveyors::c_ConveyorStraightCappedFront);
                 break;
             case ConveyorVisualState::CappedBack:
-                sprite.m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(
-                        resources::registry::assets::conveyors::c_ConveyorStraightCappedBack);
+                sprite.m_pTile = atlas::resource::ResourceLoader::LoadAsset<resources::registry::CoreBundle, resources::TileAsset>(
+                        resources::registry::core_bundle::assets::conveyors::c_ConveyorStraightCappedBack);
                 break;
             case ConveyorVisualState::Capped | ConveyorVisualState::CappedBack:
-                sprite.m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(
-                        resources::registry::assets::conveyors::c_ConveyorStraightCapped);
+                sprite.m_pTile = atlas::resource::ResourceLoader::LoadAsset<resources::registry::CoreBundle, resources::TileAsset>(
+                        resources::registry::core_bundle::assets::conveyors::c_ConveyorStraightCapped);
                 break;
             default:
-                sprite.m_pTile = cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(
-                        resources::registry::assets::conveyors::c_ConveyorStraight);
+                sprite.m_pTile = atlas::resource::ResourceLoader::LoadAsset<resources::registry::CoreBundle, resources::TileAsset>(
+                        resources::registry::core_bundle::assets::conveyors::c_ConveyorStraight);
                 break;
             }
 

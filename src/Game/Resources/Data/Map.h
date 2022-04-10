@@ -2,12 +2,12 @@
 
 #include <vector>
 
+#include <AtlasResource/ResourceAsset.h>
 #include "Conveyor.h"
-#include "ResourceAsset.h"
 
 namespace cpp_conv::resources
 {
-    class Map : public ResourceAsset
+    class Map : public atlas::resource::ResourceAsset
     {
     public:
         Map();

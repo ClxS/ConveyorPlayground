@@ -9,5 +9,5 @@ namespace cpp_conv::ui
     void present();
     void shutdown();
 
-    void drawUI(SceneContext& kSceneContext, const RenderContext& kRenderContext);
+    //void drawUI(SceneContext& kSceneContext, const RenderContext& kRenderContext);
 }

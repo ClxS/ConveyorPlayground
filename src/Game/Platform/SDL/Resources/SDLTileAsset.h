@@ -1,16 +1,12 @@
 #pragma once
 
-#if !defined(_SDL)
-#error Invalid Include
-#endif
-
-#include "RenderableAsset.h"
+#include "AtlasResource/ResourceAsset.h"
 
 struct SDL_Texture;
 
 namespace cpp_conv::resources
 {
-    class SDLTile2DAsset final : public RenderableAsset
+    class SDLTile2DAsset final : public atlas::resource::ResourceAsset
     {
     public:
         explicit SDLTile2DAsset(SDL_Texture* pTexture)
