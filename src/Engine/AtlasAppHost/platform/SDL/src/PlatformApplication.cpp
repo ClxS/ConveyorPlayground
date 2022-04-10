@@ -53,3 +53,12 @@ std::tuple<int, int> atlas::app_host::platform::PlatformApplication::GetAppDimen
 
     return std::make_tuple(width, height);
 }
+
+void atlas::app_host::platform::PlatformApplication::Update()
+{
+    SDL_Event currentEvent;
+    while(SDL_PollEvent(&currentEvent) != 0)
+    {
+        // TODO
+    }
+}

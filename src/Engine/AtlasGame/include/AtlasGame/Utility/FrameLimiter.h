@@ -1,8 +1,7 @@
 #pragma once
-
 #include <chrono>
 
-namespace cpp_conv
+namespace atlas::game::utility
 {
     class FrameLimiter
     {

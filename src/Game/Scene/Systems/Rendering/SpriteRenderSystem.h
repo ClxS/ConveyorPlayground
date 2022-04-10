@@ -11,9 +11,6 @@
 #include "RenderContext.h"
 #include "SpriteLayerComponent.h"
 
-// TODO REMOVE THIS. This needs to go once we move to Atlas Render
-extern cpp_conv::RenderContext* g_renderContext;
-
 namespace cpp_conv
 {
     template <int32_t Layer>

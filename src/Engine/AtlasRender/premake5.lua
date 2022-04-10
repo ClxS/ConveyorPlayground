@@ -1,4 +1,7 @@
 lib "AtlasRender"
-    links {
-        "bgfx"
+    exports {
+        ["links"] = {
+            "bgfx",
+            "AtlasResource",
+        }
     }

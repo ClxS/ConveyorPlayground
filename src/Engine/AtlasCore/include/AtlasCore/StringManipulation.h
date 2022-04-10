@@ -1,8 +1,8 @@
 #pragma once
-
+#include <sstream>
 #include <string>
 
-namespace cpp_conv::string_util
+namespace atlas::core::string_manipulation
 {
     template <typename T>
     std::string to_string_with_precision(const T a_value, const int n = 2)

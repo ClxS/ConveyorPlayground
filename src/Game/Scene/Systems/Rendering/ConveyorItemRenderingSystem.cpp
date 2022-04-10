@@ -12,9 +12,6 @@
 #include "AtlasResource/AssetPtr.h"
 #include "AtlasResource/ResourceLoader.h"
 
-// TODO REMOVE THIS. This needs to go once we move to Atlas Render
-extern cpp_conv::RenderContext* g_renderContext;
-
 /*
 *
             tileRenderer(

@@ -23,8 +23,10 @@ namespace atlas::app_host
         [[nodiscard]] bool Initialise() { return m_Platform.Initialise(); }
         [[nodiscard]] std::tuple<int, int> GetAppDimensions() const { return m_Platform.GetAppDimensions(); }
 
-        [[nodiscard]] platform::PlatformApplication& GetPlatform() { return m_Platform; };
-        [[nodiscard]] const platform::PlatformApplication& GetPlatform() const { return m_Platform; };
+        [[nodiscard]] platform::PlatformApplication& GetPlatform() { return m_Platform; }
+        [[nodiscard]] const platform::PlatformApplication& GetPlatform() const { return m_Platform; }
+
+        void Update() { m_Platform.Update(); }
 
     private:
         Application() = default;

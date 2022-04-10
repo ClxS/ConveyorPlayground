@@ -72,6 +72,7 @@ project "CppConveyor"
 		"bgfx",
 
 		"AtlasAppHost",
+		"AtlasGame",
 		"AtlasScene",
 		"AtlasResource",
 		"AtlasRender",
