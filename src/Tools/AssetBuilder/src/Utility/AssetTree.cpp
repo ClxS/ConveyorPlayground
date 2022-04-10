@@ -6,13 +6,15 @@
 #include "Asset.h"
 #include "Processing/AssetProcessor.h"
 
-AssetTree::TreeNode::TreeNode(std::filesystem::path rootPath): m_Path{std::move(rootPath)}
+AssetTree::TreeNode::TreeNode(std::filesystem::path rootPath, std::filesystem::path fullPath)
+    : m_Path{std::move(rootPath)}
+    , m_FullPath{std::move(fullPath)}
 {
 }
 
 AssetTree::TreeNode* AssetTree::TreeNode::GetOrCreateChildNode(const std::filesystem::path& path)
 {
-    const std::filesystem::path relativePath = std::filesystem::relative(path, m_Path);
+    const std::filesystem::path relativePath = std::filesystem::relative(path, m_FullPath);
     for(const auto& child : m_ChildNodes)
     {
         if (child->m_Path == relativePath)
@@ -21,7 +23,7 @@ AssetTree::TreeNode* AssetTree::TreeNode::GetOrCreateChildNode(const std::filesy
         }
     }
 
-    m_ChildNodes.push_back(std::make_unique<TreeNode>(relativePath));
+    m_ChildNodes.push_back(std::make_unique<TreeNode>(relativePath, path));
     return m_ChildNodes.back().get();
 }
 
@@ -46,7 +48,8 @@ void AssetTree::TreeNode::AddAsset(const std::filesystem::path& fullPath, const 
     m_Assets.push_back({ fullPath, relative, assetHandler });
 }
 
-AssetTree::AssetTree(std::filesystem::path rootPath): m_Root(std::move(rootPath))
+AssetTree::AssetTree(std::filesystem::path rootPath)
+    : m_Root(rootPath, std::move(rootPath))
 {
 
 }

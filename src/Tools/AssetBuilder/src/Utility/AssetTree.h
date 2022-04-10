@@ -10,7 +10,7 @@ public:
     class TreeNode
     {
     public:
-        explicit TreeNode(std::filesystem::path rootPath);
+        TreeNode(std::filesystem::path relativePath, std::filesystem::path fullPath);
 
         [[nodiscard]] TreeNode* GetOrCreateChildNode(const std::filesystem::path& path);
 
@@ -19,6 +19,7 @@ public:
         void AddAsset(const std::filesystem::path& fullPath, const std::filesystem::path& relative, AssetHandler* assetHandler);
 
         std::filesystem::path m_Path;
+        std::filesystem::path m_FullPath;
 
         std::vector<std::unique_ptr<TreeNode>> m_ChildNodes;
         std::vector<Asset> m_Assets;

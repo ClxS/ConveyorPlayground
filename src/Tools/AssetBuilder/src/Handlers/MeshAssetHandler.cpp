@@ -1,4 +1,4 @@
-#include "ShaderAssetHandler.h"
+#include "MeshAssetHandler.h"
 
 #include <cassert>
 
@@ -8,28 +8,20 @@
 #include "ToolsCore/Hashing.h"
 #include "ToolsCore/Utility/TemporaryFile.h"
 #include <Windows.h>
-#include <corecrt_io.h>
 
 #include "PathUtility.h"
 #include "ProcessUtility.h"
 
 namespace
 {
-    struct ShaderMetadata
+    struct MeshMetadata
     {
-        enum class ShaderType
-        {
-            Vertex,
-            Fragment
-        };
-
-        ShaderType m_Type = ShaderType::Vertex;
-        std::string m_Model;
         std::string m_SourceFile;
+        double m_Scale;
     };
 }
 
-std::variant<ShaderMetadata, ErrorString> readMetadata(const std::filesystem::path& path)
+std::variant<MeshMetadata, ErrorString> readMetadata(const std::filesystem::path& path)
 {
     using cppconv::tools::hashing::fnv1;
 
@@ -41,35 +33,27 @@ std::variant<ShaderMetadata, ErrorString> readMetadata(const std::filesystem::pa
 
     const auto table = std::get<0>(result);
     const auto keys = table->keys();
-    const auto shaderInfo = table->getTable("shader");
+    const auto shaderInfo = table->getTable("mesh");
 
-    ShaderMetadata metadata;
-    metadata.m_Model = shaderInfo->getString("model").second;
+    MeshMetadata metadata;
     metadata.m_SourceFile = (path.parent_path() / shaderInfo->getString("source").second).string();
 
-    switch(fnv1(shaderInfo->getString("type").second))
+    auto [hasScale, scale] = shaderInfo->getDouble("scale");
+    if (hasScale)
     {
-        case fnv1("vertex"):
-            metadata.m_Type = ShaderMetadata::ShaderType::Vertex;
-            break;
-        case fnv1("fragment"):
-            metadata.m_Type = ShaderMetadata::ShaderType::Fragment;
-            break;
-        default:
-            return std::format("Unknown shader type ", shaderInfo->getString("type").second);
+        metadata.m_Scale = scale;
     }
-
 
     return metadata;
 }
 
-std::filesystem::path ShaderAssetHandler::GetAssetRelativeOutputPath(const Asset& fullPath)
+std::filesystem::path MeshAssetHandler::GetAssetRelativeOutputPath(const Asset& fullPath)
 {
     auto outputPath = fullPath.m_RelativePath;
-    return outputPath.replace_extension("nshader");
+    return outputPath.replace_extension("nmesh");
 }
 
-std::variant<std::vector<OutputArtifact>, ErrorString> ShaderAssetHandler::Cook(const Asset& asset)
+std::variant<std::vector<OutputArtifact>, ErrorString> MeshAssetHandler::Cook(const Asset& asset)
 {
     auto metadataResult = readMetadata(asset.m_SourceAssetPath);
     if (std::holds_alternative<ErrorString>(metadataResult))
@@ -83,22 +67,6 @@ std::variant<std::vector<OutputArtifact>, ErrorString> ShaderAssetHandler::Cook(
 
     std::string sourceFile = metadata.m_SourceFile;
     std::string outputFile = tempBinFile.GetFile().string();
-    std::string platform = "windows";
-    std::string shaderType;
-    std::string shaderModelPrefix = "vs";
-    std::string shaderModel = metadata.m_Model;
-
-    switch(metadata.m_Type)
-    {
-    case ShaderMetadata::ShaderType::Vertex:
-        shaderType = "vertex";
-        shaderModelPrefix = "vs";
-        break;
-    case ShaderMetadata::ShaderType::Fragment:
-        shaderType = "fragment";
-        shaderModelPrefix = "ps";
-        break;
-    }
 
     auto currentDirectory = asset_builder::utility::path_utility::getCurrentPath();
     if (!currentDirectory.has_value())
@@ -106,21 +74,21 @@ std::variant<std::vector<OutputArtifact>, ErrorString> ShaderAssetHandler::Cook(
         return "Could not determine current directory";
     }
 
-    std::string processName = (currentDirectory.value() / "shaderc.exe").string();
+    std::string processName = (currentDirectory.value() / "geometryc.exe").string();
     std::string args = std::format(
-        R"(-f "{}" -o "{}" --platform {} --type {} --verbose -i -p {}_{})",
+        R"(-f "{}" -o "{}" -s {})",
         sourceFile,
         outputFile,
-        platform,
-        shaderType,
-        shaderModelPrefix,
-        shaderModel);
+        metadata.m_Scale);
 
     std::string stdOut, stdErr;
     int exitCode = asset_builder::utility::process_utility::execute(processName, args, stdOut, stdErr);
 
     // TODO Capture output
-    assert(exitCode == 0);
+    if (exitCode != 0)
+    {
+        return std::format("geometryc failed with code {}. {} {}", exitCode, processName, args);
+    }
 
     auto [fileContents, size] = asset_builder::utility::file_utility::readFile(outputFile);
     if (!fileContents)

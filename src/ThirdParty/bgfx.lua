@@ -197,3 +197,54 @@ project "shaderc"
         "glsl-optimizer",
         "glslang",
     }
+
+project "shaderc"
+	kind "ConsoleApp"
+	targetdir(path.getabsolute("../../bin/tools"))
+    files {
+		"bgfx.lua",
+		"bgfx/tools/shaderc/**",
+		"bgfx/src/vertexlayout.**",
+		"bgfx/src/shader**",
+    }
+    includedirs {
+        "bimg/include",
+        "bx/include",
+        "bgfx/include",
+        "bgfx/3rdparty/webgpu/include",
+        "bgfx/3rdparty/dxsdk/include",
+    }
+    links {
+        "bx",
+        "spirv-opt",
+        "spirv-cross",
+        "fcpp",
+        "glsl-optimizer",
+        "glslang",
+    }
+
+project "geometryc"
+	kind "ConsoleApp"
+	targetdir(path.getabsolute("../../bin/tools"))
+    files {
+		"bgfx.lua",
+		"bgfx/tools/geometryc/**",
+		"bgfx/src/vertexlayout.**",
+		"bgfx/examples/common/bounds.**",
+		"bgfx/3rdparty/meshoptimizer/src/**",
+    }
+    includedirs {
+        "bimg/include",
+        "bx/include",
+        "bgfx/include",
+        "bgfx/3rdparty",
+    }
+    links {
+        "bx",
+        "bgfx",
+        "spirv-opt",
+        "spirv-cross",
+        "fcpp",
+        "glsl-optimizer",
+        "glslang",
+    }
