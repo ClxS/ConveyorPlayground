@@ -60,6 +60,8 @@ namespace atlas::render
         ShaderProgram operator=(const ShaderProgram&) = delete;
         ShaderProgram operator=(const ShaderProgram&&) = delete;
 
+        [[nodiscard]] bgfx::ProgramHandle GetHandle() const { return m_ProgramHandle; }
+
     private:
         bgfx::ProgramHandle m_ProgramHandle;
         resource::AssetPtr<VertexShader> m_Vertex;

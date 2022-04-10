@@ -19,15 +19,16 @@ project "bx"
 	exports {
 		["includedirs"]	= path.getabsolute("bx/include"),
 	}
-
 	filter { "configurations:Debug" }
-        defines {
-            "BX_CONFIG_DEBUG=0",
-        }
-	filter { "configurations:Release" }
-        defines {
-            "BX_CONFIG_DEBUG=0",
-        }
+	    exports {
+    		["defines"]	= "BX_CONFIG_DEBUG=0",
+    	}
+    filter { "configurations:Release" }
+	    exports {
+    		["defines"]	= "BX_CONFIG_DEBUG=0",
+    	}
+    filter {}
+
     filter { "system:windows" }
         exports {
             ["includedirs"]	= {

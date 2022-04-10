@@ -17,7 +17,7 @@ bool atlas::app_host::platform::PlatformApplication::Initialise()
     }
 
 #if WINDOWED
-    windowFlags = 0;
+    windowFlags = SDL_WINDOW_SHOWN;
     m_Sdl.m_Window = SDL_CreateWindow("Cpp Conveyor", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1200, 800,
                                       windowFlags);
 #else
@@ -29,17 +29,6 @@ bool atlas::app_host::platform::PlatformApplication::Initialise()
     if (!m_Sdl.m_Window)
     {
         printf("Failed to open %d x %d window: %s\n", 800, 600, SDL_GetError());
-        return false;
-    }
-
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
-    SDL_SetHint(SDL_HINT_RENDER_BATCHING, "1");
-
-    m_Sdl.m_Renderer = SDL_CreateRenderer(m_Sdl.m_Window, -1, rendererFlags);
-
-    if (!m_Sdl.m_Renderer)
-    {
-        printf("Failed to create renderer: %s\n", SDL_GetError());
         return false;
     }
 

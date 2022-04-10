@@ -71,6 +71,7 @@ namespace atlas::game
                     SDL_GetError());
                 return 1;
             }
+            bgfx::renderFrame(); // single threaded mode
 #endif // !BX_PLATFORM_EMSCRIPTEN
 
             atlas::render::RendererInitArgs args;
@@ -92,6 +93,8 @@ namespace atlas::game
 
             while(true)
             {
+                bgfx::touch(0);
+
                 app.Update();
                 m_Game.Tick();
 

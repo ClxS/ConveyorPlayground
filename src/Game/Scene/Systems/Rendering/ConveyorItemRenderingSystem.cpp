@@ -6,6 +6,7 @@
 #include "ItemDefinition.h"
 #include "ItemRegistry.h"
 #include "RenderContext.h"
+#include "SDL_mouse.h"
 #include "SequenceComponent.h"
 #include "TileRenderHandler.h"
 #include "AtlasRender/Renderer.h"
@@ -13,6 +14,8 @@
 #include "AtlasResource/AssetPtr.h"
 #include "AtlasResource/ResourceLoader.h"
 #include "bgfx/bgfx.h"
+#include "bx/bx.h"
+#include "bx/math.h"
 
 /*
 *
@@ -167,9 +170,92 @@ void ConveyorItemRenderingSystem::Update(atlas::scene::EcsManager& ecs)
 
     atlas::render::addToFrameGraph_oneOff("ConveyorRenderer", []()
     {
-        atlas::resource::ResourceLoader::LoadAsset<cpp_conv::resources::registry::CoreBundle, atlas::render::ShaderProgram>(
+        static int prev_mouse_x = 0;
+        static int prev_mouse_y = 0;
+        static float cam_pitch = 0.0f;
+        static float cam_yaw = 0.0f;
+        static float rot_scale = 0.01f;
+        static const int width = 800;
+        static const int height = 600;
+
+        struct PosColorVertex
+        {
+            float x;
+            float y;
+            float z;
+            uint32_t abgr;
+        };
+
+        static PosColorVertex cube_vertices[] = {
+            {-1.0f, 1.0f, 1.0f, 0xff000000},   {1.0f, 1.0f, 1.0f, 0xff0000ff},
+            {-1.0f, -1.0f, 1.0f, 0xff00ff00},  {1.0f, -1.0f, 1.0f, 0xff00ffff},
+            {-1.0f, 1.0f, -1.0f, 0xffff0000},  {1.0f, 1.0f, -1.0f, 0xffff00ff},
+            {-1.0f, -1.0f, -1.0f, 0xffffff00}, {1.0f, -1.0f, -1.0f, 0xffffffff},
+        };
+
+        static const uint16_t cube_tri_list[] = {
+            0, 1, 2, 1, 3, 2, 4, 6, 5, 5, 6, 7, 0, 2, 4, 4, 2, 6,
+            1, 5, 3, 5, 7, 3, 0, 4, 1, 4, 5, 1, 2, 3, 6, 6, 3, 7,
+        };
+
+        static bgfx::VertexBufferHandle vbh{};
+        static bgfx::IndexBufferHandle ibh{};
+        if (vbh.idx == 0)
+        {
+            bgfx::VertexLayout pos_col_vert_layout;
+            pos_col_vert_layout.begin()
+                .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
+                .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
+                .end();
+            vbh = bgfx::createVertexBuffer(
+                bgfx::makeRef(cube_vertices, sizeof(cube_vertices)),
+                pos_col_vert_layout);
+            ibh = bgfx::createIndexBuffer(
+                bgfx::makeRef(cube_tri_list, sizeof(cube_tri_list)));
+        }
+
+
+        auto program = atlas::resource::ResourceLoader::LoadAsset<cpp_conv::resources::registry::CoreBundle, atlas::render::ShaderProgram>(
             cpp_conv::resources::registry::core_bundle::shaders::c_basic);
-        int i = 0;
-        i++;
+
+        int mouse_x, mouse_y;
+           const int buttons = SDL_GetMouseState(&mouse_x, &mouse_y);
+           if ((buttons & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0) {
+               int delta_x = mouse_x - prev_mouse_x;
+               int delta_y = mouse_y - prev_mouse_y;
+               cam_yaw += float(-delta_x) * rot_scale;
+               cam_pitch += float(-delta_y) * rot_scale;
+           }
+
+           prev_mouse_x = mouse_x;
+           prev_mouse_y = mouse_y;
+
+           float cam_rotation[16];
+           bx::mtxRotateXYZ(cam_rotation, cam_pitch, cam_yaw, 0.0f);
+
+           float cam_translation[16];
+           bx::mtxTranslate(cam_translation, 0.0f, 0.0f, -5.0f);
+
+           float cam_transform[16];
+           bx::mtxMul(cam_transform, cam_translation, cam_rotation);
+
+           float view[16];
+           bx::mtxInverse(view, cam_transform);
+
+           float proj[16];
+           bx::mtxProj(
+               proj, 60.0f, float(width) / float(height), 0.1f,
+               100.0f, bgfx::getCaps()->homogeneousDepth);
+
+           bgfx::setViewTransform(0, view, proj);
+
+           float model[16];
+           bx::mtxIdentity(model);
+           bgfx::setTransform(model);
+
+           bgfx::setVertexBuffer(0, vbh);
+           bgfx::setIndexBuffer(ibh);
+
+           bgfx::submit(0, program->GetHandle());
     });
 }

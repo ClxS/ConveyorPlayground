@@ -25,16 +25,10 @@ project "bgfx"
         "BGFX_CONFIG_RENDERER_OPENGL=0",
         "BGFX_CONFIG_RENDERER_OPENGLES=0",
         "BGFX_CONFIG_RENDERER_WEBGPU=0",
+        "BGFX_CONFIG_RENDERER_DIRECT3D11=1",
+        "BGFX_CONFIG_RENDERER_DIRECT3D12=0",
+        "BGFX_CONFIG_RENDERER_VULKAN=0",
 	}
-    filter { "configurations:Debug" }
-        defines {
-            "BX_CONFIG_DEBUG=0",
-        }
-	filter { "configurations:Release" }
-        defines {
-            "BX_CONFIG_DEBUG=0",
-        }
-    filter {}
 
 
 project "glsl-optimizer"
@@ -203,12 +197,3 @@ project "shaderc"
         "glsl-optimizer",
         "glslang",
     }
-    filter { "configurations:Debug" }
-        defines {
-            "BX_CONFIG_DEBUG=0",
-        }
-	filter { "configurations:Release" }
-        defines {
-            "BX_CONFIG_DEBUG=0",
-        }
-    filter {}
