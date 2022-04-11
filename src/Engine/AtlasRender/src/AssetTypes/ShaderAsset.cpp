@@ -19,7 +19,7 @@ namespace
 
         ProgramChunk m_VertexShader;
         ProgramChunk m_FragmentShader;
-        int32_t m_TextureSlotCount;
+        int64_t m_TextureSlotCount;
     };
 }
 
