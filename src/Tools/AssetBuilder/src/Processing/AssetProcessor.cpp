@@ -6,6 +6,7 @@
 #include "DataAssetHandler.h"
 #include "MapAssetHandler.h"
 #include "MeshAssetHandler.h"
+#include "ModelAssetHandler.h"
 #include "ShaderAssetHandler.h"
 #include "ShaderProgramAssetHandler.h"
 #include "Texture2dAsssetHandler.h"
@@ -20,6 +21,7 @@ void AssetProcessor::initDefaults()
     registerHandler<ShaderProgramAssetHandler>();
     registerHandler<Texture2DAssetHandler>();
     registerHandler<MeshAssetHandler>();
+    registerHandler<ModelAssetHandler>();
 }
 
 void AssetProcessor::registerHandler(const std::string& key, std::unique_ptr<AssetHandler>&& pHandler)
