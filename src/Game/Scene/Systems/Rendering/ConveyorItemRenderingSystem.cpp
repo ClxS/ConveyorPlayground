@@ -1,5 +1,6 @@
 #include "ConveyorItemRenderingSystem.h"
 #include <array>
+#include <iostream>
 
 #include "ConveyorComponent.h"
 #include "ConveyorHelper.h"
@@ -10,11 +11,13 @@
 #include "SequenceComponent.h"
 #include "TileRenderHandler.h"
 #include "AtlasRender/Renderer.h"
+#include "AtlasRender/AssetTypes/ModelAsset.h"
 #include "AtlasRender/AssetTypes/ShaderAsset.h"
 #include "AtlasResource/AssetPtr.h"
 #include "AtlasResource/ResourceLoader.h"
 #include "bgfx/bgfx.h"
 #include "bx/bx.h"
+#include "bx/hash.h"
 #include "bx/math.h"
 
 /*
@@ -26,6 +29,45 @@
                 {0xFFFFFFFF},
                 true);
  */
+
+namespace bgfx
+{
+    extern const char* getAttribName(Attrib::Enum _attr);
+}
+
+namespace
+{
+    void dump(const bgfx::VertexLayout& layout)
+    {
+        std::cout << std::format("\nVertexLayout {} ({}), stride {}"
+            , layout.m_hash
+            , bx::hash<bx::HashMurmur2A>(layout.m_attributes)
+            , layout.m_stride
+            );
+
+        for (uint32_t attr = 0; attr < bgfx::Attrib::Count; ++attr)
+        {
+            if (UINT16_MAX != layout.m_attributes[attr])
+            {
+                uint8_t num;
+                bgfx::AttribType::Enum type;
+                bool normalized;
+                bool asInt;
+                layout.decode(static_cast<bgfx::Attrib::Enum>(attr), num, type, normalized, asInt);
+
+                std::cout << std::format("\n\tattr {}: {} num {}, type {}, norm [{}], asint [{}], offset {}"
+                    , attr
+                    , bgfx::getAttribName(static_cast<bgfx::Attrib::Enum>(attr) )
+                    , num
+                    , static_cast<int>(type)
+                    , normalized ? 'x' : ' '
+                    , asInt      ? 'x' : ' '
+                    , layout.m_offset[attr]
+                    );
+            }
+        }
+    }
+}
 
 struct LerpInformation
 {
@@ -170,6 +212,13 @@ void ConveyorItemRenderingSystem::Update(atlas::scene::EcsManager& ecs)
 
     atlas::render::addToFrameGraph_oneOff("ConveyorRenderer", []()
     {
+        const auto modelPtr = atlas::resource::ResourceLoader::LoadAsset<cpp_conv::resources::registry::CoreBundle, atlas::render::ModelAsset>(
+            cpp_conv::resources::registry::core_bundle::assets::conveyors::models::c_ConveyorStraight);
+        if (!modelPtr || !modelPtr->GetMesh() || !modelPtr->GetProgram())
+        {
+            return;
+        }
+
         static int prev_mouse_x = 0;
         static int prev_mouse_y = 0;
         static float cam_pitch = 0.0f;
@@ -177,8 +226,15 @@ void ConveyorItemRenderingSystem::Update(atlas::scene::EcsManager& ecs)
         static float rot_scale = 0.01f;
         static const int width = 800;
         static const int height = 600;
+        static bool layoutDumped = false;
 
-        struct PosColorVertex
+        if (!layoutDumped)
+        {
+            dump(modelPtr->GetMesh()->GetLayout());
+            layoutDumped = true;
+        }
+
+        /*struct PosColorVertex
         {
             float x;
             float y;
@@ -216,46 +272,57 @@ void ConveyorItemRenderingSystem::Update(atlas::scene::EcsManager& ecs)
 
 
         auto program = atlas::resource::ResourceLoader::LoadAsset<cpp_conv::resources::registry::CoreBundle, atlas::render::ShaderProgram>(
-            cpp_conv::resources::registry::core_bundle::shaders::c_basic);
+            cpp_conv::resources::registry::core_bundle::shaders::c_basic);*/
 
         int mouse_x, mouse_y;
-           const int buttons = SDL_GetMouseState(&mouse_x, &mouse_y);
-           if ((buttons & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0) {
-               int delta_x = mouse_x - prev_mouse_x;
-               int delta_y = mouse_y - prev_mouse_y;
-               cam_yaw += float(-delta_x) * rot_scale;
-               cam_pitch += float(-delta_y) * rot_scale;
-           }
+        const int buttons = SDL_GetMouseState(&mouse_x, &mouse_y);
+        if ((buttons & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0) {
+            int deltaX = mouse_x - prev_mouse_x;
+            int deltaY = mouse_y - prev_mouse_y;
+            cam_yaw += static_cast<float>(-deltaX) * rot_scale;
+            cam_pitch += static_cast<float>(-deltaY) * rot_scale;
+        }
 
-           prev_mouse_x = mouse_x;
-           prev_mouse_y = mouse_y;
+        prev_mouse_x = mouse_x;
+        prev_mouse_y = mouse_y;
 
-           float cam_rotation[16];
-           bx::mtxRotateXYZ(cam_rotation, cam_pitch, cam_yaw, 0.0f);
+        float cam_rotation[16];
+        bx::mtxRotateXYZ(cam_rotation, cam_pitch, cam_yaw, 0.0f);
 
-           float cam_translation[16];
-           bx::mtxTranslate(cam_translation, 0.0f, 0.0f, -5.0f);
+        float cam_translation[16];
+        bx::mtxTranslate(cam_translation, 0.0f, 0.0f, -5.0f);
 
-           float cam_transform[16];
-           bx::mtxMul(cam_transform, cam_translation, cam_rotation);
+        float cam_transform[16];
+        bx::mtxMul(cam_transform, cam_translation, cam_rotation);
 
-           float view[16];
-           bx::mtxInverse(view, cam_transform);
+        float view[16];
+        bx::mtxInverse(view, cam_transform);
 
-           float proj[16];
-           bx::mtxProj(
-               proj, 60.0f, float(width) / float(height), 0.1f,
-               100.0f, bgfx::getCaps()->homogeneousDepth);
+        float proj[16];
+        bx::mtxProj(
+           proj, 60.0f, static_cast<float>(width) / static_cast<float>(height), 0.1f,
+           100.0f, bgfx::getCaps()->homogeneousDepth);
 
-           bgfx::setViewTransform(0, view, proj);
+        bgfx::setViewTransform(0, view, proj);
 
-           float model[16];
-           bx::mtxIdentity(model);
-           bgfx::setTransform(model);
+        float model[16];
+        bx::mtxIdentity(model);
+        bgfx::setTransform(model);
 
-           bgfx::setVertexBuffer(0, vbh);
-           bgfx::setIndexBuffer(ibh);
+        const auto& mesh = modelPtr->GetMesh();
+        const auto& program = modelPtr->GetProgram();
 
-           bgfx::submit(0, program->GetHandle());
+        int textureIndex = 0;
+        for(const auto& texture : modelPtr->GetTextures())
+        {
+            bgfx::setTexture(textureIndex++, texture.m_Sampler, texture.m_Texture->GetHandle());
+        }
+
+        for(const auto& segment : mesh->GetSegments())
+        {
+            bgfx::setVertexBuffer(0, segment.m_VertexBuffer);
+            bgfx::setIndexBuffer(segment.m_IndexBuffer);
+            bgfx::submit(0, program->GetHandle());
+        }
     });
 }
