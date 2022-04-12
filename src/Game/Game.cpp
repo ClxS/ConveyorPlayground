@@ -19,7 +19,9 @@
 #include "SpriteLayerComponent.h"
 #include "WorldEntityInformationComponent.h"
 #include "AtlasGame/GameHost.h"
+#include "AtlasRender/AssetTypes/ModelAsset.h"
 #include "AtlasRender/AssetTypes/ShaderAsset.h"
+#include "AtlasRender/AssetTypes/TextureAsset.h"
 
 #undef max
 #undef min
@@ -65,6 +67,9 @@ void registerTypeHandlers()
     ResourceLoader::RegisterTypeHandler<atlas::render::VertexShader>(atlas::render::vertexShaderLoadHandler);
     ResourceLoader::RegisterTypeHandler<atlas::render::FragmentShader>(atlas::render::fragmentShaderLoadHandler);
     ResourceLoader::RegisterTypeHandler<atlas::render::ShaderProgram>(atlas::render::shaderProgramLoadHandler);
+    ResourceLoader::RegisterTypeHandler<atlas::render::TextureAsset>(atlas::render::textureLoadHandler);
+    ResourceLoader::RegisterTypeHandler<atlas::render::ModelAsset>(atlas::render::modelLoadHandler);
+    ResourceLoader::RegisterTypeHandler<atlas::render::MeshAsset>(atlas::render::meshLoadHandler);
 }
 
 void loadDataAssets()

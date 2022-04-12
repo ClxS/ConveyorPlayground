@@ -164,6 +164,7 @@ std::string asset_builder::actions::getAssetRelativeName(std::filesystem::path r
     std::string namespaceName = relativePath.string();
     namespaceName = replaceAll(namespaceName, "\\", "::");
     namespaceName = replaceAll(namespaceName, "/", "::");
+    namespaceName = replaceAll(namespaceName, ".", "");
     return namespaceName;
 }
 

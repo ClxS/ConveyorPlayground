@@ -41,6 +41,15 @@ atlas::render::FragmentShader::FragmentShader(const bgfx::ShaderHandle handle)
 {
 }
 
+atlas::render::ShaderProgram::ShaderProgram(bgfx::ProgramHandle handle, resource::AssetPtr<VertexShader> vertex,
+    resource::AssetPtr<FragmentShader> fragment, const int64_t textureSlotCount): m_ProgramHandle{handle}
+    , m_Vertex{std::move(vertex)}
+    , m_Fragment{std::move(fragment)}
+    , m_TextureSlotCount{textureSlotCount}
+{
+
+}
+
 atlas::render::ShaderProgram::~ShaderProgram()
 {
     bgfx::destroy(m_ProgramHandle);
@@ -83,28 +92,28 @@ atlas::resource::AssetPtr<atlas::resource::ResourceAsset> atlas::render::shaderP
     const auto vertexBundleId = resource::ResourceLoader::LookupId(vertexName);
     if (!vertexBundleId.has_value() || !vertexBundleId->IsValid())
     {
-        std::cerr << std::format("Could not find resource with name {}", vertexName);
+        std::cerr << std::format("Could not find resource with name {}\n", vertexName);
         return nullptr;
     }
 
     const auto fragmentBundleId = resource::ResourceLoader::LookupId(fragmentName);
     if (!fragmentBundleId.has_value() || !fragmentBundleId->IsValid())
     {
-        std::cerr << std::format("Could not find resource with name {}", fragmentName);
+        std::cerr << std::format("Could not find resource with name {}\n", fragmentName);
         return nullptr;
     }
 
     const auto vertexShader = resource::ResourceLoader::LoadAsset<VertexShader>(vertexBundleId.value());
     if (!vertexShader)
     {
-        std::cerr << std::format("Failed to load resource with name {}. Bundle: {}, Id: {}", vertexName, vertexBundleId.value().m_BundleIndex, vertexBundleId.value().m_BundleId.m_Value);
+        std::cerr << std::format("Failed to load resource with name {}. Bundle: {}, Id: {}\n", vertexName, vertexBundleId.value().m_BundleIndex, vertexBundleId.value().m_BundleId.m_Value);
         return nullptr;
     }
 
     const auto fragmentShader = resource::ResourceLoader::LoadAsset<FragmentShader>(fragmentBundleId.value());
     if (!fragmentShader)
     {
-        std::cerr << std::format("Failed to load resource with name {}. Bundle: {}, Id: {}", fragmentName, fragmentBundleId.value().m_BundleIndex, fragmentBundleId.value().m_BundleId.m_Value);
+        std::cerr << std::format("Failed to load resource with name {}. Bundle: {}, Id: {}\n", fragmentName, fragmentBundleId.value().m_BundleIndex, fragmentBundleId.value().m_BundleId.m_Value);
         return nullptr;
     }
 

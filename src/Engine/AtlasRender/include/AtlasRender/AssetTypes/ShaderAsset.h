@@ -18,10 +18,6 @@ namespace atlas::render
     public:
         explicit ShaderAsset(bgfx::ShaderHandle handle);
         ~ShaderAsset() override;
-        ShaderAsset(const ShaderAsset&) = delete;
-        ShaderAsset(const ShaderAsset&&) = delete;
-        ShaderAsset operator=(const ShaderAsset&) = delete;
-        ShaderAsset operator=(const ShaderAsset&&) = delete;
 
         [[nodiscard]] bgfx::ShaderHandle GetHandle() const { return m_Handle; }
 
@@ -48,19 +44,8 @@ namespace atlas::render
             bgfx::ProgramHandle handle,
             resource::AssetPtr<VertexShader> vertex,
             resource::AssetPtr<FragmentShader> fragment,
-            const int64_t textureSlotCount)
-            : m_ProgramHandle{handle}
-            , m_Vertex{std::move(vertex)}
-            , m_Fragment{std::move(fragment)}
-            , m_TextureSlotCount{textureSlotCount}
-        {
-
-        }
+            const int64_t textureSlotCount);
         ~ShaderProgram() override;
-        ShaderProgram(const ShaderProgram&) = delete;
-        ShaderProgram(const ShaderProgram&&) = delete;
-        ShaderProgram operator=(const ShaderProgram&) = delete;
-        ShaderProgram operator=(const ShaderProgram&&) = delete;
 
         [[nodiscard]] bgfx::ProgramHandle GetHandle() const { return m_ProgramHandle; }
 

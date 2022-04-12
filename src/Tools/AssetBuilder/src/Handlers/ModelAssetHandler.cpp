@@ -1,8 +1,5 @@
 #include "ModelAssetHandler.h"
 
-#include <cassert>
-#include <numeric>
-
 #include "Asset.h"
 #include "FileUtility.h"
 #include "GenerateSpec.h"
@@ -15,8 +12,14 @@ namespace
     {
         struct Material
         {
+            struct Binding
+            {
+                std::string m_Sampler;
+                std::filesystem::path m_Texture;
+            };
+
             std::filesystem::path m_Program;
-            std::vector<std::filesystem::path> m_Textures;
+            std::vector<Binding> m_Bindings;
         };
 
         std::filesystem::path m_Mesh;
@@ -45,18 +48,27 @@ namespace
         {
             ModelMetadata::Material materialMetadata;
             materialMetadata.m_Program = relativePath.parent_path() / material->getString("program").second;
-            const auto textures = material->getArray("textures");
+            materialMetadata.m_Program = materialMetadata.m_Program.lexically_normal();
+
+            const auto textures = material->getArray("texture");
             if (textures)
             {
                 for(int i = 0; i < textures->size(); ++i)
                 {
-                    materialMetadata.m_Textures.push_back(relativePath.parent_path() / textures->getString(0).second);
+                    const auto texture = textures->getTable(0);
+
+                    auto texturePath = relativePath.parent_path() / texture->getString("texture").second;
+                    texturePath = relativePath.lexically_normal();
+
+                    materialMetadata.m_Bindings.push_back({
+                        texture->getString("sampler").second,
+                        texturePath
+                    });
                 }
             }
 
             metadata.m_Material = materialMetadata;
         }
-
 
         return metadata;
     }
@@ -81,7 +93,7 @@ std::variant<std::vector<OutputArtifact>, ErrorString> ModelAssetHandler::Cook(c
     int64_t textureCount = 0;
     if (metadata.m_Material.has_value())
     {
-        textureCount = metadata.m_Material->m_Textures.size();
+        textureCount = metadata.m_Material->m_Bindings.size();
     }
 
     asset_builder::utility::file_utility::StructuredFileWriter writer;
@@ -90,6 +102,7 @@ std::variant<std::vector<OutputArtifact>, ErrorString> ModelAssetHandler::Cook(c
     writer.AddData(textureCount);
     for(int i = 0; i < textureCount; i++)
     {
+        writer.AddDoubleSizedFixup(std::format("sampler_{}", i));
         writer.AddDoubleSizedFixup(std::format("texture_{}", i));
     }
 
@@ -99,7 +112,8 @@ std::variant<std::vector<OutputArtifact>, ErrorString> ModelAssetHandler::Cook(c
         writer.AddKeyedData("program", asset_builder::actions::getAssetRelativeName(metadata.m_Material.value().m_Program));
         for(int i = 0; i < textureCount; i++)
         {
-            writer.AddKeyedData(std::format("texture_{}", i), asset_builder::actions::getAssetRelativeName(metadata.m_Material.value().m_Textures[i]));
+            writer.AddKeyedData(std::format("sampler_{}", i), metadata.m_Material.value().m_Bindings[i].m_Sampler);
+            writer.AddKeyedData(std::format("texture_{}", i), asset_builder::actions::getAssetRelativeName(metadata.m_Material.value().m_Bindings[i].m_Texture));
         }
     }
 

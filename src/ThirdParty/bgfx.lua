@@ -4,14 +4,22 @@ project "bgfx"
 		"bgfx.lua",
 	    "bgfx/src/amalgamated.**",
 		"bgfx/include/**",
+		"bgfx/3rdparty/meshoptimizer/src/**",
+		"bgfx/examples/common/*",
+		"bgfx/examples/common/entry/**.h",
+		"bgfx/examples/common/entry/entry.cpp",
 	}
 	includedirs {
 		"bx/include",
         "bx/include/compat/msvc",
+        "bgfx/3rdparty",
     }
 	exports {
 		["includedirs"]	= {
 		    path.getabsolute("bgfx/include"),
+		    path.getabsolute("bgfx/3rdparty/meshoptimizer/src"),
+		    path.getabsolute("bgfx/examples/common"),
+		    path.getabsolute("bimg/include"),
         },
         ["links"] = {
             "bx",
@@ -29,7 +37,9 @@ project "bgfx"
         "BGFX_CONFIG_RENDERER_DIRECT3D12=0",
         "BGFX_CONFIG_RENDERER_VULKAN=0",
 	}
-
+    removefiles {
+        "**/example-glue.cpp",
+    }
 
 project "glsl-optimizer"
     kind "StaticLib"
