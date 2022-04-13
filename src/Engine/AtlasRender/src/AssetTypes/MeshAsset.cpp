@@ -159,8 +159,6 @@ atlas::render::MeshAsset::~MeshAsset()
 
 atlas::resource::AssetPtr<atlas::resource::ResourceAsset> atlas::render::meshLoadHandler(const resource::FileData& data)
 {
-    meshLoad("C:/Users/c-j-1/source/repos/ConveyorPlayground/build/bin/SDL/Debug/data/assets/conveyors/Models/ConveyorStraightMesh.nmesh");
-
     constexpr uint32_t kChunkVertexBuffer           = BX_MAKEFOURCC('V', 'B', ' ', 0x1);
 	constexpr uint32_t kChunkVertexBufferCompressed = BX_MAKEFOURCC('V', 'B', 'C', 0x0);
 	constexpr uint32_t kChunkIndexBuffer            = BX_MAKEFOURCC('I', 'B', ' ', 0x0);
