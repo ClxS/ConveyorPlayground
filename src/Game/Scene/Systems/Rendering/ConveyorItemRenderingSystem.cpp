@@ -39,7 +39,7 @@ namespace
 {
     void dump(const bgfx::VertexLayout& layout)
     {
-        std::cout << std::format("\nVertexLayout {} ({}), stride {}"
+        std::cerr << std::format("\nVertexLayout {} ({}), stride {}"
             , layout.m_hash
             , bx::hash<bx::HashMurmur2A>(layout.m_attributes)
             , layout.m_stride
@@ -55,7 +55,7 @@ namespace
                 bool asInt;
                 layout.decode(static_cast<bgfx::Attrib::Enum>(attr), num, type, normalized, asInt);
 
-                std::cout << std::format("\n\tattr {}: {} num {}, type {}, norm [{}], asint [{}], offset {}"
+                std::cerr << std::format("\n\tattr {}: {} num {}, type {}, norm [{}], asint [{}], offset {}"
                     , attr
                     , bgfx::getAttribName(static_cast<bgfx::Attrib::Enum>(attr) )
                     , num
@@ -233,46 +233,6 @@ void ConveyorItemRenderingSystem::Update(atlas::scene::EcsManager& ecs)
             dump(modelPtr->GetMesh()->GetLayout());
             layoutDumped = true;
         }
-
-        /*struct PosColorVertex
-        {
-            float x;
-            float y;
-            float z;
-            uint32_t abgr;
-        };
-
-        static PosColorVertex cube_vertices[] = {
-            {-1.0f, 1.0f, 1.0f, 0xff000000},   {1.0f, 1.0f, 1.0f, 0xff0000ff},
-            {-1.0f, -1.0f, 1.0f, 0xff00ff00},  {1.0f, -1.0f, 1.0f, 0xff00ffff},
-            {-1.0f, 1.0f, -1.0f, 0xffff0000},  {1.0f, 1.0f, -1.0f, 0xffff00ff},
-            {-1.0f, -1.0f, -1.0f, 0xffffff00}, {1.0f, -1.0f, -1.0f, 0xffffffff},
-        };
-
-        static const uint16_t cube_tri_list[] = {
-            0, 1, 2, 1, 3, 2, 4, 6, 5, 5, 6, 7, 0, 2, 4, 4, 2, 6,
-            1, 5, 3, 5, 7, 3, 0, 4, 1, 4, 5, 1, 2, 3, 6, 6, 3, 7,
-        };
-
-        static bgfx::VertexBufferHandle vbh{};
-        static bgfx::IndexBufferHandle ibh{};
-        if (vbh.idx == 0)
-        {
-            bgfx::VertexLayout pos_col_vert_layout;
-            pos_col_vert_layout.begin()
-                .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
-                .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
-                .end();
-            vbh = bgfx::createVertexBuffer(
-                bgfx::makeRef(cube_vertices, sizeof(cube_vertices)),
-                pos_col_vert_layout);
-            ibh = bgfx::createIndexBuffer(
-                bgfx::makeRef(cube_tri_list, sizeof(cube_tri_list)));
-        }
-
-
-        auto program = atlas::resource::ResourceLoader::LoadAsset<cpp_conv::resources::registry::CoreBundle, atlas::render::ShaderProgram>(
-            cpp_conv::resources::registry::core_bundle::shaders::c_basic);*/
 
         int mouse_x, mouse_y;
         const int buttons = SDL_GetMouseState(&mouse_x, &mouse_y);

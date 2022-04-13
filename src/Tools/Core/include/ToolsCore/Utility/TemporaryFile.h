@@ -7,6 +7,7 @@ namespace cpp_conv::tools::utility
     {
     public:
         TemporaryFile();
+        TemporaryFile(std::string_view extension);
         ~TemporaryFile();
 
         TemporaryFile(const TemporaryFile&) = delete;

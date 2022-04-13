@@ -58,7 +58,7 @@ namespace
                     const auto texture = textures->getTable(0);
 
                     auto texturePath = relativePath.parent_path() / texture->getString("texture").second;
-                    texturePath = relativePath.lexically_normal();
+                    texturePath = texturePath.lexically_normal();
 
                     materialMetadata.m_Bindings.push_back({
                         texture->getString("sampler").second,

@@ -120,7 +120,10 @@ std::variant<std::vector<OutputArtifact>, ErrorString> ShaderAssetHandler::Cook(
     int exitCode = asset_builder::utility::process_utility::execute(processName, args, stdOut, stdErr);
 
     // TODO Capture output
-    assert(exitCode == 0);
+    if (exitCode != 0)
+    {
+        return std::format("shaderc failed with code {}. {} {}", exitCode, processName, args);
+    }
 
     auto [fileContents, size] = asset_builder::utility::file_utility::readFile(outputFile);
     if (!fileContents)

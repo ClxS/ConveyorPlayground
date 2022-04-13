@@ -258,3 +258,57 @@ project "geometryc"
         "glsl-optimizer",
         "glslang",
     }
+
+project "bimg_encode"
+	kind "StaticLib"
+
+	includedirs {
+		"bimg/include",
+		"bimg/3rdparty",
+		"bimg/3rdparty/nvtt",
+		"bimg/3rdparty/iqa/include",
+		"bimg/3rdparty/tinyexr/deps/miniz",
+	}
+
+	files {
+		"bimg/include/**",
+		"bimg/src/image_encode.*",
+		"bimg/src/image_cubemap_filter.*",
+		"bimg/3rdparty/libsquish/**.cpp",
+		"bimg/3rdparty/libsquish/**.h",
+		"bimg/3rdparty/edtaa3/**.cpp",
+		"bimg/3rdparty/edtaa3/**.h",
+		"bimg/3rdparty/etc1/**.cpp",
+		"bimg/3rdparty/etc1/**.h",
+		"bimg/3rdparty/etc2/**.cpp",
+		"bimg/3rdparty/etc2/**.hpp",
+		"bimg/3rdparty/nvtt/**.cpp",
+		"bimg/3rdparty/nvtt/**.h",
+		"bimg/3rdparty/pvrtc/**.cpp",
+		"bimg/3rdparty/pvrtc/**.h",
+		"bimg/3rdparty/astc/**.cpp",
+		"bimg/3rdparty/astc/**.h",
+		"bimg/3rdparty/tinyexr/**.h",
+		"bimg/3rdparty/iqa/include/**.h",
+		"bimg/3rdparty/iqa/source/**.c",
+	}
+	links {
+	    "bx"
+    }
+
+project "texturec"
+	kind "ConsoleApp"
+	targetdir(path.getabsolute("../../bin/tools"))
+	files {
+		"bimg/tools/texturec/**",
+	}
+	links {
+		"etc1",
+		"etc2",
+		"nvtt",
+		"bimg",
+		"bimg_encode",
+		"bgfx",
+		"bx",
+	}
+

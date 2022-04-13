@@ -58,6 +58,10 @@ namespace atlas::core
 
         [[nodiscard]] bool IsEndOfFile() const { return m_CurrentPosition > m_BufferEnd; }
 
+        [[nodiscard]] const uint8_t* GetData() const { return m_BufferBase; }
+
+        [[nodiscard]] size_t GetTotalSize() const { return m_BufferEnd - m_BufferBase + 1; }
+
     private:
         uint8_t* m_BufferBase;
         uint8_t* m_CurrentPosition;

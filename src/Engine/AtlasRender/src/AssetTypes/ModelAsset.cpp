@@ -87,7 +87,7 @@ atlas::resource::AssetPtr<atlas::resource::ResourceAsset> atlas::render::modelLo
         bgfx::UniformHandle sampler = createUniform(samplerName.c_str(), bgfx::UniformType::Sampler);
         textures.emplace_back(
             sampler,
-            loadAsset<TextureAsset>(getString(file, header->m_Program)));
+            loadAsset<TextureAsset>(getString(file, binding.m_Texture)));
     }
 
     return std::make_shared<ModelAsset>(mesh, program, textures);
