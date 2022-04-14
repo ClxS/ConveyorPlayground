@@ -76,7 +76,7 @@ std::variant<std::vector<OutputArtifact>, ErrorString> MeshAssetHandler::Cook(co
 
     std::string processName = (currentDirectory.value() / "geometryc.exe").string();
     std::string args = std::format(
-        R"(-f "{}" -o "{}" -s {})",
+        R"(-f "{}" -o "{}" -s {} --flipv)",
         sourceFile,
         outputFile,
         metadata.m_Scale);
