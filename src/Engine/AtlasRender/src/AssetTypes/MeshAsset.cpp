@@ -1,7 +1,6 @@
 #include "AtlasRenderPCH.h"
 #include "MeshAsset.h"
 
-#include "bgfx_utils.h"
 #include "meshoptimizer.h"
 #include "AtlasCore/FileReader.h"
 #include "AtlasResource/FileData.h"

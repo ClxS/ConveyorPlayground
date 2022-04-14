@@ -285,7 +285,7 @@ void cpp_conv::ConveyorStateDeterminationSystem::Initialise(atlas::scene::EcsMan
             conveyorVisualState |= bIsBackCapped ? ConveyorVisualState::CappedBack : 0;
 
             auto test = ConveyorVisualState::Corner | ConveyorVisualState::Clockwise | ConveyorVisualState::Capped;
-            switch(conveyorVisualState)
+            /*switch(conveyorVisualState)
             {
             case ConveyorVisualState::Corner:
                 sprite.m_pTile = atlas::resource::ResourceLoader::LoadAsset<resources::registry::CoreBundle, resources::TileAsset>(
@@ -319,7 +319,7 @@ void cpp_conv::ConveyorStateDeterminationSystem::Initialise(atlas::scene::EcsMan
                 sprite.m_pTile = atlas::resource::ResourceLoader::LoadAsset<resources::registry::CoreBundle, resources::TileAsset>(
                         resources::registry::core_bundle::assets::conveyors::c_ConveyorStraight);
                 break;
-            }
+            }*/
 
             sprite.m_RotationRadians = rotationRadiansFromDirection(direction.m_Direction);
         }

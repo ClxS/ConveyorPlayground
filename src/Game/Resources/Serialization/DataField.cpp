@@ -125,7 +125,8 @@ bool cpp_conv::TypedDataReader<atlas::resource::BundleRegistryId>::Read(
     const auto id = atlas::resource::ResourceLoader::LookupId(strValue);
     if (!id.has_value())
     {
-        return false;
+        pTargetVariable = {};
+        return true;
     }
 
     pTargetVariable = id.value();

@@ -5,9 +5,9 @@ project "bgfx"
 	    "bgfx/src/amalgamated.**",
 		"bgfx/include/**",
 		"bgfx/3rdparty/meshoptimizer/src/**",
-		"bgfx/examples/common/*",
-		"bgfx/examples/common/entry/**.h",
-		"bgfx/examples/common/entry/entry.cpp",
+		--"bgfx/examples/common/*",
+		--"bgfx/examples/common/entry/**.h",
+		--"bgfx/examples/common/entry/entry.cpp",
 	}
 	includedirs {
 		"bx/include",
@@ -18,7 +18,7 @@ project "bgfx"
 		["includedirs"]	= {
 		    path.getabsolute("bgfx/include"),
 		    path.getabsolute("bgfx/3rdparty/meshoptimizer/src"),
-		    path.getabsolute("bgfx/examples/common"),
+		    --path.getabsolute("bgfx/examples/common"),
 		    path.getabsolute("bimg/include"),
         },
         ["links"] = {

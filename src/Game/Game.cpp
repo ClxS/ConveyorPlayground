@@ -83,7 +83,7 @@ void loadDataAssets()
 
 void setBgfxSettings()
 {
-    bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x6495EDFF, 1.0f, 0);
+    bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x322e3dFF, 1.0f, 0);
 }
 
 class CppConveyor final : public atlas::game::GameImplementation
@@ -101,7 +101,7 @@ public:
         setBgfxSettings();
 
         m_SceneManager.TransitionTo<cpp_conv::GameMapLoadInterstitialScene>(
-            ResourceLoader::CreateBundleRegistryId<registry::CoreBundle>(registry::core_bundle::maps::c_bigmap));
+            ResourceLoader::CreateBundleRegistryId<registry::CoreBundle>(registry::core_bundle::maps::c_simple));
     }
 };
 
