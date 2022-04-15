@@ -195,6 +195,10 @@ void cpp_conv::SequenceFormationSystem::Initialise(atlas::scene::EcsManager& ecs
 
             std::vector vSequenceConveyors(chunk_begin, chunk_end);
             const auto& pTailConveyor = ecs.GetComponent<ConveyorComponent>(vSequenceConveyors.front());
+            const auto unitDirection2d =
+                pTailConveyor.m_Channels[0].m_pSlots[1].m_VisualPosition - pTailConveyor.m_Channels[0].m_pSlots[0].
+                m_VisualPosition;
+            const auto normalizedUnitDirection2d = unitDirection2d.normalized();
 
             const EntityId sequenceId = ecs.AddEntity();
             SequenceComponent& component = ecs.AddComponent<SequenceComponent>(
@@ -203,8 +207,7 @@ void cpp_conv::SequenceFormationSystem::Initialise(atlas::scene::EcsManager& ecs
                 vSequenceConveyors[vSequenceConveyors.size() - 1],
                 pTailConveyor.m_Channels[0].m_pSlots[0].m_VisualPosition,
                 pTailConveyor.m_Channels[1].m_pSlots[0].m_VisualPosition,
-                pTailConveyor.m_Channels[0].m_pSlots[1].m_VisualPosition - pTailConveyor.m_Channels[0].m_pSlots[0].
-                m_VisualPosition,
+                Eigen::Vector3f(normalizedUnitDirection2d.x(), normalizedUnitDirection2d.y(), 0.0f),
                 pTailConveyor.m_MoveTick
             );
 

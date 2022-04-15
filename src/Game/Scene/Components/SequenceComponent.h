@@ -44,7 +44,7 @@ namespace cpp_conv::components
             const atlas::scene::EntityId headConveyor,
             const Eigen::Vector2f laneOneVisualPosition,
             const Eigen::Vector2f laneTwoVisualPosition,
-            const Eigen::Vector2f unitDirection,
+            const Eigen::Vector3f unitDirection,
             const uint32_t moveTick)
             : m_UnitDirection(unitDirection)
               , m_MoveTick(moveTick)
@@ -58,7 +58,7 @@ namespace cpp_conv::components
         }
 
 
-        Eigen::Vector2f m_UnitDirection;
+        Eigen::Vector3f m_UnitDirection;
 
         uint32_t m_MoveTick;
         uint32_t m_CurrentTick;

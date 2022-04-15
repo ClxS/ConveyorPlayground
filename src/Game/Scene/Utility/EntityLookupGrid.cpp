@@ -91,22 +91,22 @@ bool cpp_conv::EntityLookupGrid::Cell::SetEntity(const CellCoordinate coord, atl
 cpp_conv::EntityLookupGrid::CellCoordinate cpp_conv::EntityLookupGrid::ToCellSpace(Eigen::Vector3i position)
 {
     constexpr int32_t worldToGridSpaceValue = (c_uiMaximumMapSize / 2) * c_uiCellSize;
-    const Eigen::Vector3i worldToGridSpaceTransform = {worldToGridSpaceValue, worldToGridSpaceValue, 0};
+    const Eigen::Vector3i worldToGridSpaceTransform = {worldToGridSpaceValue, 0, worldToGridSpaceValue};
     position += worldToGridSpaceTransform;
 
     constexpr int32_t axisSize = c_uiMaximumMapSize * c_uiCellSize;
-    if (position.x() < 0 || position.y() < 0 || position.x() >= axisSize || position.y() >= axisSize)
+    if (position.x() < 0 || position.z() < 0 || position.x() >= axisSize || position.z() >= axisSize)
     {
-        return {-1, -1, -1, -1, position.z()};
+        return {-1, -1, -1, -1, position.y()};
     }
 
     const auto iHorizontalCell = position.x() / c_uiCellSize;
     const auto iHorizontalSlot = position.x() % c_uiCellSize;
 
-    const auto iVerticalCell = position.y() / c_uiCellSize;
-    const auto iVerticalSlot = position.y() % c_uiCellSize;
+    const auto iVerticalCell = position.z() / c_uiCellSize;
+    const auto iVerticalSlot = position.z() % c_uiCellSize;
 
-    return {iHorizontalCell, iVerticalCell, iHorizontalSlot, iVerticalSlot, position.z()};
+    return {iHorizontalCell, iVerticalCell, iHorizontalSlot, iVerticalSlot, position.y()};
 }
 
 atlas::scene::EntityId cpp_conv::EntityLookupGrid::GetEntity(const Eigen::Vector3i position) const
@@ -136,11 +136,11 @@ bool cpp_conv::EntityLookupGrid::PlaceEntity(Eigen::Vector3i position, Eigen::Ve
 
     for (int32_t iXPosition = position.x(); iXPosition < (position.x() + size.x()); ++iXPosition)
     {
-        for (int32_t iYPosition = position.y(); iYPosition < (position.y() + size.y()); ++iYPosition)
+        for (int32_t iYPosition = position.z(); iYPosition < (position.z() + size.z()); ++iYPosition)
         {
-            for (int32_t iDepthPosition = position.z(); iDepthPosition < (position.z() + size.z()); ++iDepthPosition)
+            for (int32_t iDepthPosition = position.y(); iDepthPosition < (position.y() + size.y()); ++iDepthPosition)
             {
-                CellCoordinate coord = ToCellSpace({iXPosition, iYPosition, iDepthPosition});
+                CellCoordinate coord = ToCellSpace({iXPosition, iDepthPosition, iYPosition});
                 assert(!coord.IsInvalid());
 
                 Cell* pCell = GetOrCreateCell(coord);
@@ -164,9 +164,9 @@ bool cpp_conv::EntityLookupGrid::ValidateCanPlaceEntity(Eigen::Vector3i position
 
     for (int32_t iXPosition = position.x(); iXPosition < (position.x() + size.x()); ++iXPosition)
     {
-        for (int32_t iYPosition = position.y(); iYPosition < (position.y() + size.y()); ++iYPosition)
+        for (int32_t iYPosition = position.z(); iYPosition < (position.z() + size.z()); ++iYPosition)
         {
-            for (int32_t iDepthPosition = position.z(); iDepthPosition < (position.z() + size.z()); ++iDepthPosition)
+            for (int32_t iDepthPosition = position.y(); iDepthPosition < (position.y() + size.y()); ++iDepthPosition)
             {
                 const Eigen::Vector3i checkPosition = {iXPosition, iYPosition, iDepthPosition};
                 CellCoordinate coord = ToCellSpace(checkPosition);

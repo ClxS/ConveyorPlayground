@@ -1,7 +1,7 @@
 #include "GameScene.h"
 
 #include "ConveyorComponent.h"
-#include "ConveyorItemRenderingSystem.h"
+#include "ConveyorRenderingSystem.h"
 #include "ConveyorStateDeterminationSystem.h"
 #include "DescriptionComponent.h"
 #include "DirectionComponent.h"
@@ -162,7 +162,7 @@ void cpp_conv::GameScene::ConstructSystems(atlas::scene::SystemsBuilder& builder
     auto layer2 = builder.RegisterGroup("SpriteRendering_Layer2", {layer1}, [](atlas::scene::SystemsBuilder& groupBuilder)
     {
         groupBuilder.RegisterSystem<SpriteLayerRenderSystem<2>>();
-        groupBuilder.RegisterSystem<ConveyorItemRenderingSystem>();
+        groupBuilder.RegisterSystem<ConveyorRenderingSystem>();
     });
 
     auto layer3 = builder.RegisterGroup("SpriteRendering_Layer3", {layer2}, [](atlas::scene::SystemsBuilder& groupBuilder)

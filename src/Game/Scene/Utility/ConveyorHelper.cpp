@@ -36,12 +36,6 @@ atlas::scene::EntityId cpp_conv::conveyor_helper::findNextTailConveyor(
     for (auto d : directionPriority)
     {
         EntityId directionEntity = grid.GetEntity(vPositions[static_cast<int>(d)]);
-        if (directionEntity.m_Value == 12995)
-        {
-            int i = 0;
-            i++;
-        }
-
         if (directionEntity.IsInvalid() || !ecs.DoesEntityHaveComponents<
             PositionComponent, DirectionComponent, WorldEntityInformationComponent>(directionEntity))
         {
@@ -174,7 +168,8 @@ Eigen::Vector2f cpp_conv::conveyor_helper::getSlotPosition(const cpp_conv::compo
     const uint8_t uiSequenceIndex, const int lane, const int slot)
 {
     const Eigen::Vector2f visual = component.m_LaneVisualOffsets[lane];
-    return visual + component.m_UnitDirection * (uiSequenceIndex * 2.0f + slot);
+    const Eigen::Vector2f unitDirection2d{component.m_UnitDirection.x(), component.m_UnitDirection.y()};
+    return visual + unitDirection2d * (uiSequenceIndex * 2.0f + slot);
 }
 
 std::optional<cpp_conv::conveyor_helper::ItemInformation> cpp_conv::conveyor_helper::getItemInSlot(

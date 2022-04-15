@@ -6,6 +6,7 @@ project "CppConveyor"
 	    "premake5.lua",
 		"**.h",
 		"**.cpp",
+		"**.natvis",
 	}
 	filter {"files:Scene/Grid/**"}
 	    flags{"ExcludeFromBuild"}

@@ -54,7 +54,7 @@ namespace cpp_conv
         }
     }
 
-    inline float rotationRadiansFromDirection(Direction direction)
+    inline float rotationRadiansFromDirection(const Direction direction)
     {
         constexpr float c_pi = 3.14159265358979323846f;  /* pi */
         // This engine uses right-based assets. Up/Down are inverted as we use a top major positioning system
@@ -63,11 +63,11 @@ namespace cpp_conv
         default:
         case Direction::Right:
             return 0.0f;
-        case Direction::Up:
+        case Direction::Down:
             return 90.0f * (c_pi / 180.0f);
         case Direction::Left:
             return 180.0f * (c_pi / 180.0f);
-        case Direction::Down:
+        case Direction::Up:
             return 270.0f * (c_pi / 180.0f);
         }
     }

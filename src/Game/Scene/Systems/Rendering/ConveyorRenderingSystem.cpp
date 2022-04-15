@@ -1,11 +1,14 @@
-#include "ConveyorItemRenderingSystem.h"
+#include "ConveyorRenderingSystem.h"
 #include <array>
 #include <iostream>
 
+#include "Constants.h"
 #include "ConveyorComponent.h"
 #include "ConveyorHelper.h"
+#include "DirectionComponent.h"
 #include "ItemDefinition.h"
 #include "ItemRegistry.h"
+#include "PositionComponent.h"
 #include "RenderContext.h"
 #include "SDL_mouse.h"
 #include "SequenceComponent.h"
@@ -93,14 +96,58 @@ void drawItem(
         true);*/
 }
 
-void ConveyorItemRenderingSystem::Update(atlas::scene::EcsManager& ecs)
+void ConveyorRenderingSystem::Update(atlas::scene::EcsManager& ecs)
 {
+    enum ConveyorType
+    {
+        Straight = 0,
+        AntiClockwise = 1,
+        Clockwise = 2,
+        Max
+    };
+
+    struct ConveyorPosition
+    {
+        Eigen::Vector3f m_Position;
+        float m_Rotation;
+    };
+
+    struct ConveyorInstanceSet
+    {
+        atlas::resource::AssetPtr<atlas::render::ModelAsset> m_Model;
+        std::vector<ConveyorPosition> m_ConveyorPositions;
+    };
+
+    std::vector<ConveyorInstanceSet> conveyors;
+    conveyors.reserve(ConveyorType::Max);
+    conveyors.emplace_back(atlas::resource::ResourceLoader::LoadAsset<cpp_conv::resources::registry::CoreBundle, atlas::render::ModelAsset>(
+    cpp_conv::resources::registry::core_bundle::assets::conveyors::models::c_ConveyorStraight));
+    conveyors.emplace_back(atlas::resource::ResourceLoader::LoadAsset<cpp_conv::resources::registry::CoreBundle, atlas::render::ModelAsset>(
+    cpp_conv::resources::registry::core_bundle::assets::conveyors::models::c_ConveyorAntiClockwise));
+    conveyors.emplace_back(atlas::resource::ResourceLoader::LoadAsset<cpp_conv::resources::registry::CoreBundle, atlas::render::ModelAsset>(
+            cpp_conv::resources::registry::core_bundle::assets::conveyors::models::c_ConveyorClockwise));
+
     for(const auto entity : ecs.GetEntitiesWithComponents<cpp_conv::components::SequenceComponent>())
     {
         const auto& sequence = ecs.GetComponent<cpp_conv::components::SequenceComponent>(entity);
 
-        const float fLerpFactor = sequence.m_CurrentTick / static_cast<float>(sequence.m_MoveTick);
+        if (ecs.DoesEntityHaveComponents<cpp_conv::components::PositionComponent, cpp_conv::components::DirectionComponent>(sequence.m_HeadConveyor))
+        {
+            auto [headPositionComponent, direction] = ecs.GetComponents<
+                cpp_conv::components::PositionComponent,
+                cpp_conv::components::DirectionComponent>(sequence.m_HeadConveyor);
+            Eigen::Vector3f headPosition = (headPositionComponent.m_Position).cast<float>();
 
+            for(int conveyorSlot = 0; conveyorSlot < sequence.m_Length; ++conveyorSlot)
+            {
+                Eigen::Vector3f positionOffset = sequence.m_UnitDirection * (conveyorSlot);
+                conveyors[ConveyorType::Straight].m_ConveyorPositions.emplace_back(
+                    headPosition - positionOffset,
+                    cpp_conv::rotationRadiansFromDirection(direction.m_Direction));
+            }
+        }
+
+        const float fLerpFactor = sequence.m_CurrentTick / static_cast<float>(sequence.m_MoveTick);
         for(int channel = 0; channel < cpp_conv::components::c_conveyorChannels; channel++)
         {
             auto lanes = sequence.m_RealizedStates[channel].m_Lanes;
@@ -163,6 +210,18 @@ void ConveyorItemRenderingSystem::Update(atlas::scene::EcsManager& ecs)
     for(const auto entity : ecs.GetEntitiesWithComponents<cpp_conv::components::ConveyorComponent, cpp_conv::components::IndividuallyProcessableConveyorComponent>())
     {
         const auto& conveyor = ecs.GetComponent<cpp_conv::components::ConveyorComponent>(entity);
+        if (ecs.DoesEntityHaveComponents<cpp_conv::components::PositionComponent, cpp_conv::components::DirectionComponent>(entity))
+        {
+            auto [position, direction] = ecs.GetComponents<
+                cpp_conv::components::PositionComponent,
+                cpp_conv::components::DirectionComponent>(entity);
+
+            const ConveyorType type = conveyor.m_bIsClockwise ? Clockwise : AntiClockwise;
+            conveyors[type].m_ConveyorPositions.emplace_back(
+                                (position.m_Position).cast<float>(),
+                                cpp_conv::rotationRadiansFromDirection(direction.m_Direction));
+        }
+
         const float fLerpFactor = conveyor.m_CurrentTick / static_cast<float>(conveyor.m_MoveTick);
 
         for (int channel = 0; channel < cpp_conv::components::c_conveyorChannels; channel++)
@@ -210,11 +269,9 @@ void ConveyorItemRenderingSystem::Update(atlas::scene::EcsManager& ecs)
         }
     }
 
-    atlas::render::addToFrameGraph_oneOff("ConveyorRenderer", []()
+    atlas::render::addToFrameGraph_oneOff("ConveyorRenderer", [conveyors]()
     {
-        const auto modelPtr = atlas::resource::ResourceLoader::LoadAsset<cpp_conv::resources::registry::CoreBundle, atlas::render::ModelAsset>(
-            cpp_conv::resources::registry::core_bundle::assets::conveyors::models::c_ConveyorStraight);
-        if (!modelPtr || !modelPtr->GetMesh() || !modelPtr->GetProgram())
+        if (conveyors.empty())
         {
             return;
         }
@@ -224,23 +281,30 @@ void ConveyorItemRenderingSystem::Update(atlas::scene::EcsManager& ecs)
         static float cam_pitch = 0.0f;
         static float cam_yaw = 0.0f;
         static float rot_scale = 0.01f;
+        static float camX = 0.0f;
+        static float camY = 0.0f;
         static const int width = 800;
         static const int height = 600;
         static bool layoutDumped = false;
 
-        if (!layoutDumped)
-        {
-            dump(modelPtr->GetMesh()->GetLayout());
-            layoutDumped = true;
-        }
-
         int mouse_x, mouse_y;
         const int buttons = SDL_GetMouseState(&mouse_x, &mouse_y);
-        if ((buttons & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0) {
-            int deltaX = mouse_x - prev_mouse_x;
-            int deltaY = mouse_y - prev_mouse_y;
+        if ((buttons & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0)
+        {
+            const int deltaX = mouse_x - prev_mouse_x;
+            const int deltaY = mouse_y - prev_mouse_y;
             cam_yaw += static_cast<float>(-deltaX) * rot_scale;
             cam_pitch += static_cast<float>(-deltaY) * rot_scale;
+        }
+        else if ((buttons & SDL_BUTTON(SDL_BUTTON_MIDDLE)) != 0)
+        {
+            const Eigen::Rotation2D rot2(cam_yaw);
+            int deltaX = mouse_x - prev_mouse_x;
+            int deltaY = mouse_y - prev_mouse_y;
+            Eigen::Vector2f forward = { 0.0f, 1.0f };
+            forward = rot2.toRotationMatrix() * forward;
+            camX += forward.x();
+            camY += forward.y();
         }
 
         prev_mouse_x = mouse_x;
@@ -250,7 +314,7 @@ void ConveyorItemRenderingSystem::Update(atlas::scene::EcsManager& ecs)
         bx::mtxRotateXYZ(cam_rotation, cam_pitch, cam_yaw, 0.0f);
 
         float cam_translation[16];
-        bx::mtxTranslate(cam_translation, 0.0f, 0.0f, -5.0f);
+        bx::mtxTranslate(cam_translation, 5, 0, -5.0f);
 
         float cam_transform[16];
         bx::mtxMul(cam_transform, cam_translation, cam_rotation);
@@ -265,24 +329,37 @@ void ConveyorItemRenderingSystem::Update(atlas::scene::EcsManager& ecs)
 
         bgfx::setViewTransform(0, view, proj);
 
-        float model[16];
-        bx::mtxIdentity(model);
-        bgfx::setTransform(model);
-
-        const auto& mesh = modelPtr->GetMesh();
-        const auto& program = modelPtr->GetProgram();
-
-        int textureIndex = 0;
-        for(const auto& texture : modelPtr->GetTextures())
+        for(auto& conveyorType : conveyors)
         {
-            bgfx::setTexture(textureIndex++, texture.m_Sampler, texture.m_Texture->GetHandle());
-        }
+            if (conveyorType.m_ConveyorPositions.empty())
+            {
+                continue;
+            }
 
-        for(const auto& segment : mesh->GetSegments())
-        {
-            bgfx::setVertexBuffer(0, segment.m_VertexBuffer);
-            bgfx::setIndexBuffer(segment.m_IndexBuffer);
-            bgfx::submit(0, program->GetHandle());
+            const auto& mesh = conveyorType.m_Model->GetMesh();
+            const auto& program = conveyorType.m_Model->GetProgram();
+
+            for(const auto& segment : mesh->GetSegments())
+            {
+                for(auto& [position, rotation]: conveyorType.m_ConveyorPositions)
+                {
+                    Eigen::Affine3f t{Eigen::Translation3f(position.x(), position.y(), position.z())};
+                    Eigen::Affine3f r{Eigen::AngleAxisf(rotation, Eigen::Vector3f(0, 1, 0))};
+                    Eigen::Matrix4f m = (t * r).matrix();
+                    bgfx::setTransform(m.data());
+
+                    bgfx::setVertexBuffer(0, segment.m_VertexBuffer);
+                    bgfx::setIndexBuffer(segment.m_IndexBuffer);
+
+                    int textureIndex = 0;
+                    for(const auto& texture : conveyorType.m_Model->GetTextures())
+                    {
+                        bgfx::setTexture(textureIndex++, texture.m_Sampler, texture.m_Texture->GetHandle());
+                    }
+
+                    bgfx::submit(0, program->GetHandle());
+                }
+            }
         }
     });
 }

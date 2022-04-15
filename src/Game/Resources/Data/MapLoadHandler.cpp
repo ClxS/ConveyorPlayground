@@ -37,55 +37,55 @@ atlas::resource::AssetPtr<atlas::resource::ResourceAsset> cpp_conv::resources::m
             switch (strLine[iCol])
             {
             case '>': pEntity = new
-                    cpp_conv::Conveyor({static_cast<int32_t>(iCol), iRow, 0}, size1X1, Direction::Right);
+                    cpp_conv::Conveyor({static_cast<int32_t>(iCol), 0, iRow}, size1X1, Direction::Right);
                 break;
-            case '<': pEntity = new cpp_conv::Conveyor({static_cast<int32_t>(iCol), iRow, 0}, size1X1, Direction::Left);
+            case '<': pEntity = new cpp_conv::Conveyor({static_cast<int32_t>(iCol), 0, iRow}, size1X1, Direction::Left);
                 break;
-            case '^': pEntity = new cpp_conv::Conveyor({static_cast<int32_t>(iCol), iRow, 0}, size1X1, Direction::Down);
+            case '^': pEntity = new cpp_conv::Conveyor({static_cast<int32_t>(iCol), 0, iRow}, size1X1, Direction::Down);
                 break;
-            case 'v': pEntity = new cpp_conv::Conveyor({static_cast<int32_t>(iCol), iRow, 0}, size1X1, Direction::Up);
+            case 'v': pEntity = new cpp_conv::Conveyor({static_cast<int32_t>(iCol), 0, iRow}, size1X1, Direction::Up);
                 break;
-            case 'I': pEntity = new cpp_conv::Inserter({static_cast<int32_t>(iCol), iRow, 0}, size1X1, Direction::Down,
+            case 'I': pEntity = new cpp_conv::Inserter({static_cast<int32_t>(iCol), 0, iRow}, size1X1, Direction::Down,
                                                        cpp_conv::InserterId::FromStringId("INSERTER_BASIC"));
                 break;
-            case 'U': pEntity = new cpp_conv::Inserter({static_cast<int32_t>(iCol), iRow, 0}, size1X1, Direction::Up,
+            case 'U': pEntity = new cpp_conv::Inserter({static_cast<int32_t>(iCol), 0, iRow}, size1X1, Direction::Up,
                                                        cpp_conv::InserterId::FromStringId("INSERTER_BASIC"));
                 break;
-            case 'T': pEntity = new cpp_conv::Inserter({static_cast<int32_t>(iCol), iRow, 0}, size1X1, Direction::Left,
+            case 'T': pEntity = new cpp_conv::Inserter({static_cast<int32_t>(iCol), 0, iRow}, size1X1, Direction::Left,
                                                        cpp_conv::InserterId::FromStringId("INSERTER_BASIC"));
                 break;
-            case 'Y': pEntity = new cpp_conv::Inserter({static_cast<int32_t>(iCol), iRow, 0}, size1X1, Direction::Right,
+            case 'Y': pEntity = new cpp_conv::Inserter({static_cast<int32_t>(iCol), 0, iRow}, size1X1, Direction::Right,
                                                        cpp_conv::InserterId::FromStringId("INSERTER_BASIC"));
                 break;
-            case 'A': pEntity = new cpp_conv::Factory({static_cast<int32_t>(iCol), iRow, 0}, Direction::Right,
+            case 'A': pEntity = new cpp_conv::Factory({static_cast<int32_t>(iCol), 0, iRow}, Direction::Right,
                                                       cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_MINE"));
                 break;
-            case 'D': pEntity = new cpp_conv::Factory({static_cast<int32_t>(iCol), iRow, 0}, Direction::Left,
+            case 'D': pEntity = new cpp_conv::Factory({static_cast<int32_t>(iCol), 0, iRow}, Direction::Left,
                                                       cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_MINE"));
                 break;
-            case 'F': pEntity = new cpp_conv::Factory({static_cast<int32_t>(iCol), iRow, 0}, Direction::Down,
+            case 'F': pEntity = new cpp_conv::Factory({static_cast<int32_t>(iCol), 0, iRow}, Direction::Down,
                                                       cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_MINE"));
                 break;
-            case 'G': pEntity = new cpp_conv::Factory({static_cast<int32_t>(iCol), iRow, 0}, Direction::Up,
+            case 'G': pEntity = new cpp_conv::Factory({static_cast<int32_t>(iCol), 0, iRow}, Direction::Up,
                                                       cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_MINE"));
                 break;
-            case 'C': pEntity = new cpp_conv::Factory({static_cast<int32_t>(iCol), iRow, 0}, Direction::Right,
+            case 'C': pEntity = new cpp_conv::Factory({static_cast<int32_t>(iCol), 0, iRow}, Direction::Right,
                                                       cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_SMELTER"));
                 break;
-            case 'J': pEntity = new cpp_conv::Junction({static_cast<int32_t>(iCol), iRow, 0}, size1X1);
+            case 'J': pEntity = new cpp_conv::Junction({static_cast<int32_t>(iCol), 0, iRow}, size1X1);
                 break;
-            case 'S': pEntity = new cpp_conv::Storage({static_cast<int32_t>(iCol), iRow, 0}, size1X1, 16, 256);
+            case 'S': pEntity = new cpp_conv::Storage({static_cast<int32_t>(iCol), 0, iRow}, size1X1, 16, 256);
                 break;
-            case '@': pEntity = new cpp_conv::Stairs({static_cast<int32_t>(iCol), iRow, 0}, {1, 1, 2}, Direction::Right,
+            case '@': pEntity = new cpp_conv::Stairs({static_cast<int32_t>(iCol), 0, iRow}, {1, 1, 2}, Direction::Right,
                                                      true);
                 break;
-            case 'u': pEntity = new cpp_conv::Tunnel({static_cast<int32_t>(iCol), iRow, 0}, size1X1, Direction::Down);
+            case 'u': pEntity = new cpp_conv::Tunnel({static_cast<int32_t>(iCol), 0, iRow}, size1X1, Direction::Down);
                 break;
-            case 'y': pEntity = new cpp_conv::Tunnel({static_cast<int32_t>(iCol), iRow, 0}, size1X1, Direction::Up);
+            case 'y': pEntity = new cpp_conv::Tunnel({static_cast<int32_t>(iCol), 0, iRow}, size1X1, Direction::Up);
                 break;
-            case 'i': pEntity = new cpp_conv::Tunnel({static_cast<int32_t>(iCol), iRow, 0}, size1X1, Direction::Left);
+            case 'i': pEntity = new cpp_conv::Tunnel({static_cast<int32_t>(iCol), 0, iRow}, size1X1, Direction::Left);
                 break;
-            case 'o': pEntity = new cpp_conv::Tunnel({static_cast<int32_t>(iCol), iRow, 0}, size1X1, Direction::Right);
+            case 'o': pEntity = new cpp_conv::Tunnel({static_cast<int32_t>(iCol), 0, iRow}, size1X1, Direction::Right);
                 break;
             default: ; // Ignored
             }
