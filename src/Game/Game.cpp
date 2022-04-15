@@ -1,4 +1,6 @@
 #include "Game.h"
+
+#include "CameraComponent.h"
 #include "ConveyorComponent.h"
 #include "ConveyorDefinition.h"
 #include "ConveyorRegistry.h"
@@ -33,6 +35,8 @@ void registerComponents()
     using namespace atlas::resource;
     using namespace atlas::scene;
     using namespace cpp_conv::components;
+    ComponentRegistry::RegisterComponent<LookAtCamera>();
+    ComponentRegistry::RegisterComponent<FreeCamera>();
     ComponentRegistry::RegisterComponent<NameComponent>();
     ComponentRegistry::RegisterComponent<DescriptionComponent>();
     ComponentRegistry::RegisterComponent<ConveyorComponent>();

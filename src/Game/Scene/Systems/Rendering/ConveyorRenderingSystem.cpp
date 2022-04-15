@@ -276,59 +276,6 @@ void ConveyorRenderingSystem::Update(atlas::scene::EcsManager& ecs)
             return;
         }
 
-        static int prev_mouse_x = 0;
-        static int prev_mouse_y = 0;
-        static float cam_pitch = 0.0f;
-        static float cam_yaw = 0.0f;
-        static float rot_scale = 0.01f;
-        static float camX = 0.0f;
-        static float camY = 0.0f;
-        static const int width = 800;
-        static const int height = 600;
-        static bool layoutDumped = false;
-
-        int mouse_x, mouse_y;
-        const int buttons = SDL_GetMouseState(&mouse_x, &mouse_y);
-        if ((buttons & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0)
-        {
-            const int deltaX = mouse_x - prev_mouse_x;
-            const int deltaY = mouse_y - prev_mouse_y;
-            cam_yaw += static_cast<float>(-deltaX) * rot_scale;
-            cam_pitch += static_cast<float>(-deltaY) * rot_scale;
-        }
-        else if ((buttons & SDL_BUTTON(SDL_BUTTON_MIDDLE)) != 0)
-        {
-            const Eigen::Rotation2D rot2(cam_yaw);
-            int deltaX = mouse_x - prev_mouse_x;
-            int deltaY = mouse_y - prev_mouse_y;
-            Eigen::Vector2f forward = { 0.0f, 1.0f };
-            forward = rot2.toRotationMatrix() * forward;
-            camX += forward.x();
-            camY += forward.y();
-        }
-
-        prev_mouse_x = mouse_x;
-        prev_mouse_y = mouse_y;
-
-        float cam_rotation[16];
-        bx::mtxRotateXYZ(cam_rotation, cam_pitch, cam_yaw, 0.0f);
-
-        float cam_translation[16];
-        bx::mtxTranslate(cam_translation, 5, 0, -5.0f);
-
-        float cam_transform[16];
-        bx::mtxMul(cam_transform, cam_translation, cam_rotation);
-
-        float view[16];
-        bx::mtxInverse(view, cam_transform);
-
-        float proj[16];
-        bx::mtxProj(
-           proj, 60.0f, static_cast<float>(width) / static_cast<float>(height), 0.1f,
-           100.0f, bgfx::getCaps()->homogeneousDepth);
-
-        bgfx::setViewTransform(0, view, proj);
-
         for(auto& conveyorType : conveyors)
         {
             if (conveyorType.m_ConveyorPositions.empty())
@@ -348,16 +295,16 @@ void ConveyorRenderingSystem::Update(atlas::scene::EcsManager& ecs)
                     Eigen::Matrix4f m = (t * r).matrix();
                     bgfx::setTransform(m.data());
 
-                    bgfx::setVertexBuffer(0, segment.m_VertexBuffer);
-                    bgfx::setIndexBuffer(segment.m_IndexBuffer);
+                    setVertexBuffer(0, segment.m_VertexBuffer);
+                    setIndexBuffer(segment.m_IndexBuffer);
 
                     int textureIndex = 0;
                     for(const auto& texture : conveyorType.m_Model->GetTextures())
                     {
-                        bgfx::setTexture(textureIndex++, texture.m_Sampler, texture.m_Texture->GetHandle());
+                        setTexture(textureIndex++, texture.m_Sampler, texture.m_Texture->GetHandle());
                     }
 
-                    bgfx::submit(0, program->GetHandle());
+                    submit(0, program->GetHandle());
                 }
             }
         }

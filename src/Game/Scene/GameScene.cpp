@@ -1,5 +1,7 @@
 #include "GameScene.h"
 
+#include "CameraComponent.h"
+#include "CameraControllerSystem.h"
 #include "ConveyorComponent.h"
 #include "ConveyorRenderingSystem.h"
 #include "ConveyorStateDeterminationSystem.h"
@@ -19,6 +21,7 @@
 #include "SpriteRenderSystem.h"
 #include "StandaloneConveyorSystem.h"
 #include "WorldEntityInformationComponent.h"
+#include "MathHelpers.h"
 
 namespace
 {
@@ -67,6 +70,18 @@ namespace
 
         return factory;
     }
+
+    void addCameras(atlas::scene::EcsManager& ecs)
+    {
+        const auto cameraEntity = ecs.AddEntity();
+        auto& camera = ecs.AddComponent<cpp_conv::components::LookAtCamera>(cameraEntity);
+        camera.m_bIsActive = true;
+        camera.m_Distance = 5.0f;
+        camera.m_LookAtPoint = {5.0f, 0.0f, 0.0f};
+        camera.m_Pitch = 20.0_degrees;
+        camera.m_Yaw = 0.0_degrees;
+    }
+
 }
 
 void cpp_conv::GameScene::OnEntered(atlas::scene::SceneManager& sceneManager)
@@ -117,6 +132,8 @@ void cpp_conv::GameScene::OnEntered(atlas::scene::SceneManager& sceneManager)
         }
     }
 
+    addCameras(ecs);
+
     m_InitialisationData.m_Map.reset();
 
     EcsScene::OnEntered(sceneManager);
@@ -146,6 +163,12 @@ void cpp_conv::GameScene::ConstructSystems(atlas::scene::SystemsBuilder& builder
             groupBuilder.RegisterSystem<StandaloneConveyorSystem_Realize>();
         });
 
+    auto cameraSystems = builder.RegisterGroup("Camera",
+        [](atlas::scene::SystemsBuilder& groupBuilder)
+        {
+            groupBuilder.RegisterSystem<CameraControllerSystem>();
+        });
+
     auto sceneSystems = builder.RegisterGroup(
         "General Scene Systems",
         {conveyorRealizeGroup},
@@ -154,7 +177,7 @@ void cpp_conv::GameScene::ConstructSystems(atlas::scene::SystemsBuilder& builder
             groupBuilder.RegisterSystem<FactorySystem>(m_SceneData.m_LookupGrid);
         });
 
-    auto layer1 = builder.RegisterGroup("SpriteRendering_Layer1", {sceneSystems}, [](atlas::scene::SystemsBuilder& groupBuilder)
+    auto layer1 = builder.RegisterGroup("SpriteRendering_Layer1", {sceneSystems, cameraSystems}, [](atlas::scene::SystemsBuilder& groupBuilder)
     {
         groupBuilder.RegisterSystem<SpriteLayerRenderSystem<1>>();
     });

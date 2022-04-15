@@ -57,8 +57,8 @@ namespace atlas::scene
             using difference_type   = std::ptrdiff_t;
             using value_type        = std::tuple<EntityId, TComponents&...>;
 
-            explicit ComponentIterator(std::vector<ArchetypePool>* archetypePools,uint64_t mask);
-            ComponentIterator(std::vector<ArchetypePool>* archetypePools, const int32_t pool, int32_t entity, uint64_t mask);
+            explicit ComponentIterator(std::vector<ArchetypePool>& archetypePools,uint64_t mask);
+            ComponentIterator(std::vector<ArchetypePool>& archetypePools, const int32_t pool, int32_t entity, uint64_t mask);
 
             // Prefix increment
             ComponentIterator& operator++();
@@ -88,18 +88,18 @@ namespace atlas::scene
             int32_t m_PoolIndex;
             int32_t m_PoolEntityIndex;
             uint64_t m_Mask;
-            std::vector<ArchetypePool>* m_ArchetypePools;
+            std::vector<ArchetypePool>& m_ArchetypePools;
         };
 
         template <typename... TComponents>
         struct ComponentIteratorWrapper
         {
-            ComponentIteratorWrapper(std::vector<ArchetypePool>* archetypePools);
+            ComponentIteratorWrapper(std::vector<ArchetypePool>& archetypePools);
             ComponentIterator<TComponents...> begin();
             ComponentIterator<TComponents...> end();
 
             uint64_t m_Mask;
-            std::vector<ArchetypePool>* m_ArchetypePools;
+            std::vector<ArchetypePool>& m_ArchetypePools;
         };
 
         EcsManager();
@@ -412,7 +412,7 @@ namespace atlas::scene
     template <typename ... TComponent>
     EcsManager::ComponentIteratorWrapper<TComponent...> EcsManager::IterateEntityComponents()
     {
-        return EcsManager::ComponentIteratorWrapper<TComponent...>{&m_ArchetypePools};
+        return EcsManager::ComponentIteratorWrapper<TComponent...>{m_ArchetypePools};
     }
 
     template <typename ... TComponent>
@@ -437,7 +437,7 @@ namespace atlas::scene
     }
 
     template <typename ... TComponents>
-    EcsManager::ComponentIterator<TComponents...>::ComponentIterator(std::vector<ArchetypePool>* archetypePools, const uint64_t mask)
+    EcsManager::ComponentIterator<TComponents...>::ComponentIterator(std::vector<ArchetypePool>& archetypePools, const uint64_t mask)
         : m_PoolIndex{-1}
         , m_PoolEntityIndex{-1}
         , m_Mask{mask}
@@ -445,11 +445,11 @@ namespace atlas::scene
     {
         m_PoolIndex = -1;
         m_PoolEntityIndex = -1;
-        //FindNextEntity();
+        FindNextEntity();
     }
 
     template <typename ... TComponents>
-    EcsManager::ComponentIterator<TComponents...>::ComponentIterator(std::vector<ArchetypePool>* archetypePools, const int32_t pool, const int32_t entity, const uint64_t mask)
+    EcsManager::ComponentIterator<TComponents...>::ComponentIterator(std::vector<ArchetypePool>& archetypePools, const int32_t pool, const int32_t entity, const uint64_t mask)
         : m_PoolIndex{pool}
         , m_PoolEntityIndex{entity}
         , m_Mask{mask}
@@ -460,7 +460,7 @@ namespace atlas::scene
     template <typename ... TComponents>
     EcsManager::ComponentIterator<TComponents...>& EcsManager::ComponentIterator<TComponents...>::operator++()
     {
-        //FindNextEntity();
+        FindNextEntity();
         return *this;
     }
 
@@ -472,7 +472,7 @@ namespace atlas::scene
     typename EcsManager::ComponentIterator<TComponents...>::value_type EcsManager::ComponentIterator<TComponents...>::
     operator*() const
     {
-        auto& pool = (*m_ArchetypePools)[m_PoolIndex];
+        auto& pool = m_ArchetypePools[m_PoolIndex];
         EntityId entity = pool.m_EntityPool.GetCopy(m_PoolEntityIndex);
 
         return { entity, GetComponentFromPool<TComponents>(pool, m_PoolEntityIndex)... };
@@ -488,7 +488,7 @@ namespace atlas::scene
     }
 
     template <typename ... TComponents>
-    EcsManager::ComponentIteratorWrapper<TComponents...>::ComponentIteratorWrapper(std::vector<ArchetypePool>* archetypePools)
+    EcsManager::ComponentIteratorWrapper<TComponents...>::ComponentIteratorWrapper(std::vector<ArchetypePool>& archetypePools)
         : m_ArchetypePools{archetypePools}
     {
         m_Mask = MaskLookup<TComponents...>::GetComponentMask();
@@ -512,7 +512,7 @@ namespace atlas::scene
         if (m_PoolIndex >= 0)
         {
             m_PoolEntityIndex++;
-            if (m_PoolEntityIndex < (*m_ArchetypePools)[m_PoolIndex].m_EntityPool.Size())
+            if (m_PoolEntityIndex < m_ArchetypePools[m_PoolIndex].m_EntityPool.Size())
             {
                 return;
             }
@@ -520,13 +520,14 @@ namespace atlas::scene
 
         bool found = false;
         m_PoolIndex++;
-        for (;m_PoolIndex < m_ArchetypePools->size(); m_PoolIndex++)
+        for (;m_PoolIndex < m_ArchetypePools.size(); m_PoolIndex++)
         {
-            auto& archetype = (*m_ArchetypePools)[m_PoolIndex];
+            auto& archetype = m_ArchetypePools[m_PoolIndex];
             if (archetype.m_EntityPool.Size() > 0 && (archetype.m_ArchetypeComponentMask & m_Mask) == m_Mask)
             {
                 m_PoolEntityIndex = 0;
                 found = true;
+                break;
             }
         }
 

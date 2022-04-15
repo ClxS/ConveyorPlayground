@@ -23,6 +23,12 @@ namespace cpp_conv::math_helpers
             return angle;
         }
 
+        Angle& operator+=(const Angle& other)
+        {
+            m_Value += other.m_Value;
+            return *this;
+        }
+
         void SetRadians(const float value) { m_Value = value; }
         void SetDegrees(const float value) { m_Value = value  * (c_pi / 180.0f); }
 
