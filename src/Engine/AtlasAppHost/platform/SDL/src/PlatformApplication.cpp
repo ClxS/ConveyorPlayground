@@ -10,7 +10,7 @@ bool atlas::app_host::platform::PlatformApplication::Initialise()
     int windowFlags;
 
     constexpr int rendererFlags = SDL_RENDERER_ACCELERATED;
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) < 0)
     {
         printf("Couldn't initialize SDL: %s\n", SDL_GetError());
         return false;
@@ -49,5 +49,12 @@ void atlas::app_host::platform::PlatformApplication::Update()
     while(SDL_PollEvent(&currentEvent) != 0)
     {
         // TODO
+        if (currentEvent.type == SDL_KEYDOWN)
+        {
+            int i = 0;
+            i++;
+        }
     }
+
+    SDL_PumpEvents();
 }

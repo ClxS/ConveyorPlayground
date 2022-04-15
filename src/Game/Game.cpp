@@ -105,7 +105,7 @@ public:
         setBgfxSettings();
 
         m_SceneManager.TransitionTo<cpp_conv::GameMapLoadInterstitialScene>(
-            ResourceLoader::CreateBundleRegistryId<registry::CoreBundle>(registry::core_bundle::maps::c_circle));
+            ResourceLoader::CreateBundleRegistryId<registry::CoreBundle>(registry::core_bundle::maps::c_simple));
     }
 };
 
