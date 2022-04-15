@@ -40,35 +40,75 @@ namespace bgfx
 
 namespace
 {
-    void dump(const bgfx::VertexLayout& layout)
+    struct ConveyorPosition
     {
-        std::cerr << std::format("\nVertexLayout {} ({}), stride {}"
-            , layout.m_hash
-            , bx::hash<bx::HashMurmur2A>(layout.m_attributes)
-            , layout.m_stride
-            );
+        Eigen::Vector3f m_Position;
+        float m_Rotation;
+    };
 
-        for (uint32_t attr = 0; attr < bgfx::Attrib::Count; ++attr)
+    void drawNonInstanced(
+        const atlas::resource::AssetPtr<atlas::render::ModelAsset>& model,
+        const atlas::resource::AssetPtr<atlas::render::ShaderProgram>& program,
+        const atlas::render::MeshSegment& segment,
+        const std::vector<ConveyorPosition> positions)
+    {
+        for(auto& [position, rotation]: positions)
         {
-            if (UINT16_MAX != layout.m_attributes[attr])
-            {
-                uint8_t num;
-                bgfx::AttribType::Enum type;
-                bool normalized;
-                bool asInt;
-                layout.decode(static_cast<bgfx::Attrib::Enum>(attr), num, type, normalized, asInt);
+            Eigen::Affine3f t{Eigen::Translation3f(position.x(), position.y(), position.z())};
+            Eigen::Affine3f r{Eigen::AngleAxisf(rotation, Eigen::Vector3f(0, 1, 0))};
+            Eigen::Matrix4f m = (t * r).matrix();
+            bgfx::setTransform(m.data());
 
-                std::cerr << std::format("\n\tattr {}: {} num {}, type {}, norm [{}], asint [{}], offset {}"
-                    , attr
-                    , bgfx::getAttribName(static_cast<bgfx::Attrib::Enum>(attr) )
-                    , num
-                    , static_cast<int>(type)
-                    , normalized ? 'x' : ' '
-                    , asInt      ? 'x' : ' '
-                    , layout.m_offset[attr]
-                    );
+            setVertexBuffer(0, segment.m_VertexBuffer);
+            setIndexBuffer(segment.m_IndexBuffer);
+
+            int textureIndex = 0;
+            for(const auto& texture : model->GetTextures())
+            {
+                setTexture(textureIndex++, texture.m_Sampler, texture.m_Texture->GetHandle());
             }
+
+            submit(0, program->GetHandle());
         }
+    }
+
+    void drawInstanced(
+        const atlas::resource::AssetPtr<atlas::render::ModelAsset>& model,
+        const atlas::resource::AssetPtr<atlas::render::ShaderProgram>& program,
+        const atlas::render::MeshSegment& segment,
+        const std::vector<ConveyorPosition> positions)
+    {
+        constexpr uint16_t instanceStride = sizeof(Eigen::Matrix4f);
+
+        const uint32_t totalPositions = static_cast<uint32_t>(positions.size());
+        const uint32_t numDrawableInstances = bgfx::getAvailInstanceDataBuffer(totalPositions, instanceStride);
+
+        bgfx::InstanceDataBuffer idb;
+        bgfx::allocInstanceDataBuffer(&idb, numDrawableInstances, instanceStride);
+
+        // TODO Log how many entities couldn't be drawn
+        for (uint32_t i = 0; i < numDrawableInstances; ++i)
+        {
+            auto& [position, rotation] = positions[i];
+            Eigen::Affine3f t{Eigen::Translation3f(position.x(), position.y(), position.z())};
+            Eigen::Affine3f r{Eigen::AngleAxisf(rotation, Eigen::Vector3f(0, 1, 0))};
+            Eigen::Matrix4f m = (t * r).matrix();
+
+            std::memcpy(&(idb.data[i * instanceStride]), m.data(), instanceStride);
+        }
+
+        int textureIndex = 0;
+        for(const auto& texture : model->GetTextures())
+        {
+            setTexture(textureIndex++, texture.m_Sampler, texture.m_Texture->GetHandle());
+        }
+
+        setVertexBuffer(0, segment.m_VertexBuffer);
+        setIndexBuffer(segment.m_IndexBuffer);
+        setInstanceDataBuffer(&idb);
+        bgfx::setState(BGFX_STATE_DEFAULT);
+
+        submit(0, program->GetHandle());
     }
 }
 
@@ -78,23 +118,6 @@ struct LerpInformation
     float m_LerpFactor;
 };
 
-void drawItem(
-    const cpp_conv::resources::TileAsset* pTile,
-    Eigen::Vector2f renderPosition,
-    const std::optional<LerpInformation> lerp = {})
-{
-    if (lerp.has_value())
-    {
-        renderPosition = lerp->m_PreviousPosition + ((renderPosition - lerp->m_PreviousPosition) * lerp->m_LerpFactor);
-    }
-
-    /*tileRenderer(
-        *g_renderContext,
-        pTile,
-        { renderPosition.x(), renderPosition.y() },
-        {0xFFFFFFFF},
-        true);*/
-}
 
 void ConveyorRenderingSystem::Update(atlas::scene::EcsManager& ecs)
 {
@@ -104,12 +127,6 @@ void ConveyorRenderingSystem::Update(atlas::scene::EcsManager& ecs)
         AntiClockwise = 1,
         Clockwise = 2,
         Max
-    };
-
-    struct ConveyorPosition
-    {
-        Eigen::Vector3f m_Position;
-        float m_Rotation;
     };
 
     struct ConveyorInstanceSet
@@ -258,13 +275,13 @@ void ConveyorRenderingSystem::Update(atlas::scene::EcsManager& ecs)
                 }
 
                 const auto& rTargetChannel = conveyor.m_Channels[channel];
-                drawItem(
-                   tileAsset.get(),
-                   rTargetChannel.m_pSlots[slot].m_VisualPosition,
-                   {{
-                       itemSlot->m_PreviousVisualLocation,
-                       fLerpFactor
-                   }});
+                // drawItem(
+                //    tileAsset.get(),
+                //    rTargetChannel.m_pSlots[slot].m_VisualPosition,
+                //    {{
+                //        itemSlot->m_PreviousVisualLocation,
+                //        fLerpFactor
+                //    }});
             }
         }
     }
@@ -276,6 +293,7 @@ void ConveyorRenderingSystem::Update(atlas::scene::EcsManager& ecs)
             return;
         }
 
+        const bool instancingSupported = 0 != (BGFX_CAPS_INSTANCING & bgfx::getCaps()->supported);
         for(auto& conveyorType : conveyors)
         {
             if (conveyorType.m_ConveyorPositions.empty())
@@ -283,28 +301,20 @@ void ConveyorRenderingSystem::Update(atlas::scene::EcsManager& ecs)
                 continue;
             }
 
-            const auto& mesh = conveyorType.m_Model->GetMesh();
+            const auto& model = conveyorType.m_Model;
             const auto& program = conveyorType.m_Model->GetProgram();
 
-            for(const auto& segment : mesh->GetSegments())
+            for(const auto& segment : model->GetMesh()->GetSegments())
             {
-                for(auto& [position, rotation]: conveyorType.m_ConveyorPositions)
+                if (instancingSupported)
                 {
-                    Eigen::Affine3f t{Eigen::Translation3f(position.x(), position.y(), position.z())};
-                    Eigen::Affine3f r{Eigen::AngleAxisf(rotation, Eigen::Vector3f(0, 1, 0))};
-                    Eigen::Matrix4f m = (t * r).matrix();
-                    bgfx::setTransform(m.data());
-
-                    setVertexBuffer(0, segment.m_VertexBuffer);
-                    setIndexBuffer(segment.m_IndexBuffer);
-
-                    int textureIndex = 0;
-                    for(const auto& texture : conveyorType.m_Model->GetTextures())
-                    {
-                        setTexture(textureIndex++, texture.m_Sampler, texture.m_Texture->GetHandle());
-                    }
-
-                    submit(0, program->GetHandle());
+                    drawInstanced(model, program, segment, conveyorType.m_ConveyorPositions);
+                }
+                else
+                {
+                    // We don't currently support non-instanced platforms
+                    assert(false);
+                    drawNonInstanced(model, program, segment, conveyorType.m_ConveyorPositions);
                 }
             }
         }

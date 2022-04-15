@@ -1,0 +1,1 @@
+"bin/tools/AssetBuilder.exe" cook -r C:/Users/c-j-1/source/repos/ConveyorPlayground/data --platform SDL -o C:\Users\c-j-1\source\repos\ConveyorPlayground\build\bin\SDL\Debug\data
