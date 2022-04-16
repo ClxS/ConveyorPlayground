@@ -12,13 +12,13 @@
 #include "InserterRegistry.h"
 #include "ItemRegistry.h"
 #include "MapLoadHandler.h"
+#include "ModelComponent.h"
 #include "NameComponent.h"
 #include "PositionComponent.h"
 #include "RecipeDefinition.h"
 #include "RecipeRegistry.h"
 #include "SDLTileLoadHandler.h"
 #include "SequenceComponent.h"
-#include "SpriteLayerComponent.h"
 #include "WorldEntityInformationComponent.h"
 #include "AtlasGame/GameHost.h"
 #include "AtlasRender/AssetTypes/ModelAsset.h"
@@ -45,9 +45,7 @@ void registerComponents()
     ComponentRegistry::RegisterComponent<FactoryComponent>();
     ComponentRegistry::RegisterComponent<PositionComponent>();
     ComponentRegistry::RegisterComponent<SequenceComponent>();
-    ComponentRegistry::RegisterComponent<SpriteLayerComponent<1>>();
-    ComponentRegistry::RegisterComponent<SpriteLayerComponent<2>>();
-    ComponentRegistry::RegisterComponent<SpriteLayerComponent<3>>();
+    ComponentRegistry::RegisterComponent<ModelComponent>();
     ComponentRegistry::RegisterComponent<WorldEntityInformationComponent>();
 }
 
@@ -111,6 +109,6 @@ public:
 
 int gameMain(int argc, char* argv[])
 {
-    atlas::game::GameHost<CppConveyor> game{};
+    atlas::game::GameHost<CppConveyor> game{{"Transportadoras"}};
     return game.Run();
 }

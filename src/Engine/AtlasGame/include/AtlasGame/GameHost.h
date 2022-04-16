@@ -41,6 +41,7 @@ namespace atlas::game
     public:
         struct Args
         {
+            std::string m_GameName;
             int m_FrameRateCap = 60;
         };
 
@@ -51,6 +52,11 @@ namespace atlas::game
 
         int Run()
         {
+            if (!atlas::app_host::Application::Get().Initialise(m_GameArguments.m_GameName))
+            {
+                return -1;
+            }
+
             logStartUp();
             srand(static_cast<unsigned>(time(nullptr)));
             auto [iWidth, iHeight] = atlas::app_host::Application::Get().GetAppDimensions();

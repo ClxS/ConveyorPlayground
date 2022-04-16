@@ -23,18 +23,24 @@ atlas::resource::AssetPtr<atlas::resource::ResourceAsset> cpp_conv::resources::m
 
     const auto pTruncatedData = std::string_view(pStrData, static_cast<uint32_t>(rData.m_Size));
     auto ss = std::istringstream(std::string(pTruncatedData));
-    std::string strLine;
+
+    std::vector<std::string> grid;
 
     atlas::resource::AssetPtr<cpp_conv::resources::Map> pMap {new cpp_conv::resources::Map()};
-    int iRow = 0;
 
     const Eigen::Vector3i size1X1 = {1, 1, 1};
+    std::string strLine;
     while (std::getline(ss, strLine))
     {
-        for (size_t iCol = 0; iCol < strLine.size(); iCol++)
+        grid.push_back(strLine);
+    }
+
+    for(int32_t iRow = 0; iRow < grid.size(); iRow++)
+    {
+        for (size_t iCol = 0; iCol < grid[iRow].size(); iCol++)
         {
             cpp_conv::Entity* pEntity = nullptr;
-            switch (strLine[iCol])
+            switch (grid[iRow][iCol])
             {
             case '>': pEntity = new
                     cpp_conv::Conveyor({static_cast<int32_t>(iCol), 0, iRow}, size1X1, Direction::Right);
@@ -57,19 +63,19 @@ atlas::resource::AssetPtr<atlas::resource::ResourceAsset> cpp_conv::resources::m
             case 'Y': pEntity = new cpp_conv::Inserter({static_cast<int32_t>(iCol), 0, iRow}, size1X1, Direction::Right,
                                                        cpp_conv::InserterId::FromStringId("INSERTER_BASIC"));
                 break;
-            case 'A': pEntity = new cpp_conv::Factory({static_cast<int32_t>(iCol), 0, iRow}, Direction::Right,
+            case 'A': pEntity = new cpp_conv::Factory({static_cast<int32_t>(iCol + 1), 0, iRow + 1}, Direction::Right,
                                                       cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_MINE"));
                 break;
-            case 'D': pEntity = new cpp_conv::Factory({static_cast<int32_t>(iCol), 0, iRow}, Direction::Left,
+            case 'D': pEntity = new cpp_conv::Factory({static_cast<int32_t>(iCol + 1), 0, iRow + 1}, Direction::Left,
                                                       cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_MINE"));
                 break;
-            case 'F': pEntity = new cpp_conv::Factory({static_cast<int32_t>(iCol), 0, iRow}, Direction::Down,
+            case 'F': pEntity = new cpp_conv::Factory({static_cast<int32_t>(iCol + 1), 0, iRow + 1}, Direction::Down,
                                                       cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_MINE"));
                 break;
-            case 'G': pEntity = new cpp_conv::Factory({static_cast<int32_t>(iCol), 0, iRow}, Direction::Up,
+            case 'G': pEntity = new cpp_conv::Factory({static_cast<int32_t>(iCol + 1), 0, iRow + 1}, Direction::Up,
                                                       cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_MINE"));
                 break;
-            case 'C': pEntity = new cpp_conv::Factory({static_cast<int32_t>(iCol), 0, iRow}, Direction::Right,
+            case 'C': pEntity = new cpp_conv::Factory({static_cast<int32_t>(iCol + 1), 0, iRow + 1}, Direction::Right,
                                                       cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_SMELTER"));
                 break;
             case 'J': pEntity = new cpp_conv::Junction({static_cast<int32_t>(iCol), 0, iRow}, size1X1);
@@ -92,6 +98,14 @@ atlas::resource::AssetPtr<atlas::resource::ResourceAsset> cpp_conv::resources::m
 
             if (pEntity)
             {
+                for(size_t i = iRow; i < iRow + pEntity->m_size.x(); i++)
+                {
+                    for(size_t j = iCol; j < iCol + pEntity->m_size.z(); j++)
+                    {
+                        grid[i][j] = ' ';
+                    }
+                }
+
                 if (pEntity->m_eEntityKind == EntityKind::Conveyor)
                 {
                     pMap->GetConveyors().push_back(static_cast<cpp_conv::Conveyor*>(pEntity));
@@ -102,8 +116,6 @@ atlas::resource::AssetPtr<atlas::resource::ResourceAsset> cpp_conv::resources::m
                 }
             }
         }
-
-        iRow++;
     }
 
     return pMap;

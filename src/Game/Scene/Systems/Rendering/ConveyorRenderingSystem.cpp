@@ -43,7 +43,7 @@ namespace
     struct ConveyorPosition
     {
         Eigen::Vector3f m_Position;
-        float m_Rotation;
+        cpp_conv::math_helpers::Angle m_Rotation;
     };
 
     void drawNonInstanced(
@@ -55,7 +55,7 @@ namespace
         for(auto& [position, rotation]: positions)
         {
             Eigen::Affine3f t{Eigen::Translation3f(position.x(), position.y(), position.z())};
-            Eigen::Affine3f r{Eigen::AngleAxisf(rotation, Eigen::Vector3f(0, 1, 0))};
+            Eigen::Affine3f r{Eigen::AngleAxisf(rotation.AsRadians(), Eigen::Vector3f(0, 1, 0))};
             Eigen::Matrix4f m = (t * r).matrix();
             bgfx::setTransform(m.data());
 
@@ -75,7 +75,6 @@ namespace
     void drawInstanced(
         const atlas::resource::AssetPtr<atlas::render::ModelAsset>& model,
         const atlas::resource::AssetPtr<atlas::render::ShaderProgram>& program,
-        const atlas::render::MeshSegment& segment,
         const std::vector<ConveyorPosition> positions)
     {
         constexpr uint16_t instanceStride = sizeof(Eigen::Matrix4f);
@@ -91,7 +90,7 @@ namespace
         {
             auto& [position, rotation] = positions[i];
             Eigen::Affine3f t{Eigen::Translation3f(position.x(), position.y(), position.z())};
-            Eigen::Affine3f r{Eigen::AngleAxisf(rotation, Eigen::Vector3f(0, 1, 0))};
+            Eigen::Affine3f r{Eigen::AngleAxisf(rotation.AsRadians(), Eigen::Vector3f(0, 1, 0))};
             Eigen::Matrix4f m = (t * r).matrix();
 
             std::memcpy(&(idb.data[i * instanceStride]), m.data(), instanceStride);
@@ -103,12 +102,14 @@ namespace
             setTexture(textureIndex++, texture.m_Sampler, texture.m_Texture->GetHandle());
         }
 
-        setVertexBuffer(0, segment.m_VertexBuffer);
-        setIndexBuffer(segment.m_IndexBuffer);
-        setInstanceDataBuffer(&idb);
         bgfx::setState(BGFX_STATE_DEFAULT);
-
-        submit(0, program->GetHandle());
+        for(const auto& segment : model->GetMesh()->GetSegments())
+        {
+            setVertexBuffer(0, segment.m_VertexBuffer);
+            setIndexBuffer(segment.m_IndexBuffer);
+            setInstanceDataBuffer(&idb);
+            submit(0, program->GetHandle());
+        }
     }
 }
 
@@ -304,13 +305,14 @@ void ConveyorRenderingSystem::Update(atlas::scene::EcsManager& ecs)
             const auto& model = conveyorType.m_Model;
             const auto& program = conveyorType.m_Model->GetProgram();
 
-            for(const auto& segment : model->GetMesh()->GetSegments())
+
+            if (instancingSupported)
             {
-                if (instancingSupported)
-                {
-                    drawInstanced(model, program, segment, conveyorType.m_ConveyorPositions);
-                }
-                else
+                drawInstanced(model, program, conveyorType.m_ConveyorPositions);
+            }
+            else
+            {
+                for(const auto& segment : model->GetMesh()->GetSegments())
                 {
                     // We don't currently support non-instanced platforms
                     assert(false);

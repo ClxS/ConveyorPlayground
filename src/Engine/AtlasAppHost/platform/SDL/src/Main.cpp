@@ -14,11 +14,6 @@ extern "C" {
 // ReSharper disable once CppParameterMayBeConst
 int SDL_main(int argc, char* argv[])
 {
-    if (!atlas::app_host::Application::Get().Initialise())
-    {
-        return -1;
-    }
-
     gameMain(argc, argv);
 
     SDL_Quit();

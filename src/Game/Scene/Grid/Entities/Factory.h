@@ -2,6 +2,8 @@
 
 #include "DataId.h"
 #include "Entity.h"
+#include "FactoryRegistry.h"
+#include "FactoryDefinition.h"
 #include "GeneralItemContainer.h"
 #include "Renderer.h"
 
@@ -25,6 +27,11 @@ namespace cpp_conv
           , m_uiTick(0)
           , m_bIsRecipeDemandSatisfied(false)
         {
+            const auto definition = resources::getFactoryDefinition(factoryId);
+            if (definition)
+            {
+                m_size = definition->GetSize();
+            }
         }
 
         [[nodiscard]] const char* GetName() const { return "Factory"; }

@@ -5,7 +5,7 @@
 
 #define WINDOWED 1
 
-bool atlas::app_host::platform::PlatformApplication::Initialise()
+bool atlas::app_host::platform::PlatformApplication::Initialise(std::string_view applicationName)
 {
     int windowFlags;
 
@@ -16,13 +16,15 @@ bool atlas::app_host::platform::PlatformApplication::Initialise()
         return false;
     }
 
+    const std::string title {applicationName};
 #if WINDOWED
     windowFlags = SDL_WINDOW_SHOWN;
-    m_Sdl.m_Window = SDL_CreateWindow("Cpp Conveyor", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1200, 800,
+
+    m_Sdl.m_Window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1200, 800,
                                       windowFlags);
 #else
     windowFlags = 0;
-    m_Sdl.m_Window = SDL_CreateWindow("Cpp Conveyor", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 2560, 1080, windowFlags);
+    m_Sdl.m_Window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 2560, 1080, windowFlags);
     SDL_SetRelativeMouseMode(SDL_TRUE);
 #endif
 

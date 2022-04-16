@@ -7,5 +7,5 @@ rate=1
 
 [factory.size]
 x = 3
-y = 3
-z = 1
+y = 1
+z = 3

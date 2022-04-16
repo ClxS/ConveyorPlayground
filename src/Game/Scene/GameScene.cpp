@@ -17,11 +17,11 @@
 #include "RecipeRegistry.h"
 #include "SequenceFormationSystem.h"
 #include "SequenceProcessingSystem.h"
-#include "SpriteLayerComponent.h"
-#include "SpriteRenderSystem.h"
 #include "StandaloneConveyorSystem.h"
 #include "WorldEntityInformationComponent.h"
 #include "MathHelpers.h"
+#include "ModelComponent.h"
+#include "ModelRenderSystem.h"
 
 namespace
 {
@@ -31,11 +31,10 @@ namespace
     {
         const auto factoryEntity = static_cast<const cpp_conv::Factory*>(entity);
         const auto definition = cpp_conv::resources::getFactoryDefinition(factoryEntity->GetDefinitionId());
-        if (definition && definition->GetTile())
+        if (definition && definition->GetModel())
         {
-            auto& sprite = ecs.AddComponent<cpp_conv::components::SpriteLayerComponent<1>>(ecsEntity);
-            sprite.m_pTile = definition->GetTile();
-            sprite.m_RotationRadians = cpp_conv::rotationRadiansFromDirection(entity->m_Direction);
+            auto& sprite = ecs.AddComponent<cpp_conv::components::ModelComponent>(ecsEntity);
+            sprite.m_Model = definition->GetModel();
         }
 
         ecs.AddComponent<cpp_conv::components::NameComponent>(ecsEntity, definition->GetName().c_str());
@@ -77,9 +76,9 @@ namespace
         auto& camera = ecs.AddComponent<cpp_conv::components::LookAtCamera>(cameraEntity);
         camera.m_bIsActive = true;
         camera.m_Distance = 5.0f;
-        camera.m_LookAtPoint = {5.0f, 0.0f, 0.0f};
-        camera.m_Pitch = 20.0_degrees;
-        camera.m_Yaw = 0.0_degrees;
+        camera.m_LookAtPoint = {5.39f, 0.0f, 0.179f};
+        camera.m_Pitch = 30.0_degrees;
+        camera.m_Yaw = -135.0_degrees;
     }
 
 }
@@ -98,7 +97,6 @@ void cpp_conv::GameScene::OnEntered(atlas::scene::SceneManager& sceneManager)
         ecs.AddComponent<components::DescriptionComponent>(ecsEntity, "The wheels of invention");
         ecs.AddComponent<components::DirectionComponent>(ecsEntity, entity->m_Direction);
         ecs.AddComponent<components::ConveyorComponent>(ecsEntity);
-        ecs.AddComponent<components::SpriteLayerComponent<1>>(ecsEntity);
         ecs.AddComponent<components::WorldEntityInformationComponent>(ecsEntity, entity->m_eEntityKind);
         m_SceneData.m_LookupGrid.PlaceEntity(position.m_Position, {1, 1, 1}, ecsEntity);
     }
@@ -177,19 +175,9 @@ void cpp_conv::GameScene::ConstructSystems(atlas::scene::SystemsBuilder& builder
             groupBuilder.RegisterSystem<FactorySystem>(m_SceneData.m_LookupGrid);
         });
 
-    auto layer1 = builder.RegisterGroup("SpriteRendering_Layer1", {sceneSystems, cameraSystems}, [](atlas::scene::SystemsBuilder& groupBuilder)
+    auto generalRendering = builder.RegisterGroup("GeneralRendering", {sceneSystems, cameraSystems}, [](atlas::scene::SystemsBuilder& groupBuilder)
     {
-        groupBuilder.RegisterSystem<SpriteLayerRenderSystem<1>>();
-    });
-
-    auto layer2 = builder.RegisterGroup("SpriteRendering_Layer2", {layer1}, [](atlas::scene::SystemsBuilder& groupBuilder)
-    {
-        groupBuilder.RegisterSystem<SpriteLayerRenderSystem<2>>();
+        groupBuilder.RegisterSystem<ModelRenderSystem>();
         groupBuilder.RegisterSystem<ConveyorRenderingSystem>();
-    });
-
-    auto layer3 = builder.RegisterGroup("SpriteRendering_Layer3", {layer2}, [](atlas::scene::SystemsBuilder& groupBuilder)
-    {
-        groupBuilder.RegisterSystem<SpriteLayerRenderSystem<3>>();
     });
 }

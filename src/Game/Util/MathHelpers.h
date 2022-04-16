@@ -9,6 +9,11 @@ namespace cpp_conv::math_helpers
         [[nodiscard]] float AsRadians() const { return m_Value; }
         [[nodiscard]] float AsDegrees() const { return m_Value * (180.0f / c_pi); }
 
+        Angle operator-() const
+        {
+            return FromRadians(-m_Value);
+        }
+
         static Angle FromRadians(const float value)
         {
             Angle angle;

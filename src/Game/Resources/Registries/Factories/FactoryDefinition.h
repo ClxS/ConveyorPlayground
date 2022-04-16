@@ -10,6 +10,14 @@
 #include "TileAsset.h"
 #include "TomlSerializer.h"
 
+namespace atlas
+{
+    namespace render
+    {
+        class ModelAsset;
+    }
+}
+
 namespace cpp_conv
 {
     class FactoryDefinition : public Serializable<FactoryDefinition, TomlSerializer, atlas::resource::ResourceAsset>
@@ -39,7 +47,7 @@ namespace cpp_conv
         [[nodiscard]] Eigen::Vector3i GetOutputPipe() const { return m_OutputPipe.m_Value; }
         [[nodiscard]] RecipeId GetProducedRecipe() const { return m_ProducedRecipe.m_Value; }
 
-        [[nodiscard]] atlas::resource::AssetPtr<resources::TileAsset> GetTile() const;
+        [[nodiscard]] atlas::resource::AssetPtr<atlas::render::ModelAsset> GetModel() const;
 
     private:
         DataField<FactoryId, "id"> m_InternalId{};

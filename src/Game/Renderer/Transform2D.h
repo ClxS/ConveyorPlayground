@@ -1,5 +1,6 @@
 #pragma once
 #include "Enums.h"
+#include "MathHelpers.h"
 #include "Rotation.h"
 
 namespace cpp_conv
@@ -54,7 +55,7 @@ namespace cpp_conv
         }
     }
 
-    inline float rotationRadiansFromDirection(const Direction direction)
+    inline math_helpers::Angle rotationRadiansFromDirection(const Direction direction)
     {
         constexpr float c_pi = 3.14159265358979323846f;  /* pi */
         // This engine uses right-based assets. Up/Down are inverted as we use a top major positioning system
@@ -62,13 +63,13 @@ namespace cpp_conv
         {
         default:
         case Direction::Right:
-            return 0.0f;
+            return 0.0_degrees;
         case Direction::Down:
-            return 90.0f * (c_pi / 180.0f);
+            return 90.0_degrees;
         case Direction::Left:
-            return 180.0f * (c_pi / 180.0f);
+            return 180.0_degrees;
         case Direction::Up:
-            return 270.0f * (c_pi / 180.0f);
+            return 270.0_degrees;
         }
     }
 }

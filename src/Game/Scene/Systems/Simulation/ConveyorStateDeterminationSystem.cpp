@@ -8,7 +8,6 @@
 #include "EntityLookupGrid.h"
 #include "PositionComponent.h"
 #include "PositionHelper.h"
-#include "SpriteLayerComponent.h"
 #include "WorldEntityInformationComponent.h"
 #include "AtlasResource/ResourceLoader.h"
 #include "AtlasScene/ECS/Components/EcsManager.h"
@@ -270,58 +269,6 @@ void cpp_conv::ConveyorStateDeterminationSystem::Initialise(atlas::scene::EcsMan
                 conveyor.m_Channels[iLane].m_pSlots[iSlot].m_VisualPosition = getRenderPosition(
                     position, direction, conveyor, {iLane, iSlot});
             }
-        }
-
-
-
-        if (ecs.DoesEntityHaveComponent<SpriteLayerComponent<1>>(entity))
-        {
-            auto& sprite = ecs.GetComponent<SpriteLayerComponent<1>>(entity);
-
-            int conveyorVisualState = ConveyorVisualState::None;
-            conveyorVisualState |= conveyor.m_bIsCorner ? ConveyorVisualState::Corner : 0;
-            conveyorVisualState |= conveyor.m_bIsClockwise ? ConveyorVisualState::Clockwise : 0;
-            conveyorVisualState |= bIsCapped ? ConveyorVisualState::Capped : 0;
-            conveyorVisualState |= bIsBackCapped ? ConveyorVisualState::CappedBack : 0;
-
-            auto test = ConveyorVisualState::Corner | ConveyorVisualState::Clockwise | ConveyorVisualState::Capped;
-            /*switch(conveyorVisualState)
-            {
-            case ConveyorVisualState::Corner:
-                sprite.m_pTile = atlas::resource::ResourceLoader::LoadAsset<resources::registry::CoreBundle, resources::TileAsset>(
-                        resources::registry::core_bundle::assets::conveyors::c_ConveyorCornerAntiClockwise);
-                break;
-            case ConveyorVisualState::Corner | ConveyorVisualState::Clockwise:
-                sprite.m_pTile = atlas::resource::ResourceLoader::LoadAsset<resources::registry::CoreBundle, resources::TileAsset>(
-                        resources::registry::core_bundle::assets::conveyors::c_ConveyorCornerClockwise);
-                break;
-            case ConveyorVisualState::Corner | ConveyorVisualState::Capped:
-                sprite.m_pTile = atlas::resource::ResourceLoader::LoadAsset<resources::registry::CoreBundle, resources::TileAsset>(
-                        resources::registry::core_bundle::assets::conveyors::c_ConveyorCornerAntiClockwiseCapped);
-                break;
-            case ConveyorVisualState::Corner | ConveyorVisualState::Clockwise | ConveyorVisualState::Capped:
-                sprite.m_pTile = atlas::resource::ResourceLoader::LoadAsset<resources::registry::CoreBundle, resources::TileAsset>(
-                        resources::registry::core_bundle::assets::conveyors::c_ConveyorCornerClockwiseCapped);
-                break;
-            case ConveyorVisualState::Capped:
-                sprite.m_pTile = atlas::resource::ResourceLoader::LoadAsset<resources::registry::CoreBundle, resources::TileAsset>(
-                        resources::registry::core_bundle::assets::conveyors::c_ConveyorStraightCappedFront);
-                break;
-            case ConveyorVisualState::CappedBack:
-                sprite.m_pTile = atlas::resource::ResourceLoader::LoadAsset<resources::registry::CoreBundle, resources::TileAsset>(
-                        resources::registry::core_bundle::assets::conveyors::c_ConveyorStraightCappedBack);
-                break;
-            case ConveyorVisualState::Capped | ConveyorVisualState::CappedBack:
-                sprite.m_pTile = atlas::resource::ResourceLoader::LoadAsset<resources::registry::CoreBundle, resources::TileAsset>(
-                        resources::registry::core_bundle::assets::conveyors::c_ConveyorStraightCapped);
-                break;
-            default:
-                sprite.m_pTile = atlas::resource::ResourceLoader::LoadAsset<resources::registry::CoreBundle, resources::TileAsset>(
-                        resources::registry::core_bundle::assets::conveyors::c_ConveyorStraight);
-                break;
-            }*/
-
-            sprite.m_RotationRadians = rotationRadiansFromDirection(direction.m_Direction);
         }
 
         const bool bAlreadyHasIndividual = ecs.DoesEntityHaveComponent<IndividuallyProcessableConveyorComponent>(entity);
