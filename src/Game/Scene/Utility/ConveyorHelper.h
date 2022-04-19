@@ -80,7 +80,7 @@ namespace cpp_conv::conveyor_helper
         bool bShouldSetDirectly = false);
 
     Eigen::Vector2f getSlotPosition(
-        const components::SequenceComponent& component,
+        const components::SequenceComponent& sequence,
         uint8_t uiSequenceIndex,
         int lane,
         int slot);

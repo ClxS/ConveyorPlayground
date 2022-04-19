@@ -109,6 +109,6 @@ public:
 
 int gameMain(int argc, char* argv[])
 {
-    atlas::game::GameHost<CppConveyor> game{{"Transportadoras"}};
+    atlas::game::GameHost<CppConveyor> game{{"Transportadoras", 30}};
     return game.Run();
 }

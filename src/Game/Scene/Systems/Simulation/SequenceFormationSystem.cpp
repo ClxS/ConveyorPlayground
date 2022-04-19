@@ -125,7 +125,7 @@ namespace
                 break;
             }
 
-            auto& targetConveyorComponent = ecs.GetComponent<ConveyorComponent>(targetConveyor);
+            const auto& targetConveyorComponent = ecs.GetComponent<ConveyorComponent>(targetConveyor);
             if (targetConveyorComponent.m_bIsCorner)
             {
                 break;

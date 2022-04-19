@@ -143,6 +143,11 @@ namespace
             stepsRequired++;
         }
 
+        constexpr float c_firstSlot = -0.25f;
+        constexpr float c_secondSlot = 0.25f;
+        constexpr float c_lowCornerSlot = -0.1f;
+        constexpr float c_highCornerSlot = 0.1f;
+
         Eigen::Vector2f position;
         if (conveyor.m_bIsCorner)
         {
@@ -152,35 +157,35 @@ namespace
                 {
                     switch (slot.m_Channel)
                     {
-                    case 0: position = {1.0f, 2.0f};
+                    case 0: position = {c_firstSlot, c_secondSlot};
                         break;
-                    case 1: position = {1.2f, 1.2f};
+                    case 1: position = {c_lowCornerSlot, c_lowCornerSlot};
                         break;
-                    case 2: position = {2.0f, 1.0f};
+                    case 2: position = {c_secondSlot, c_firstSlot };
                         break;
                     default: ;
                     }
                 }
                 else
                 {
-                    position = {2.0f, 2.0f};
+                    position = {c_secondSlot, c_secondSlot};
                 }
             }
             else
             {
                 if (slot.m_Lane == 0)
                 {
-                    position = {2.0f, 1.0f};
+                    position = {c_secondSlot, c_firstSlot };
                 }
                 else
                 {
                     switch (slot.m_Channel)
                     {
-                    case 0: position = {1.0f, 1.0f};
+                    case 0: position = {c_firstSlot,  c_firstSlot };
                         break;
-                    case 1: position = {1.2f, 1.8f};
+                    case 1: position = {c_lowCornerSlot, c_highCornerSlot};
                         break;
-                    case 2: position = {2.0f, 2.0f};
+                    case 2: position = {c_secondSlot, c_secondSlot};
                         break;
                     default: ;
                     }
@@ -189,27 +194,18 @@ namespace
         }
         else
         {
-            position = {1.0f + static_cast<float>(slot.m_Channel), 1.0f + static_cast<float>(slot.m_Lane)};
+            position = { c_firstSlot + 0.5f * slot.m_Channel, c_firstSlot + 0.5f * slot.m_Lane };
         }
 
-        constexpr float c_fBlockSize = 4;
-        const Eigen::Vector2f blockSize(c_fBlockSize, c_fBlockSize);
+        const Eigen::Vector2f blockSize(1.0f, 1.0f );
         const auto backToOrigin = static_cast<Rotation>((4 - stepsRequired) % 4);
         position = rotate(position, backToOrigin, blockSize);
 
-        const Eigen::Vector2f scale{cpp_conv::constants::c_gridScale / c_fBlockSize, cpp_conv::constants::c_gridScale / c_fBlockSize};
-        const Eigen::Vector2f offset = position * 0.5f * c_fBlockSize - Eigen::Vector2f(1.0f, 1.0f) - scale;
-
-        const float x = positionComponent.m_Position.x() * blockSize.x() + offset.x();
-        const float y = positionComponent.m_Position.y() * blockSize.y() + offset.y();
-        const Eigen::Vector2f end = { x, y };
-        if (!bAnimate)
+        return
         {
-            return Eigen::Vector2f(end.x(), end.y());
-        }
-
-        const auto outValue = previousPosition + ((end - previousPosition) * fLerpFactor);
-        return {outValue.x(), outValue.y()};
+            positionComponent.m_Position.x() + position.x(),
+            positionComponent.m_Position.z() + position.y(),
+        };
     }
 }
 

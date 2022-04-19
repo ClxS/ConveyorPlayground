@@ -164,12 +164,13 @@ void cpp_conv::conveyor_helper::placeItemInSlot(atlas::scene::EcsManager& ecs, c
     };
 }
 
-Eigen::Vector2f cpp_conv::conveyor_helper::getSlotPosition(const cpp_conv::components::SequenceComponent& component,
+Eigen::Vector2f cpp_conv::conveyor_helper::getSlotPosition(
+    const cpp_conv::components::SequenceComponent& sequence,
     const uint8_t uiSequenceIndex, const int lane, const int slot)
 {
-    const Eigen::Vector2f visual = component.m_LaneVisualOffsets[lane];
-    const Eigen::Vector2f unitDirection2d{component.m_UnitDirection.x(), component.m_UnitDirection.y()};
-    return visual + unitDirection2d * (uiSequenceIndex * 2.0f + slot);
+    const Eigen::Vector2f visual = sequence.m_LaneVisualOffsets[lane];
+    const Eigen::Vector2f unitDirection2d{sequence.m_UnitDirection.x(), sequence.m_UnitDirection.y()};
+    return visual + unitDirection2d * uiSequenceIndex + unitDirection2d * (0.5f * slot);
 }
 
 std::optional<cpp_conv::conveyor_helper::ItemInformation> cpp_conv::conveyor_helper::getItemInSlot(

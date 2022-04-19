@@ -25,5 +25,10 @@ namespace atlas::resource
 
         static BundleRegistryId Invalid() { return {RegistryId::Invalid(), -1}; }
         [[nodiscard]] bool IsValid() const { return m_BundleId.IsValid() && m_BundleIndex >= 0; }
+
+        bool operator<(const BundleRegistryId& other) const
+        {
+            return std::tie (m_BundleId, m_BundleIndex) < std::tie (other.m_BundleId, other.m_BundleIndex);
+        }
     };
 }

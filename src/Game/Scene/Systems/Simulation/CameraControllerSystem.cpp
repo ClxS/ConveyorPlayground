@@ -143,7 +143,6 @@ namespace
         Eigen::Vector3f cameraOffset = { camera.m_Distance, 0.0f, 0.0f };
         cameraOffset = cameraRotation * cameraOffset;
 
-
         auto [width, height] = atlas::app_host::Application::Get().GetAppDimensions();
         Eigen::Matrix4f view = lookAt(camera.m_LookAtPoint - cameraOffset, camera.m_LookAtPoint, camera.m_Up);
         Eigen::Matrix4f projection = project(
@@ -156,7 +155,6 @@ namespace
         bgfx::setViewTransform(0, view.data(), projection.data());
     }
 }
-
 
 void cpp_conv::CameraControllerSystem::Update(atlas::scene::EcsManager& ecs)
 {
