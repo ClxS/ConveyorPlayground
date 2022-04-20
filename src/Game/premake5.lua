@@ -67,6 +67,7 @@ project "CppConveyor"
 		"eigen",
 		"fixed_string",
 		"bgfx",
+		"RmlUI",
 
 		"AtlasAppHost",
 		"AtlasGame",
