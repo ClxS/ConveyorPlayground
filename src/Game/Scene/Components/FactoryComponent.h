@@ -3,7 +3,7 @@
 
 #include "FactoryDefinition.h"
 #include "GeneralItemContainer.h"
-#include "Eigen/src/Core/Matrix.h"
+#include "Eigen/Core"
 
 namespace cpp_conv::components
 {

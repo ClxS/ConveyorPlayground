@@ -2,6 +2,7 @@
 
 #include "CameraComponent.h"
 #include "CameraControllerSystem.h"
+#include "Constants.h"
 #include "ConveyorComponent.h"
 #include "ConveyorRenderingSystem.h"
 #include "ConveyorStateDeterminationSystem.h"
@@ -22,6 +23,9 @@
 #include "MathHelpers.h"
 #include "ModelComponent.h"
 #include "ModelRenderSystem.h"
+#include "PostProcessSystem.h"
+#include "AtlasAppHost/Application.h"
+#include "AtlasRender/Renderer.h"
 
 namespace
 {
@@ -161,13 +165,13 @@ void cpp_conv::GameScene::ConstructSystems(atlas::scene::SystemsBuilder& builder
             groupBuilder.RegisterSystem<StandaloneConveyorSystem_Realize>();
         });
 
-    auto cameraSystems = builder.RegisterGroup("Camera",
+    builder.RegisterGroup("Camera",
         [](atlas::scene::SystemsBuilder& groupBuilder)
         {
             groupBuilder.RegisterSystem<CameraControllerSystem>();
         });
 
-    auto sceneSystems = builder.RegisterGroup(
+    builder.RegisterGroup(
         "General Scene Systems",
         {conveyorRealizeGroup},
         [this](atlas::scene::SystemsBuilder& groupBuilder)
@@ -175,9 +179,64 @@ void cpp_conv::GameScene::ConstructSystems(atlas::scene::SystemsBuilder& builder
             groupBuilder.RegisterSystem<FactorySystem>(m_SceneData.m_LookupGrid);
         });
 
-    auto generalRendering = builder.RegisterGroup("GeneralRendering", {sceneSystems, cameraSystems}, [](atlas::scene::SystemsBuilder& groupBuilder)
+    ConstructFrameGraph();
+}
+
+void cpp_conv::GameScene::ConstructFrameGraph()
+{
+    using namespace constants;
+    bgfx::ViewId order[] =
     {
-        groupBuilder.RegisterSystem<ModelRenderSystem>();
-        groupBuilder.RegisterSystem<ConveyorRenderingSystem>();
-    });
+        render_views::c_geometry,
+        render_views::c_postProcess,
+    };
+    bgfx::setViewOrder(0, BX_COUNTOF(order), order);
+
+
+    atlas::render::addToFrameGraph("SetPrimaryRenderTargets",
+        [this]()
+        {
+            const auto [width, height] = atlas::app_host::Application::Get().GetAppDimensions();
+            m_RenderSystems.m_GBuffer.Initialise(width, height);
+
+            bgfx::setState(BGFX_STATE_DEFAULT);
+            bgfx::setViewName(render_views::c_geometry, "Mesh");
+            bgfx::setViewClear(render_views::c_geometry, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x322e3dFF, 1.0f, 0);
+            bgfx::setViewRect(render_views::c_geometry, 0, 0, bgfx::BackbufferRatio::Equal);
+            bgfx::setViewFrameBuffer(render_views::c_geometry, m_RenderSystems.m_GBuffer.GetHandle());
+
+            bgfx::setViewName(render_views::c_postProcess, "OutputView");
+            bgfx::setViewClear(render_views::c_postProcess, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x322e3dFF, 1.0f, 0);
+            bgfx::setViewRect(render_views::c_postProcess, 0, 0, bgfx::BackbufferRatio::Equal);
+            bgfx::setViewFrameBuffer(render_views::c_postProcess, BGFX_INVALID_HANDLE);
+        },
+        [this]()
+        {
+            const auto [width, height] = atlas::app_host::Application::Get().GetAppDimensions();
+            m_RenderSystems.m_GBuffer.EnsureSize(width, height);
+        });
+
+    atlas::render::addToFrameGraph("RenderWorld",
+        [this]()
+        {
+            DirectInitialiseSystem(m_RenderSystems.m_CameraRenderSystem);
+            DirectInitialiseSystem(m_RenderSystems.m_ModelRenderer);
+            DirectInitialiseSystem(m_RenderSystems.m_ConveyorRenderer);
+        },
+        [this]()
+        {
+            DirectRunSystem(m_RenderSystems.m_CameraRenderSystem);
+            DirectRunSystem(m_RenderSystems.m_ModelRenderer);
+            DirectRunSystem(m_RenderSystems.m_ConveyorRenderer);
+        });
+
+    atlas::render::addToFrameGraph("FXAA",
+        [this]()
+        {
+            DirectInitialiseSystem(m_RenderSystems.m_PostProcess, &m_RenderSystems.m_GBuffer);
+        },
+        [this]()
+        {
+            DirectRunSystem(m_RenderSystems.m_PostProcess);
+        });
 }

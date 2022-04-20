@@ -29,10 +29,6 @@ project "CppConveyor"
 			  	<Message Text="Generating Asset Specification" Importance="High" />
 			  	<Exec Command="$(ToolsDir)/AssetBuilder.exe -r $(DataDir) --platform $(BuildPlatform) -d --ns $(DataNamespace) -o $(CodeDir)/Generated/AssetRegistry.h" />
 			  </Target>
-			  <!--<Target Name="DeployAssets" AfterTargets="Build">
-			    <Message Text="Deploying Assets" Importance="High" />
-			    <Exec Command="$(ToolsDir)/AssetBuilder.exe cook -r $(DataDir) --platform $(BuildPlatform) -o $(TargetDir)data " />
-			  </Target>-->
 			]]
 		}
 	end

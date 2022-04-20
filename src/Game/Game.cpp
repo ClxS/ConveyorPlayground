@@ -1,6 +1,7 @@
 #include "Game.h"
 
 #include "CameraComponent.h"
+#include "Constants.h"
 #include "ConveyorComponent.h"
 #include "ConveyorDefinition.h"
 #include "ConveyorRegistry.h"
@@ -86,6 +87,8 @@ void loadDataAssets()
 void setBgfxSettings()
 {
     bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x322e3dFF, 1.0f, 0);
+    bgfx::setViewClear(cpp_conv::constants::render_views::c_geometry, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x322e3dFF, 1.0f, 0);
+
 }
 
 class CppConveyor final : public atlas::game::GameImplementation

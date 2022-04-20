@@ -57,7 +57,7 @@ namespace
                     setTexture(textureIndex++, texture.m_Sampler, texture.m_Texture->GetHandle());
                 }
 
-                submit(0, program->GetHandle());
+                submit(cpp_conv::constants::render_views::c_geometry, program->GetHandle());
             }
         }
     }
@@ -92,13 +92,12 @@ namespace
             setTexture(textureIndex++, texture.m_Sampler, texture.m_Texture->GetHandle());
         }
 
-        bgfx::setState(BGFX_STATE_DEFAULT);
         for(const auto& segment : model->GetMesh()->GetSegments())
         {
             setVertexBuffer(0, segment.m_VertexBuffer);
             setIndexBuffer(segment.m_IndexBuffer);
             setInstanceDataBuffer(&idb);
-            submit(0, program->GetHandle());
+            submit(cpp_conv::constants::render_views::c_geometry, program->GetHandle());
         }
     }
 }
@@ -279,7 +278,7 @@ void ConveyorRenderingSystem::Update(atlas::scene::EcsManager& ecs)
         }
     }
 
-    atlas::render::addToFrameGraph_oneOff("ConveyorRenderer", [conveyors, items]()
+    //atlas::render::addToFrameGraph_oneOff("ConveyorRenderer", [conveyors, items]()
     {
         const bool instancingSupported = 0 != (BGFX_CAPS_INSTANCING & bgfx::getCaps()->supported);
         for(auto& conveyorType : conveyors)
@@ -319,5 +318,6 @@ void ConveyorRenderingSystem::Update(atlas::scene::EcsManager& ecs)
                 drawNonInstanced(item.m_Model, item.m_Model->GetProgram(), item.m_ConveyorPositions);
             }
         }
-    });
+    }
+    //);
 }

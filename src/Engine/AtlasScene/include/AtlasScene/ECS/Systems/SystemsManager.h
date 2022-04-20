@@ -104,8 +104,13 @@ namespace atlas::scene
         {
             for (const auto& system : m_Systems)
             {
-                system->Update(ecsManager);
+                Update(ecsManager, system);
             }
+        }
+
+        static void Update(EcsManager& ecsManager, SystemBase* system)
+        {
+            system->Update(ecsManager);
         }
 
     private:

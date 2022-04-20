@@ -38,8 +38,21 @@ void atlas::render::init(const RendererInitArgs& args)
     bgfx::setViewRect(0, 0, 0, args.m_Width, args.m_Height);
 }
 
-atlas::render::RenderTaskHandle atlas::render::addToFrameGraph(std::string name, std::function<void()> callback,
-                                                               std::vector<RenderTaskHandle> dependentTasks)
+atlas::render::RenderTaskHandle atlas::render::addToFrameGraph(
+    std::string name,
+    std::function<void()> initiailize,
+    std::function<void()> callback,
+    std::vector<RenderTaskHandle> dependentTasks)
+{
+    m_RenderMethods.emplace_back(initiailize, true);
+    m_RenderMethods.emplace_back(callback, false);
+    return {-1};
+}
+
+atlas::render::RenderTaskHandle atlas::render::addToFrameGraph(
+    std::string name,
+    std::function<void()> callback,
+    std::vector<RenderTaskHandle> dependentTasks)
 {
     m_RenderMethods.emplace_back(callback, false);
     return {-1};

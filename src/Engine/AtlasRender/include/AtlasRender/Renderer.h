@@ -20,6 +20,7 @@ namespace atlas::render
 
     void init(const RendererInitArgs& args);
 
+    RenderTaskHandle addToFrameGraph(std::string name, std::function<void()> initiailize, std::function<void()> callback, std::vector<RenderTaskHandle> dependentTasks = {});
     RenderTaskHandle addToFrameGraph(std::string name, std::function<void()> callback, std::vector<RenderTaskHandle> dependentTasks = {});
 
     RenderTaskHandle addToFrameGraph_oneOff(std::string name, std::function<void()> callback, std::vector<RenderTaskHandle> dependentTasks = {});

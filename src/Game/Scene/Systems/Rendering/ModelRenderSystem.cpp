@@ -1,5 +1,6 @@
 #include "ModelRenderSystem.h"
 
+#include "Constants.h"
 #include "DirectionComponent.h"
 #include "MathHelpers.h"
 #include "ModelComponent.h"
@@ -52,7 +53,7 @@ void cpp_conv::ModelRenderSystem::Update(atlas::scene::EcsManager& ecs)
                 setTexture(textureIndex++, texture.m_Sampler, texture.m_Texture->GetHandle());
             }
 
-            submit(0, model.m_Model->GetProgram()->GetHandle());
+            submit(cpp_conv::constants::render_views::c_geometry, model.m_Model->GetProgram()->GetHandle());
         }
     }
 }

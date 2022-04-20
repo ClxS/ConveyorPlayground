@@ -2,9 +2,14 @@
 
 #include <AtlasScene/Scene.h>
 
+#include "CameraRenderSystem.h"
+#include "ConveyorRenderingSystem.h"
 #include "EntityLookupGrid.h"
 #include "FactoryDefinition.h"
 #include "Map.h"
+#include "ModelRenderSystem.h"
+#include "PostProcessSystem.h"
+#include "AtlasRender/Types/FrameBuffer.h"
 
 namespace cpp_conv
 {
@@ -36,6 +41,8 @@ namespace cpp_conv
         }
 
     private:
+        void ConstructFrameGraph();
+
         struct InitialisationData
         {
             atlas::resource::AssetPtr<resources::Map> m_Map;
@@ -45,5 +52,15 @@ namespace cpp_conv
         {
             EntityLookupGrid m_LookupGrid;
         } m_SceneData;
+
+        struct RenderSystems
+        {
+            CameraRenderSystem m_CameraRenderSystem;
+            ModelRenderSystem m_ModelRenderer;
+            ConveyorRenderingSystem m_ConveyorRenderer;
+            PostProcessSystem m_PostProcess;
+
+            atlas::render::FrameBuffer m_GBuffer;
+        } m_RenderSystems;
     };
 }

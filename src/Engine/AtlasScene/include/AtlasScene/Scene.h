@@ -47,6 +47,17 @@ namespace atlas::scene
             m_SystemsManager.Update(m_EcsManager);
         }
 
+        template<typename TSystem, typename... TArgs>
+        void DirectInitialiseSystem(TSystem& system, TArgs&&... args)
+        {
+            system.Initialise(m_EcsManager, std::forward<TArgs>(args)...);
+        }
+
+        void DirectRunSystem(SystemBase& system)
+        {
+            SystemsManager::Update(m_EcsManager, &system);
+        }
+
         virtual void ConstructSystems(SystemsBuilder& builder) = 0;
 
         EcsManager& GetEcsManager() { return m_EcsManager; }
