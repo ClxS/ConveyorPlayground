@@ -49,3 +49,6 @@
 [submodule "src/ThirdParty/fixed_string"]
 	path = src/ThirdParty/fixed_string
 	url = https://github.com/unterumarmung/fixed_string
+[submodule "data/sdlPrivate"]
+	path = data/sdlPrivate
+	url = https://github.com/ClxS/ConveyorPlayground_Private.git
