@@ -39,14 +39,13 @@ void atlas::render::FrameBuffer::Initialise(const uint32_t width, const uint32_t
         depthFormat,
         BGFX_TEXTURE_RT_WRITE_ONLY);
 
-    bgfx::TextureHandle handles[] =
+    const bgfx::TextureHandle handles[] =
     {
         colour,
         depth
     };
 
     m_Handle = bgfx::createFrameBuffer(BX_COUNTOF(handles), handles, true);
-    //m_Handle = createFrameBuffer(static_cast<uint16_t>(m_Width), static_cast<uint16_t>(m_Height), bgfx::TextureFormat::RGBA32F, bgfx::TextureFormat::D32F);
 }
 
 void atlas::render::FrameBuffer::EnsureSize(const uint32_t width, const uint32_t height)
