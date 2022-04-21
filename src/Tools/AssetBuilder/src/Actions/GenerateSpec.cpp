@@ -57,6 +57,9 @@ namespace
             return filename;
         }
 
+        std::ranges::replace(filename, '-', '_');
+        std::ranges::replace(filename, ':', '_');
+
         return filename.substr(0, dot);
     }
 

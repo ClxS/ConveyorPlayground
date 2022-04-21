@@ -188,6 +188,7 @@ void cpp_conv::GameScene::ConstructFrameGraph()
     bgfx::ViewId order[] =
     {
         render_views::c_geometry,
+        render_views::c_ui,
         render_views::c_postProcess,
     };
     bgfx::setViewOrder(0, BX_COUNTOF(order), order);
@@ -201,12 +202,18 @@ void cpp_conv::GameScene::ConstructFrameGraph()
 
             bgfx::setState(BGFX_STATE_DEFAULT);
             bgfx::setViewName(render_views::c_geometry, "Mesh");
-            bgfx::setViewClear(render_views::c_geometry, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x322e3dFF, 1.0f, 0);
+            bgfx::setViewClear(render_views::c_geometry, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x322e3dFF);
             bgfx::setViewRect(render_views::c_geometry, 0, 0, bgfx::BackbufferRatio::Equal);
             bgfx::setViewFrameBuffer(render_views::c_geometry, m_RenderSystems.m_GBuffer.GetHandle());
 
+            bgfx::setViewName(render_views::c_ui, "UI Layer");
+            bgfx::setViewClear(render_views::c_ui, 0);
+            bgfx::setViewRect(render_views::c_ui, 0, 0, bgfx::BackbufferRatio::Equal);
+            bgfx::setViewMode(render_views::c_ui, bgfx::ViewMode::Sequential);
+            bgfx::setViewFrameBuffer(render_views::c_ui, m_RenderSystems.m_GBuffer.GetHandle());
+
             bgfx::setViewName(render_views::c_postProcess, "OutputView");
-            bgfx::setViewClear(render_views::c_postProcess, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x322e3dFF, 1.0f, 0);
+            bgfx::setViewClear(render_views::c_postProcess, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x322e3dFF);
             bgfx::setViewRect(render_views::c_postProcess, 0, 0, bgfx::BackbufferRatio::Equal);
             bgfx::setViewFrameBuffer(render_views::c_postProcess, BGFX_INVALID_HANDLE);
         },
@@ -225,10 +232,21 @@ void cpp_conv::GameScene::ConstructFrameGraph()
         },
         [this]()
         {
+            bgfx::setState(BGFX_STATE_DEFAULT);
             DirectRunSystem(m_RenderSystems.m_CameraRenderSystem);
             DirectRunSystem(m_RenderSystems.m_ModelRenderer);
             DirectRunSystem(m_RenderSystems.m_ConveyorRenderer);
         });
+
+    atlas::render::addToFrameGraph("UI",
+       [this]()
+       {
+           DirectInitialiseSystem(m_RenderSystems.m_UIController);
+       },
+       [this]()
+       {
+           DirectRunSystem(m_RenderSystems.m_UIController);
+       });
 
     atlas::render::addToFrameGraph("FXAA",
         [this]()

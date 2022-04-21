@@ -9,6 +9,7 @@
 #include "Map.h"
 #include "ModelRenderSystem.h"
 #include "PostProcessSystem.h"
+#include "UIControllerSystem.h"
 #include "AtlasRender/Types/FrameBuffer.h"
 
 namespace cpp_conv
@@ -58,6 +59,9 @@ namespace cpp_conv
             CameraRenderSystem m_CameraRenderSystem;
             ModelRenderSystem m_ModelRenderer;
             ConveyorRenderingSystem m_ConveyorRenderer;
+
+            UIControllerSystem m_UIController;
+
             PostProcessSystem m_PostProcess;
 
             atlas::render::FrameBuffer m_GBuffer;

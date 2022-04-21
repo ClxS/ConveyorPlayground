@@ -33,6 +33,10 @@ project "CppConveyor"
 		}
 	end
 
+    defines {
+        "__STDC_FORMAT_MACROS"
+    }
+
 	filter {"platforms:Console"}
 		kind "ConsoleApp"
 		customprops {

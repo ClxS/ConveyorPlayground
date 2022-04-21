@@ -21,7 +21,7 @@ namespace
         file.open(filePath, std::ios::binary | std::ios::ate);
         if (file.fail())
         {
-            return {atlas::resource::RegistryId::Invalid(), nullptr, 0};
+            return {filePath, atlas::resource::RegistryId::Invalid(), nullptr, 0};
         }
 
         // ReSharper disable once CppRedundantCastExpression
@@ -32,13 +32,13 @@ namespace
 
         if (uiLength == 0)
         {
-            return {atlas::resource::RegistryId::Invalid(), nullptr, 0};
+            return {filePath, atlas::resource::RegistryId::Invalid(), nullptr, 0};
         }
 
         std::unique_ptr<uint8_t[]> pData(new uint8_t[uiLength]);
         file.read(reinterpret_cast<char*>(pData.get()), uiLength);
 
-        return {id, std::move(pData), uiLength};
+        return {filePath, id, std::move(pData), uiLength};
     }
 }
 
@@ -73,7 +73,7 @@ atlas::resource::AssetPtr<atlas::resource::ResourceAsset> atlas::resource::Resou
         return nullptr;
     }
 
-    const FileData fileData = getFileData(registryId, entry.value().m_Path);
+    FileData fileData = getFileData(registryId, entry.value().m_Path);
     if (!fileData.m_pData)
     {
         return nullptr;

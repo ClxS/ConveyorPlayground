@@ -17,4 +17,7 @@ project "RmlUI"
     }
 	exports {
 		["includedirs"]	= path.getabsolute("RmlUi/Include"),
+		["defines"] = {
+		    "RMLUI_STATIC_LIB",
+		}
 	}

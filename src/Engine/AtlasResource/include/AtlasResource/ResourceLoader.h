@@ -18,7 +18,7 @@ namespace atlas::resource
         struct BundleContext {};
         struct TypeContext {};
     public:
-        using LoaderFunc = std::function<AssetPtr<ResourceAsset>(const FileData&)>;
+        using LoaderFunc = std::function<AssetPtr<ResourceAsset>(FileData&)>;
 
         template<typename TBundle>
         static void RegisterBundle()

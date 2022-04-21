@@ -5,11 +5,12 @@
 
 #include "DataAssetHandler.h"
 #include "MapAssetHandler.h"
-#include "MeshAssetHandler.h"
 #include "ModelAssetHandler.h"
 #include "ShaderAssetHandler.h"
-#include "ShaderProgramAssetHandler.h"
-#include "Texture2dAsssetHandler.h"
+#include "Bgfx/MeshAssetHandler.h"
+#include "Bgfx/ShaderProgramAssetHandler.h"
+#include "Bgfx/Texture2dAsssetHandler.h"
+#include "Rml/RmlDataHandler.h"
 
 std::unordered_map<std::string, std::unique_ptr<AssetHandler>> s_handlers;
 
@@ -22,6 +23,9 @@ void AssetProcessor::initDefaults()
     registerHandler<Texture2DAssetHandler>();
     registerHandler<MeshAssetHandler>();
     registerHandler<ModelAssetHandler>();
+    registerHandler<RmlPageDataHandler>();
+    registerHandler<RmlFontDataHandler>();
+    registerHandler<RmlCssDataHandler>();
 }
 
 void AssetProcessor::registerHandler(const std::string& key, std::unique_ptr<AssetHandler>&& pHandler)
