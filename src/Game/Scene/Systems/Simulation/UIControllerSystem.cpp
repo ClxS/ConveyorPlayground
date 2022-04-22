@@ -97,6 +97,57 @@ public:
         m_Uniforms.m_Transform = bgfx::createUniform("u_transform", bgfx::UniformType::Mat3);
     }
 
+    Rml::CompiledGeometryHandle CompileGeometry(Rml::Vertex* vertices, const int numVertices, int* indices, const int numIndices, Rml::TextureHandle texture) override
+    {
+        const bgfx::Memory* vertexMemory = bgfx::alloc(m_RmlVertexLayout.getSize(numVertices));
+        const bgfx::Memory* indexMemory = bgfx::alloc(numIndices * sizeof(int));
+
+        std::memcpy(vertexMemory->data, vertices, m_RmlVertexLayout.getSize(numVertices));
+        std::memcpy(indexMemory->data, indices, numIndices * sizeof(int));
+
+        const auto vertexBuffer = bgfx::createVertexBuffer(vertexMemory, m_RmlVertexLayout);
+        const auto indexBuffer = bgfx::createIndexBuffer(indexMemory, BGFX_BUFFER_INDEX32);
+
+        const auto handle = ++m_CompiledGeometryCounter;
+        m_CompiledGeometry[handle] =
+        {
+            vertexBuffer,
+            indexBuffer
+        };
+
+        return handle;
+    }
+
+    void RenderCompiledGeometry(const Rml::CompiledGeometryHandle geometryHandle, const Rml::Vector2f& translation) override
+    {
+        const auto geometryIter = m_CompiledGeometry.find(geometryHandle);
+        if (geometryIter == m_CompiledGeometry.end())
+        {
+            return;
+        }
+
+        const auto& geometry = *geometryIter;
+
+        SetTransformUniform(translation);
+        bgfx::setVertexBuffer(0, geometry.second.m_VertexBuffer);
+        bgfx::setIndexBuffer(geometry.second.m_IndexBuffer);
+        bgfx::setState(BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A);
+        bgfx::submit(cpp_conv::constants::render_views::c_ui, m_Program->GetHandle());
+    }
+
+    void ReleaseCompiledGeometry(const Rml::CompiledGeometryHandle geometryHandle) override
+    {
+        const auto geometryIter = m_CompiledGeometry.find(geometryHandle);
+        if (geometryIter == m_CompiledGeometry.end())
+        {
+            return;
+        }
+
+        const auto& geometry = *geometryIter;
+        destroy(geometry.second.m_VertexBuffer);
+        destroy(geometry.second.m_IndexBuffer);
+    }
+
     void RenderGeometry(
         Rml::Vertex* vertices,
         const int numVertices,
@@ -121,34 +172,10 @@ public:
         std::memcpy(vb.data, vertices, m_RmlVertexLayout.getSize(numVertices));
         std::memcpy(ib.data, indices, numIndices * sizeof(int));
 
+        SetTransformUniform(translation);
         setVertexBuffer(0, &vb);
         setIndexBuffer(&ib);
-
-        auto [width, height] = atlas::app_host::Application::Get().GetAppDimensions();
-        Eigen::Vector4f frameBufferSize = { static_cast<float>(width), static_cast<float>(height), 0.0f, 0.0f };
-
-        const Eigen::Vector4f translation4F = { translation[0], translation[1], 0.0f, 0.0f };
-
         bgfx::setState(BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A);
-
-        const Eigen::Affine2f t
-                { Eigen::Translation2f(
-                    translation[0] - frameBufferSize.x() / 2.0f,
-                    translation[1] - frameBufferSize.y() / 2.0f) };
-        const Eigen::Affine2f s { Eigen::Scaling((1.0f / frameBufferSize.x()) * 2.0f, (1.0f / frameBufferSize[1]) * 2.0f) };
-        Eigen::Affine2f inversionScaling;
-        if (!bgfx::getCaps()->originBottomLeft)
-        {
-            // RmlUI structures with the assumption that bottom left is 0,0. We need to manually flip if it is not
-            inversionScaling = Eigen::Scaling(1.0f, -1.0f);
-        }
-        else
-        {
-            inversionScaling = Eigen::Scaling(1.0f, 1.0f);
-        }
-
-        Eigen::Matrix3f m = (inversionScaling * s * t).matrix();
-        bgfx::setUniform(m_Uniforms.m_Transform, m.data());
         bgfx::submit(cpp_conv::constants::render_views::c_ui, m_Program->GetHandle());
     }
 
@@ -188,14 +215,48 @@ public:
     }
 
 private:
-    Eigen::Vector4i m_ScissorRegion;
-    atlas::resource::AssetPtr<atlas::render::ShaderProgram> m_Program;
-    bgfx::VertexLayout m_RmlVertexLayout{};
+    void SetTransformUniform(const Rml::Vector2f& translation) const
+    {
+        auto [width, height] = atlas::app_host::Application::Get().GetAppDimensions();
+        Eigen::Vector4f frameBufferSize = { static_cast<float>(width), static_cast<float>(height), 0.0f, 0.0f };
+
+        const Eigen::Affine2f t
+                { Eigen::Translation2f(
+                    translation[0] - frameBufferSize.x() / 2.0f,
+                    translation[1] - frameBufferSize.y() / 2.0f) };
+        const Eigen::Affine2f s { Eigen::Scaling((1.0f / frameBufferSize.x()) * 2.0f, (1.0f / frameBufferSize[1]) * 2.0f) };
+        Eigen::Affine2f inversionScaling;
+        if (!bgfx::getCaps()->originBottomLeft)
+        {
+            // RmlUI structures with the assumption that bottom left is 0,0. We need to manually flip if it is not
+            inversionScaling = Eigen::Scaling(1.0f, -1.0f);
+        }
+        else
+        {
+            inversionScaling = Eigen::Scaling(1.0f, 1.0f);
+        }
+
+        Eigen::Matrix3f m = (inversionScaling * s * t).matrix();
+        bgfx::setUniform(m_Uniforms.m_Transform, m.data());
+    }
+
+    struct CompiledGeometry
+    {
+        bgfx::VertexBufferHandle m_VertexBuffer{BGFX_INVALID_HANDLE};
+        bgfx::IndexBufferHandle m_IndexBuffer{BGFX_INVALID_HANDLE};
+    };
 
     struct
     {
         bgfx::UniformHandle m_Transform{BGFX_INVALID_HANDLE};
     } m_Uniforms;
+
+    Eigen::Vector4i m_ScissorRegion;
+    atlas::resource::AssetPtr<atlas::render::ShaderProgram> m_Program;
+    bgfx::VertexLayout m_RmlVertexLayout{};
+
+    Rml::CompiledGeometryHandle m_CompiledGeometryCounter{};
+    std::unordered_map<Rml::CompiledGeometryHandle, CompiledGeometry> m_CompiledGeometry;
 };
 
 class RmlSystemInterface final : public Rml::SystemInterface
