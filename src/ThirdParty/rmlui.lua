@@ -4,7 +4,7 @@ project "RmlUI"
 		"rmlui.lua",
 		"RmlUi/Include/**",
 		"RmlUi/Source/Core/**",
-		--"RmlUi/Source/Debugger/**",
+		"RmlUi/Source/Debugger/**",
 		--"RmlUi/Source/Lottie/**",
 		--"RmlUi/Source/Lua/**",
 		--"RmlUi/Source/SVG/**",

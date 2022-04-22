@@ -13,6 +13,7 @@
 #include "bgfx/bgfx.h"
 #include "Eigen/Core"
 #include "Eigen/Geometry"
+#include "RmlUi/Debugger/Debugger.h"
 
 class RmlRawDataAsset : public atlas::resource::ResourceAsset
 {
@@ -93,8 +94,7 @@ public:
         m_Program = atlas::resource::ResourceLoader::LoadAsset<
             cpp_conv::resources::registry::CoreBundle,
             atlas::render::ShaderProgram>(cpp_conv::resources::registry::core_bundle::shaders::ui::c_rmlui_basic);
-        m_Uniforms.m_Translation = bgfx::createUniform("u_translation", bgfx::UniformType::Vec4);
-        m_Uniforms.m_FrameBufferSize = bgfx::createUniform("u_frameBufferSize", bgfx::UniformType::Vec4);
+        m_Uniforms.m_Transform = bgfx::createUniform("u_transform", bgfx::UniformType::Mat3);
     }
 
     void RenderGeometry(
@@ -129,10 +129,26 @@ public:
 
         const Eigen::Vector4f translation4F = { translation[0], translation[1], 0.0f, 0.0f };
 
-        bgfx::setUniform(m_Uniforms.m_Translation, translation4F.data());
-        bgfx::setUniform(m_Uniforms.m_FrameBufferSize, frameBufferSize.data());
         bgfx::setState(BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A);
 
+        const Eigen::Affine2f t
+                { Eigen::Translation2f(
+                    translation[0] - frameBufferSize.x() / 2.0f,
+                    translation[1] - frameBufferSize.y() / 2.0f) };
+        const Eigen::Affine2f s { Eigen::Scaling((1.0f / frameBufferSize.x()) * 2.0f, (1.0f / frameBufferSize[1]) * 2.0f) };
+        Eigen::Affine2f inversionScaling;
+        if (!bgfx::getCaps()->originBottomLeft)
+        {
+            // RmlUI structures with the assumption that bottom left is 0,0. We need to manually flip if it is not
+            inversionScaling = Eigen::Scaling(1.0f, -1.0f);
+        }
+        else
+        {
+            inversionScaling = Eigen::Scaling(1.0f, 1.0f);
+        }
+
+        Eigen::Matrix3f m = (inversionScaling * s * t).matrix();
+        bgfx::setUniform(m_Uniforms.m_Transform, m.data());
         bgfx::submit(cpp_conv::constants::render_views::c_ui, m_Program->GetHandle());
     }
 
@@ -178,8 +194,7 @@ private:
 
     struct
     {
-        bgfx::UniformHandle m_Translation{BGFX_INVALID_HANDLE};
-        bgfx::UniformHandle m_FrameBufferSize{BGFX_INVALID_HANDLE};
+        bgfx::UniformHandle m_Transform{BGFX_INVALID_HANDLE};
     } m_Uniforms;
 };
 
@@ -350,6 +365,8 @@ void cpp_conv::UIControllerSystem::Initialise(atlas::scene::EcsManager& ecsManag
     Rml::SetRenderInterface(m_RenderInterface.get());
 
     Rml::Initialise();
+
+    Rml::Debugger::SetVisible(true);
 
     auto [width, height] = atlas::app_host::Application::Get().GetAppDimensions();
 

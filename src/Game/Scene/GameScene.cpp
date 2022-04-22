@@ -188,8 +188,8 @@ void cpp_conv::GameScene::ConstructFrameGraph()
     bgfx::ViewId order[] =
     {
         render_views::c_geometry,
-        render_views::c_ui,
         render_views::c_postProcess,
+        render_views::c_ui,
     };
     bgfx::setViewOrder(0, BX_COUNTOF(order), order);
 
@@ -210,7 +210,7 @@ void cpp_conv::GameScene::ConstructFrameGraph()
             bgfx::setViewClear(render_views::c_ui, 0);
             bgfx::setViewRect(render_views::c_ui, 0, 0, bgfx::BackbufferRatio::Equal);
             bgfx::setViewMode(render_views::c_ui, bgfx::ViewMode::Sequential);
-            bgfx::setViewFrameBuffer(render_views::c_ui, m_RenderSystems.m_GBuffer.GetHandle());
+            bgfx::setViewFrameBuffer(render_views::c_ui, BGFX_INVALID_HANDLE);
 
             bgfx::setViewName(render_views::c_postProcess, "OutputView");
             bgfx::setViewClear(render_views::c_postProcess, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x322e3dFF);
