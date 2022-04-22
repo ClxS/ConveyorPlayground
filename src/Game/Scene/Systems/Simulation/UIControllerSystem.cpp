@@ -116,7 +116,7 @@ public:
         bgfx::TransientIndexBuffer ib{};
 
         allocTransientVertexBuffer(&vb, numVertices, m_RmlVertexLayout);
-        allocTransientIndexBuffer(&ib, numIndices);
+        allocTransientIndexBuffer(&ib, numIndices, true);
 
         std::memcpy(vb.data, vertices, m_RmlVertexLayout.getSize(numVertices));
         std::memcpy(ib.data, indices, numIndices * sizeof(int));
