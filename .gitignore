@@ -40,3 +40,5 @@ generated
 !premake5.exe
 
 temp/
+
+CookFast.bat

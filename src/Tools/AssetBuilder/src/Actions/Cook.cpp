@@ -13,16 +13,24 @@
 #include "AssetTree.h"
 
 
-void cookAssets(const AssetTree::TreeNode& node, const std::filesystem::path& dataRoot, const std::filesystem::path& outputRoot)
+void cookAssets(const std::vector<std::string>& types, const AssetTree::TreeNode& node, const std::filesystem::path& dataRoot, const std::filesystem::path& outputRoot)
 {
     for(auto& group : node.m_ChildNodes)
     {
-        cookAssets(*group, dataRoot, outputRoot);
+        cookAssets(types, *group, dataRoot, outputRoot);
     }
 
     for(const auto& asset : node.m_Assets)
     {
         assert(asset.m_pAssociatedHandler);
+
+        if (!types.empty())
+        {
+            if (std::ranges::find(types, asset.m_Type) == types.end())
+            {
+                continue;
+            }
+        }
 
         std::filesystem::path outputPath = outputRoot / asset.m_pAssociatedHandler->GetAssetRelativeOutputPath(asset);
         if (!exists(outputPath.parent_path()) && !create_directories(outputPath.parent_path()))
@@ -68,7 +76,7 @@ ExitCode asset_builder::actions::cook(const Arguments& args)
     const AssetTree tree = AssetTree::CreateFromFileStructure(args.m_DataRoot.m_Value, args.m_Platform.m_Value);
     for(auto& group : tree.GetRoot().m_ChildNodes)
     {
-        cookAssets(*group, dataRoot, outputRoot);
+        cookAssets(args.m_Types.m_Value, *group, dataRoot, outputRoot);
     }
 
     return ExitCode::Success;

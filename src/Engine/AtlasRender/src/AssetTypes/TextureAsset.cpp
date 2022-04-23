@@ -22,7 +22,7 @@ namespace
         bimg::imageFree(imageContainer);
     }
 
-    bgfx::TextureHandle loadTexture(
+    std::tuple<bgfx::TextureHandle, uint32_t, uint32_t> loadTexture(
         const atlas::core::FileReader reader,
         const uint64_t flags = BGFX_TEXTURE_NONE|BGFX_SAMPLER_NONE,
         bgfx::TextureInfo* info = nullptr,
@@ -108,11 +108,14 @@ namespace
                 );
         }
 
-        return handle;
+        return std::make_tuple(handle, imageContainer->m_width, imageContainer->m_height);
     }
 }
 
-atlas::render::TextureAsset::TextureAsset(bgfx::TextureHandle textureHandle): m_Texture{textureHandle}
+atlas::render::TextureAsset::TextureAsset(bgfx::TextureHandle textureHandle, const uint32_t width, const uint32_t height)
+    : m_Texture{textureHandle}
+    , m_Width{width}
+    , m_Height{height}
 {
 }
 
@@ -126,11 +129,11 @@ atlas::resource::AssetPtr<atlas::resource::ResourceAsset> atlas::render::texture
     const resource::FileData& data)
 {
     const core::FileReader reader{ data.m_pData.get(), data.m_Size };
-    const auto handle = loadTexture(reader);
-    if (!isValid(handle))
+    const auto [handle, width, height] = loadTexture(reader);
+    if (!bgfx::isValid(handle))
     {
         return nullptr;
     }
 
-    return std::make_shared<TextureAsset>(handle);
+    return std::make_shared<TextureAsset>(handle, width, height);
 }

@@ -2,7 +2,7 @@
 * Default styles for all the basic elements.
 */
 
-div
+div, button
 {
 	display: block;
 }
@@ -65,18 +65,8 @@ thead, tbody, tfoot {
 	display: table-row-group;
 }
 
-body {
-	font-family: LatoLatin;
-	font-size: 18px;
-	color: #02475e;
-	background: #fefecc;
-	text-align: center;
-	padding: 2em 1em;
-	position: absolute;
-	border: 2px #ccc;
-	width: 500px;
-	height: 200px;
-	margin: auto;
+html {
+	background:black;
 }
 		
 h1 {
@@ -100,4 +90,71 @@ input.text {
 	box-sizing: border-box;
 	width: 200px;
 	font-size: 0.9em;
+}
+
+body {
+	font-family: LatoLatin;
+	font-size: 18px;
+	text-align: center;
+	width: 100%;
+	height: 100%;
+	margin: auto;
+}
+
+body > table {
+	width:100%;
+	height:100%;
+}
+
+.dis-ib {
+	display:inline-block;
+}
+
+.header-left {
+}
+
+.watermark {
+	decorator: image("assets::ui::icons::watermark");
+	height: 15px;
+	width: 200px;
+	margin: 5px 10px 0 0;
+	opacity: 0.4;
+}
+
+.header-right {
+}
+
+.footer-left {
+}
+
+.footer-right {
+	text-align: right;
+}
+
+button.ui-front-block {
+	decorator: image("assets::ui::icons::backing");
+	height:4em;
+	width: 4em;
+	text-align: center;
+	text-transform: uppercase;
+	position:relative;
+}
+
+.build-button {
+	decorator: image("assets::ui::icons::crafting");
+	height:4em;
+	width: 4em;
+	position:absolute;
+	top:0;
+	left:0;
+}
+
+
+.manage-button {
+	decorator: image("assets::ui::icons::managecolony");
+	height:4em;
+	width: 4em;
+	position:absolute;
+	top:0;
+	left:0;
 }

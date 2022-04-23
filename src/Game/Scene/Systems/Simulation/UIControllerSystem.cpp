@@ -8,6 +8,7 @@
 #include "Constants.h"
 #include "AtlasAppHost/Application.h"
 #include "AtlasRender/AssetTypes/ShaderAsset.h"
+#include "AtlasRender/AssetTypes/TextureAsset.h"
 #include "AtlasResource/ResourceAsset.h"
 #include "AtlasResource/ResourceLoader.h"
 #include "bgfx/bgfx.h"
@@ -91,10 +92,14 @@ public:
         .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
         .end();
 
-        m_Program = atlas::resource::ResourceLoader::LoadAsset<
+        m_TexturedProgram = atlas::resource::ResourceLoader::LoadAsset<
             cpp_conv::resources::registry::CoreBundle,
-            atlas::render::ShaderProgram>(cpp_conv::resources::registry::core_bundle::shaders::ui::c_rmlui_basic);
-        m_Uniforms.m_Transform = bgfx::createUniform("u_transform", bgfx::UniformType::Mat3);
+        atlas::render::ShaderProgram>(cpp_conv::resources::registry::core_bundle::shaders::ui::c_rmlui_basic_textured);
+        m_UntexturedProgram = atlas::resource::ResourceLoader::LoadAsset<
+            cpp_conv::resources::registry::CoreBundle,
+            atlas::render::ShaderProgram>(cpp_conv::resources::registry::core_bundle::shaders::ui::c_rmlui_basic_untextured);
+        m_Uniforms.m_Transform = createUniform("u_transform", bgfx::UniformType::Mat3);
+        m_Uniforms.m_Sampler = createUniform("s_texColor", bgfx::UniformType::Sampler);
     }
 
     Rml::CompiledGeometryHandle CompileGeometry(Rml::Vertex* vertices, const int numVertices, int* indices, const int numIndices, Rml::TextureHandle texture) override
@@ -112,7 +117,8 @@ public:
         m_CompiledGeometry[handle] =
         {
             vertexBuffer,
-            indexBuffer
+            indexBuffer,
+            texture
         };
 
         return handle;
@@ -131,8 +137,28 @@ public:
         SetTransformUniform(translation);
         bgfx::setVertexBuffer(0, geometry.second.m_VertexBuffer);
         bgfx::setIndexBuffer(geometry.second.m_IndexBuffer);
-        bgfx::setState(BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A);
-        bgfx::submit(cpp_conv::constants::render_views::c_ui, m_Program->GetHandle());
+        bgfx::setState(0
+            | BGFX_STATE_WRITE_RGB
+            | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA)
+            );
+
+        if (geometry.second.m_Texture)
+        {
+            const auto textureIter = m_Textures.find(geometry.second.m_Texture);
+            if (textureIter == m_Textures.end())
+            {
+                bgfx::submit(cpp_conv::constants::render_views::c_ui, m_UntexturedProgram->GetHandle());
+            }
+            else
+            {
+                bgfx::setTexture(0, m_Uniforms.m_Sampler, textureIter->second.m_Handle);
+                bgfx::submit(cpp_conv::constants::render_views::c_ui, m_TexturedProgram->GetHandle());
+            }
+        }
+        else
+        {
+            bgfx::submit(cpp_conv::constants::render_views::c_ui, m_UntexturedProgram->GetHandle());
+        }
     }
 
     void ReleaseCompiledGeometry(const Rml::CompiledGeometryHandle geometryHandle) override
@@ -146,6 +172,7 @@ public:
         const auto& geometry = *geometryIter;
         destroy(geometry.second.m_VertexBuffer);
         destroy(geometry.second.m_IndexBuffer);
+        m_CompiledGeometry.erase(geometryIter);
     }
 
     void RenderGeometry(
@@ -153,10 +180,10 @@ public:
         const int numVertices,
         int* indices,
         const int numIndices,
-        Rml::TextureHandle texture,
+        const Rml::TextureHandle texture,
         const Rml::Vector2f& translation) override
     {
-        if (!m_Program ||
+        if (!m_TexturedProgram ||
             getAvailTransientVertexBuffer(numVertices, m_RmlVertexLayout) != static_cast<uint32_t>(numVertices) ||
             bgfx::getAvailTransientIndexBuffer(numIndices, true) != static_cast<uint32_t>(numIndices))
         {
@@ -175,8 +202,25 @@ public:
         SetTransformUniform(translation);
         setVertexBuffer(0, &vb);
         setIndexBuffer(&ib);
-        bgfx::setState(BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A);
-        bgfx::submit(cpp_conv::constants::render_views::c_ui, m_Program->GetHandle());
+        bgfx::setState(BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_BLEND_ALPHA);
+
+        if (texture)
+        {
+            const auto textureIter = m_Textures.find(texture);
+            if (textureIter == m_Textures.end())
+            {
+                bgfx::submit(cpp_conv::constants::render_views::c_ui, m_UntexturedProgram->GetHandle());
+            }
+            else
+            {
+                bgfx::setTexture(0, m_Uniforms.m_Sampler, textureIter->second.m_Handle);
+                bgfx::submit(cpp_conv::constants::render_views::c_ui, m_TexturedProgram->GetHandle());
+            }
+        }
+        else
+        {
+            bgfx::submit(cpp_conv::constants::render_views::c_ui, m_UntexturedProgram->GetHandle());
+        }
     }
 
     void SetScissorRegion(const int x, const int y, const int width, const int height) override
@@ -184,18 +228,88 @@ public:
         m_ScissorRegion = { x, y, width, height };
     }
 
-    bool LoadTexture(Rml::TextureHandle& texture_handle, Rml::Vector2i& texture_dimensions, const Rml::String& source) override
+    bool LoadTexture(Rml::TextureHandle& textureHandle, Rml::Vector2i& textureDimensions, const Rml::String& source) override
     {
-        return true;
+        const auto id = atlas::resource::ResourceLoader::LookupId(source);
+        if (!id.has_value())
+        {
+            return false;
+        }
+
+        const auto texture = atlas::resource::ResourceLoader::LoadAsset<atlas::render::TextureAsset>(id.value());
+        if (!texture)
+        {
+            return false;
+        }
+
+        const auto handle = ++m_TextureCounter;
+        m_Textures[handle] =
+        {
+            texture,
+            texture->GetHandle(),
+            texture->GetWidth(),
+            texture->GetHeight()
+        };
+
+        textureDimensions = { static_cast<int>(texture->GetWidth()), static_cast<int>(texture->GetHeight()) };
+        textureHandle = handle;
+        return handle;
     }
 
-    bool GenerateTexture(Rml::TextureHandle& texture_handle, const Rml::byte* source, const Rml::Vector2i& source_dimensions) override
+    bool GenerateTexture(Rml::TextureHandle& textureHandle, const Rml::byte* source, const Rml::Vector2i& sourceDimensions) override
     {
-        return true;
+        constexpr uint32_t c_stride = 4;
+        const uint32_t size = c_stride * sourceDimensions.x * sourceDimensions.y;
+
+        if (!bgfx::isTextureValid(0, false, 1, bgfx::TextureFormat::RGBA8, 0) )
+        {
+            return false;
+        }
+
+        const bgfx::Memory* mem = bgfx::alloc(size);
+        std::memcpy(mem->data, source, mem->size);
+
+        const auto texHandle = bgfx::createTexture2D(
+                  static_cast<uint16_t>(sourceDimensions.x),
+                  static_cast<uint16_t>(sourceDimensions.y),
+                  false,
+                  1,
+                  bgfx::TextureFormat::RGBA8,
+                  0,
+                  mem);
+
+        if (!bgfx::isValid(texHandle))
+        {
+            return false;
+        }
+
+        const auto handle = ++m_TextureCounter;
+        m_Textures[handle] =
+        {
+            nullptr,
+            texHandle,
+            static_cast<uint32_t>(sourceDimensions.x),
+            static_cast<uint32_t>(sourceDimensions.y)
+        };
+
+        textureHandle = handle;
+        return handle;
     }
 
-    void ReleaseTexture(Rml::TextureHandle texture) override
+    void ReleaseTexture(const Rml::TextureHandle texture) override
     {
+        const auto textureIter = m_Textures.find(texture);
+        if (textureIter == m_Textures.end())
+        {
+            return;
+        }
+
+        if (!textureIter->second.m_Asset)
+        {
+            destroy(textureIter->second.m_Handle);
+        }
+
+        m_Textures.erase(textureIter);
     }
 
     void EnableScissorRegion(const bool enable) override
@@ -244,19 +358,33 @@ private:
     {
         bgfx::VertexBufferHandle m_VertexBuffer{BGFX_INVALID_HANDLE};
         bgfx::IndexBufferHandle m_IndexBuffer{BGFX_INVALID_HANDLE};
+        Rml::TextureHandle m_Texture{};
+    };
+
+    struct Texture
+    {
+        atlas::resource::AssetPtr<atlas::render::TextureAsset> m_Asset{};
+        bgfx::TextureHandle m_Handle{};
+        uint32_t m_Width{};
+        uint32_t m_Height{};
     };
 
     struct
     {
         bgfx::UniformHandle m_Transform{BGFX_INVALID_HANDLE};
+        bgfx::UniformHandle m_Sampler{BGFX_INVALID_HANDLE};
     } m_Uniforms;
 
     Eigen::Vector4i m_ScissorRegion;
-    atlas::resource::AssetPtr<atlas::render::ShaderProgram> m_Program;
+    atlas::resource::AssetPtr<atlas::render::ShaderProgram> m_TexturedProgram;
+    atlas::resource::AssetPtr<atlas::render::ShaderProgram> m_UntexturedProgram;
     bgfx::VertexLayout m_RmlVertexLayout{};
 
     Rml::CompiledGeometryHandle m_CompiledGeometryCounter{};
     std::unordered_map<Rml::CompiledGeometryHandle, CompiledGeometry> m_CompiledGeometry;
+
+    Rml::TextureHandle m_TextureCounter{};
+    std::unordered_map<Rml::TextureHandle, Texture> m_Textures;
 };
 
 class RmlSystemInterface final : public Rml::SystemInterface
