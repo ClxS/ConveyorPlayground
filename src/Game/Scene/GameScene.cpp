@@ -24,14 +24,20 @@
 #include "ModelComponent.h"
 #include "ModelRenderSystem.h"
 #include "PostProcessSystem.h"
+#include "Storage.h"
+#include "StorageComponent.h"
 #include "AtlasAppHost/Application.h"
 #include "AtlasRender/Renderer.h"
+#include "AtlasResource/ResourceLoader.h"
 
 namespace
 {
-    cpp_conv::components::FactoryComponent& loadFactory(atlas::scene::EcsManager& ecs,
-                                                        const atlas::scene::EntityId& ecsEntity,
-                                                        const cpp_conv::Entity* entity)
+    void loadFactory(
+        cpp_conv::EntityLookupGrid& grid,
+        const Eigen::Vector3i& position,
+        atlas::scene::EcsManager& ecs,
+        const atlas::scene::EntityId& ecsEntity,
+        const cpp_conv::Entity* entity)
     {
         const auto factoryEntity = static_cast<const cpp_conv::Factory*>(entity);
         const auto definition = cpp_conv::resources::getFactoryDefinition(factoryEntity->GetDefinitionId());
@@ -71,7 +77,35 @@ namespace
             factory.m_Recipe = componentRecipe;
         }
 
-        return factory;
+        if (!grid.PlaceEntity(position, factory.m_Size, ecsEntity))
+        {
+            ecs.RemoveEntity(ecsEntity);
+        }
+    }
+
+    void loadStorage(
+        cpp_conv::EntityLookupGrid& grid,
+        const Eigen::Vector3i& position,
+        atlas::scene::EcsManager& ecs,
+        const atlas::scene::EntityId& ecsEntity,
+        const cpp_conv::Entity* entity)
+    {
+        const auto storageEntity = static_cast<const cpp_conv::Storage*>(entity);
+        ecs.AddComponent<cpp_conv::components::NameComponent>(ecsEntity, "Storage");
+        ecs.AddComponent<cpp_conv::components::ModelComponent>(ecsEntity).m_Model = atlas::resource::ResourceLoader::LoadAsset
+            <cpp_conv::resources::registry::CoreBundle,
+            atlas::render::ModelAsset>(cpp_conv::resources::registry::core_bundle::assets::others::c_Barrel);
+
+        auto& storage = ecs.AddComponent<cpp_conv::components::StorageComponent>(ecsEntity);
+        storage.m_ItemContainer.Initialise(
+            storageEntity->GetContainer().GetMaxCapacity(),
+            storageEntity->GetContainer().GetMaxStackSize(),
+            storageEntity->GetContainer().OnlyAllowsUniqueStacks());
+
+        if (!grid.PlaceEntity(position, { 1, 1, 1 }, ecsEntity))
+        {
+            ecs.RemoveEntity(ecsEntity);
+        }
     }
 
     void addCameras(atlas::scene::EcsManager& ecs)
@@ -105,8 +139,25 @@ void cpp_conv::GameScene::OnEntered(atlas::scene::SceneManager& sceneManager)
         m_SceneData.m_LookupGrid.PlaceEntity(position.m_Position, {1, 1, 1}, ecsEntity);
     }
 
+    static std::map<EntityKind, std::function<void(EntityLookupGrid&,
+            const Eigen::Vector3i&,
+            atlas::scene::EcsManager&,
+            const atlas::scene::EntityId&,
+            const Entity*)>> handlers =
+    {
+        {EntityKind::Producer, &loadFactory},
+        {EntityKind::Storage, &loadStorage},
+    };
+
+
     for (const auto& entity : m_InitialisationData.m_Map->GetOtherEntities())
     {
+        auto handlerIt = handlers.find(entity->m_eEntityKind);
+        if (handlerIt == handlers.end())
+        {
+            continue;
+        }
+
         const auto ecsEntity = ecs.AddEntity();
         ecs.AddComponent<components::WorldEntityInformationComponent>(ecsEntity, entity->m_eEntityKind);
         const auto& position = ecs.AddComponent<components::PositionComponent>(
@@ -114,24 +165,7 @@ void cpp_conv::GameScene::OnEntered(atlas::scene::SceneManager& sceneManager)
             Eigen::Vector3i(entity->m_position.x(), entity->m_position.y(), entity->m_position.z()));
         ecs.AddComponent<components::DirectionComponent>(ecsEntity, entity->m_Direction);
 
-        switch (entity->m_eEntityKind)
-        {
-        case EntityKind::Producer:
-            {
-                const auto& factory = loadFactory(ecs, ecsEntity, entity);
-                if (!m_SceneData.m_LookupGrid.PlaceEntity(position.m_Position, factory.m_Size, ecsEntity))
-                {
-                    ecs.RemoveEntity(ecsEntity);
-                }
-            }
-            break;
-        default:
-            if (!m_SceneData.m_LookupGrid.PlaceEntity(position.m_Position, {1, 1, 1}, ecsEntity))
-            {
-                ecs.RemoveEntity(ecsEntity);
-            }
-            break;
-        }
+        (*handlerIt).second(m_SceneData.m_LookupGrid, position.m_Position, ecs, ecsEntity, entity);
     }
 
     addCameras(ecs);

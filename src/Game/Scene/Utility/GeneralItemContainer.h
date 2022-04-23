@@ -9,7 +9,14 @@ namespace cpp_conv
     class GeneralItemContainer
     {
     public:
+        GeneralItemContainer()
+            : m_uiMaxCapacity{0}
+            , m_uiMaxStackSize{0}
+            , m_bUniqueStacksOnly{false}
+        {
+        }
         GeneralItemContainer(uint32_t uiMaxCapacity, uint32_t uiMaxStackSize, bool bUniqueStacksOnly);
+        void Initialise(uint32_t uiMaxCapacity, uint32_t uiMaxStackSize, bool bUniqueStacksOnly);
 
         struct ItemEntry
         {
@@ -28,6 +35,10 @@ namespace cpp_conv
         [[nodiscard]] const std::vector<ItemEntry>& GetItems() const { return m_vItemEntries; }
 
         [[nodiscard]] std::string GetDescription() const;
+
+        [[nodiscard]] uint32_t GetMaxCapacity() const { return m_uiMaxCapacity; }
+        [[nodiscard]] uint32_t GetMaxStackSize() const { return m_uiMaxStackSize; }
+        [[nodiscard]] bool OnlyAllowsUniqueStacks() const { return m_bUniqueStacksOnly; }
 
     private:
         uint32_t m_uiMaxCapacity;

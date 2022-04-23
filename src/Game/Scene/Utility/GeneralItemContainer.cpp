@@ -6,12 +6,21 @@
 #include "ItemRegistry.h"
 #include "Profiler.h"
 
-cpp_conv::GeneralItemContainer::GeneralItemContainer(uint32_t uiMaxCapacity, uint32_t uiMaxStackSize,
-                                                     bool bUniqueStacksOnly)
+cpp_conv::GeneralItemContainer::GeneralItemContainer(
+    const uint32_t uiMaxCapacity,
+    const uint32_t uiMaxStackSize,
+    const bool bUniqueStacksOnly)
     : m_uiMaxCapacity(uiMaxCapacity)
       , m_uiMaxStackSize(uiMaxStackSize)
       , m_bUniqueStacksOnly(bUniqueStacksOnly)
 {
+}
+
+void cpp_conv::GeneralItemContainer::Initialise(const uint32_t uiMaxCapacity, const uint32_t uiMaxStackSize, const bool bUniqueStacksOnly)
+{
+    m_uiMaxCapacity = uiMaxCapacity;
+    m_uiMaxStackSize = uiMaxStackSize;
+    m_bUniqueStacksOnly = bUniqueStacksOnly;
 }
 
 bool cpp_conv::GeneralItemContainer::TryTake(bool bSingle, std::tuple<ItemId, uint32_t>& outItem)

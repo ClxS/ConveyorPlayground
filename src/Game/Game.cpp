@@ -20,6 +20,7 @@
 #include "RecipeRegistry.h"
 #include "SDLTileLoadHandler.h"
 #include "SequenceComponent.h"
+#include "StorageComponent.h"
 #include "WorldEntityInformationComponent.h"
 #include "AtlasGame/GameHost.h"
 #include "AtlasRender/AssetTypes/ModelAsset.h"
@@ -48,6 +49,7 @@ void registerComponents()
     ComponentRegistry::RegisterComponent<SequenceComponent>();
     ComponentRegistry::RegisterComponent<ModelComponent>();
     ComponentRegistry::RegisterComponent<WorldEntityInformationComponent>();
+    ComponentRegistry::RegisterComponent<StorageComponent>();
 }
 
 void registerAssetBundles()

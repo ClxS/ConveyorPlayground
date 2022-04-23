@@ -6,6 +6,7 @@
 #include "DirectionComponent.h"
 #include "FactoryComponent.h"
 #include "PositionComponent.h"
+#include "StorageComponent.h"
 #include "WorldEntityInformationComponent.h"
 
 namespace
@@ -192,13 +193,32 @@ bool tryInsertItemFactory(
     return false;
 }
 
+bool tryInsertItemStorage(
+    atlas::scene::EcsManager& ecs,
+    const cpp_conv::EntityLookupGrid& grid,
+    const atlas::scene::EntityId sourceEntity,
+    const atlas::scene::EntityId targetEntity,
+    const cpp_conv::ItemId& itemId,
+    std::optional<int> sourceChannel,
+    const std::optional<Eigen::Vector2f>& startPosition)
+{
+    auto& storage = ecs.GetComponent<cpp_conv::components::StorageComponent>(targetEntity);
+    if (!storage.m_ItemContainer.TryInsert(itemId))
+    {
+        return false;
+    }
+
+    return true;
+}
+
 bool cpp_conv::item_passing_utility::entitySupportsInsertion(
     const atlas::scene::EcsManager& ecs,
     const atlas::scene::EntityId targetEntity)
 {
     return
         ecs.DoesEntityHaveComponent<components::ConveyorComponent>(targetEntity) ||
-        ecs.DoesEntityHaveComponent<components::FactoryComponent>(targetEntity);
+        ecs.DoesEntityHaveComponent<components::FactoryComponent>(targetEntity) ||
+        ecs.DoesEntityHaveComponent<components::StorageComponent>(targetEntity);
 }
 
 bool cpp_conv::item_passing_utility::tryInsertItem(
@@ -218,6 +238,11 @@ bool cpp_conv::item_passing_utility::tryInsertItem(
     if (ecs.DoesEntityHaveComponent<components::FactoryComponent>(targetEntity))
     {
         return tryInsertItemFactory(ecs, grid, sourceEntity, targetEntity, itemId, sourceChannel, startPosition);
+    }
+
+    if (ecs.DoesEntityHaveComponent<components::StorageComponent>(targetEntity))
+    {
+        return tryInsertItemStorage(ecs, grid, sourceEntity, targetEntity, itemId, sourceChannel, startPosition);
     }
 
     return false;
