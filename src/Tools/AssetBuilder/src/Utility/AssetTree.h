@@ -16,7 +16,7 @@ public:
 
         [[nodiscard]] bool Exists(const std::filesystem::path& path) const;
 
-        void AddAsset(const std::filesystem::path& fullPath, const std::filesystem::path& relative, AssetHandler* assetHandler);
+        void AddAsset(const std::filesystem::path& fullPath, const std::filesystem::path& relative, AssetHandler* assetHandler, const std::string& type);
 
         std::filesystem::path m_Path;
         std::filesystem::path m_FullPath;

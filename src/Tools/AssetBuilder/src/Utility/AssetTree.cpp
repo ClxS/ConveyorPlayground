@@ -43,9 +43,9 @@ bool AssetTree::TreeNode::Exists(const std::filesystem::path& path) const
 }
 
 void AssetTree::TreeNode::AddAsset(const std::filesystem::path& fullPath, const std::filesystem::path& relative,
-    AssetHandler* assetHandler)
+    AssetHandler* assetHandler, const std::string& type)
 {
-    m_Assets.push_back({ fullPath, relative, assetHandler });
+    m_Assets.push_back({ fullPath, relative, assetHandler, type });
 }
 
 AssetTree::AssetTree(std::filesystem::path rootPath)
@@ -107,10 +107,10 @@ AssetTree AssetTree::CreateFromFileStructure(const std::string& root, const std:
                     const bool isMetadata = relativePath.has_extension() && relativePath.extension() == ".metadata";
                     if (isMetadata)
                     {
-                        auto handler = AssetProcessor::getAssetFileHandler(entry);
+                        auto [handler, type] = AssetProcessor::getAssetFileHandler(entry);
                         if (handler)
                         {
-                            node.AddAsset(entry, relativePath, handler);
+                            node.AddAsset(entry, relativePath, handler, type);
                         }
                         else
                         {

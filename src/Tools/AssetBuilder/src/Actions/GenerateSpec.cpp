@@ -75,7 +75,7 @@ namespace
             writeGroup(outStream, *group, depth + 1, index);
         }
 
-        for(const auto& [fullPath, relativePath, _] : node.m_Assets)
+        for(const auto& [fullPath, relativePath, _1, _2] : node.m_Assets)
         {
             outStream
                 << std::string((depth + 1) * 4, ' ')
@@ -88,7 +88,7 @@ namespace
         if (!node.m_Assets.empty())
         {
             outStream << std::string((depth + 1) * 4, ' ') << "inline constexpr std::array<atlas::resource::RegistryId, " << node.m_Assets.size() << "> c_AllAssets {{ \n";
-            for(const auto& [fullPath, relativePath, _] : node.m_Assets)
+            for(const auto& [fullPath, relativePath, _1, _2] : node.m_Assets)
             {
                 outStream << std::string((depth + 2) * 4, ' ') << "c_" << sanitizeAssetNameForVariable(relativePath) << ",\n";
             }

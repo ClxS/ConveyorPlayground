@@ -14,7 +14,7 @@
 
 ExitCode mainImpl(const int argc, char **argv)
 {
-    Arguments args;
+    const Arguments args;
     if (!args.TryRead(argc, argv))
     {
         std::cerr << "Failed to read arguments\n";

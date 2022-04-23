@@ -12,5 +12,5 @@ namespace AssetProcessor
         registerHandler(T::GetAssetTag(), std::move(std::make_unique<T>()));
     }
 
-    AssetHandler* getAssetFileHandler(const std::filesystem::path& path);
+    std::tuple<AssetHandler*, std::string> getAssetFileHandler(const std::filesystem::path& path);
 }

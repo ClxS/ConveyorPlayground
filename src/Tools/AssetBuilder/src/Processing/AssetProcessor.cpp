@@ -33,13 +33,13 @@ void AssetProcessor::registerHandler(const std::string& key, std::unique_ptr<Ass
     s_handlers[key] = std::move(pHandler);
 }
 
-AssetHandler* AssetProcessor::getAssetFileHandler(const std::filesystem::path& path)
+std::tuple<AssetHandler*, std::string> AssetProcessor::getAssetFileHandler(const std::filesystem::path& path)
 {
     std::ifstream file;
     file.open(path, std::ios::binary | std::ios::ate);
     if (file.fail())
     {
-        return nullptr;
+        return { nullptr, "" };
     }
 
     // ReSharper disable once CppRedundantCastExpression
@@ -50,7 +50,7 @@ AssetHandler* AssetProcessor::getAssetFileHandler(const std::filesystem::path& p
 
     if (uiLength == 0)
     {
-        return nullptr;
+        return { nullptr, "" };
     }
 
     const std::unique_ptr<uint8_t[]> pData(new uint8_t[uiLength]);
@@ -62,21 +62,21 @@ AssetHandler* AssetProcessor::getAssetFileHandler(const std::filesystem::path& p
     if (!table)
     {
         std::cerr << std::format("Failed to read TOML: {} - {}\n", errors, path.string());
-        return nullptr;
+        return { nullptr, "" };
     }
 
     auto keys = table->keys();
     if (keys.size() != 1)
     {
         std::cerr << std::format("Resource metadata tables can only contain a maximum of 1 root level keys. File {} contains {}\n", path.string(), keys.size());
-        return nullptr;
+        return { nullptr, "" };
     }
 
     const auto handlerIt = s_handlers.find(keys[0]);
     if (handlerIt == s_handlers.end())
     {
-        return nullptr;
+        return { nullptr, "" };
     }
 
-    return (*handlerIt).second.get();
+    return { (*handlerIt).second.get(), keys[0] };
 }
