@@ -1,11 +1,13 @@
 #pragma once
+#include <Eigen/Core>
 
-namespace cpp_conv::math_helpers
+namespace atlas::maths_helpers
 {
     constexpr float c_pi = 3.14159265358979323846f;
 
-    struct Angle
+    class Angle
     {
+    public:
         [[nodiscard]] float AsRadians() const { return m_Value; }
         [[nodiscard]] float AsDegrees() const { return m_Value * (180.0f / c_pi); }
 
@@ -40,14 +42,23 @@ namespace cpp_conv::math_helpers
     private:
         float m_Value{};
     };
+
+    Eigen::Matrix4f createLookAtMatrix(const Eigen::Vector3f& eye, const Eigen::Vector3f& target, const Eigen::Vector3f& inUp, bool leftHanded = true);
+    Eigen::Matrix4f createProjectionMatrix(
+        Angle fovY,
+        float aspectRatio,
+        float near,
+        float far,
+        bool homogenousDepth,
+        bool leftHanded = true);
 }
 
-inline cpp_conv::math_helpers::Angle operator ""_radians(long double value)
+inline atlas::maths_helpers::Angle operator ""_radians(long double value)
 {
-    return cpp_conv::math_helpers::Angle::FromRadians(static_cast<float>(value));
+    return atlas::maths_helpers::Angle::FromRadians(static_cast<float>(value));
 }
 
-inline cpp_conv::math_helpers::Angle operator ""_degrees(long double value)
+inline atlas::maths_helpers::Angle operator ""_degrees(long double value)
 {
-    return cpp_conv::math_helpers::Angle::FromDegrees(static_cast<float>(value));
+    return atlas::maths_helpers::Angle::FromDegrees(static_cast<float>(value));
 }

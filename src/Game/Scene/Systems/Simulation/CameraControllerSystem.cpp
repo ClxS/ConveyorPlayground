@@ -1,12 +1,10 @@
 #include "CameraControllerSystem.h"
 
 #include "CameraComponent.h"
-#include "SDL_events.h"
 #include "AtlasScene/ECS/Components/EcsManager.h"
 #include "SDL_mouse.h"
 #include "SDL_keyboard.h"
 #include "AtlasAppHost/Application.h"
-#include "bgfx/bgfx.h"
 #include "bx/math.h"
 
 namespace
@@ -17,7 +15,7 @@ namespace
 
     std::tuple<Eigen::Vector3f, Eigen::Vector3f> getForwardAndRight(
         const cpp_conv::components::LookAtCamera& camera,
-        const Eigen::Vector3f up = { 0.0f, 1.0f, 0.0f })
+        const Eigen::Vector3f& up = { 0.0f, 1.0f, 0.0f })
     {
         Eigen::Matrix3f cameraRotation;
         cameraRotation =
@@ -38,7 +36,6 @@ namespace
         static int previousMouseX = 0;
         static int previousMouseY = 0;
 
-        using namespace cpp_conv::math_helpers;
         int mouseX, mouseY;
 
         const Uint8* keyboardState = SDL_GetKeyboardState(nullptr);
@@ -47,8 +44,8 @@ namespace
         {
             const int deltaX = mouseX - previousMouseX;
             const int deltaY = mouseY- previousMouseY;
-            camera.m_Yaw += Angle::FromRadians(static_cast<float>(deltaX) * c_rotationScaling);
-            camera.m_Pitch += Angle::FromRadians(static_cast<float>(deltaY) * c_rotationScaling);
+            camera.m_Yaw += atlas::maths_helpers::Angle::FromRadians(static_cast<float>(deltaX) * c_rotationScaling);
+            camera.m_Pitch += atlas::maths_helpers::Angle::FromRadians(static_cast<float>(deltaY) * c_rotationScaling);
         }
         else if ((buttons & SDL_BUTTON(SDL_BUTTON_MIDDLE)) != 0)
         {

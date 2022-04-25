@@ -20,7 +20,6 @@
 #include "SequenceProcessingSystem.h"
 #include "StandaloneConveyorSystem.h"
 #include "WorldEntityInformationComponent.h"
-#include "MathHelpers.h"
 #include "ModelComponent.h"
 #include "ModelRenderSystem.h"
 #include "PostProcessSystem.h"
@@ -219,14 +218,13 @@ void cpp_conv::GameScene::ConstructSystems(atlas::scene::SystemsBuilder& builder
 void cpp_conv::GameScene::ConstructFrameGraph()
 {
     using namespace constants;
-    bgfx::ViewId order[] =
+    const bgfx::ViewId order[] =
     {
         render_views::c_geometry,
         render_views::c_postProcess,
         render_views::c_ui,
     };
     bgfx::setViewOrder(0, BX_COUNTOF(order), order);
-
 
     atlas::render::addToFrameGraph("SetPrimaryRenderTargets",
         [this]()

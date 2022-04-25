@@ -26,82 +26,6 @@ namespace bgfx
     extern const char* getAttribName(Attrib::Enum _attr);
 }
 
-namespace
-{
-    struct ConveyorPosition
-    {
-        Eigen::Vector3f m_Position;
-        cpp_conv::math_helpers::Angle m_Rotation;
-    };
-
-    void drawNonInstanced(
-        const atlas::resource::AssetPtr<atlas::render::ModelAsset>& model,
-        const atlas::resource::AssetPtr<atlas::render::ShaderProgram>& program,
-        const std::vector<ConveyorPosition> positions)
-    {
-        for(const auto& segment : model->GetMesh()->GetSegments())
-        {
-            for(auto& [position, rotation]: positions)
-            {
-                Eigen::Affine3f t{Eigen::Translation3f(position.x(), position.y(), position.z())};
-                Eigen::Affine3f r{Eigen::AngleAxisf(rotation.AsRadians(), Eigen::Vector3f(0, 1, 0))};
-                Eigen::Matrix4f m = (t * r).matrix();
-                bgfx::setTransform(m.data());
-
-                setVertexBuffer(0, segment.m_VertexBuffer);
-                setIndexBuffer(segment.m_IndexBuffer);
-
-                int textureIndex = 0;
-                for(const auto& texture : model->GetTextures())
-                {
-                    setTexture(textureIndex++, texture.m_Sampler, texture.m_Texture->GetHandle());
-                }
-
-                submit(cpp_conv::constants::render_views::c_geometry, program->GetHandle());
-            }
-        }
-    }
-
-    void drawInstanced(
-        const atlas::resource::AssetPtr<atlas::render::ModelAsset>& model,
-        const atlas::resource::AssetPtr<atlas::render::ShaderProgram>& program,
-        const std::vector<ConveyorPosition> positions)
-    {
-        constexpr uint16_t instanceStride = sizeof(Eigen::Matrix4f);
-
-        const uint32_t totalPositions = static_cast<uint32_t>(positions.size());
-        const uint32_t numDrawableInstances = bgfx::getAvailInstanceDataBuffer(totalPositions, instanceStride);
-
-        bgfx::InstanceDataBuffer idb;
-        bgfx::allocInstanceDataBuffer(&idb, numDrawableInstances, instanceStride);
-
-        // TODO Log how many entities couldn't be drawn
-        for (uint32_t i = 0; i < numDrawableInstances; ++i)
-        {
-            auto& [position, rotation] = positions[i];
-            Eigen::Affine3f t{Eigen::Translation3f(position.x(), position.y(), position.z())};
-            Eigen::Affine3f r{Eigen::AngleAxisf(rotation.AsRadians(), Eigen::Vector3f(0, 1, 0))};
-            Eigen::Matrix4f m = (t * r).matrix();
-
-            std::memcpy(&(idb.data[i * instanceStride]), m.data(), instanceStride);
-        }
-
-        int textureIndex = 0;
-        for(const auto& texture : model->GetTextures())
-        {
-            setTexture(textureIndex++, texture.m_Sampler, texture.m_Texture->GetHandle());
-        }
-
-        for(const auto& segment : model->GetMesh()->GetSegments())
-        {
-            setVertexBuffer(0, segment.m_VertexBuffer);
-            setIndexBuffer(segment.m_IndexBuffer);
-            setInstanceDataBuffer(&idb);
-            submit(cpp_conv::constants::render_views::c_geometry, program->GetHandle());
-        }
-    }
-}
-
 struct LerpInformation
 {
     Eigen::Vector2f m_PreviousPosition;
@@ -121,12 +45,12 @@ void ConveyorRenderingSystem::Update(atlas::scene::EcsManager& ecs)
     struct ConveyorInstanceSet
     {
         atlas::resource::AssetPtr<atlas::render::ModelAsset> m_Model;
-        std::vector<ConveyorPosition> m_ConveyorPositions;
+        std::vector<Eigen::Matrix4f> m_ConveyorPositions;
     };
 
     std::vector<ConveyorInstanceSet> conveyors;
     std::map<atlas::resource::BundleRegistryId, ConveyorInstanceSet> items;
-    conveyors.reserve(ConveyorType::Max);
+    conveyors.reserve(Max);
     conveyors.emplace_back(atlas::resource::ResourceLoader::LoadAsset<cpp_conv::resources::registry::CoreBundle, atlas::render::ModelAsset>(
     cpp_conv::resources::registry::core_bundle::assets::conveyors::models::c_ConveyorStraight));
     conveyors.emplace_back(atlas::resource::ResourceLoader::LoadAsset<cpp_conv::resources::registry::CoreBundle, atlas::render::ModelAsset>(
@@ -148,9 +72,14 @@ void ConveyorRenderingSystem::Update(atlas::scene::EcsManager& ecs)
         for(int conveyorSlot = 0; conveyorSlot < sequence.m_Length; ++conveyorSlot)
         {
             Eigen::Vector3f positionOffset = sequence.m_UnitDirection * (conveyorSlot);
-            conveyors[ConveyorType::Straight].m_ConveyorPositions.emplace_back(
-                headPosition - positionOffset,
-                cpp_conv::rotationRadiansFromDirection(direction.m_Direction));
+
+            auto translation = headPosition - positionOffset;
+            auto rotation = cpp_conv::rotationRadiansFromDirection(direction.m_Direction);
+            Eigen::Affine3f t{Eigen::Translation3f(translation.x(), translation.y(), translation.z())};
+            Eigen::Affine3f r{Eigen::AngleAxisf(rotation.AsRadians(), Eigen::Vector3f(0, 1, 0))};
+            Eigen::Matrix4f m = (t * r).matrix();
+
+            conveyors[Straight].m_ConveyorPositions.push_back(m);
         }
 
         const float fLerpFactor = sequence.m_CurrentTick / static_cast<float>(sequence.m_MoveTick);
@@ -199,13 +128,13 @@ void ConveyorRenderingSystem::Update(atlas::scene::EcsManager& ecs)
                 if (itemSlot->m_bIsAnimated)
                 {
                     position2d = itemSlot->m_PreviousVisualLocation + ((position2d - itemSlot->m_PreviousVisualLocation) * fLerpFactor);
-                    Eigen::Vector3f finalPosition {position2d.x(), headPosition.y() + 0.1f, position2d.y()};
-                    itemSet.m_ConveyorPositions.emplace_back(finalPosition, cpp_conv::math_helpers::Angle::FromRadians(0));
+                    Eigen::Affine3f t{Eigen::Translation3f(position2d.x(), headPosition.y() + 0.1f, position2d.y())};
+                    itemSet.m_ConveyorPositions.push_back(t.matrix());
                 }
                 else
                 {
-                    Eigen::Vector3f finalPosition {position2d.x(), headPosition.y() + 0.1f, position2d.y()};
-                    itemSet.m_ConveyorPositions.emplace_back(finalPosition, cpp_conv::math_helpers::Angle::FromRadians(0));
+                    Eigen::Affine3f t{Eigen::Translation3f(position2d.x(), headPosition.y() + 0.1f, position2d.y())};
+                    itemSet.m_ConveyorPositions.push_back(t.matrix());
                 }
             }
         }
@@ -222,9 +151,12 @@ void ConveyorRenderingSystem::Update(atlas::scene::EcsManager& ecs)
             cpp_conv::components::DirectionComponent>(entity);
 
         const ConveyorType type = conveyor.m_bIsClockwise ? Clockwise : AntiClockwise;
-        conveyors[type].m_ConveyorPositions.emplace_back(
-                            (position.m_Position).cast<float>(),
-                            cpp_conv::rotationRadiansFromDirection(direction.m_Direction));
+
+        auto translation = (position.m_Position).cast<float>();
+        auto rotation = cpp_conv::rotationRadiansFromDirection(direction.m_Direction);
+        Eigen::Affine3f t{Eigen::Translation3f(translation.x(), translation.y(), translation.z())};
+        Eigen::Affine3f r{Eigen::AngleAxisf(rotation.AsRadians(), Eigen::Vector3f(0, 1, 0))};
+        conveyors[type].m_ConveyorPositions.push_back((t * r).matrix());
 
         const float fLerpFactor = conveyor.m_CurrentTick / static_cast<float>(conveyor.m_MoveTick);
 
@@ -266,58 +198,60 @@ void ConveyorRenderingSystem::Update(atlas::scene::EcsManager& ecs)
                 if (itemSlot->m_bIsAnimated)
                 {
                     position2d = itemSlot->m_PreviousVisualLocation + ((position2d - itemSlot->m_PreviousVisualLocation) * fLerpFactor);
-                    Eigen::Vector3f finalPosition {position2d.x(), position.m_Position.y() + 0.1f, position2d.y()};
-                    itemSet.m_ConveyorPositions.emplace_back(finalPosition, cpp_conv::math_helpers::Angle::FromRadians(0));
+                    Eigen::Affine3f t{Eigen::Translation3f(position2d.x(), position.m_Position.y() + 0.1f, position2d.y())};
+                    itemSet.m_ConveyorPositions.push_back(t.matrix());
                 }
                 else
                 {
-                    Eigen::Vector3f finalPosition {position2d.x(), position.m_Position.y() + 0.1f, position2d.y()};
-                    itemSet.m_ConveyorPositions.emplace_back(finalPosition, cpp_conv::math_helpers::Angle::FromRadians(0));
+                    Eigen::Affine3f t{Eigen::Translation3f(position2d.x(), position.m_Position.y() + 0.1f, position2d.y())};
+                    itemSet.m_ConveyorPositions.push_back(t.matrix());
                 }
             }
         }
     }
 
-    //atlas::render::addToFrameGraph_oneOff("ConveyorRenderer", [conveyors, items]()
+    const bool instancingSupported = 0 != (BGFX_CAPS_INSTANCING & bgfx::getCaps()->supported);
+    for(auto& conveyorType : conveyors)
     {
-        const bool instancingSupported = 0 != (BGFX_CAPS_INSTANCING & bgfx::getCaps()->supported);
-        for(auto& conveyorType : conveyors)
+        if (conveyorType.m_ConveyorPositions.empty())
         {
-            if (conveyorType.m_ConveyorPositions.empty())
-            {
-                continue;
-            }
-
-            if (instancingSupported)
-            {
-                drawInstanced(conveyorType.m_Model, conveyorType.m_Model->GetProgram(), conveyorType.m_ConveyorPositions);
-            }
-            else
-            {
-                // We don't currently support non-instanced platforms
-                assert(false);
-                drawNonInstanced(conveyorType.m_Model, conveyorType.m_Model->GetProgram(), conveyorType.m_ConveyorPositions);
-            }
+            continue;
         }
 
-        for(auto& item : items | std::ranges::views::values)
+        if (instancingSupported)
         {
-            if (item.m_ConveyorPositions.empty())
-            {
-                continue;
-            }
-
-            if (instancingSupported)
-            {
-                drawInstanced(item.m_Model, item.m_Model->GetProgram(), item.m_ConveyorPositions);
-            }
-            else
-            {
-                // We don't currently support non-instanced platforms
-                assert(false);
-                drawNonInstanced(item.m_Model, item.m_Model->GetProgram(), item.m_ConveyorPositions);
-            }
+            atlas::render::drawInstanced(
+                cpp_conv::constants::render_views::c_geometry,
+                conveyorType.m_Model,
+                conveyorType.m_Model->GetProgram(),
+                conveyorType.m_ConveyorPositions);
+        }
+        else
+        {
+            // We don't currently support non-instanced platforms
+            assert(false);
         }
     }
-    //);
+
+    for(auto& item : items | std::ranges::views::values)
+    {
+        if (item.m_ConveyorPositions.empty())
+        {
+            continue;
+        }
+
+        if (instancingSupported)
+        {
+            drawInstanced(
+                cpp_conv::constants::render_views::c_geometry,
+                item.m_Model,
+                item.m_Model->GetProgram(),
+                item.m_ConveyorPositions);
+        }
+        else
+        {
+            // We don't currently support non-instanced platforms
+            assert(false);
+        }
+    }
 }

@@ -2,7 +2,6 @@
 
 #include "Constants.h"
 #include "DirectionComponent.h"
-#include "MathHelpers.h"
 #include "ModelComponent.h"
 #include "PositionComponent.h"
 #include "Transform2D.h"
@@ -20,7 +19,7 @@ void cpp_conv::ModelRenderSystem::Update(atlas::scene::EcsManager& ecs)
 
         assert(0 != (BGFX_CAPS_INSTANCING & bgfx::getCaps()->supported));
 
-        math_helpers::Angle rotation{};
+        atlas::maths_helpers::Angle rotation{};
         if (ecs.DoesEntityHaveComponent<DirectionComponent>(entity))
         {
             const auto& direction = ecs.GetComponent<DirectionComponent>(entity);

@@ -3,8 +3,17 @@
 #include <functional>
 #include <string>
 
+#include <Eigen/Core>
+
+#include "AtlasCore/MathsHelpers.h"
+#include "AtlasResource/AssetPtr.h"
+#include "bgfx/bgfx.h"
+
 namespace atlas::render
 {
+    class ShaderProgram;
+    class ModelAsset;
+
     struct RendererInitArgs
     {
         void* m_WindowHandle;
@@ -18,12 +27,29 @@ namespace atlas::render
         int32_t m_Value;
     };
 
+    struct DrawInstance
+    {
+        Eigen::Vector3f m_Position;
+        maths_helpers::Angle m_Rotation;
+    };
+
     void init(const RendererInitArgs& args);
 
     RenderTaskHandle addToFrameGraph(std::string name, std::function<void()> initiailize, std::function<void()> callback, std::vector<RenderTaskHandle> dependentTasks = {});
     RenderTaskHandle addToFrameGraph(std::string name, std::function<void()> callback, std::vector<RenderTaskHandle> dependentTasks = {});
-
     RenderTaskHandle addToFrameGraph_oneOff(std::string name, std::function<void()> callback, std::vector<RenderTaskHandle> dependentTasks = {});
+
+    void draw(
+        bgfx::ViewId viewId,
+        const resource::AssetPtr<ModelAsset>& model,
+        const resource::AssetPtr<ShaderProgram>& program,
+        const Eigen::Matrix4f& transform);
+
+    void drawInstanced(
+        bgfx::ViewId viewId,
+        const resource::AssetPtr<ModelAsset>& model,
+        const resource::AssetPtr<ShaderProgram>& program,
+        const std::vector<Eigen::Matrix4f>& transforms);
 
     void sync();
 }

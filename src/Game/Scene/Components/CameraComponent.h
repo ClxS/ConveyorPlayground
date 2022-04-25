@@ -1,5 +1,5 @@
 #pragma once
-#include "MathHelpers.h"
+#include "AtlasCore/MathsHelpers.h"
 #include "Eigen/Core"
 #include "Eigen/Geometry"
 
@@ -17,8 +17,8 @@ namespace cpp_conv::components
     {
         Eigen::Vector3f m_Up {0.0f, 1.0f, 0.0f};
         Eigen::Vector3f m_LookAtPoint{7.0f, 0.0f, 0.0f};
-        math_helpers::Angle m_Yaw;
-        math_helpers::Angle m_Pitch;
+        atlas::maths_helpers::Angle m_Yaw;
+        atlas::maths_helpers::Angle m_Pitch;
         float m_Distance;
     };
 
