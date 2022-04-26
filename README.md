@@ -6,8 +6,8 @@ Basic proof of concept thrown together in a couple of hours. Code is messy and n
 
 # Licence
 
-No Licence is currently provided. Code should only be used as reference material.
-This will probably change in the future! :)
+No Licence is currently provided (don't use it!). Code should only be used as reference material.
+This will probably change in the future!
 
 # Build Process
 
