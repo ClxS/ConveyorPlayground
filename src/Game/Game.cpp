@@ -26,6 +26,7 @@
 #include "AtlasRender/AssetTypes/ModelAsset.h"
 #include "AtlasRender/AssetTypes/ShaderAsset.h"
 #include "AtlasRender/AssetTypes/TextureAsset.h"
+#include "Lighting/DirectionalLightComponent.h"
 
 #undef max
 #undef min
@@ -50,6 +51,7 @@ void registerComponents()
     ComponentRegistry::RegisterComponent<ModelComponent>();
     ComponentRegistry::RegisterComponent<WorldEntityInformationComponent>();
     ComponentRegistry::RegisterComponent<StorageComponent>();
+    ComponentRegistry::RegisterComponent<DirectionalLightComponent>();
 }
 
 void registerAssetBundles()

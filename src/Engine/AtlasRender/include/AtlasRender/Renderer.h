@@ -43,13 +43,15 @@ namespace atlas::render
         bgfx::ViewId viewId,
         const resource::AssetPtr<ModelAsset>& model,
         const resource::AssetPtr<ShaderProgram>& program,
-        const Eigen::Matrix4f& transform);
+        const Eigen::Matrix4f& transform,
+        uint8_t flags = BGFX_DISCARD_ALL);
 
     void drawInstanced(
         bgfx::ViewId viewId,
         const resource::AssetPtr<ModelAsset>& model,
         const resource::AssetPtr<ShaderProgram>& program,
-        const std::vector<Eigen::Matrix4f>& transforms);
+        const std::vector<Eigen::Matrix4f>& transforms,
+        uint8_t flags = BGFX_DISCARD_ALL);
 
     void sync();
 }

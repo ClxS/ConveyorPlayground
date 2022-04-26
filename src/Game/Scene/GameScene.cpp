@@ -28,6 +28,7 @@
 #include "AtlasAppHost/Application.h"
 #include "AtlasRender/Renderer.h"
 #include "AtlasResource/ResourceLoader.h"
+#include "Lighting/DirectionalLightComponent.h"
 
 namespace
 {
@@ -118,6 +119,13 @@ namespace
         camera.m_Yaw = -135.0_degrees;
     }
 
+    void addLights(atlas::scene::EcsManager& ecs)
+    {
+        const auto lightEntity = ecs.AddEntity();
+        auto& light = ecs.AddComponent<cpp_conv::components::DirectionalLightComponent>(lightEntity);
+        light.m_LightDirection = {0.5, -0.5, 0.5 };
+        light.m_LightColour = {1.0, 1.0, 1.0, 1.0f};
+    }
 }
 
 void cpp_conv::GameScene::OnEntered(atlas::scene::SceneManager& sceneManager)
@@ -168,6 +176,7 @@ void cpp_conv::GameScene::OnEntered(atlas::scene::SceneManager& sceneManager)
     }
 
     addCameras(ecs);
+    addLights(ecs);
 
     m_InitialisationData.m_Map.reset();
 
@@ -259,6 +268,7 @@ void cpp_conv::GameScene::ConstructFrameGraph()
         [this]()
         {
             DirectInitialiseSystem(m_RenderSystems.m_CameraRenderSystem);
+            DirectInitialiseSystem(m_RenderSystems.m_LightingSystem);
             DirectInitialiseSystem(m_RenderSystems.m_ModelRenderer);
             DirectInitialiseSystem(m_RenderSystems.m_ConveyorRenderer);
         },
@@ -266,6 +276,7 @@ void cpp_conv::GameScene::ConstructFrameGraph()
         {
             bgfx::setState(BGFX_STATE_DEFAULT);
             DirectRunSystem(m_RenderSystems.m_CameraRenderSystem);
+            DirectRunSystem(m_RenderSystems.m_LightingSystem);
             DirectRunSystem(m_RenderSystems.m_ModelRenderer);
             DirectRunSystem(m_RenderSystems.m_ConveyorRenderer);
         });

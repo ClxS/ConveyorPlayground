@@ -6,6 +6,7 @@
 #include "ConveyorRenderingSystem.h"
 #include "EntityLookupGrid.h"
 #include "FactoryDefinition.h"
+#include "LightingRenderSystem.h"
 #include "Map.h"
 #include "ModelRenderSystem.h"
 #include "PostProcessSystem.h"
@@ -57,6 +58,8 @@ namespace cpp_conv
         struct RenderSystems
         {
             CameraRenderSystem m_CameraRenderSystem;
+
+            LightingRenderSystem m_LightingSystem;
             ModelRenderSystem m_ModelRenderer;
             ConveyorRenderingSystem m_ConveyorRenderer;
 

@@ -7,7 +7,8 @@ void atlas::render::draw(
     const bgfx::ViewId viewId,
     const resource::AssetPtr<ModelAsset>& model,
     const resource::AssetPtr<ShaderProgram>& program,
-    const Eigen::Matrix4f& transform)
+    const Eigen::Matrix4f& transform,
+    const uint8_t flags)
 {
     for(const auto& segment : model->GetMesh()->GetSegments())
     {
@@ -22,7 +23,7 @@ void atlas::render::draw(
             setTexture(textureIndex++, texture.m_Sampler, texture.m_Texture->GetHandle());
         }
 
-        submit(viewId, program->GetHandle());
+        submit(viewId, program->GetHandle(), flags);
     }
 }
 
@@ -30,7 +31,8 @@ void atlas::render::drawInstanced(
     const bgfx::ViewId viewId,
     const resource::AssetPtr<ModelAsset>& model,
     const resource::AssetPtr<ShaderProgram>& program,
-    const std::vector<Eigen::Matrix4f>& transforms)
+    const std::vector<Eigen::Matrix4f>& transforms,
+    const uint8_t flags)
 {
     constexpr uint16_t instanceStride = sizeof(Eigen::Matrix4f);
 
@@ -47,17 +49,17 @@ void atlas::render::drawInstanced(
         std::memcpy(&(idb.data[offset]), transforms[i].data(), instanceStride);
     }
 
-    uint8_t textureIndex = 0;
-    for(const auto& texture : model->GetTextures())
-    {
-        setTexture(textureIndex++, texture.m_Sampler, texture.m_Texture->GetHandle());
-    }
-
     for(const auto& segment : model->GetMesh()->GetSegments())
     {
+        uint8_t textureIndex = 0;
+        for(const auto& texture : model->GetTextures())
+        {
+            setTexture(textureIndex++, texture.m_Sampler, texture.m_Texture->GetHandle());
+        }
+
         setVertexBuffer(0, segment.m_VertexBuffer);
         setIndexBuffer(segment.m_IndexBuffer);
         setInstanceDataBuffer(&idb);
-        submit(viewId, program->GetHandle());
+        submit(viewId, program->GetHandle(), flags);
     }
 }

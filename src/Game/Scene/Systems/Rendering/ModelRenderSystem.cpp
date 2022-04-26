@@ -5,6 +5,7 @@
 #include "ModelComponent.h"
 #include "PositionComponent.h"
 #include "Transform2D.h"
+#include "AtlasRender/Renderer.h"
 #include "AtlasRender/AssetTypes/ModelAsset.h"
 
 void cpp_conv::ModelRenderSystem::Update(atlas::scene::EcsManager& ecs)
@@ -39,20 +40,12 @@ void cpp_conv::ModelRenderSystem::Update(atlas::scene::EcsManager& ecs)
         Eigen::Affine3f r{Eigen::AngleAxisf(rotation.AsRadians(), Eigen::Vector3f(0, 1, 0))};
         Eigen::Matrix4f m = (t * r).matrix();
         bgfx::setTransform(m.data());
-        for(const auto& segment : model.m_Model->GetMesh()->GetSegments())
-        {
-            std::memcpy(idb.data, m.data(), instanceStride);
-            setInstanceDataBuffer(&idb);
-            setVertexBuffer(0, segment.m_VertexBuffer);
-            setIndexBuffer(segment.m_IndexBuffer);
 
-            int textureIndex = 0;
-            for(const auto& texture : model.m_Model->GetTextures())
-            {
-                setTexture(textureIndex++, texture.m_Sampler, texture.m_Texture->GetHandle());
-            }
-
-            submit(cpp_conv::constants::render_views::c_geometry, model.m_Model->GetProgram()->GetHandle());
-        }
+        atlas::render::drawInstanced(
+                cpp_conv::constants::render_views::c_geometry,
+                model.m_Model,
+                model.m_Model->GetProgram(),
+                { m },
+                ~BGFX_DISCARD_STATE);
     }
 }

@@ -246,7 +246,8 @@ void ConveyorRenderingSystem::Update(atlas::scene::EcsManager& ecs)
                 cpp_conv::constants::render_views::c_geometry,
                 item.m_Model,
                 item.m_Model->GetProgram(),
-                item.m_ConveyorPositions);
+                item.m_ConveyorPositions,
+                ~BGFX_DISCARD_STATE);
         }
         else
         {
