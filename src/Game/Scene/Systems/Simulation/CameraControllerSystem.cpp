@@ -38,6 +38,8 @@ namespace
 
         int mouseX, mouseY;
 
+        float speedFactor = camera.m_Distance / 5.0f;
+
         const Uint8* keyboardState = SDL_GetKeyboardState(nullptr);
         const int buttons = SDL_GetMouseState(&mouseX, &mouseY);
         if ((buttons & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0)
@@ -53,8 +55,8 @@ namespace
             const int deltaY = mouseY - previousMouseY;
 
             auto [forward, right] = getForwardAndRight(camera);
-            forward *= static_cast<float>(deltaY) * c_moveScaling;
-            right *= static_cast<float>(-deltaX) * c_moveScaling;
+            forward *= static_cast<float>(deltaY) * c_moveScaling * speedFactor;
+            right *= static_cast<float>(-deltaX) * c_moveScaling * speedFactor;
 
             camera.m_LookAtPoint += forward;
             camera.m_LookAtPoint += right;
@@ -63,26 +65,26 @@ namespace
         if(keyboardState[SDL_SCANCODE_W])
         {
             auto [forward, _] = getForwardAndRight(camera);
-            forward *= static_cast<float>(1) * c_keyboardMoveScaling;
+            forward *= static_cast<float>(1) * c_keyboardMoveScaling * speedFactor;
             camera.m_LookAtPoint += forward;
         }
         else if(keyboardState[SDL_SCANCODE_S])
         {
             auto [forward, _] = getForwardAndRight(camera);
-            forward *= static_cast<float>(1) * -c_keyboardMoveScaling;
+            forward *= static_cast<float>(1) * -c_keyboardMoveScaling * speedFactor;
             camera.m_LookAtPoint += forward;
         }
 
         if(keyboardState[SDL_SCANCODE_A])
         {
             auto [_, right] = getForwardAndRight(camera);
-            right *= static_cast<float>(1) * -c_keyboardMoveScaling;
+            right *= static_cast<float>(1) * -c_keyboardMoveScaling * speedFactor;
             camera.m_LookAtPoint += right;
         }
         else if(keyboardState[SDL_SCANCODE_D])
         {
             auto [_, right] = getForwardAndRight(camera);
-            right *= static_cast<float>(1) * c_keyboardMoveScaling;
+            right *= static_cast<float>(1) * c_keyboardMoveScaling * speedFactor;
             camera.m_LookAtPoint += right;
         }
 
