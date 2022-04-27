@@ -113,7 +113,7 @@ namespace
         const auto cameraEntity = ecs.AddEntity();
         auto& camera = ecs.AddComponent<cpp_conv::components::LookAtCamera>(cameraEntity);
         camera.m_bIsActive = true;
-        camera.m_Distance = 5.0f;
+        camera.m_Distance = 15.0f;
         camera.m_LookAtPoint = {5.39f, 0.0f, 0.179f};
         camera.m_Pitch = 30.0_degrees;
         camera.m_Yaw = -135.0_degrees;
@@ -123,10 +123,20 @@ namespace
     {
         const auto lightEntity = ecs.AddEntity();
         auto& light = ecs.AddComponent<cpp_conv::components::DirectionalLightComponent>(lightEntity);
-        light.m_LightDirection = {0.5, -0.5, 0.5 };
+        light.m_LightDirection = {0.08f, -0.5, -0.70f };
         light.m_LightColour = {1.0, 1.0, 1.0, 1.0f};
     }
+
+    void addGround(atlas::scene::EcsManager& ecs)
+    {
+        const auto ground = ecs.AddEntity();
+        ecs.AddComponent<cpp_conv::components::PositionComponent>(ground).m_Position = { 0, 0, 0 };
+        ecs.AddComponent<cpp_conv::components::ModelComponent>(ground).m_Model = atlas::resource::ResourceLoader::LoadAsset
+                    <cpp_conv::resources::registry::CoreBundle,
+                    atlas::render::ModelAsset>(cpp_conv::resources::registry::core_bundle::assets::others::c_SurfaceFlat);
+    }
 }
+
 
 void cpp_conv::GameScene::OnEntered(atlas::scene::SceneManager& sceneManager)
 {
@@ -175,6 +185,7 @@ void cpp_conv::GameScene::OnEntered(atlas::scene::SceneManager& sceneManager)
         (*handlerIt).second(m_SceneData.m_LookupGrid, position.m_Position, ecs, ecsEntity, entity);
     }
 
+    addGround(ecs);
     addCameras(ecs);
     addLights(ecs);
 
