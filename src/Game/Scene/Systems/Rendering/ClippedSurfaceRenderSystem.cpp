@@ -48,7 +48,6 @@ void cpp_conv::ClippedSurfaceRenderSystem::Update(atlas::scene::EcsManager& ecs)
     // Annoying bgfx only really supports vec4s... We have to pretend to be one.
     Eigen::Vector4f vecColour = { 150.0f / 255.0f, 117.0f / 255.0f, 66.0f / 255.0f, 1.0f };
     Eigen::Vector4f vecClipCount = { static_cast<float>(clipCount), 0.0f, 0.0f, 0.0f };
-    Eigen::Vector4f vecPositions = { static_cast<float>(clipCount), 0.0f, 0.0f, 0.0f };
 
     bgfx::setUniform(m_Uniforms.m_SurfaceColour, vecColour.data(), 1);
     bgfx::setUniform(m_Uniforms.m_ClipCount, vecClipCount.data(), 1);
