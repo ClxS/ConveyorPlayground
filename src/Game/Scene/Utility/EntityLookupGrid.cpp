@@ -138,7 +138,7 @@ bool cpp_conv::EntityLookupGrid::PlaceEntity(Eigen::Vector3i position, Eigen::Ve
     {
         for (int32_t iYPosition = position.z() - size.z() / 2; iYPosition < (position.z() + (size.z() + 1) / 2); ++iYPosition)
         {
-            for (int32_t iDepthPosition = position.y() - size.y() / 2; iDepthPosition < (position.y() + (size.y() + 1) / 2); ++iDepthPosition)
+            for (int32_t iDepthPosition = position.y(); iDepthPosition < position.y() + size.y(); ++iDepthPosition)
             {
                 CellCoordinate coord = ToCellSpace({iXPosition, iDepthPosition, iYPosition});
                 assert(!coord.IsInvalid());
@@ -162,13 +162,13 @@ bool cpp_conv::EntityLookupGrid::ValidateCanPlaceEntity(Eigen::Vector3i position
         return false;
     }
 
-    for (int32_t iXPosition = position.x(); iXPosition < (position.x() + size.x()); ++iXPosition)
+    for (int32_t iXPosition = position.x() - size.x() / 2; iXPosition < (position.x() + (size.x() + 1) / 2); ++iXPosition)
     {
-        for (int32_t iYPosition = position.z(); iYPosition < (position.z() + size.z()); ++iYPosition)
+        for (int32_t iYPosition = position.z() - size.z() / 2; iYPosition < (position.z() + (size.z() + 1) / 2); ++iYPosition)
         {
-            for (int32_t iDepthPosition = position.y(); iDepthPosition < (position.y() + size.y()); ++iDepthPosition)
+            for (int32_t iDepthPosition = position.y(); iDepthPosition < position.y() + size.y(); ++iDepthPosition)
             {
-                const Eigen::Vector3i checkPosition = {iXPosition, iYPosition, iDepthPosition};
+                const Eigen::Vector3i checkPosition = {iXPosition, iDepthPosition, iYPosition};
                 CellCoordinate coord = ToCellSpace(checkPosition);
                 if (coord.IsInvalid())
                 {

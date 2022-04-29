@@ -113,7 +113,7 @@ void cpp_conv::PostProcessSystem::Initialise(atlas::scene::EcsManager& ecsManage
     m_Programs.m_Copy = atlas::resource::ResourceLoader::LoadAsset<resources::registry::CoreBundle, atlas::render::ShaderProgram>(resources::registry::core_bundle::shaders::postprocess::c_copy);
     m_Programs.m_Fxaa = atlas::resource::ResourceLoader::LoadAsset<resources::registry::CoreBundle, atlas::render::ShaderProgram>(resources::registry::core_bundle::shaders::postprocess::c_fxaa);
 
-    m_Samplers.m_Color = bgfx::createUniform("s_texColor", bgfx::UniformType::Sampler); // Color (albedo) gbuffer, default color input
+    m_Samplers.m_Color = bgfx::createUniform("s_texColor", bgfx::UniformType::Sampler);
     m_Uniforms.m_FrameBufferSize = bgfx::createUniform("frameBufferSize", bgfx::UniformType::Vec4);
 }
 

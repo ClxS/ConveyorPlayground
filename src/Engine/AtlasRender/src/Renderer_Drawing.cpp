@@ -54,7 +54,10 @@ void atlas::render::drawInstanced(
         uint8_t textureIndex = 0;
         for(const auto& texture : model->GetTextures())
         {
-            setTexture(textureIndex++, texture.m_Sampler, texture.m_Texture->GetHandle());
+            if (texture.m_Texture)
+            {
+                setTexture(textureIndex++, texture.m_Sampler, texture.m_Texture->GetHandle());
+            }
         }
 
         setVertexBuffer(0, segment.m_VertexBuffer);

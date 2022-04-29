@@ -8,12 +8,18 @@
 #include "AtlasRender/Renderer.h"
 #include "AtlasRender/AssetTypes/ModelAsset.h"
 
+
+void cpp_conv::ModelRenderSystem::Initialise(atlas::scene::EcsManager&, const uint8_t renderMask)
+{
+    m_RenderMask = renderMask;
+}
+
 void cpp_conv::ModelRenderSystem::Update(atlas::scene::EcsManager& ecs)
 {
     using namespace components;
     for(auto [entity, model, position] : ecs.IterateEntityComponents<ModelComponent, PositionComponent>())
     {
-        if (!model.m_Model || !model.m_Model->GetMesh() || !model.m_Model->GetProgram())
+        if ((model.m_RenderMask & m_RenderMask) == 0 || !model.m_Model || !model.m_Model->GetMesh() || !model.m_Model->GetProgram())
         {
             continue;
         }

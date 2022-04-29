@@ -412,7 +412,7 @@ namespace atlas::scene
     template <typename ... TComponent>
     EcsManager::ComponentIteratorWrapper<TComponent...> EcsManager::IterateEntityComponents()
     {
-        return EcsManager::ComponentIteratorWrapper<TComponent...>{m_ArchetypePools};
+        return ComponentIteratorWrapper<TComponent...>{m_ArchetypePools};
     }
 
     template <typename ... TComponent>

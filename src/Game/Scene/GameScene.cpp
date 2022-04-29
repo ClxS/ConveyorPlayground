@@ -12,23 +12,28 @@
 #include "FactoryComponent.h"
 #include "FactoryRegistry.h"
 #include "FactorySystem.h"
+#include "ModelComponent.h"
+#include "ModelRenderSystem.h"
 #include "NameComponent.h"
 #include "PositionComponent.h"
+#include "PostProcessSystem.h"
 #include "RecipeDefinition.h"
 #include "RecipeRegistry.h"
 #include "SequenceFormationSystem.h"
 #include "SequenceProcessingSystem.h"
 #include "StandaloneConveyorSystem.h"
-#include "WorldEntityInformationComponent.h"
-#include "ModelComponent.h"
-#include "ModelRenderSystem.h"
-#include "PostProcessSystem.h"
 #include "Storage.h"
 #include "StorageComponent.h"
+#include "WorldEntityInformationComponent.h"
 #include "AtlasAppHost/Application.h"
 #include "AtlasRender/Renderer.h"
 #include "AtlasResource/ResourceLoader.h"
 #include "Lighting/DirectionalLightComponent.h"
+
+using namespace cpp_conv::components;
+using namespace cpp_conv::resources::registry;
+using namespace atlas::resource;
+using namespace atlas::render;
 
 namespace
 {
@@ -43,12 +48,11 @@ namespace
         const auto definition = cpp_conv::resources::getFactoryDefinition(factoryEntity->GetDefinitionId());
         if (definition && definition->GetModel())
         {
-            auto& sprite = ecs.AddComponent<cpp_conv::components::ModelComponent>(ecsEntity);
-            sprite.m_Model = definition->GetModel();
+            ecs.AddComponent<ModelComponent>(ecsEntity, definition->GetModel());
         }
 
-        ecs.AddComponent<cpp_conv::components::NameComponent>(ecsEntity, definition->GetName().c_str());
-        auto& factory = ecs.AddComponent<cpp_conv::components::FactoryComponent>(ecsEntity);
+        ecs.AddComponent<NameComponent>(ecsEntity, definition->GetName().c_str());
+        auto& factory = ecs.AddComponent<FactoryComponent>(ecsEntity);
         auto size = definition->GetSize();
 
         factory.m_Size = {size.x(), size.y(), size.z()};
@@ -62,7 +66,7 @@ namespace
         const auto recipe = cpp_conv::resources::getRecipeDefinition(recipeId);
         if (recipe)
         {
-            cpp_conv::components::FactoryComponent::Recipe componentRecipe;
+            FactoryComponent::Recipe componentRecipe;
             componentRecipe.m_Effort = recipe->GetEffort();
             for (auto& input : recipe->GetInputItems())
             {
@@ -91,12 +95,10 @@ namespace
         const cpp_conv::Entity* entity)
     {
         const auto storageEntity = static_cast<const cpp_conv::Storage*>(entity);
-        ecs.AddComponent<cpp_conv::components::NameComponent>(ecsEntity, "Storage");
-        ecs.AddComponent<cpp_conv::components::ModelComponent>(ecsEntity).m_Model = atlas::resource::ResourceLoader::LoadAsset
-            <cpp_conv::resources::registry::CoreBundle,
-            atlas::render::ModelAsset>(cpp_conv::resources::registry::core_bundle::assets::others::c_Barrel);
+        ecs.AddComponent<NameComponent>(ecsEntity, "Storage");
+        ecs.AddComponent<ModelComponent>(ecsEntity, ResourceLoader::LoadAsset<CoreBundle, ModelAsset>(core_bundle::assets::others::c_Barrel));
 
-        auto& storage = ecs.AddComponent<cpp_conv::components::StorageComponent>(ecsEntity);
+        auto& storage = ecs.AddComponent<StorageComponent>(ecsEntity);
         storage.m_ItemContainer.Initialise(
             storageEntity->GetContainer().GetMaxCapacity(),
             storageEntity->GetContainer().GetMaxStackSize(),
@@ -108,10 +110,28 @@ namespace
         }
     }
 
+    void loadLaunchPad(
+        cpp_conv::EntityLookupGrid& grid,
+        const Eigen::Vector3i& position,
+        atlas::scene::EcsManager& ecs,
+        const atlas::scene::EntityId& ecsEntity,
+        const cpp_conv::Entity* entity)
+    {
+        ecs.AddComponent<NameComponent>(ecsEntity, "Launchpad");
+        ecs.AddComponent<ModelComponent>(ecsEntity,
+            ResourceLoader::LoadAsset<CoreBundle, ModelAsset>(core_bundle::assets::others::c_LaunchPad),
+            cpp_conv::constants::render_masks::c_generalGeometry | cpp_conv::constants::render_masks::c_clipCasterGeometry);
+
+        if (!grid.PlaceEntity(position, { 10, 4, 10 }, ecsEntity))
+        {
+            ecs.RemoveEntity(ecsEntity);
+        }
+    }
+
     void addCameras(atlas::scene::EcsManager& ecs)
     {
         const auto cameraEntity = ecs.AddEntity();
-        auto& camera = ecs.AddComponent<cpp_conv::components::LookAtCamera>(cameraEntity);
+        auto& camera = ecs.AddComponent<LookAtCamera>(cameraEntity);
         camera.m_bIsActive = true;
         camera.m_Distance = 15.0f;
         camera.m_LookAtPoint = {5.39f, 0.0f, 0.179f};
@@ -122,7 +142,7 @@ namespace
     void addLights(atlas::scene::EcsManager& ecs)
     {
         const auto lightEntity = ecs.AddEntity();
-        auto& light = ecs.AddComponent<cpp_conv::components::DirectionalLightComponent>(lightEntity);
+        auto& light = ecs.AddComponent<DirectionalLightComponent>(lightEntity);
         light.m_LightDirection = {0.08f, -0.5, -0.70f };
         light.m_LightColour = {1.0, 1.0, 1.0, 1.0f};
     }
@@ -130,29 +150,33 @@ namespace
     void addGround(atlas::scene::EcsManager& ecs)
     {
         const auto ground = ecs.AddEntity();
-        ecs.AddComponent<cpp_conv::components::PositionComponent>(ground).m_Position = { 0, 0, 0 };
-        ecs.AddComponent<cpp_conv::components::ModelComponent>(ground).m_Model = atlas::resource::ResourceLoader::LoadAsset
-                    <cpp_conv::resources::registry::CoreBundle,
-                    atlas::render::ModelAsset>(cpp_conv::resources::registry::core_bundle::assets::others::c_SurfaceFlat);
+        ecs.AddComponent<PositionComponent>(ground).m_Position = { 0, 0, 0 };
+        ecs.AddComponent<ModelComponent>(
+            ground,
+            ResourceLoader::LoadAsset<CoreBundle, ModelAsset>(core_bundle::assets::others::c_SurfaceFlat),
+            cpp_conv::constants::render_masks::c_surfaceClippedGeometry);
     }
 }
-
 
 void cpp_conv::GameScene::OnEntered(atlas::scene::SceneManager& sceneManager)
 {
     atlas::scene::EcsManager& ecs = GetEcsManager();
 
+    addGround(ecs);
+    addCameras(ecs);
+    addLights(ecs);
+
     for (const auto& entity : m_InitialisationData.m_Map->GetConveyors())
     {
         const auto ecsEntity = ecs.AddEntity();
-        const auto& position = ecs.AddComponent<components::PositionComponent>(
+        const auto& position = ecs.AddComponent<PositionComponent>(
             ecsEntity, Eigen::Vector3i(entity->m_position.x(), entity->m_position.y(),
                                        entity->m_position.z()));
-        ecs.AddComponent<components::NameComponent>(ecsEntity, "Basic Conveyor");
-        ecs.AddComponent<components::DescriptionComponent>(ecsEntity, "The wheels of invention");
-        ecs.AddComponent<components::DirectionComponent>(ecsEntity, entity->m_Direction);
-        ecs.AddComponent<components::ConveyorComponent>(ecsEntity);
-        ecs.AddComponent<components::WorldEntityInformationComponent>(ecsEntity, entity->m_eEntityKind);
+        ecs.AddComponent<NameComponent>(ecsEntity, "Basic Conveyor");
+        ecs.AddComponent<DescriptionComponent>(ecsEntity, "The wheels of invention");
+        ecs.AddComponent<DirectionComponent>(ecsEntity, entity->m_Direction);
+        ecs.AddComponent<ConveyorComponent>(ecsEntity);
+        ecs.AddComponent<WorldEntityInformationComponent>(ecsEntity, entity->m_eEntityKind);
         m_SceneData.m_LookupGrid.PlaceEntity(position.m_Position, {1, 1, 1}, ecsEntity);
     }
 
@@ -164,8 +188,8 @@ void cpp_conv::GameScene::OnEntered(atlas::scene::SceneManager& sceneManager)
     {
         {EntityKind::Producer, &loadFactory},
         {EntityKind::Storage, &loadStorage},
+        {EntityKind::LaunchPad, &loadLaunchPad},
     };
-
 
     for (const auto& entity : m_InitialisationData.m_Map->GetOtherEntities())
     {
@@ -176,18 +200,14 @@ void cpp_conv::GameScene::OnEntered(atlas::scene::SceneManager& sceneManager)
         }
 
         const auto ecsEntity = ecs.AddEntity();
-        ecs.AddComponent<components::WorldEntityInformationComponent>(ecsEntity, entity->m_eEntityKind);
-        const auto& position = ecs.AddComponent<components::PositionComponent>(
+        ecs.AddComponent<WorldEntityInformationComponent>(ecsEntity, entity->m_eEntityKind);
+        const auto& position = ecs.AddComponent<PositionComponent>(
             ecsEntity,
             Eigen::Vector3i(entity->m_position.x(), entity->m_position.y(), entity->m_position.z()));
-        ecs.AddComponent<components::DirectionComponent>(ecsEntity, entity->m_Direction);
+        ecs.AddComponent<DirectionComponent>(ecsEntity, entity->m_Direction);
 
         (*handlerIt).second(m_SceneData.m_LookupGrid, position.m_Position, ecs, ecsEntity, entity);
     }
-
-    addGround(ecs);
-    addCameras(ecs);
-    addLights(ecs);
 
     m_InitialisationData.m_Map.reset();
 
@@ -240,75 +260,83 @@ void cpp_conv::GameScene::ConstructFrameGraph()
     using namespace constants;
     const bgfx::ViewId order[] =
     {
+        render_views::c_surface,
         render_views::c_geometry,
         render_views::c_postProcess,
         render_views::c_ui,
     };
     bgfx::setViewOrder(0, BX_COUNTOF(order), order);
 
-    atlas::render::addToFrameGraph("SetPrimaryRenderTargets",
-        [this]()
-        {
-            const auto [width, height] = atlas::app_host::Application::Get().GetAppDimensions();
-            m_RenderSystems.m_GBuffer.Initialise(width, height);
+    addToFrameGraph("SetPrimaryRenderTargets",
+                    [this]()
+                    {
+                        const auto [width, height] = atlas::app_host::Application::Get().GetAppDimensions();
+                        m_RenderSystems.m_GBuffer.Initialise(width, height);
 
-            bgfx::setState(BGFX_STATE_DEFAULT);
-            bgfx::setViewName(render_views::c_geometry, "Mesh");
-            bgfx::setViewClear(render_views::c_geometry, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x322e3dFF);
-            bgfx::setViewRect(render_views::c_geometry, 0, 0, bgfx::BackbufferRatio::Equal);
-            bgfx::setViewFrameBuffer(render_views::c_geometry, m_RenderSystems.m_GBuffer.GetHandle());
+                        bgfx::setViewName(render_views::c_geometry, "Mesh");
+                        bgfx::setViewClear(render_views::c_geometry, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x322e3dFF);
+                        setViewRect(render_views::c_geometry, 0, 0, bgfx::BackbufferRatio::Equal);
+                        setViewFrameBuffer(render_views::c_geometry, m_RenderSystems.m_GBuffer.GetHandle());
 
-            bgfx::setViewName(render_views::c_ui, "UI Layer");
-            bgfx::setViewClear(render_views::c_ui, 0);
-            bgfx::setViewRect(render_views::c_ui, 0, 0, bgfx::BackbufferRatio::Equal);
-            bgfx::setViewMode(render_views::c_ui, bgfx::ViewMode::Sequential);
-            bgfx::setViewFrameBuffer(render_views::c_ui, BGFX_INVALID_HANDLE);
+                        bgfx::setViewName(render_views::c_surface, "Surface Draw");
+                        setViewRect(render_views::c_surface, 0, 0, bgfx::BackbufferRatio::Equal);
+                        setViewFrameBuffer(render_views::c_surface, m_RenderSystems.m_GBuffer.GetHandle());
 
-            bgfx::setViewName(render_views::c_postProcess, "OutputView");
-            bgfx::setViewClear(render_views::c_postProcess, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x322e3dFF);
-            bgfx::setViewRect(render_views::c_postProcess, 0, 0, bgfx::BackbufferRatio::Equal);
-            bgfx::setViewFrameBuffer(render_views::c_postProcess, BGFX_INVALID_HANDLE);
-        },
-        [this]()
-        {
-            const auto [width, height] = atlas::app_host::Application::Get().GetAppDimensions();
-            m_RenderSystems.m_GBuffer.EnsureSize(width, height);
-        });
+                        bgfx::setViewName(render_views::c_ui, "UI Layer");
+                        bgfx::setViewClear(render_views::c_ui, 0);
+                        setViewRect(render_views::c_ui, 0, 0, bgfx::BackbufferRatio::Equal);
+                        setViewMode(render_views::c_ui, bgfx::ViewMode::Sequential);
+                        bgfx::setViewFrameBuffer(render_views::c_ui, BGFX_INVALID_HANDLE);
 
-    atlas::render::addToFrameGraph("RenderWorld",
-        [this]()
-        {
-            DirectInitialiseSystem(m_RenderSystems.m_CameraRenderSystem);
-            DirectInitialiseSystem(m_RenderSystems.m_LightingSystem);
-            DirectInitialiseSystem(m_RenderSystems.m_ModelRenderer);
-            DirectInitialiseSystem(m_RenderSystems.m_ConveyorRenderer);
-        },
-        [this]()
-        {
-            bgfx::setState(BGFX_STATE_DEFAULT);
-            DirectRunSystem(m_RenderSystems.m_CameraRenderSystem);
-            DirectRunSystem(m_RenderSystems.m_LightingSystem);
-            DirectRunSystem(m_RenderSystems.m_ModelRenderer);
-            DirectRunSystem(m_RenderSystems.m_ConveyorRenderer);
-        });
+                        bgfx::setViewName(render_views::c_postProcess, "OutputView");
+                        bgfx::setViewClear(render_views::c_postProcess, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x322e3dFF);
+                        setViewRect(render_views::c_postProcess, 0, 0, bgfx::BackbufferRatio::Equal);
+                        bgfx::setViewFrameBuffer(render_views::c_postProcess, BGFX_INVALID_HANDLE);
+                    },
+                    [this]()
+                    {
+                        const auto [width, height] = atlas::app_host::Application::Get().GetAppDimensions();
+                        m_RenderSystems.m_GBuffer.EnsureSize(width, height);
+                    });
 
-    atlas::render::addToFrameGraph("UI",
-       [this]()
-       {
-           DirectInitialiseSystem(m_RenderSystems.m_UIController);
-       },
-       [this]()
-       {
-           DirectRunSystem(m_RenderSystems.m_UIController);
-       });
+    addToFrameGraph("RenderWorld",
+                    [this]()
+                    {
+                        DirectInitialiseSystem(m_RenderSystems.m_CameraRenderSystem);
+                        DirectInitialiseSystem(m_RenderSystems.m_LightingSystem);
+                        DirectInitialiseSystem(m_RenderSystems.m_ClippedSurfaceRenderSystem);
+                        DirectInitialiseSystem(m_RenderSystems.m_ModelRenderer, render_masks::c_generalGeometry);
+                        DirectInitialiseSystem(m_RenderSystems.m_ConveyorRenderer);
+                    },
+                    [this]()
+                    {
+                        bgfx::setState(BGFX_STATE_DEFAULT);
+                        DirectRunSystem(m_RenderSystems.m_CameraRenderSystem);
+                        DirectRunSystem(m_RenderSystems.m_LightingSystem);
+                        DirectRunSystem(m_RenderSystems.m_ClippedSurfaceRenderSystem);
+                        DirectRunSystem(m_RenderSystems.m_ModelRenderer);
+                        DirectRunSystem(m_RenderSystems.m_ConveyorRenderer);
+                    });
 
-    atlas::render::addToFrameGraph("FXAA",
-        [this]()
-        {
-            DirectInitialiseSystem(m_RenderSystems.m_PostProcess, &m_RenderSystems.m_GBuffer);
-        },
-        [this]()
-        {
-            DirectRunSystem(m_RenderSystems.m_PostProcess);
-        });
+    addToFrameGraph("UI",
+                    [this]()
+                    {
+                        DirectInitialiseSystem(m_RenderSystems.m_UIController);
+                    },
+                    [this]()
+                    {
+                        bgfx::setState(BGFX_STATE_DEFAULT);
+                        DirectRunSystem(m_RenderSystems.m_UIController);
+                    });
+
+    addToFrameGraph("FXAA",
+                    [this]()
+                    {
+                        DirectInitialiseSystem(m_RenderSystems.m_PostProcess, &m_RenderSystems.m_GBuffer);
+                    },
+                    [this]()
+                    {
+                        bgfx::setState(BGFX_STATE_DEFAULT);
+                        DirectRunSystem(m_RenderSystems.m_PostProcess);
+                    });
 }
