@@ -52,3 +52,6 @@
 [submodule "data/sdlPrivate"]
 	path = data/sdlPrivate
 	url = https://github.com/ClxS/ConveyorPlayground_Private.git
+[submodule "src/ThirdParty/fmt"]
+	path = src/ThirdParty/fmt
+	url = https://github.com/fmtlib/fmt
