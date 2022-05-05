@@ -30,6 +30,7 @@ project "bgfx"
         "bx",
 	}
 	defines {
+	    "__STDC_FORMAT_MACROS",
         "BGFX_CONFIG_RENDERER_OPENGL=0",
         "BGFX_CONFIG_RENDERER_OPENGLES=0",
         "BGFX_CONFIG_RENDERER_WEBGPU=0",

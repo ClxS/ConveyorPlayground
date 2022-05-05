@@ -21,7 +21,7 @@ project "bx"
 	}
 	filter { "configurations:Debug" }
 	    exports {
-    		["defines"]	= "BX_CONFIG_DEBUG=0",
+    		["defines"]	= "BX_CONFIG_DEBUG=1",
     	}
     filter { "configurations:Release" }
 	    exports {
