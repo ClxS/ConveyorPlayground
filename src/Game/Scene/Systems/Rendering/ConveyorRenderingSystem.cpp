@@ -32,6 +32,11 @@ struct LerpInformation
     float m_LerpFactor;
 };
 
+void ConveyorRenderingSystem::Initialise(atlas::scene::EcsManager&, const uint8_t viewId)
+{
+    m_ViewId = viewId;
+}
+
 void ConveyorRenderingSystem::Update(atlas::scene::EcsManager& ecs)
 {
     enum ConveyorType
@@ -221,7 +226,7 @@ void ConveyorRenderingSystem::Update(atlas::scene::EcsManager& ecs)
         if (instancingSupported)
         {
             atlas::render::drawInstanced(
-                cpp_conv::constants::render_views::c_geometry,
+                m_ViewId,
                 conveyorType.m_Model,
                 conveyorType.m_Model->GetProgram(),
                 conveyorType.m_ConveyorPositions);
@@ -243,7 +248,7 @@ void ConveyorRenderingSystem::Update(atlas::scene::EcsManager& ecs)
         if (instancingSupported)
         {
             drawInstanced(
-                cpp_conv::constants::render_views::c_geometry,
+                m_ViewId,
                 item.m_Model,
                 item.m_Model->GetProgram(),
                 item.m_ConveyorPositions,

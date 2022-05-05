@@ -12,7 +12,7 @@
 #include "bx/math.h"
 #include "Lighting/DirectionalLightComponent.h"
 
-void cpp_conv::ShadowMappingSystem::Initialise(atlas::scene::EcsManager& ecsManager, uint16_t shadowMapWidth, uint16_t shadowMapHeight)
+void cpp_conv::ShadowMappingSystem::Initialise(atlas::scene::EcsManager& ecsManager, const uint16_t shadowMapWidth, const uint16_t shadowMapHeight)
 {
     m_ShadowMapWidth = shadowMapWidth;
     m_ShadowMapHeight = shadowMapHeight;
@@ -35,6 +35,8 @@ void cpp_conv::ShadowMappingSystem::Initialise(atlas::scene::EcsManager& ecsMana
 
     m_ShadowMapFrameBuffer = bgfx::createFrameBuffer(BX_COUNTOF(frameBufferTextures), frameBufferTextures, true);
 
+    bgfx::setViewName(constants::render_views::c_shadowPass, "ShadowMap");
+    bgfx::setViewClear(constants::render_views::c_shadowPass, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH);
     bgfx::setViewRect(constants::render_views::c_shadowPass, 0, 0, m_ShadowMapWidth, m_ShadowMapHeight);
     bgfx::setViewFrameBuffer(constants::render_views::c_shadowPass, m_ShadowMapFrameBuffer);
 }

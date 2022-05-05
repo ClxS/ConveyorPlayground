@@ -11,6 +11,7 @@
 #include "Map.h"
 #include "ModelRenderSystem.h"
 #include "PostProcessSystem.h"
+#include "ShadowMappingSystem.h"
 #include "UIControllerSystem.h"
 #include "AtlasRender/Renderer.h"
 #include "AtlasRender/Types/FrameBuffer.h"
@@ -76,6 +77,7 @@ namespace cpp_conv
         {
             struct ShadowPass
             {
+                ShadowMappingSystem m_ShadowMapping;
                 ModelRenderSystem m_ModelRenderer;
                 ConveyorRenderingSystem m_ConveyorRenderer;
 

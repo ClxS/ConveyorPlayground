@@ -9,8 +9,12 @@
 #include "AtlasRender/AssetTypes/ModelAsset.h"
 
 
-void cpp_conv::ModelRenderSystem::Initialise(atlas::scene::EcsManager&, const uint8_t renderMask)
+void cpp_conv::ModelRenderSystem::Initialise(
+    atlas::scene::EcsManager&,
+    const uint8_t viewId,
+    const uint8_t renderMask)
 {
+    m_ViewId = viewId;
     m_RenderMask = renderMask;
 }
 
@@ -47,11 +51,11 @@ void cpp_conv::ModelRenderSystem::Update(atlas::scene::EcsManager& ecs)
         Eigen::Matrix4f m = (t * r).matrix();
         bgfx::setTransform(m.data());
 
-        atlas::render::drawInstanced(
-                cpp_conv::constants::render_views::c_geometry,
-                model.m_Model,
-                model.m_Model->GetProgram(),
-                { m },
-                ~BGFX_DISCARD_STATE);
+        drawInstanced(
+            m_ViewId,
+            model.m_Model,
+            model.m_Model->GetProgram(),
+            { m },
+            ~BGFX_DISCARD_STATE);
     }
 }
