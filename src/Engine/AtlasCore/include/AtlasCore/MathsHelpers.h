@@ -43,6 +43,24 @@ namespace atlas::maths_helpers
         float m_Value{};
     };
 
+    struct Rectangle
+    {
+        Rectangle(const float top,
+            const float bottom,
+            const float left,
+            const float right)
+            : m_Values{top, bottom, left, right }
+        {
+        }
+
+        [[nodiscard]] float GetTop() const { return m_Values[0]; }
+        [[nodiscard]] float GetBottom() const { return m_Values[1]; }
+        [[nodiscard]] float GetLeft() const { return m_Values[2]; }
+        [[nodiscard]] float GetRight() const { return m_Values[3]; }
+
+        Eigen::Vector4f m_Values;
+    };
+
     Eigen::Matrix4f createLookAtMatrix(const Eigen::Vector3f& eye, const Eigen::Vector3f& target, const Eigen::Vector3f& inUp, bool leftHanded = true);
     Eigen::Matrix4f createProjectionMatrix(
         Angle fovY,
@@ -51,6 +69,15 @@ namespace atlas::maths_helpers
         float far,
         bool homogenousDepth,
         bool leftHanded = true);
+
+    Eigen::Matrix4f createOrthographicMatrix(
+        const Rectangle& viewRectangle,
+        float near,
+        float far,
+        float offset,
+        bool homogenousDepth,
+        bool leftHanded = true);
+
 }
 
 inline atlas::maths_helpers::Angle operator ""_radians(long double value)

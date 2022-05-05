@@ -12,6 +12,7 @@
 #include "ModelRenderSystem.h"
 #include "PostProcessSystem.h"
 #include "UIControllerSystem.h"
+#include "AtlasRender/Renderer.h"
 #include "AtlasRender/Types/FrameBuffer.h"
 
 namespace cpp_conv
@@ -46,6 +47,21 @@ namespace cpp_conv
     private:
         void ConstructFrameGraph();
 
+        template<typename TRenderPass, typename ... TInitArgs>
+        void AddToFrameGraph(std::string_view viewName, TRenderPass* renderPass, TInitArgs... args)
+        {
+            atlas::render::addToFrameGraph(
+                viewName,
+                [&, args..., renderPass]()
+                {
+                    renderPass->Initialise(GetEcsManager(), args...);
+                },
+                [&, renderPass]()
+                {
+                    renderPass->Update(GetEcsManager());
+                });
+        }
+
         struct InitialisationData
         {
             atlas::resource::AssetPtr<resources::Map> m_Map;
@@ -58,16 +74,35 @@ namespace cpp_conv
 
         struct RenderSystems
         {
-            CameraRenderSystem m_CameraRenderSystem;
+            struct ShadowPass
+            {
+                ModelRenderSystem m_ModelRenderer;
+                ConveyorRenderingSystem m_ConveyorRenderer;
 
-            LightingRenderSystem m_LightingSystem;
-            ClippedSurfaceRenderSystem m_ClippedSurfaceRenderSystem;
-            ModelRenderSystem m_ModelRenderer;
-            ConveyorRenderingSystem m_ConveyorRenderer;
+                void Initialise(atlas::scene::EcsManager& ecsManager);
+                void Update(atlas::scene::EcsManager& ecsManager);
+            } m_ShadowPass;
 
-            UIControllerSystem m_UIController;
+            struct GeometryPass
+            {
+                CameraRenderSystem m_CameraRenderSystem;
+                LightingRenderSystem m_LightingSystem;
+                ClippedSurfaceRenderSystem m_ClippedSurfaceRenderSystem;
+                ModelRenderSystem m_ModelRenderer;
+                ConveyorRenderingSystem m_ConveyorRenderer;
 
-            PostProcessSystem m_PostProcess;
+                void Initialise(atlas::scene::EcsManager& ecsManager);
+                void Update(atlas::scene::EcsManager& ecsManager);
+            } m_GeometryPass;
+
+            struct PostGeometry
+            {
+                UIControllerSystem m_UIController;
+                PostProcessSystem m_PostProcess;
+
+                void Initialise(atlas::scene::EcsManager& ecsManager, const atlas::render::FrameBuffer* gbuffer);
+                void Update(atlas::scene::EcsManager& ecsManager);
+            } m_PostGeometry;
 
             atlas::render::FrameBuffer m_GBuffer;
         } m_RenderSystems;

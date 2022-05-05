@@ -39,7 +39,7 @@ void atlas::render::init(const RendererInitArgs& args)
 }
 
 atlas::render::RenderTaskHandle atlas::render::addToFrameGraph(
-    std::string name,
+    std::string_view name,
     std::function<void()> initiailize,
     std::function<void()> callback,
     std::vector<RenderTaskHandle> dependentTasks)
@@ -50,7 +50,7 @@ atlas::render::RenderTaskHandle atlas::render::addToFrameGraph(
 }
 
 atlas::render::RenderTaskHandle atlas::render::addToFrameGraph(
-    std::string name,
+    std::string_view name,
     std::function<void()> callback,
     std::vector<RenderTaskHandle> dependentTasks)
 {
@@ -58,7 +58,7 @@ atlas::render::RenderTaskHandle atlas::render::addToFrameGraph(
     return {-1};
 }
 
-atlas::render::RenderTaskHandle atlas::render::addToFrameGraph_oneOff(std::string name, std::function<void()> callback,
+atlas::render::RenderTaskHandle atlas::render::addToFrameGraph_oneOff(std::string_view name, std::function<void()> callback,
     std::vector<RenderTaskHandle> dependentTasks)
 {
     m_RenderMethods.emplace_back(callback, true);

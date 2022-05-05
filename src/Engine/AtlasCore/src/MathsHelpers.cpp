@@ -38,3 +38,36 @@ Eigen::Matrix4f atlas::maths_helpers::createProjectionMatrix(
     mat(2, 3) = -bb;
     return mat;
 }
+
+Eigen::Matrix4f atlas::maths_helpers::createOrthographicMatrix(
+        const Rectangle& viewRectangle,
+        const float near,
+        const float far,
+        const float offset,
+        const bool homogenousDepth,
+        const bool leftHanded)
+{
+    const float right = viewRectangle.GetRight();
+    const float left = viewRectangle.GetLeft();
+    const float top = viewRectangle.GetTop();
+    const float bottom = viewRectangle.GetBottom();
+
+    const float aa = 2.0f / (right - left);
+    const float bb = 2.0f / (top - bottom);
+    const float cc = (homogenousDepth ? 2.0f : 1.0f) / (far - near);
+    const float dd = (left + right )/(left   - right);
+    const float ee = (top  + bottom)/(bottom - top  );
+
+    const float viewDepth = (near - far);
+    const float ff = (homogenousDepth ? (near + far) : near) / viewDepth;
+
+    Eigen::Matrix4f mat = Eigen::Matrix4f::Zero();
+    mat(0, 0) = aa;
+    mat(1, 1) = bb;
+    mat(2, 2) = leftHanded ? cc : -cc;
+    mat(0, 3) = dd + offset;
+    mat(1, 3) = ee;
+    mat(2, 3) = ff;
+    mat(3, 3) = 1.0f;
+    return mat;
+}

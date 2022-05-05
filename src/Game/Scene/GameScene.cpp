@@ -44,11 +44,13 @@ namespace
         const atlas::scene::EntityId& ecsEntity,
         const cpp_conv::Entity* entity)
     {
+        using namespace cpp_conv::constants::render_masks;
+
         const auto factoryEntity = static_cast<const cpp_conv::Factory*>(entity);
         const auto definition = cpp_conv::resources::getFactoryDefinition(factoryEntity->GetDefinitionId());
         if (definition && definition->GetModel())
         {
-            ecs.AddComponent<ModelComponent>(ecsEntity, definition->GetModel());
+            ecs.AddComponent<ModelComponent>(ecsEntity, definition->GetModel(), c_generalGeometry | c_shadowCaster);
         }
 
         ecs.AddComponent<NameComponent>(ecsEntity, definition->GetName().c_str());
@@ -94,9 +96,14 @@ namespace
         const atlas::scene::EntityId& ecsEntity,
         const cpp_conv::Entity* entity)
     {
+        using namespace cpp_conv::constants::render_masks;
+
         const auto storageEntity = static_cast<const cpp_conv::Storage*>(entity);
         ecs.AddComponent<NameComponent>(ecsEntity, "Storage");
-        ecs.AddComponent<ModelComponent>(ecsEntity, ResourceLoader::LoadAsset<CoreBundle, ModelAsset>(core_bundle::assets::others::c_Barrel));
+        ecs.AddComponent<ModelComponent>(
+            ecsEntity,
+            ResourceLoader::LoadAsset<CoreBundle, ModelAsset>(core_bundle::assets::others::c_Barrel),
+            c_generalGeometry | c_shadowCaster);
 
         auto& storage = ecs.AddComponent<StorageComponent>(ecsEntity);
         storage.m_ItemContainer.Initialise(
@@ -117,10 +124,11 @@ namespace
         const atlas::scene::EntityId& ecsEntity,
         const cpp_conv::Entity* entity)
     {
+        using namespace cpp_conv::constants::render_masks;
         ecs.AddComponent<NameComponent>(ecsEntity, "Launchpad");
         ecs.AddComponent<ModelComponent>(ecsEntity,
             ResourceLoader::LoadAsset<CoreBundle, ModelAsset>(core_bundle::assets::others::c_LaunchPad),
-            cpp_conv::constants::render_masks::c_generalGeometry | cpp_conv::constants::render_masks::c_clipCasterGeometry);
+            c_generalGeometry | c_shadowCaster | c_clipCasterGeometry);
 
         if (!grid.PlaceEntity(position, { 10, 4, 10 }, ecsEntity))
         {
@@ -258,8 +266,9 @@ void cpp_conv::GameScene::ConstructSystems(atlas::scene::SystemsBuilder& builder
 void cpp_conv::GameScene::ConstructFrameGraph()
 {
     using namespace constants;
-    const bgfx::ViewId order[] =
+    constexpr bgfx::ViewId order[] =
     {
+        render_views::c_shadowPass,
         render_views::c_surface,
         render_views::c_geometry,
         render_views::c_postProcess,
@@ -267,76 +276,77 @@ void cpp_conv::GameScene::ConstructFrameGraph()
     };
     bgfx::setViewOrder(0, BX_COUNTOF(order), order);
 
-    addToFrameGraph("SetPrimaryRenderTargets",
-                    [this]()
-                    {
-                        const auto [width, height] = atlas::app_host::Application::Get().GetAppDimensions();
-                        m_RenderSystems.m_GBuffer.Initialise(width, height);
+    const auto [width, height] = atlas::app_host::Application::Get().GetAppDimensions();
+    m_RenderSystems.m_GBuffer.Initialise(width, height);
 
-                        bgfx::setViewName(render_views::c_geometry, "Mesh");
-                        bgfx::setViewClear(render_views::c_geometry, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x322e3dFF);
-                        setViewRect(render_views::c_geometry, 0, 0, bgfx::BackbufferRatio::Equal);
-                        setViewFrameBuffer(render_views::c_geometry, m_RenderSystems.m_GBuffer.GetHandle());
+    bgfx::setViewName(render_views::c_geometry, "Mesh");
+    bgfx::setViewClear(render_views::c_geometry, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x322e3dFF);
+    setViewRect(render_views::c_geometry, 0, 0, bgfx::BackbufferRatio::Equal);
+    setViewFrameBuffer(render_views::c_geometry, m_RenderSystems.m_GBuffer.GetHandle());
 
-                        bgfx::setViewName(render_views::c_surface, "Surface Draw");
-                        setViewRect(render_views::c_surface, 0, 0, bgfx::BackbufferRatio::Equal);
-                        setViewFrameBuffer(render_views::c_surface, m_RenderSystems.m_GBuffer.GetHandle());
+    bgfx::setViewName(render_views::c_surface, "Surface Draw");
+    setViewRect(render_views::c_surface, 0, 0, bgfx::BackbufferRatio::Equal);
+    setViewFrameBuffer(render_views::c_surface, m_RenderSystems.m_GBuffer.GetHandle());
 
-                        bgfx::setViewName(render_views::c_ui, "UI Layer");
-                        bgfx::setViewClear(render_views::c_ui, 0);
-                        setViewRect(render_views::c_ui, 0, 0, bgfx::BackbufferRatio::Equal);
-                        setViewMode(render_views::c_ui, bgfx::ViewMode::Sequential);
-                        bgfx::setViewFrameBuffer(render_views::c_ui, BGFX_INVALID_HANDLE);
+    bgfx::setViewName(render_views::c_ui, "UI Layer");
+    bgfx::setViewClear(render_views::c_ui, 0);
+    setViewRect(render_views::c_ui, 0, 0, bgfx::BackbufferRatio::Equal);
+    setViewMode(render_views::c_ui, bgfx::ViewMode::Sequential);
+    bgfx::setViewFrameBuffer(render_views::c_ui, BGFX_INVALID_HANDLE);
 
-                        bgfx::setViewName(render_views::c_postProcess, "OutputView");
-                        bgfx::setViewClear(render_views::c_postProcess, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x322e3dFF);
-                        setViewRect(render_views::c_postProcess, 0, 0, bgfx::BackbufferRatio::Equal);
-                        bgfx::setViewFrameBuffer(render_views::c_postProcess, BGFX_INVALID_HANDLE);
-                    },
+    bgfx::setViewName(render_views::c_postProcess, "OutputView");
+    bgfx::setViewClear(render_views::c_postProcess, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x322e3dFF);
+    setViewRect(render_views::c_postProcess, 0, 0, bgfx::BackbufferRatio::Equal);
+    bgfx::setViewFrameBuffer(render_views::c_postProcess, BGFX_INVALID_HANDLE);
+
+    addToFrameGraph("BufferPrep", [](){},
                     [this]()
                     {
                         const auto [width, height] = atlas::app_host::Application::Get().GetAppDimensions();
                         m_RenderSystems.m_GBuffer.EnsureSize(width, height);
                     });
 
-    addToFrameGraph("RenderWorld",
-                    [this]()
-                    {
-                        DirectInitialiseSystem(m_RenderSystems.m_CameraRenderSystem);
-                        DirectInitialiseSystem(m_RenderSystems.m_LightingSystem);
-                        DirectInitialiseSystem(m_RenderSystems.m_ClippedSurfaceRenderSystem);
-                        DirectInitialiseSystem(m_RenderSystems.m_ModelRenderer, render_masks::c_generalGeometry);
-                        DirectInitialiseSystem(m_RenderSystems.m_ConveyorRenderer);
-                    },
-                    [this]()
-                    {
-                        bgfx::setState(BGFX_STATE_DEFAULT);
-                        DirectRunSystem(m_RenderSystems.m_CameraRenderSystem);
-                        DirectRunSystem(m_RenderSystems.m_LightingSystem);
-                        DirectRunSystem(m_RenderSystems.m_ClippedSurfaceRenderSystem);
-                        DirectRunSystem(m_RenderSystems.m_ModelRenderer);
-                        DirectRunSystem(m_RenderSystems.m_ConveyorRenderer);
-                    });
+    AddToFrameGraph("ShadowPass", &m_RenderSystems.m_ShadowPass);
+    AddToFrameGraph("GeometryPass", &m_RenderSystems.m_GeometryPass);
+    AddToFrameGraph("PostGeometryPass", &m_RenderSystems.m_PostGeometry, &m_RenderSystems.m_GBuffer);
+}
 
-    addToFrameGraph("UI",
-                    [this]()
-                    {
-                        DirectInitialiseSystem(m_RenderSystems.m_UIController);
-                    },
-                    [this]()
-                    {
-                        bgfx::setState(BGFX_STATE_DEFAULT);
-                        DirectRunSystem(m_RenderSystems.m_UIController);
-                    });
+void cpp_conv::GameScene::RenderSystems::ShadowPass::Initialise(atlas::scene::EcsManager& ecsManager)
+{
+}
 
-    addToFrameGraph("FXAA",
-                    [this]()
-                    {
-                        DirectInitialiseSystem(m_RenderSystems.m_PostProcess, &m_RenderSystems.m_GBuffer);
-                    },
-                    [this]()
-                    {
-                        bgfx::setState(BGFX_STATE_DEFAULT);
-                        DirectRunSystem(m_RenderSystems.m_PostProcess);
-                    });
+void cpp_conv::GameScene::RenderSystems::ShadowPass::Update(atlas::scene::EcsManager& ecsManager)
+{
+}
+
+void cpp_conv::GameScene::RenderSystems::GeometryPass::Initialise(atlas::scene::EcsManager& ecsManager)
+{
+    m_CameraRenderSystem.Initialise(ecsManager);
+    m_LightingSystem.Initialise(ecsManager);
+    m_ClippedSurfaceRenderSystem.Initialise(ecsManager);
+    m_ModelRenderer.Initialise(ecsManager, constants::render_masks::c_generalGeometry);
+    m_ConveyorRenderer.Initialise(ecsManager);
+}
+
+void cpp_conv::GameScene::RenderSystems::GeometryPass::Update(atlas::scene::EcsManager& ecsManager)
+{
+    bgfx::setState(BGFX_STATE_DEFAULT);
+    atlas::scene::SystemsManager::Update(ecsManager, &m_CameraRenderSystem);
+    atlas::scene::SystemsManager::Update(ecsManager, &m_LightingSystem);
+    atlas::scene::SystemsManager::Update(ecsManager, &m_ClippedSurfaceRenderSystem);
+    atlas::scene::SystemsManager::Update(ecsManager, &m_ModelRenderer);
+    atlas::scene::SystemsManager::Update(ecsManager, &m_ConveyorRenderer);
+}
+
+void cpp_conv::GameScene::RenderSystems::PostGeometry::Initialise(atlas::scene::EcsManager& ecsManager, const FrameBuffer* gbuffer)
+{
+    m_UIController.Initialise(ecsManager);
+    m_PostProcess.Initialise(ecsManager, gbuffer);
+}
+
+void cpp_conv::GameScene::RenderSystems::PostGeometry::Update(atlas::scene::EcsManager& ecsManager)
+{
+    bgfx::setState(BGFX_STATE_DEFAULT);
+    atlas::scene::SystemsManager::Update(ecsManager, &m_UIController);
+    atlas::scene::SystemsManager::Update(ecsManager, &m_PostProcess);
 }
