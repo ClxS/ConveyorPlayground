@@ -133,5 +133,6 @@ void cpp_conv::PostProcessSystem::Update(atlas::scene::EcsManager& ecs)
 
     bgfx::setTexture(0, m_Samplers.m_Color, bgfx::getTexture(m_pFrameBuffer->GetHandle()));
 
+    bgfx::setMarker("FXAA");
     bgfx::submit(constants::render_views::c_postProcess, m_Programs.m_Fxaa->GetHandle());
 }

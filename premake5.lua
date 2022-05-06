@@ -70,6 +70,7 @@ group("ThirdParty")
 	include('src/ThirdParty/sdl.lua')
 	include('src/ThirdParty/sdlimage.lua')
 	include('src/ThirdParty/tomlcpp.lua')
+	include('src/ThirdParty/fmt.lua')
 
 group("ThirdParty/bgfx")
 	include('src/ThirdParty/bgfx.lua')

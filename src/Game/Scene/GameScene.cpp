@@ -279,7 +279,7 @@ void cpp_conv::GameScene::ConstructFrameGraph()
     const auto [width, height] = atlas::app_host::Application::Get().GetAppDimensions();
     m_RenderSystems.m_GBuffer.Initialise(width, height);
 
-    bgfx::setViewName(render_views::c_geometry, "Mesh");
+    bgfx::setViewName(render_views::c_geometry, "Geometry Drawn");
     bgfx::setViewClear(render_views::c_geometry, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x322e3dFF);
     setViewRect(render_views::c_geometry, 0, 0, bgfx::BackbufferRatio::Equal);
     setViewFrameBuffer(render_views::c_geometry, m_RenderSystems.m_GBuffer.GetHandle());
@@ -294,7 +294,7 @@ void cpp_conv::GameScene::ConstructFrameGraph()
     setViewMode(render_views::c_ui, bgfx::ViewMode::Sequential);
     bgfx::setViewFrameBuffer(render_views::c_ui, BGFX_INVALID_HANDLE);
 
-    bgfx::setViewName(render_views::c_postProcess, "OutputView");
+    bgfx::setViewName(render_views::c_postProcess, "Post Process");
     bgfx::setViewClear(render_views::c_postProcess, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x322e3dFF);
     setViewRect(render_views::c_postProcess, 0, 0, bgfx::BackbufferRatio::Equal);
     bgfx::setViewFrameBuffer(render_views::c_postProcess, BGFX_INVALID_HANDLE);
@@ -337,11 +337,27 @@ void cpp_conv::GameScene::RenderSystems::GeometryPass::Initialise(atlas::scene::
 void cpp_conv::GameScene::RenderSystems::GeometryPass::Update(atlas::scene::EcsManager& ecsManager)
 {
     bgfx::setState(BGFX_STATE_DEFAULT);
-    atlas::scene::SystemsManager::Update(ecsManager, &m_CameraRenderSystem);
-    atlas::scene::SystemsManager::Update(ecsManager, &m_LightingSystem);
-    atlas::scene::SystemsManager::Update(ecsManager, &m_ClippedSurfaceRenderSystem);
-    atlas::scene::SystemsManager::Update(ecsManager, &m_ModelRenderer);
-    atlas::scene::SystemsManager::Update(ecsManager, &m_ConveyorRenderer);
+    {
+        bgfx::setMarker("CameraRenderingSystem");
+        atlas::scene::SystemsManager::Update(ecsManager, &m_CameraRenderSystem);
+    }
+    {
+        bgfx::setMarker("LightingSystem");
+        atlas::scene::SystemsManager::Update(ecsManager, &m_LightingSystem);
+    }
+    {
+        bgfx::setMarker("ClippedSurfaceRenderingSystem");
+        atlas::scene::SystemsManager::Update(ecsManager, &m_ClippedSurfaceRenderSystem);
+    }
+    {
+        bgfx::setMarker("ModelRenderingSystem");
+        atlas::scene::SystemsManager::Update(ecsManager, &m_ModelRenderer);
+    }
+
+    {
+        bgfx::setMarker("ConveyorRenderingSystem");
+        atlas::scene::SystemsManager::Update(ecsManager, &m_ConveyorRenderer);
+    }
 }
 
 void cpp_conv::GameScene::RenderSystems::PostGeometry::Initialise(atlas::scene::EcsManager& ecsManager, const FrameBuffer* gbuffer)

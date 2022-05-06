@@ -215,6 +215,7 @@ void ConveyorRenderingSystem::Update(atlas::scene::EcsManager& ecs)
         }
     }
 
+    bgfx::setMarker("Drawing Conveyor");
     const bool instancingSupported = 0 != (BGFX_CAPS_INSTANCING & bgfx::getCaps()->supported);
     for(auto& conveyorType : conveyors)
     {
@@ -238,6 +239,7 @@ void ConveyorRenderingSystem::Update(atlas::scene::EcsManager& ecs)
         }
     }
 
+    bgfx::setMarker("Drawing Conveyor Items");
     for(auto& item : items | std::ranges::views::values)
     {
         if (item.m_ConveyorPositions.empty())

@@ -11,6 +11,7 @@ namespace
 {
     struct Task
     {
+        std::string m_Name;
         std::function<void()> m_Callback;
         bool m_IsOneOff;
     };
@@ -44,8 +45,8 @@ atlas::render::RenderTaskHandle atlas::render::addToFrameGraph(
     std::function<void()> callback,
     std::vector<RenderTaskHandle> dependentTasks)
 {
-    m_RenderMethods.emplace_back(initiailize, true);
-    m_RenderMethods.emplace_back(callback, false);
+    m_RenderMethods.emplace_back(std::string(name), initiailize, true);
+    m_RenderMethods.emplace_back(std::string(name), callback, false);
     return {-1};
 }
 
@@ -54,14 +55,14 @@ atlas::render::RenderTaskHandle atlas::render::addToFrameGraph(
     std::function<void()> callback,
     std::vector<RenderTaskHandle> dependentTasks)
 {
-    m_RenderMethods.emplace_back(callback, false);
+    m_RenderMethods.emplace_back(std::string(name), callback, false);
     return {-1};
 }
 
 atlas::render::RenderTaskHandle atlas::render::addToFrameGraph_oneOff(std::string_view name, std::function<void()> callback,
     std::vector<RenderTaskHandle> dependentTasks)
 {
-    m_RenderMethods.emplace_back(callback, true);
+    m_RenderMethods.emplace_back(std::string(name), callback, true);
     return {-1};
 }
 
@@ -71,7 +72,9 @@ void atlas::render::sync()
     {
         if (task.m_Callback)
         {
+            bgfx::setMarker((task.m_Name + "_Begin").c_str());
             task.m_Callback();
+            bgfx::setMarker((task.m_Name + "_End").c_str());
         }
     }
 
