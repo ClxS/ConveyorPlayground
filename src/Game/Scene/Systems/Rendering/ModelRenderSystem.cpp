@@ -11,19 +11,24 @@
 
 void cpp_conv::ModelRenderSystem::Initialise(
     atlas::scene::EcsManager&,
-    const uint8_t viewId,
-    const uint8_t renderMask)
+    const std::vector<Pass> passes)
 {
-    m_ViewId = viewId;
-    m_RenderMask = renderMask;
+    m_Passes = passes;
 }
 
 void cpp_conv::ModelRenderSystem::Update(atlas::scene::EcsManager& ecs)
 {
     using namespace components;
+
+    uint8_t renderMask = 0;
+    for(const auto& pass : m_Passes)
+    {
+        renderMask |= pass.m_RenderMask;
+    }
+
     for(auto [entity, model, position] : ecs.IterateEntityComponents<ModelComponent, PositionComponent>())
     {
-        if ((model.m_RenderMask & m_RenderMask) == 0 || !model.m_Model || !model.m_Model->GetMesh() || !model.m_Model->GetProgram())
+        if ((model.m_RenderMask & renderMask) == 0 || !model.m_Model || !model.m_Model->GetMesh() || !model.m_Model->GetProgram())
         {
             continue;
         }
@@ -51,11 +56,19 @@ void cpp_conv::ModelRenderSystem::Update(atlas::scene::EcsManager& ecs)
         Eigen::Matrix4f m = (t * r).matrix();
         bgfx::setTransform(m.data());
 
-        drawInstanced(
-            m_ViewId,
-            model.m_Model,
-            model.m_Model->GetProgram(),
-            { m },
-            ~BGFX_DISCARD_STATE);
+        for(const auto& pass : m_Passes)
+        {
+            if ((model.m_RenderMask & pass.m_RenderMask) == 0)
+            {
+                continue;
+            }
+
+            drawInstanced(
+                pass.m_ViewId,
+                model.m_Model,
+                model.m_Model->GetProgram(),
+                { m },
+                BGFX_DISCARD_NONE);
+        }
     }
 }

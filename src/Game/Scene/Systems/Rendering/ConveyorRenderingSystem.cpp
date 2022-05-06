@@ -32,9 +32,11 @@ struct LerpInformation
     float m_LerpFactor;
 };
 
-void ConveyorRenderingSystem::Initialise(atlas::scene::EcsManager&, const uint8_t viewId)
+void ConveyorRenderingSystem::Initialise(
+    atlas::scene::EcsManager&,
+    const std::vector<uint8_t> viewIds)
 {
-    m_ViewId = viewId;
+    m_ViewIds = viewIds;
 }
 
 void ConveyorRenderingSystem::Update(atlas::scene::EcsManager& ecs)
@@ -217,49 +219,54 @@ void ConveyorRenderingSystem::Update(atlas::scene::EcsManager& ecs)
 
     bgfx::setMarker("Drawing Conveyor");
     const bool instancingSupported = 0 != (BGFX_CAPS_INSTANCING & bgfx::getCaps()->supported);
-    for(auto& conveyorType : conveyors)
+    for(const uint8_t viewId : m_ViewIds)
     {
-        if (conveyorType.m_ConveyorPositions.empty())
+        for(auto& conveyorType : conveyors)
         {
-            continue;
+            if (conveyorType.m_ConveyorPositions.empty())
+            {
+                continue;
+            }
+
+
+            if (instancingSupported)
+            {
+                atlas::render::drawInstanced(
+                    viewId,
+                    conveyorType.m_Model,
+                    conveyorType.m_Model->GetProgram(),
+                    conveyorType.m_ConveyorPositions,
+                    BGFX_DISCARD_NONE);
+            }
+            else
+            {
+                // We don't currently support non-instanced platforms
+                assert(false);
+            }
         }
 
-        if (instancingSupported)
+        bgfx::setMarker("Drawing Conveyor Items");
+        for(auto& item : items | std::ranges::views::values)
         {
-            atlas::render::drawInstanced(
-                m_ViewId,
-                conveyorType.m_Model,
-                conveyorType.m_Model->GetProgram(),
-                conveyorType.m_ConveyorPositions);
-        }
-        else
-        {
-            // We don't currently support non-instanced platforms
-            assert(false);
-        }
-    }
+            if (item.m_ConveyorPositions.empty())
+            {
+                continue;
+            }
 
-    bgfx::setMarker("Drawing Conveyor Items");
-    for(auto& item : items | std::ranges::views::values)
-    {
-        if (item.m_ConveyorPositions.empty())
-        {
-            continue;
-        }
-
-        if (instancingSupported)
-        {
-            drawInstanced(
-                m_ViewId,
-                item.m_Model,
-                item.m_Model->GetProgram(),
-                item.m_ConveyorPositions,
-                ~BGFX_DISCARD_STATE);
-        }
-        else
-        {
-            // We don't currently support non-instanced platforms
-            assert(false);
+            if (instancingSupported)
+            {
+                drawInstanced(
+                    viewId,
+                    item.m_Model,
+                    item.m_Model->GetProgram(),
+                    item.m_ConveyorPositions,
+                    BGFX_DISCARD_NONE);
+            }
+            else
+            {
+                // We don't currently support non-instanced platforms
+                assert(false);
+            }
         }
     }
 }

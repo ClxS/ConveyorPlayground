@@ -39,6 +39,8 @@ namespace atlas::render
     RenderTaskHandle addToFrameGraph(std::string_view name, std::function<void()> callback, std::vector<RenderTaskHandle> dependentTasks = {});
     RenderTaskHandle addToFrameGraph_oneOff(std::string_view name, std::function<void()> callback, std::vector<RenderTaskHandle> dependentTasks = {});
 
+    void setShadowMap(uint8_t shadowIndex, bgfx::TextureHandle texture);
+
     void draw(
         bgfx::ViewId viewId,
         const resource::AssetPtr<ModelAsset>& model,

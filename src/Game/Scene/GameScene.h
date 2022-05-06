@@ -78,8 +78,6 @@ namespace cpp_conv
             struct ShadowPass
             {
                 ShadowMappingSystem m_ShadowMapping;
-                ModelRenderSystem m_ModelRenderer;
-                ConveyorRenderingSystem m_ConveyorRenderer;
 
                 void Initialise(atlas::scene::EcsManager& ecsManager);
                 void Update(atlas::scene::EcsManager& ecsManager);

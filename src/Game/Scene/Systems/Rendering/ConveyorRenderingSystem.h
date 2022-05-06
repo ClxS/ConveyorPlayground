@@ -9,9 +9,9 @@ class ConveyorRenderingSystem final : public atlas::scene::SystemBase
 public:
     void Initialise(
         atlas::scene::EcsManager&,
-        uint8_t viewId = cpp_conv::constants::render_views::c_geometry);
+        std::vector<uint8_t> viewIds = { cpp_conv::constants::render_views::c_geometry, cpp_conv::constants::render_views::c_shadowPass });
     void Update(atlas::scene::EcsManager& ecs) override;
 
     private:
-        uint8_t m_ViewId{cpp_conv::constants::render_views::c_geometry};
+        std::vector<uint8_t> m_ViewIds;
 };

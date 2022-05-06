@@ -314,15 +314,11 @@ void cpp_conv::GameScene::ConstructFrameGraph()
 void cpp_conv::GameScene::RenderSystems::ShadowPass::Initialise(atlas::scene::EcsManager& ecsManager)
 {
     m_ShadowMapping.Initialise(ecsManager);
-    m_ModelRenderer.Initialise(ecsManager, constants::render_views::c_shadowPass, constants::render_masks::c_shadowCaster);
-    m_ConveyorRenderer.Initialise(ecsManager, constants::render_views::c_shadowPass);
 }
 
 void cpp_conv::GameScene::RenderSystems::ShadowPass::Update(atlas::scene::EcsManager& ecsManager)
 {
     atlas::scene::SystemsManager::Update(ecsManager, &m_ShadowMapping);
-    atlas::scene::SystemsManager::Update(ecsManager, &m_ModelRenderer);
-    atlas::scene::SystemsManager::Update(ecsManager, &m_ConveyorRenderer);
 }
 
 void cpp_conv::GameScene::RenderSystems::GeometryPass::Initialise(atlas::scene::EcsManager& ecsManager)
@@ -330,7 +326,7 @@ void cpp_conv::GameScene::RenderSystems::GeometryPass::Initialise(atlas::scene::
     m_CameraRenderSystem.Initialise(ecsManager);
     m_LightingSystem.Initialise(ecsManager);
     m_ClippedSurfaceRenderSystem.Initialise(ecsManager);
-    m_ModelRenderer.Initialise(ecsManager, constants::render_masks::c_generalGeometry);
+    m_ModelRenderer.Initialise(ecsManager);
     m_ConveyorRenderer.Initialise(ecsManager);
 }
 
