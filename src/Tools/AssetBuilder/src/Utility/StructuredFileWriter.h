@@ -48,14 +48,16 @@ namespace asset_builder::utility::file_utility
             memcpy(&(m_Buffer[m_Buffer.size() - size]), data, size);
         }
 
-        void AddData(const int32_t value)
+        void AddPadding(const int32_t padAmount)
         {
-            AddData(&value, sizeof(int32_t));
+            EnsureSizeIncrease(padAmount);
+            memset(&(m_Buffer[m_Buffer.size() - padAmount]), 0, padAmount);
         }
 
-        void AddData(const int64_t value)
+        template<typename T>
+        void AddData(const T value)
         {
-            AddData(&value, sizeof(int64_t));
+            AddData(&value, sizeof(T));
         }
 
         void AddKeyedData(const std::string& key, const void* data, const size_t size)
@@ -70,15 +72,15 @@ namespace asset_builder::utility::file_utility
 
             if (fixup.second.m_Type == FixupType::Single)
             {
-                const auto start = static_cast<int32_t>(m_Buffer.size() - size);
-                memcpy(&(m_Buffer[fixup.second.m_Base]), &start, sizeof(int32_t));
+                const auto start = static_cast<uint32_t>(m_Buffer.size() - size);
+                memcpy(&(m_Buffer[fixup.second.m_Base]), &start, sizeof(uint32_t));
             }
             else
             {
-                const auto start = static_cast<int32_t>(m_Buffer.size() - size);
-                const auto end = static_cast<int32_t>(m_Buffer.size() - 1);
-                memcpy(&(m_Buffer[fixup.second.m_Base]), &start, sizeof(int32_t));
-                memcpy(&(m_Buffer[fixup.second.m_Base + sizeof(int32_t)]), &end, sizeof(int32_t));
+                const auto start = static_cast<uint32_t>(m_Buffer.size() - size);
+                const auto end = static_cast<uint32_t>(m_Buffer.size() - 1);
+                memcpy(&(m_Buffer[fixup.second.m_Base]), &start, sizeof(uint32_t));
+                memcpy(&(m_Buffer[fixup.second.m_Base + sizeof(uint32_t)]), &end, sizeof(uint32_t));
             }
         }
 
@@ -91,6 +93,30 @@ namespace asset_builder::utility::file_utility
         void AddKeyedData(const std::string& key, const std::vector<T>& data)
         {
             AddKeyedData(key, data.data(), data.size() * sizeof(T));
+        }
+
+        void SetKeyedDataRange(const std::string& key, const uint32_t start, const uint32_t end)
+        {
+            const auto it = m_FixupPointers.find(key);
+            assert(it != m_FixupPointers.end());
+            const auto fixup = *it;
+            m_FixupPointers.erase(it);
+
+            memcpy(&(m_Buffer[fixup.second.m_Base]), &start, sizeof(uint32_t));
+            memcpy(&(m_Buffer[fixup.second.m_Base + sizeof(uint32_t)]), &end, sizeof(uint32_t));
+        }
+
+        void SetKeyedDataRangeFromCurrent(const std::string& key, uint32_t end)
+        {
+            const auto it = m_FixupPointers.find(key);
+            assert(it != m_FixupPointers.end());
+            const auto fixup = *it;
+            m_FixupPointers.erase(it);
+
+            const uint32_t start = m_Buffer.size();
+            end = start + end;
+            memcpy(&(m_Buffer[fixup.second.m_Base]), &start, sizeof(uint32_t));
+            memcpy(&(m_Buffer[fixup.second.m_Base + sizeof(uint32_t)]), &end, sizeof(uint32_t));
         }
 
         [[nodiscard]] const std::vector<uint8_t>& GetData() const { return m_Buffer; }

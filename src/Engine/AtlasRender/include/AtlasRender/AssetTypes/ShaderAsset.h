@@ -1,4 +1,7 @@
 #pragma once
+#include <string>
+#include <vector>
+
 #include "../../../../AtlasResource/include/AtlasResource/ResourceAsset.h"
 #include "AtlasResource/AssetPtr.h"
 #include "bgfx/bgfx.h"
@@ -40,11 +43,19 @@ namespace atlas::render
     class ShaderProgram final : public resource::ResourceAsset
     {
     public:
+        struct SlotInfo
+        {
+            uint8_t m_Slot{0xFF};
+            bool m_bReserved{false};
+            std::string m_Type{};
+        };
+
         explicit ShaderProgram(
             bgfx::ProgramHandle handle,
             resource::AssetPtr<VertexShader> vertex,
             resource::AssetPtr<FragmentShader> fragment,
-            const int64_t textureSlotCount);
+            int64_t textureSlotCount,
+            std::vector<SlotInfo> textureSlotInformation);
         ~ShaderProgram() override;
 
         [[nodiscard]] bgfx::ProgramHandle GetHandle() const { return m_ProgramHandle; }
@@ -55,6 +66,8 @@ namespace atlas::render
         bgfx::ProgramHandle m_ProgramHandle;
         resource::AssetPtr<VertexShader> m_Vertex;
         resource::AssetPtr<FragmentShader> m_Fragment;
+        std::vector<SlotInfo> m_TextureSlotInformation;
+
         int64_t m_TextureSlotCount;
     };
 

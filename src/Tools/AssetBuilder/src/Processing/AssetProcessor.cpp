@@ -8,8 +8,8 @@
 #include "ModelAssetHandler.h"
 #include "ShaderAssetHandler.h"
 #include "Bgfx/MeshAssetHandler.h"
-#include "Bgfx/ShaderProgramAssetHandler.h"
 #include "Bgfx/Texture2dAsssetHandler.h"
+#include "ShaderProgramAssetHandler.h"
 #include "Rml/RmlDataHandler.h"
 
 std::unordered_map<std::string, std::unique_ptr<AssetHandler>> s_handlers;

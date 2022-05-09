@@ -55,7 +55,7 @@ namespace
             {
                 for(int i = 0; i < textures->size(); ++i)
                 {
-                    const auto texture = textures->getTable(0);
+                    const auto texture = textures->getTable(i);
 
                     auto texturePath = relativePath.parent_path() / texture->getString("texture").second;
                     texturePath = texturePath.lexically_normal();

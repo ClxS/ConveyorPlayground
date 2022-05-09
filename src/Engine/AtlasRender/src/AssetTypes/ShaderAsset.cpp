@@ -17,9 +17,18 @@ namespace
             uint32_t m_End;
         };
 
+        struct TextureSlotInfo
+        {
+            uint8_t m_Slot;
+            uint8_t m_IsReserved;
+            ProgramChunk m_Type;
+        };
+
         ProgramChunk m_VertexShader;
         ProgramChunk m_FragmentShader;
-        int64_t m_TextureSlotCount;
+        int32_t m_TextureSlotCount;
+        int32_t m_TextureSlotInfoCount;
+        ProgramChunk m_TextureSlotInfo;
     };
 }
 
@@ -41,10 +50,16 @@ atlas::render::FragmentShader::FragmentShader(const bgfx::ShaderHandle handle)
 {
 }
 
-atlas::render::ShaderProgram::ShaderProgram(bgfx::ProgramHandle handle, resource::AssetPtr<VertexShader> vertex,
-    resource::AssetPtr<FragmentShader> fragment, const int64_t textureSlotCount): m_ProgramHandle{handle}
+atlas::render::ShaderProgram::ShaderProgram(
+    bgfx::ProgramHandle handle,
+    resource::AssetPtr<VertexShader> vertex,
+    resource::AssetPtr<FragmentShader> fragment,
+    const int64_t textureSlotCount,
+    std::vector<SlotInfo> textureSlotInformation)
+    : m_ProgramHandle{handle}
     , m_Vertex{std::move(vertex)}
     , m_Fragment{std::move(fragment)}
+    , m_TextureSlotInformation{std::move(textureSlotInformation)}
     , m_TextureSlotCount{textureSlotCount}
 {
 
@@ -117,6 +132,27 @@ atlas::resource::AssetPtr<atlas::resource::ResourceAsset> atlas::render::shaderP
         return nullptr;
     }
 
+    std::vector<ShaderProgram::SlotInfo> textureSlotInformation;
+    if (program->m_TextureSlotInfo.m_Start != 0 && program->m_TextureSlotInfo.m_End != 0)
+    {
+        const auto slotInfos = reinterpret_cast<const ProgramHeader::TextureSlotInfo*>(&data.m_pData[program->m_TextureSlotInfo.m_Start]);
+        for(int i = 0; i < program->m_TextureSlotInfoCount; i++)
+        {
+            constexpr size_t stride = sizeof(ProgramHeader::TextureSlotInfo);
+            const auto info = slotInfos + stride * i;
+
+            std::string_view type;
+            if (info->m_Type.m_Start != 0)
+            {
+                type = {
+                    &dataAsChar[info->m_Type.m_Start],
+                    info->m_Type.m_End - info->m_Type.m_Start + 1};
+            }
+
+            textureSlotInformation.emplace_back(info->m_Slot, info->m_IsReserved > 0, std::string(type));
+        }
+    }
+
     auto programHandle = bgfx::createProgram(vertexShader->GetHandle(), fragmentShader->GetHandle(), false);
-    return std::make_shared<ShaderProgram>(programHandle, vertexShader, fragmentShader, program->m_TextureSlotCount);
+    return std::make_shared<ShaderProgram>(programHandle, vertexShader, fragmentShader, program->m_TextureSlotCount, textureSlotInformation);
 }
