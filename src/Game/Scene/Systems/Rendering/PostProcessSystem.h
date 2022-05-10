@@ -1,8 +1,10 @@
 #pragma once
 #include "AtlasRender/AssetTypes/ShaderAsset.h"
+#include "AtlasRender/Types/FrameBuffer.h"
 #include "AtlasScene/ECS/Components/EcsManager.h"
 #include "AtlasScene/ECS/Systems/SystemBase.h"
 #include "bgfx/bgfx.h"
+#include "Eigen/Core"
 
 namespace atlas
 {
@@ -35,13 +37,28 @@ namespace cpp_conv
         void Update(atlas::scene::EcsManager& ecs) override;
 
     private:
-        bgfx::VertexLayout m_PostProcessLayout{};
+        enum class Scope
+        {
+            Interstitial,
+            InputBuffer,
+            OutputBuffer
+        };
 
-        const atlas::render::FrameBuffer* m_pFrameBuffer;
+        [[nodiscard]] bgfx::TextureHandle GetInputAsTexture(Scope target) const;
+        [[nodiscard]] bgfx::FrameBufferHandle GetTargetFrameBuffer(Scope target) const;
+
+        void PrepareFrame();
+        void DoFxaa(bgfx::ViewId viewId, Scope source, Scope target) const;
+        void DoVignette(bgfx::ViewId viewId, Scope source, Scope target) const;
+        void DoCopy(bgfx::ViewId viewId, Scope source, Scope target) const;
+
+        bgfx::VertexLayout m_PostProcessLayout{};
+        const atlas::render::FrameBuffer* m_pFrameBuffer{nullptr};
 
         struct
         {
             atlas::resource::AssetPtr<atlas::render::ShaderProgram> m_Fxaa{};
+            atlas::resource::AssetPtr<atlas::render::ShaderProgram> m_Vignette{};
             atlas::resource::AssetPtr<atlas::render::ShaderProgram> m_Copy{};
         } m_Programs;
 
@@ -54,6 +71,13 @@ namespace cpp_conv
         {
             bgfx::UniformHandle m_FrameBufferSize{BGFX_INVALID_HANDLE};
         } m_Uniforms;
+
+        struct
+        {
+            atlas::render::FrameBuffer m_FrameBuffer;
+        } m_Interstitials;
+
+        bgfx::VertexBufferHandle m_FullScreenQuad;
 
         float m_TexelHalf{};
     };
