@@ -63,12 +63,13 @@ void cpp_conv::ModelRenderSystem::Update(atlas::scene::EcsManager& ecs)
                 continue;
             }
 
+            bgfx::setState(pass.m_State);
             drawInstanced(
                 pass.m_ViewId,
                 model.m_Model,
-                model.m_Model->GetProgram(),
+                pass.m_bOverrideProgram ? pass.m_bOverrideProgram : model.m_Model->GetProgram(),
                 { m },
-                BGFX_DISCARD_NONE);
+                BGFX_DISCARD_ALL);
         }
     }
 }

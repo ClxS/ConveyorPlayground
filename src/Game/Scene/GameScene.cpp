@@ -268,16 +268,6 @@ void cpp_conv::GameScene::ConstructSystems(atlas::scene::SystemsBuilder& builder
 void cpp_conv::GameScene::ConstructFrameGraph()
 {
     using namespace constants;
-    constexpr bgfx::ViewId order[] =
-    {
-        render_views::c_shadowPass,
-        render_views::c_surface,
-        render_views::c_geometry,
-        render_views::c_postProcess,
-        render_views::c_ui,
-    };
-    bgfx::setViewOrder(0, BX_COUNTOF(order), order);
-
     const auto [width, height] = atlas::app_host::Application::Get().GetAppDimensions();
     m_RenderSystems.m_GBuffer.Initialise(width, height);
 
@@ -286,20 +276,11 @@ void cpp_conv::GameScene::ConstructFrameGraph()
     setViewRect(render_views::c_geometry, 0, 0, bgfx::BackbufferRatio::Equal);
     setViewFrameBuffer(render_views::c_geometry, m_RenderSystems.m_GBuffer.GetHandle());
 
-    bgfx::setViewName(render_views::c_surface, "Surface Draw");
-    setViewRect(render_views::c_surface, 0, 0, bgfx::BackbufferRatio::Equal);
-    setViewFrameBuffer(render_views::c_surface, m_RenderSystems.m_GBuffer.GetHandle());
-
     bgfx::setViewName(render_views::c_ui, "UI Layer");
     bgfx::setViewClear(render_views::c_ui, 0);
     setViewRect(render_views::c_ui, 0, 0, bgfx::BackbufferRatio::Equal);
     setViewMode(render_views::c_ui, bgfx::ViewMode::Sequential);
     bgfx::setViewFrameBuffer(render_views::c_ui, BGFX_INVALID_HANDLE);
-
-    bgfx::setViewName(render_views::c_postProcess, "Post Process");
-    bgfx::setViewClear(render_views::c_postProcess, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x322e3dFF);
-    setViewRect(render_views::c_postProcess, 0, 0, bgfx::BackbufferRatio::Equal);
-    bgfx::setViewFrameBuffer(render_views::c_postProcess, BGFX_INVALID_HANDLE);
 
     addToFrameGraph("BufferPrep", [](){},
                     [this]()

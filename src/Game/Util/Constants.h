@@ -1,14 +1,17 @@
 #pragma once
 
+#include <cstdint>
+
+#include "bgfx/bgfx.h"
+
 namespace cpp_conv::constants
 {
     namespace render_views
     {
-        constexpr int c_geometry = 1;
-        constexpr int c_ui = 2;
-        constexpr int c_surface = 3;
-        constexpr int c_shadowPass = 4;
-        constexpr int c_postProcess = 0;
+        constexpr bgfx::ViewId c_shadowPass = 0;
+        constexpr bgfx::ViewId c_geometry = 1;
+        constexpr bgfx::ViewId c_postProcess = 2;
+        constexpr bgfx::ViewId c_ui = 32;
     }
 
     namespace render_masks

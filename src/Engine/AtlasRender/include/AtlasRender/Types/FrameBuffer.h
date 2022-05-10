@@ -9,7 +9,7 @@ namespace atlas::render
     public:
         ~FrameBuffer();
 
-        void Initialise(const uint32_t width, const uint32_t height);
+        void Initialise(uint32_t width, const uint32_t height, bool includeDepth = true);
 
         void EnsureSize(uint32_t width, uint32_t height);
 

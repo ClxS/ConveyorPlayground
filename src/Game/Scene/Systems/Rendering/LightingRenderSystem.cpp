@@ -20,7 +20,7 @@ void cpp_conv::LightingRenderSystem::Initialise(atlas::scene::EcsManager& ecsMan
 
 void cpp_conv::LightingRenderSystem::Update(atlas::scene::EcsManager& ecs)
 {
-    Eigen::Vector4f ambient = { 0.3f, 0.3f, 0.3f, 1.0f };
+    Eigen::Vector4f ambient = { 0.8f, 0.8f, 0.8f, 1.0f };
     bgfx::setUniform(m_Uniforms.m_AmbientColour, ambient.data());
 
     uint8_t lightIndex = 0;
@@ -30,6 +30,8 @@ void cpp_conv::LightingRenderSystem::Update(atlas::scene::EcsManager& ecs)
         {
             break;
         }
+
+        light.m_LightDirection = Eigen::AngleAxisf(0.01f, Eigen::Vector3f::UnitY()) * light.m_LightDirection;
 
         bgfx::setUniform(m_Uniforms.m_LightDirections[lightIndex], light.m_LightDirection.data());
         bgfx::setUniform(m_Uniforms.m_LightColours[lightIndex], light.m_LightColour.data());

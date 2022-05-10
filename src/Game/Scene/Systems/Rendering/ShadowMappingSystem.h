@@ -20,7 +20,7 @@ namespace cpp_conv
     class ShadowMappingSystem final : public atlas::scene::SystemBase
     {
     public:
-        void Initialise(atlas::scene::EcsManager&, uint16_t shadowMapWidth = 1024, uint16_t shadowMapHeight = 1024);
+        void Initialise(atlas::scene::EcsManager&, uint16_t shadowMapWidth = 2048, uint16_t shadowMapHeight = 2048);
 
         void Update(atlas::scene::EcsManager& ecs) override;
 

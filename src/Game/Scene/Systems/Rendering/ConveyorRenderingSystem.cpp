@@ -34,9 +34,9 @@ struct LerpInformation
 
 void ConveyorRenderingSystem::Initialise(
     atlas::scene::EcsManager&,
-    const std::vector<uint8_t> viewIds)
+    const std::vector<Pass> viewIds)
 {
-    m_ViewIds = viewIds;
+    m_Passes = viewIds;
 }
 
 void ConveyorRenderingSystem::Update(atlas::scene::EcsManager& ecs)
@@ -210,7 +210,7 @@ void ConveyorRenderingSystem::Update(atlas::scene::EcsManager& ecs)
                 }
                 else
                 {
-                    Eigen::Affine3f t{Eigen::Translation3f(position2d.x(), position.m_Position.y() + 0.1f, position2d.y())};
+                    Eigen::Affine3f t {Eigen::Translation3f(position2d.x(), position.m_Position.y() + 0.1f, position2d.y())};
                     itemSet.m_ConveyorPositions.push_back(t.matrix());
                 }
             }
@@ -219,7 +219,7 @@ void ConveyorRenderingSystem::Update(atlas::scene::EcsManager& ecs)
 
     bgfx::setMarker("Drawing Conveyor");
     const bool instancingSupported = 0 != (BGFX_CAPS_INSTANCING & bgfx::getCaps()->supported);
-    for(const uint8_t viewId : m_ViewIds)
+    for(const Pass& pass : m_Passes)
     {
         for(auto& conveyorType : conveyors)
         {
@@ -232,11 +232,11 @@ void ConveyorRenderingSystem::Update(atlas::scene::EcsManager& ecs)
             if (instancingSupported)
             {
                 atlas::render::drawInstanced(
-                    viewId,
+                    pass.m_ViewId,
                     conveyorType.m_Model,
-                    conveyorType.m_Model->GetProgram(),
+                    pass.m_bOverrideProgram ? pass.m_bOverrideProgram : conveyorType.m_Model->GetProgram(),
                     conveyorType.m_ConveyorPositions,
-                    BGFX_DISCARD_NONE);
+                    BGFX_DISCARD_ALL);
             }
             else
             {
@@ -256,11 +256,11 @@ void ConveyorRenderingSystem::Update(atlas::scene::EcsManager& ecs)
             if (instancingSupported)
             {
                 drawInstanced(
-                    viewId,
+                    pass.m_ViewId,
                     item.m_Model,
-                    item.m_Model->GetProgram(),
+                    pass.m_bOverrideProgram ? pass.m_bOverrideProgram : item.m_Model->GetProgram(),
                     item.m_ConveyorPositions,
-                    BGFX_DISCARD_NONE);
+                    BGFX_DISCARD_ALL);
             }
             else
             {
