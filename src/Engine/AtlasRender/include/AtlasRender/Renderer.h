@@ -33,13 +33,19 @@ namespace atlas::render
         maths_helpers::Angle m_Rotation;
     };
 
+    struct ShadowCaster
+    {
+        Eigen::Matrix4f m_LightMatrix;
+        bgfx::TextureHandle m_ShadowMap;
+    };
+
     void init(const RendererInitArgs& args);
 
     RenderTaskHandle addToFrameGraph(std::string_view name, std::function<void()> initiailize, std::function<void()> callback, std::vector<RenderTaskHandle> dependentTasks = {});
     RenderTaskHandle addToFrameGraph(std::string_view name, std::function<void()> callback, std::vector<RenderTaskHandle> dependentTasks = {});
     RenderTaskHandle addToFrameGraph_oneOff(std::string_view name, std::function<void()> callback, std::vector<RenderTaskHandle> dependentTasks = {});
 
-    void setShadowMap(uint8_t shadowIndex, bgfx::TextureHandle texture);
+    void setShadowCaster(uint8_t shadowIndex, ShadowCaster shadow);
 
     void draw(
         bgfx::ViewId viewId,

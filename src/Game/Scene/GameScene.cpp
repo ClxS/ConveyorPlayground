@@ -153,6 +153,8 @@ namespace
         auto& light = ecs.AddComponent<DirectionalLightComponent>(lightEntity);
         light.m_LightDirection = {0.08f, -0.5, -0.70f };
         light.m_LightColour = {1.0, 1.0, 1.0, 1.0f};
+
+        light.m_LightDirection.normalize();
     }
 
     void addGround(atlas::scene::EcsManager& ecs)

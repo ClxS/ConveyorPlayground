@@ -149,7 +149,7 @@ atlas::resource::AssetPtr<atlas::resource::ResourceAsset> atlas::render::shaderP
                     info->m_Type.m_End - info->m_Type.m_Start + 1};
             }
 
-            textureSlotInformation.emplace_back(info->m_Slot, info->m_IsReserved > 0, std::string(type));
+            textureSlotInformation.emplace_back(info->m_Slot, info->m_IsReserved > 0, core::hashing::fnv1(type));
         }
     }
 

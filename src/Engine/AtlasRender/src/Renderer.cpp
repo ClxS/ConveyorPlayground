@@ -19,6 +19,8 @@ namespace
     static std::vector<Task> m_RenderMethods;
 }
 
+void initDrawingData();
+
 void atlas::render::init(const RendererInitArgs& args)
 {
     bgfx::PlatformData pd{};
@@ -37,6 +39,8 @@ void atlas::render::init(const RendererInitArgs& args)
 
     bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x6495EDFF, 1.0f, 0);
     bgfx::setViewRect(0, 0, 0, args.m_Width, args.m_Height);
+
+    initDrawingData();
 }
 
 atlas::render::RenderTaskHandle atlas::render::addToFrameGraph(

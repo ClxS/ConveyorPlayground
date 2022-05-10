@@ -108,7 +108,7 @@ std::variant<std::vector<OutputArtifact>, ErrorString> ShaderAssetHandler::Cook(
 
     std::string processName = (currentDirectory.value() / "shaderc.exe").string();
     std::string args = std::format(
-        R"(-f "{}" -o "{}" --platform {} --type {} --verbose -i -p {}_{})",
+        R"(-f "{}" -o "{}" --platform {} --type {} --verbose --debug -i -p {}_{})",
         sourceFile,
         outputFile,
         platform,

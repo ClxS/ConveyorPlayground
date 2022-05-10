@@ -47,7 +47,7 @@ namespace atlas::render
         {
             uint8_t m_Slot{0xFF};
             bool m_bReserved{false};
-            std::string m_Type{};
+            uint64_t m_TypeHash{};
         };
 
         explicit ShaderProgram(
@@ -61,6 +61,27 @@ namespace atlas::render
         [[nodiscard]] bgfx::ProgramHandle GetHandle() const { return m_ProgramHandle; }
 
         [[nodiscard]] int64_t GetTextureSlotCount() const { return m_TextureSlotCount; }
+
+        [[nodiscard]] SlotInfo GetTextureSlotInfo(const uint8_t index) const
+        {
+            if (m_TextureSlotInformation.size() >= index)
+            {
+                return {
+                    index,
+                    false,
+                    {}
+                };
+            }
+
+            auto info = m_TextureSlotInformation[index];
+            info.m_Slot = index;
+            return info;
+        }
+
+        [[nodiscard]] const std::vector<SlotInfo>& GetTextureSlotInfos() const
+        {
+            return m_TextureSlotInformation;
+        }
 
     private:
         bgfx::ProgramHandle m_ProgramHandle;
