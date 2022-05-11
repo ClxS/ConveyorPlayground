@@ -1,42 +1,36 @@
 #include "InserterRegistry.h"
-#include "ResourceManager.h"
 #include "InserterDefinition.h"
-#include "AssetPtr.h"
+#include "AtlasResource/AssetPtr.h"
 
-#include <vector>
-#include <memory>
-#include <sstream>
 #include <iostream>
-#include "SelfRegistration.h"
+#include <memory>
+#include <vector>
 #include "DataId.h"
 #include "Profiler.h"
+#include "AtlasResource/ResourceLoader.h"
 
-using RegistryId = cpp_conv::resources::registry::RegistryId;
-static std::vector<cpp_conv::resources::AssetPtr<cpp_conv::InserterDefinition>> g_vInsertersItems;
+static std::vector<atlas::resource::AssetPtr<cpp_conv::InserterDefinition>> g_vInsertersItems;
 
-namespace
+void cpp_conv::resources::loadInserters()
 {
-    void loadItems()
+    for (const atlas::resource::RegistryId asset : cpp_conv::resources::registry::core_bundle::data::inserters::c_AllAssets)
     {
-        for(const RegistryId asset : cpp_conv::resources::registry::data::inserters::c_AllAssets)
+        auto pAsset = atlas::resource::ResourceLoader::LoadAsset<cpp_conv::resources::registry::CoreBundle, cpp_conv::InserterDefinition>(asset);
+        if (!pAsset)
         {
-            auto pAsset = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::InserterDefinition>(asset);
-            if (!pAsset)
-            {
-                continue;
-            }
-
-            g_vInsertersItems.push_back(pAsset);
+            continue;
         }
+
+        g_vInsertersItems.push_back(pAsset);
     }
 }
 
-cpp_conv::resources::ResourceAsset* inserterAssetHandler(cpp_conv::resources::resource_manager::FileData& rData)
+atlas::resource::AssetPtr<atlas::resource::ResourceAsset> cpp_conv::resources::inserterAssetHandler(const atlas::resource::FileData& rData)
 {
-    const auto pStrData = reinterpret_cast<const char*>(rData.m_pData);
+    const auto pStrData = reinterpret_cast<const char*>(rData.m_pData.get());
 
     // ReSharper disable once CppRedundantCastExpression
-    const std::string copy(pStrData, (int)(rData.m_uiSize / sizeof(char)));
+    const std::string copy(pStrData, (int)(rData.m_Size / sizeof(char)));
 
     std::string errors;
     auto pDefinition = cpp_conv::InserterDefinition::Deserialize(copy, &errors);
@@ -46,10 +40,11 @@ cpp_conv::resources::ResourceAsset* inserterAssetHandler(cpp_conv::resources::re
         return nullptr;
     }
 
-    return pDefinition.release();
+    atlas::resource::AssetPtr<atlas::resource::ResourceAsset> out {pDefinition.release()};
+    return out;
 }
 
-cpp_conv::resources::AssetPtr<cpp_conv::InserterDefinition> cpp_conv::resources::getInserterDefinition(
+atlas::resource::AssetPtr<cpp_conv::InserterDefinition> cpp_conv::resources::getInserterDefinition(
     const InserterId id)
 {
     PROFILE_FUNC();
@@ -63,6 +58,3 @@ cpp_conv::resources::AssetPtr<cpp_conv::InserterDefinition> cpp_conv::resources:
 
     return nullptr;
 }
-
-REGISTER_ASSET_LOAD_HANDLER(cpp_conv::InserterDefinition, inserterAssetHandler);
-REGISTER_LOAD_HANDLER(loadItems);

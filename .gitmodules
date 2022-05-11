@@ -37,3 +37,21 @@
 [submodule "src/ThirdParty/bimg"]
 	path = src/ThirdParty/bimg
 	url = https://github.com/bkaradzic/bimg
+[submodule "src/ThirdParty/googletest"]
+	path = src/ThirdParty/googletest
+	url = https://github.com/google/googletest.git
+[submodule "src/ThirdParty/benchmark"]
+	path = src/ThirdParty/benchmark
+	url = https://github.com/google/benchmark
+[submodule "src/ThirdParty/optick"]
+	path = src/ThirdParty/optick
+	url = https://github.com/ClxS/optick
+[submodule "src/ThirdParty/fixed_string"]
+	path = src/ThirdParty/fixed_string
+	url = https://github.com/unterumarmung/fixed_string
+[submodule "data/sdlPrivate"]
+	path = data/sdlPrivate
+	url = https://github.com/ClxS/ConveyorPlayground_Private.git
+[submodule "src/ThirdParty/fmt"]
+	path = src/ThirdParty/fmt
+	url = https://github.com/fmtlib/fmt

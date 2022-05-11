@@ -1,16 +1,16 @@
 [factory]
 id="FACTORY_COPPER_MINE"
 name="Copper Mine"
-asset="assets::factories::CopperMine"
+asset="assets::factories::Factories::CopperFactory"
 recipe="RECIPE_COPPER_ORE"
 rate=1
 
 [factory.size]
 x = 3
-y = 3
-z = 1
+y = 1
+z = 3
 
 [factory.output]
-x = 2
-y = 1
+x = 1
+y = 0
 z = 0

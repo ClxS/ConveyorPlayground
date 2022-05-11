@@ -6,6 +6,7 @@ namespace cpp_conv
     union Colour
     {
         uint32_t m_value;
+
         struct ArgbTag
         {
             uint8_t m_b;

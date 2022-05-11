@@ -1,9 +1,9 @@
 #pragma once
 
-#include <cstdint>
-#include <string>
 #include "DataId.h"
-#include "AssetPtr.h"
+#include "AtlasResource/AssetPtr.h"
+#include "AtlasResource/FileData.h"
+#include "AtlasResource/ResourceAsset.h"
 
 namespace cpp_conv
 {
@@ -12,5 +12,9 @@ namespace cpp_conv
 
 namespace cpp_conv::resources
 {
-    AssetPtr<ConveyorDefinition> getConveyorDefinition(ConveyorId id);
+    void loadConveyors();
+
+    atlas::resource::AssetPtr<ConveyorDefinition> getConveyorDefinition(ConveyorId id);
+
+    atlas::resource::AssetPtr<atlas::resource::ResourceAsset> conveyorAssetHandler(const atlas::resource::FileData& rData);
 }

@@ -8,7 +8,11 @@ project "AssetBuilder"
 	files {
 		"**",
 	}
+	includedirs {
+	    "**",
+	}
 	links {
+		"tomlcpp_tools",
 		"ToolsCore",
 	}
 	flags { "FatalWarnings" }

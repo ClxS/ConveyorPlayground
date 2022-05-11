@@ -27,6 +27,7 @@ enum class EntityKind
     Stairs,
     Storage,
     Tunnel,
+    LaunchPad,
 
     MAX
 };

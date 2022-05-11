@@ -25,7 +25,7 @@ namespace cpp_conv
             const std::vector<DataFieldBase*>& fields,
             std::string* outErrors = nullptr)
         {
-            const auto [table, errors] = ::toml::parse(input);
+            const auto [table, errors] = toml::parse(input);
             if (!table)
             {
                 if (outErrors)
@@ -48,7 +48,7 @@ namespace cpp_conv
             }
 
             bool bErrors = false;
-            for(auto& field : fields)
+            for (auto& field : fields)
             {
                 if (!field->TryRead(rootTable.get()) && field->m_bIsRequired)
                 {
@@ -57,7 +57,8 @@ namespace cpp_conv
                     {
                         if (outErrors->size() > 0)
                         {
-                            *outErrors = std::format("{}Failed to read required field {}\n", *outErrors, field->m_FieldName);
+                            *outErrors = std::format("{}Failed to read required field {}\n", *outErrors,
+                                                     field->m_FieldName);
                         }
                         else
                         {
@@ -71,4 +72,3 @@ namespace cpp_conv
         }
     };
 }
-

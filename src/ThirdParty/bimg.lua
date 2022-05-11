@@ -57,15 +57,6 @@ project "etc2"
     links {
         "bx",
     }
-    filter { "configurations:Debug" }
-        defines {
-            "BX_CONFIG_DEBUG=0",
-        }
-    filter { "configurations:Release" }
-        defines {
-            "BX_CONFIG_DEBUG=0",
-        }
-    filter { }
 
 project "iqa"
     kind "StaticLib"
@@ -97,15 +88,6 @@ project "nvtt"
     links {
         "bx"
     }
-    filter { "configurations:Debug" }
-        defines {
-            "BX_CONFIG_DEBUG=0",
-        }
-    filter { "configurations:Release" }
-        defines {
-            "BX_CONFIG_DEBUG=0",
-        }
-    filter { }
 
 project "libsquish"
     kind "StaticLib"
@@ -163,12 +145,3 @@ project "bimg"
         "iqa",
         "tinyexr",
     }
-    filter { "configurations:Debug" }
-        defines {
-            "BX_CONFIG_DEBUG=0",
-        }
-	filter { "configurations:Release" }
-        defines {
-            "BX_CONFIG_DEBUG=0",
-        }
-    filter {}

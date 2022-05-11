@@ -1,42 +1,37 @@
 #include "ItemRegistry.h"
-#include "ResourceManager.h"
+#include "AtlasResource/AssetPtr.h"
 #include "ItemDefinition.h"
-#include "AssetPtr.h"
 
-#include <vector>
+#include <iostream>
 #include <memory>
 #include <sstream>
-#include <iostream>
-#include "SelfRegistration.h"
+#include <vector>
 #include "DataId.h"
 #include "Profiler.h"
+#include "AtlasResource/ResourceLoader.h"
 
-using RegistryId = cpp_conv::resources::registry::RegistryId;
-static std::vector<cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition>> g_vItems;
+static std::vector<atlas::resource::AssetPtr<cpp_conv::ItemDefinition>> g_vItems;
 
-namespace
+void cpp_conv::resources::loadItems()
 {
-    void loadItems()
+    for (const atlas::resource::RegistryId asset : cpp_conv::resources::registry::core_bundle::data::items::c_AllAssets)
     {
-        for(const RegistryId asset : cpp_conv::resources::registry::data::items::c_AllAssets)
+        auto pAsset = atlas::resource::ResourceLoader::LoadAsset<cpp_conv::resources::registry::CoreBundle, cpp_conv::ItemDefinition>(asset);
+        if (!pAsset)
         {
-            auto pAsset = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::ItemDefinition>(asset);
-            if (!pAsset)
-            {
-                continue;
-            }
-
-            g_vItems.push_back(pAsset);
+            continue;
         }
+
+        g_vItems.push_back(pAsset);
     }
 }
 
-cpp_conv::resources::ResourceAsset* itemAssetHandler(cpp_conv::resources::resource_manager::FileData& rData)
+atlas::resource::AssetPtr<atlas::resource::ResourceAsset> cpp_conv::resources::itemAssetHandler(const atlas::resource::FileData& rData)
 {
-    const auto pStrData = reinterpret_cast<const char*>(rData.m_pData);
+    const auto pStrData = reinterpret_cast<const char*>(rData.m_pData.get());
 
     // ReSharper disable once CppRedundantCastExpression
-    const std::string copy(pStrData, (int)(rData.m_uiSize / sizeof(char)));
+    const std::string copy(pStrData, (int)(rData.m_Size / sizeof(char)));
 
     std::string errors;
     auto pDefinition = cpp_conv::ItemDefinition::Deserialize(copy, &errors);
@@ -46,10 +41,11 @@ cpp_conv::resources::ResourceAsset* itemAssetHandler(cpp_conv::resources::resour
         return nullptr;
     }
 
-    return pDefinition.release();
+    atlas::resource::AssetPtr<atlas::resource::ResourceAsset> out {pDefinition.release()};
+    return out;
 }
 
-cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> cpp_conv::resources::getItemDefinition(const ItemId id)
+atlas::resource::AssetPtr<cpp_conv::ItemDefinition> cpp_conv::resources::getItemDefinition(const ItemId id)
 {
     PROFILE_FUNC();
     for (auto item : g_vItems)
@@ -62,6 +58,3 @@ cpp_conv::resources::AssetPtr<cpp_conv::ItemDefinition> cpp_conv::resources::get
 
     return nullptr;
 }
-
-REGISTER_ASSET_LOAD_HANDLER(cpp_conv::ItemDefinition, itemAssetHandler);
-REGISTER_LOAD_HANDLER(loadItems);

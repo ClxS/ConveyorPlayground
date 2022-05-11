@@ -2,8 +2,10 @@
 
 #include <cstdint>
 #include <string>
+#include "AtlasResource/AssetPtr.h"
 #include "DataId.h"
-#include "AssetPtr.h"
+#include "AtlasResource/FileData.h"
+#include "AtlasResource/ResourceAsset.h"
 
 namespace cpp_conv
 {
@@ -12,5 +14,9 @@ namespace cpp_conv
 
 namespace cpp_conv::resources
 {
-    AssetPtr<InserterDefinition> getInserterDefinition(InserterId id);
+    void loadInserters();
+
+    atlas::resource::AssetPtr<InserterDefinition> getInserterDefinition(InserterId id);
+
+    atlas::resource::AssetPtr<atlas::resource::ResourceAsset> inserterAssetHandler(const atlas::resource::FileData& rData);
 }

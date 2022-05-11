@@ -3,9 +3,14 @@ project "CppConveyor"
 	editandcontinue "On"
 	debugdir "$(TargetDir)"
 	files {
+	    "premake5.lua",
 		"**.h",
 		"**.cpp",
+		"**.natvis",
 	}
+	filter {"files:Scene/Grid/**"}
+	    flags{"ExcludeFromBuild"}
+	filter{}
 	flags { "FatalWarnings" }
 	dependson {
 		"AssetBuilder"
@@ -24,13 +29,13 @@ project "CppConveyor"
 			  	<Message Text="Generating Asset Specification" Importance="High" />
 			  	<Exec Command="$(ToolsDir)/AssetBuilder.exe -r $(DataDir) --platform $(BuildPlatform) -d --ns $(DataNamespace) -o $(CodeDir)/Generated/AssetRegistry.h" />
 			  </Target>
-			  <Target Name="DeployAssets" AfterTargets="Build">
-			    <Message Text="Deploying Assets" Importance="High" />
-			    <Exec Command="$(ToolsDir)/AssetBuilder.exe cook -r $(DataDir) --platform $(BuildPlatform) -o $(TargetDir)data " />
-			  </Target>
 			]]
 		}
 	end
+
+    defines {
+        "__STDC_FORMAT_MACROS"
+    }
 
 	filter {"platforms:Console"}
 		kind "ConsoleApp"
@@ -63,8 +68,16 @@ project "CppConveyor"
 
 	links {
 		"tomlcpp",
+		"eigen",
+		"fixed_string",
+		"bgfx",
+		"RmlUI",
 
 		"AtlasAppHost",
+		"AtlasGame",
+		"AtlasScene",
+		"AtlasResource",
+		"AtlasRender",
 	}
 	includedirs {
 		".",

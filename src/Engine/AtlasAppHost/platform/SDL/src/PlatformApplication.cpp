@@ -2,26 +2,30 @@
 #include "AtlasAppHost/PlatformApplication.h"
 
 #include "SDL.h"
+#include "backends/imgui_impl_sdl.h"
 
 #define WINDOWED 1
 
-bool atlas::app_host::platform::PlatformApplication::Initialise()
+bool atlas::app_host::platform::PlatformApplication::Initialise(std::string_view applicationName)
 {
     int windowFlags;
 
     constexpr int rendererFlags = SDL_RENDERER_ACCELERATED;
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) < 0)
     {
         printf("Couldn't initialize SDL: %s\n", SDL_GetError());
         return false;
     }
 
+    const std::string title {applicationName};
 #if WINDOWED
-    windowFlags = 0;
-    m_Sdl.m_Window = SDL_CreateWindow("Cpp Conveyor", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1200, 800, windowFlags);
+    windowFlags = SDL_WINDOW_SHOWN;
+
+    m_Sdl.m_Window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1200, 800,
+                                      windowFlags);
 #else
     windowFlags = 0;
-    m_Sdl.m_Window = SDL_CreateWindow("Cpp Conveyor", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 2560, 1080, windowFlags);
+    m_Sdl.m_Window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 2560, 1080, windowFlags);
     SDL_SetRelativeMouseMode(SDL_TRUE);
 #endif
 
@@ -31,17 +35,7 @@ bool atlas::app_host::platform::PlatformApplication::Initialise()
         return false;
     }
 
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
-    SDL_SetHint(SDL_HINT_RENDER_BATCHING, "1");
-
-    m_Sdl.m_Renderer = SDL_CreateRenderer(m_Sdl.m_Window, -1, rendererFlags);
-
-    if (!m_Sdl.m_Renderer)
-    {
-        printf("Failed to create renderer: %s\n", SDL_GetError());
-        return false;
-    }
-
+    ImGui::CreateContext();
     return true;
 }
 
@@ -51,4 +45,30 @@ std::tuple<int, int> atlas::app_host::platform::PlatformApplication::GetAppDimen
     SDL_GetWindowSize(m_Sdl.m_Window, &width, &height);
 
     return std::make_tuple(width, height);
+}
+
+void atlas::app_host::platform::PlatformApplication::Update()
+{
+    SDL_Event currentEvent;
+    while(SDL_PollEvent(&currentEvent) != 0)
+    {
+        ImGui_ImplSDL2_ProcessEvent(&currentEvent);
+        switch (currentEvent.type)
+        {
+        case SDL_QUIT:
+            exit(0);
+            break;
+        default:
+            break;
+        }
+
+        // TODO
+        if (currentEvent.type == SDL_KEYDOWN)
+        {
+            int i = 0;
+            i++;
+        }
+    }
+
+    SDL_PumpEvents();
 }

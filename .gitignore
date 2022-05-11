@@ -36,6 +36,12 @@ x64
 
 build
 bin
-sdlPrivate
 generated
 !premake5.exe
+
+temp/
+
+CookFast.bat
+
+# Prebuilt Renderdoc
+!src/ThirdParty/renderdoc_api/**

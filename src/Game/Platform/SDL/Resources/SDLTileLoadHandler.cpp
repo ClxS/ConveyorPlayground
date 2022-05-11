@@ -1,16 +1,18 @@
-#include "SelfRegistration.h"
+#include "SDLTileLoadHandler.h"
 #include "SDLTileAsset.h"
-#include "SDLAppHost.h"
 
 #include <SDL.h>
 #include <SDL_image.h>
 
 #include "AtlasAppHost/Application.h"
 #include "AtlasAppHost/PlatformApplication.h"
+#include "AtlasResource/AssetPtr.h"
+#include "AtlasResource/FileData.h"
 
-cpp_conv::resources::ResourceAsset* textTileLoadHandler(const cpp_conv::resources::resource_manager::FileData& data)
+atlas::resource::AssetPtr<atlas::resource::ResourceAsset> cpp_conv::textTileLoadHandler(
+    const atlas::resource::FileData& data)
 {
-    SDL_RWops* pSrc = SDL_RWFromMem(data.m_pData, static_cast<int>(data.m_uiSize));
+    SDL_RWops* pSrc = SDL_RWFromMem(data.m_pData.get(), static_cast<int>(data.m_Size));
     if (!pSrc)
     {
         return nullptr;
@@ -31,7 +33,5 @@ cpp_conv::resources::ResourceAsset* textTileLoadHandler(const cpp_conv::resource
         return nullptr;
     }
 
-    return new cpp_conv::resources::SDLTile2DAsset(pTexture);
+    return std::make_shared<cpp_conv::resources::SDLTile2DAsset>(pTexture);
 }
-
-REGISTER_ASSET_LOAD_HANDLER(cpp_conv::resources::TileAsset, textTileLoadHandler);
