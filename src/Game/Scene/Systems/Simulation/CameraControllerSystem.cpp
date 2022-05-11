@@ -1,6 +1,7 @@
 #include "CameraControllerSystem.h"
 
 #include "CameraComponent.h"
+#include "imgui.h"
 #include "AtlasScene/ECS/Components/EcsManager.h"
 #include "SDL_mouse.h"
 #include "SDL_keyboard.h"
@@ -98,6 +99,11 @@ void cpp_conv::CameraControllerSystem::Update(atlas::scene::EcsManager& ecs)
 {
     using namespace atlas::scene;
     using namespace cpp_conv::components;
+
+    if (ImGui::IsAnyItemHovered())
+    {
+        return;
+    }
 
     for(auto [entity, camera] : ecs.IterateEntityComponents<LookAtCamera>())
     {

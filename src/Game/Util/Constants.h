@@ -12,6 +12,7 @@ namespace cpp_conv::constants
         constexpr bgfx::ViewId c_geometry = 1;
         constexpr bgfx::ViewId c_postProcess = 2;
         constexpr bgfx::ViewId c_ui = 32;
+        constexpr bgfx::ViewId c_debugUi = 33;
     }
 
     namespace render_masks

@@ -2,6 +2,7 @@
 #include "AtlasAppHost/PlatformApplication.h"
 
 #include "SDL.h"
+#include "backends/imgui_impl_sdl.h"
 
 #define WINDOWED 1
 
@@ -34,6 +35,7 @@ bool atlas::app_host::platform::PlatformApplication::Initialise(std::string_view
         return false;
     }
 
+    ImGui::CreateContext();
     return true;
 }
 
@@ -50,6 +52,16 @@ void atlas::app_host::platform::PlatformApplication::Update()
     SDL_Event currentEvent;
     while(SDL_PollEvent(&currentEvent) != 0)
     {
+        ImGui_ImplSDL2_ProcessEvent(&currentEvent);
+        switch (currentEvent.type)
+        {
+        case SDL_QUIT:
+            exit(0);
+            break;
+        default:
+            break;
+        }
+
         // TODO
         if (currentEvent.type == SDL_KEYDOWN)
         {

@@ -7,6 +7,7 @@ namespace atlas::render
     class FrameBuffer
     {
     public:
+        FrameBuffer();
         ~FrameBuffer();
 
         void Initialise(uint32_t width, const uint32_t height, bool includeDepth = true);

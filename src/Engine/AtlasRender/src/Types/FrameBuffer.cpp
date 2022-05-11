@@ -1,6 +1,11 @@
 #include "AtlasRenderPCH.h"
 #include "Types/FrameBuffer.h"
 
+atlas::render::FrameBuffer::FrameBuffer()
+{
+
+}
+
 atlas::render::FrameBuffer::~FrameBuffer()
 {
     bgfx::destroy(m_Handle);

@@ -15,6 +15,7 @@
 #include "UIControllerSystem.h"
 #include "AtlasRender/Renderer.h"
 #include "AtlasRender/Types/FrameBuffer.h"
+#include "DebugUI/GameSceneDebugUI.h"
 
 namespace cpp_conv
 {
@@ -97,12 +98,19 @@ namespace cpp_conv
 
             struct PostGeometry
             {
-                UIControllerSystem m_UIController;
                 PostProcessSystem m_PostProcess;
 
                 void Initialise(atlas::scene::EcsManager& ecsManager, const atlas::render::FrameBuffer* gbuffer);
                 void Update(atlas::scene::EcsManager& ecsManager);
             } m_PostGeometry;
+
+            struct UI
+            {
+                UIControllerSystem m_UIController;
+                GameSceneDebugUI m_DebugUI;
+                void Initialise(atlas::scene::EcsManager& ecsManager);
+                void Update(atlas::scene::EcsManager& ecsManager);
+            } m_UI;
 
             atlas::render::FrameBuffer m_GBuffer;
         } m_RenderSystems;

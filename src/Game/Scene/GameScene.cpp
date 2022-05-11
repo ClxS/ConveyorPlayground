@@ -292,6 +292,7 @@ void cpp_conv::GameScene::ConstructFrameGraph()
     AddToFrameGraph("ShadowPass", &m_RenderSystems.m_ShadowPass);
     AddToFrameGraph("GeometryPass", &m_RenderSystems.m_GeometryPass);
     AddToFrameGraph("PostGeometryPass", &m_RenderSystems.m_PostGeometry, &m_RenderSystems.m_GBuffer);
+    AddToFrameGraph("UI", &m_RenderSystems.m_UI);
 }
 
 void cpp_conv::GameScene::RenderSystems::ShadowPass::Initialise(atlas::scene::EcsManager& ecsManager)
@@ -341,13 +342,23 @@ void cpp_conv::GameScene::RenderSystems::GeometryPass::Update(atlas::scene::EcsM
 
 void cpp_conv::GameScene::RenderSystems::PostGeometry::Initialise(atlas::scene::EcsManager& ecsManager, const FrameBuffer* gbuffer)
 {
-    m_UIController.Initialise(ecsManager);
     m_PostProcess.Initialise(ecsManager, gbuffer);
 }
 
 void cpp_conv::GameScene::RenderSystems::PostGeometry::Update(atlas::scene::EcsManager& ecsManager)
 {
     bgfx::setState(BGFX_STATE_DEFAULT);
-    atlas::scene::SystemsManager::Update(ecsManager, &m_UIController);
     atlas::scene::SystemsManager::Update(ecsManager, &m_PostProcess);
+}
+
+void cpp_conv::GameScene::RenderSystems::UI::Initialise(atlas::scene::EcsManager& ecsManager)
+{
+    m_UIController.Initialise(ecsManager);
+    m_DebugUI.Initialise(ecsManager);
+}
+
+void cpp_conv::GameScene::RenderSystems::UI::Update(atlas::scene::EcsManager& ecsManager)
+{
+    atlas::scene::SystemsManager::Update(ecsManager, &m_UIController);
+    atlas::scene::SystemsManager::Update(ecsManager, &m_DebugUI);
 }
