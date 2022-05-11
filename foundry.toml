@@ -1,0 +1,12 @@
+﻿[foundry]
+project = "CppConveyor"
+
+[integrations]
+active-integrations = [
+    "Foundry.CppConveyor.Schema",
+    "Foundry.CppConveyor",
+    "Foundry.CppConveyor.Avalonia"
+]
+
+[CppConveyor]
+DataRoot = "data"

@@ -3,7 +3,7 @@
 
 namespace cpp_conv
 {
-    template<typename TSelf, typename Serializer, typename TBase>
+    template <typename TSelf, typename Serializer, typename TBase>
     class Serializable : public TBase
     {
     public:
@@ -19,7 +19,8 @@ namespace cpp_conv
             {
                 if (outErrors)
                 {
-                    *outErrors = std::format("Error reading [{}:{}]\n{}", self->m_Config.m_RootTable, self->GetName(), *outErrors);
+                    *outErrors = std::format("Error reading [{}:{}]\n{}", self->m_Config.m_RootTable, self->GetName(),
+                                             *outErrors);
                 }
 
                 self.reset();
@@ -31,7 +32,7 @@ namespace cpp_conv
     protected:
         explicit Serializable(const typename Serializer::Config& config, std::vector<DataFieldBase*> fields)
             : m_Config(config)
-            , m_Fields(std::move(fields))
+              , m_Fields(std::move(fields))
         {
         }
 
@@ -40,4 +41,3 @@ namespace cpp_conv
         std::vector<DataFieldBase*> m_Fields;
     };
 }
-

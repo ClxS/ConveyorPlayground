@@ -22,6 +22,10 @@ function importLinkExports()
     local wks = premake.global.getWorkspace(1)
     if wks then
         for prj in p.workspace.eachproject(wks) do
+            --if prj.name == "AssetBuilder" then
+            --    diagnosticLogging = true
+            --end
+
             diagLog(prj)
             diagLog(prj.name)
 
@@ -87,9 +91,21 @@ function importLinkExports()
                             if type(exportValue) == "table" then
                                 cfg[exportKey] = table.concatenate(cfg[exportKey], exportValue)
                                 diagLog(exportValue[1])
+
+                                if exportKey == "links" then
+                                    diagLog("\t\t\t\tAdding extra link")
+                                    for _,vlink in pairs(cfg[exportKey]) do
+                                        table.insert(linkTable, vlink)
+                                    end
+                                end
                             else
                                 table.insert(cfg[exportKey], exportValue)
                                 diagLog(exportValue)
+
+                                if exportKey == "links" then
+                                    diagLog("\t\t\t\tAdding extra link")
+                                    table.insert(linkTable, cfg[exportKey])
+                                end
                             end
                         end
                     end
@@ -100,6 +116,8 @@ function importLinkExports()
 
                 ::skip_config::
             end
+
+            diagnosticLogging = false
         end
     end
 end

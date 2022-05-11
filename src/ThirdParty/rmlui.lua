@@ -4,7 +4,7 @@ project "RmlUI"
 		"rmlui.lua",
 		"RmlUi/Include/**",
 		"RmlUi/Source/Core/**",
-		--"RmlUi/Source/Debugger/**",
+		"RmlUi/Source/Debugger/**",
 		--"RmlUi/Source/Lottie/**",
 		--"RmlUi/Source/Lua/**",
 		--"RmlUi/Source/SVG/**",
@@ -17,4 +17,7 @@ project "RmlUI"
     }
 	exports {
 		["includedirs"]	= path.getabsolute("RmlUi/Include"),
+		["defines"] = {
+		    "RMLUI_STATIC_LIB",
+		}
 	}

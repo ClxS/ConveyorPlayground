@@ -1,156 +1,120 @@
 #include "Game.h"
-#include "AppHost.h"
-#include "SwapChain.h"
-#include "Renderer.h"
-#include "EntityGrid.h"
-#include "Sequence.h"
-#include "SceneContext.h"
-#include "RenderContext.h"
-#include "Command.h"
-#include "Input.h"
-#include "Simulator.h"
-#include "Renderer.h"
-#include "Profiler.h"
-#include "FrameLimiter.h"
-#include "ResourceManager.h"
-#include "Map.h"
-#include "SelfRegistration.h"
 
-#include "ItemRegistry.h"
+#include "CameraComponent.h"
+#include "Constants.h"
+#include "ConveyorComponent.h"
+#include "ConveyorDefinition.h"
+#include "ConveyorRegistry.h"
+#include "DescriptionComponent.h"
+#include "DirectionComponent.h"
+#include "FactoryComponent.h"
 #include "FactoryRegistry.h"
-#include "Gui.h"
-
-#include <tuple>
-#include <vector>
-#include <queue>
-#include <chrono>
-#include "WorldMap.h"
-#include "Factory.h"
-#include "AtlasAppHost/Application.h"
-#include "AtlasAppHost/Main.h"
+#include "GameMapLoadInterstitialScene.h"
+#include "InserterRegistry.h"
+#include "ItemRegistry.h"
+#include "MapLoadHandler.h"
+#include "ModelComponent.h"
+#include "NameComponent.h"
+#include "PositionComponent.h"
+#include "RecipeDefinition.h"
+#include "RecipeRegistry.h"
+#include "SDLTileLoadHandler.h"
+#include "SequenceComponent.h"
+#include "StorageComponent.h"
+#include "WorldEntityInformationComponent.h"
+#include "AtlasGame/GameHost.h"
+#include "AtlasRender/AssetTypes/ModelAsset.h"
+#include "AtlasRender/AssetTypes/ShaderAsset.h"
+#include "AtlasRender/AssetTypes/TextureAsset.h"
+#include "Lighting/DirectionalLightComponent.h"
 
 #undef max
 #undef min
 
 using namespace cpp_conv::resources;
 
-void createMillionTileMap(cpp_conv::WorldMap& worldMap)
+void registerComponents()
 {
-    worldMap.PlaceEntity({ 0, 0, 0 }, new cpp_conv::Factory({ (int32_t)0, 0, 0 }, Direction::Right, cpp_conv::FactoryId::FromStringId("FACTORY_COPPER_MINE")));
-    int count = 0;
-    for (int y = 1; y < 31 * 64; y += 2)
-    {
-        if (y == 1)
-        {
-            worldMap.PlaceEntity({ 3, y, 0 }, new cpp_conv::Conveyor({ 3, y, 0 }, { 1, 1, 1 }, Direction::Right));
-            worldMap.PlaceEntity({ 3, y + 1, 0 }, new cpp_conv::Conveyor({ 3, y + 1, 0 }, { 1, 1, 1 }, Direction::Up));
-            count += 2;
-        }
-        else
-        {
-            worldMap.PlaceEntity({ 3, y, 0 }, new cpp_conv::Conveyor({ 3, y, 0 }, { 1, 1, 1 }, Direction::Right));
-            worldMap.PlaceEntity({ 3, y + 1, 0 }, new cpp_conv::Conveyor({ 3, y + 1, 0 }, { 1, 1, 1 }, Direction::Up));
-            count += 2;
-        }
-
-        const int width = 250;
-        //const int width = 31 * 64 - 1;
-        for (int x = 4; x < width; x++)
-        {
-            worldMap.PlaceEntity({ x, y, 0 }, new cpp_conv::Conveyor({ x, y, 0 }, { 1, 1, 1 }, Direction::Right));
-            worldMap.PlaceEntity({ x, y + 1, 0 }, new cpp_conv::Conveyor({ x, y + 1, 0 }, { 1, 1, 1 }, Direction::Left));
-            count += 2;
-
-            if (count >= 1000)
-            {
-                return;
-            }
-        }
-
-        worldMap.PlaceEntity({ width, y, 0 }, new cpp_conv::Conveyor({ width, y, 0 }, { 1, 1, 1 }, Direction::Up));
-        worldMap.PlaceEntity({ width, y + 1, 0 }, new cpp_conv::Conveyor({ width, y + 1, 0 }, { 1, 1, 1 }, Direction::Left));
-        count += 2;
-    }
+    using namespace atlas::resource;
+    using namespace atlas::scene;
+    using namespace cpp_conv::components;
+    ComponentRegistry::RegisterComponent<LookAtCamera>();
+    ComponentRegistry::RegisterComponent<FreeCamera>();
+    ComponentRegistry::RegisterComponent<NameComponent>();
+    ComponentRegistry::RegisterComponent<DescriptionComponent>();
+    ComponentRegistry::RegisterComponent<ConveyorComponent>();
+    ComponentRegistry::RegisterComponent<IndividuallyProcessableConveyorComponent>();
+    ComponentRegistry::RegisterComponent<DirectionComponent>();
+    ComponentRegistry::RegisterComponent<FactoryComponent>();
+    ComponentRegistry::RegisterComponent<PositionComponent>();
+    ComponentRegistry::RegisterComponent<SequenceComponent>();
+    ComponentRegistry::RegisterComponent<ModelComponent>();
+    ComponentRegistry::RegisterComponent<WorldEntityInformationComponent>();
+    ComponentRegistry::RegisterComponent<StorageComponent>();
+    ComponentRegistry::RegisterComponent<DirectionalLightComponent>();
 }
+
+void registerAssetBundles()
+{
+    using namespace atlas::resource;
+    ResourceLoader::RegisterBundle<registry::CoreBundle>();
+}
+
+void registerTypeHandlers()
+{
+    using namespace atlas::resource;
+    ResourceLoader::RegisterTypeHandler<Map>(mapAssetHandler);
+    ResourceLoader::RegisterTypeHandler<cpp_conv::ConveyorDefinition>(conveyorAssetHandler);
+    ResourceLoader::RegisterTypeHandler<cpp_conv::FactoryDefinition>(factoryAssetHandler);
+    ResourceLoader::RegisterTypeHandler<cpp_conv::InserterDefinition>(inserterAssetHandler);
+    ResourceLoader::RegisterTypeHandler<cpp_conv::ItemDefinition>(itemAssetHandler);
+    ResourceLoader::RegisterTypeHandler<cpp_conv::RecipeDefinition>(recipeAssetHandler);
+    ResourceLoader::RegisterTypeHandler<TileAsset>(cpp_conv::textTileLoadHandler);
+
+    ResourceLoader::RegisterTypeHandler<atlas::render::VertexShader>(atlas::render::vertexShaderLoadHandler);
+    ResourceLoader::RegisterTypeHandler<atlas::render::FragmentShader>(atlas::render::fragmentShaderLoadHandler);
+    ResourceLoader::RegisterTypeHandler<atlas::render::ShaderProgram>(atlas::render::shaderProgramLoadHandler);
+    ResourceLoader::RegisterTypeHandler<atlas::render::TextureAsset>(atlas::render::textureLoadHandler);
+    ResourceLoader::RegisterTypeHandler<atlas::render::ModelAsset>(atlas::render::modelLoadHandler);
+    ResourceLoader::RegisterTypeHandler<atlas::render::MeshAsset>(atlas::render::meshLoadHandler);
+}
+
+void loadDataAssets()
+{
+    loadConveyors();
+    loadFactories();
+    loadInserters();
+    loadItems();
+    loadRecipes();
+}
+
+void setBgfxSettings()
+{
+    bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x322e3dFF, 1.0f, 0);
+    bgfx::setViewClear(cpp_conv::constants::render_views::c_geometry, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x322e3dFF, 1.0f, 0);
+}
+
+class CppConveyor final : public atlas::game::GameImplementation
+{
+public:
+    void OnStartup() override
+    {
+        using namespace atlas::resource;
+        using namespace atlas::scene;
+
+        registerComponents();
+        registerTypeHandlers();
+        registerAssetBundles();
+        loadDataAssets();
+        setBgfxSettings();
+
+        m_SceneManager.TransitionTo<cpp_conv::GameMapLoadInterstitialScene>(
+            ResourceLoader::CreateBundleRegistryId<registry::CoreBundle>(registry::core_bundle::maps::c_simple));
+    }
+};
 
 int gameMain(int argc, char* argv[])
 {
-    logStartUp();
-    srand(static_cast<unsigned>(time(nullptr)));
-    auto [iWidth, iHeight] = atlas::app_host::Application::Get().GetAppDimensions();
-
-    registration::processSelfRegistrations();
-
-    cpp_conv::WorldMap worldMap;
-    {
-        const AssetPtr<Map> map = resource_manager::loadAssetUncached<Map>(registry::maps::c_simple);
-        worldMap.Consume(map);
-        worldMap.PopulateCorners();
-    }
-
-    std::vector<cpp_conv::Sequence*> sequences = initializeSequences(worldMap, worldMap.GetConveyors());
-    cpp_conv::SceneContext kSceneContext =
-    {
-        worldMap,
-        sequences,
-        { std::chrono::high_resolution_clock::now() },
-        {
-            0,
-            Direction::Right,
-            true
-        }
-    };
-
-    cpp_conv::RenderContext kRenderContext =
-    {
-        { 0.0f, 0.0f, 0.0f },
-        0,
-        { 0xFFFFFFFF },
-        0,
-        worldMap,
-        nullptr,
-        0.8f
-    };
-
-    cpp_conv::renderer::SwapChain swapChain(kRenderContext, iWidth, iHeight);
-    init(kRenderContext, swapChain);
-
-    cpp_conv::FrameLimiter frameLimiter(60);
-    std::queue<cpp_conv::commands::CommandType> commands;
-
-    cpp_conv::ui::initializeGuiSystem();
-
-
-    frameLimiter.Start();
-    float fCurrentZoom = kRenderContext.m_fZoom;
-    while (true)
-    {
-        kRenderContext.m_uiDrawnItems = 0;
-
-        PROFILE(Input, cpp_conv::input::receiveInput(kSceneContext, kRenderContext, commands));
-        PROFILE(CommandProcess, cpp_conv::command::processCommands(kSceneContext, kRenderContext, commands));
-        PROFILE(Simulation, cpp_conv::simulation::simulate(kSceneContext));
-        PROFILE(ResizeSwap, [&]()
-        {
-            int iNewWidth;
-            int iNewHeight;
-            std::tie(iNewWidth, iNewHeight) = atlas::app_host::Application::Get().GetAppDimensions();
-            if (swapChain.RequiresResize(kRenderContext, iNewWidth, iNewHeight))
-            {
-                swapChain.ResizeBuffers(kRenderContext, iNewWidth, iNewHeight);
-            }
-        }());
-
-        PROFILE(Render, cpp_conv::renderer::render(kSceneContext, kRenderContext));
-        PROFILE(DrawUI, cpp_conv::ui::drawUI(kSceneContext, kRenderContext));
-        PROFILE(Present, swapChain.SwapAndPresent());
-
-        PROFILE(FrameCapSleep, frameLimiter.Limit());
-        PROFILE(UpdatePersistence, cpp_conv::resources::resource_manager::updatePersistenceStore());
-        frameLimiter.EndFrame();
-    }
-
-    cpp_conv::ui::shutdown();
-    return 0;
+    atlas::game::GameHost<CppConveyor> game{{"Transportadoras", 30}};
+    return game.Run();
 }
-

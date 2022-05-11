@@ -1,7 +1,6 @@
-#include <tuple>
-#include "AppHost.h"
-#include "SDL.h"
 #include "SDLAppHost.h"
+#include <tuple>
+#include "SDL.h"
 
 std::tuple<int, int> cpp_conv::apphost::getCursorPosition()
 {

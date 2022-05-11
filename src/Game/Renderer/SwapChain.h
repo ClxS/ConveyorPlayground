@@ -1,13 +1,13 @@
 #pragma once
-#include "WriteSurface.h"
-#include "ScreenBuffer.h"
 #include "RenderContext.h"
+#include "ScreenBuffer.h"
+#include "WriteSurface.h"
 
 namespace cpp_conv::renderer
 {
     class SwapChain
     {
-    public:    
+    public:
         SwapChain(RenderContext& kRenderContext, uint32_t uiWidth, uint32_t uiHeight);
         void Initialize(RenderContext& kRenderContext, ScreenBufferInitArgs& rArgs);
         void SwapAndPresent();

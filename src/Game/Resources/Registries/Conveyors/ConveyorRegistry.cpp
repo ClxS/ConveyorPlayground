@@ -1,49 +1,39 @@
 #include "ConveyorRegistry.h"
 
-#include <cassert>
-
-#include "ResourceManager.h"
 #include "ConveyorDefinition.h"
-#include "AssetPtr.h"
+#include "AtlasResource/AssetPtr.h"
 
-#include <vector>
-#include <memory>
-#include <sstream>
 #include <iostream>
+#include <memory>
+#include <vector>
 
-#include <tuple>
-#include <tomlcpp.hpp>
-
-#include "SelfRegistration.h"
 #include "DataId.h"
 #include "Profiler.h"
+#include "AtlasResource/ResourceLoader.h"
 
-using RegistryId = cpp_conv::resources::registry::RegistryId;
-static std::vector<cpp_conv::resources::AssetPtr<cpp_conv::ConveyorDefinition>> g_vConveyors;
+static std::vector<atlas::resource::AssetPtr<cpp_conv::ConveyorDefinition>> g_vConveyors;
 
-namespace
+void cpp_conv::resources::loadConveyors()
 {
-    void loadItems()
+    using namespace cpp_conv::resources::registry;
+    for (const atlas::resource::RegistryId asset : core_bundle::data::conveyors::c_AllAssets)
     {
-        for(const RegistryId asset : cpp_conv::resources::registry::data::conveyors::c_AllAssets)
+        auto pAsset = atlas::resource::ResourceLoader::LoadAsset<CoreBundle, cpp_conv::ConveyorDefinition>(asset);
+        if (!pAsset)
         {
-            auto pAsset = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::ConveyorDefinition>(asset);
-            if (!pAsset)
-            {
-                continue;
-            }
-
-            g_vConveyors.push_back(pAsset);
+            continue;
         }
+
+        g_vConveyors.push_back(pAsset);
     }
 }
 
-cpp_conv::resources::ResourceAsset* conveyorAssetHandler(cpp_conv::resources::resource_manager::FileData& rData)
+atlas::resource::AssetPtr<atlas::resource::ResourceAsset> cpp_conv::resources::conveyorAssetHandler(const atlas::resource::FileData& rData)
 {
-    const auto pStrData = reinterpret_cast<const char*>(rData.m_pData);
+    const auto pStrData = reinterpret_cast<const char*>(rData.m_pData.get());
 
     // ReSharper disable once CppRedundantCastExpression
-    const std::string copy(pStrData, (int)(rData.m_uiSize / sizeof(char)));
+    const std::string copy(pStrData, (int)(rData.m_Size / sizeof(char)));
 
     std::string errors;
     auto pDefinition = cpp_conv::ConveyorDefinition::Deserialize(copy, &errors);
@@ -53,10 +43,11 @@ cpp_conv::resources::ResourceAsset* conveyorAssetHandler(cpp_conv::resources::re
         return nullptr;
     }
 
-    return pDefinition.release();
+    atlas::resource::AssetPtr<atlas::resource::ResourceAsset> out {pDefinition.release()};
+    return out;
 }
 
-cpp_conv::resources::AssetPtr<cpp_conv::ConveyorDefinition> cpp_conv::resources::getConveyorDefinition(ConveyorId id)
+atlas::resource::AssetPtr<cpp_conv::ConveyorDefinition> cpp_conv::resources::getConveyorDefinition(const ConveyorId id)
 {
     PROFILE_FUNC();
     for (auto item : g_vConveyors)
@@ -69,6 +60,3 @@ cpp_conv::resources::AssetPtr<cpp_conv::ConveyorDefinition> cpp_conv::resources:
 
     return nullptr;
 }
-
-REGISTER_ASSET_LOAD_HANDLER(cpp_conv::ConveyorDefinition, conveyorAssetHandler);
-REGISTER_LOAD_HANDLER(loadItems);

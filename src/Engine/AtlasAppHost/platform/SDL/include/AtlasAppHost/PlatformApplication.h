@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string_view>
 #include <tuple>
 
 // ReSharper disable once CppInconsistentNaming
@@ -19,13 +20,16 @@ namespace atlas::app_host::platform
             SDL_Window* m_Window = nullptr;
         };
 
-        bool Initialise();
+        bool Initialise(std::string_view applicationName);
 
         [[nodiscard]] std::tuple<int, int> GetAppDimensions() const;
         [[nodiscard]] const SdlContext& GetSDLContext() const { return m_Sdl; }
         [[nodiscard]] SdlContext& GetSDLContext() { return m_Sdl; }
 
+        void Update();
+
+
     private:
-        SdlContext m_Sdl {};
+        SdlContext m_Sdl{};
     };
 }

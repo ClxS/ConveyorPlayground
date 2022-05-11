@@ -2,7 +2,7 @@
 
 namespace cpp_conveyor
 {
-    template<typename T>
+    template <typename T>
     struct vector_set
     {
         using vec_type = std::vector<T>;
@@ -10,7 +10,7 @@ namespace cpp_conveyor
         using iterator = typename vec_type::iterator;
 
         vector_set(size_t max_size)
-            : _max_size{ max_size }
+            : _max_size{max_size}
         {
             _v.reserve(_max_size);
         }
@@ -32,31 +32,32 @@ namespace cpp_conveyor
 
                 return false;
             }
-            else
-            {
-                return false;
-            }
+            return false;
         }
 
-        [[nodiscard]] auto find(const T& elem) const
-            -> const_iterator
+        [[nodiscard]] const_iterator find(const T& elem) const
         {
             auto vend = _v.end();
             auto it = std::lower_bound(_v.begin(), vend, elem);
             if (it != vend && *it != elem)
+            {
                 it = vend;
+            }
             return it;
         }
 
-        [[nodiscard]] bool contains(const T& elem) const {
+        [[nodiscard]] bool contains(const T& elem) const
+        {
             return find(elem) != _v.end();
         }
 
-        [[nodiscard]] const_iterator begin() const {
+        [[nodiscard]] const_iterator begin() const
+        {
             return _v.begin();
         }
 
-        [[nodiscard]] const_iterator end() const {
+        [[nodiscard]] const_iterator end() const
+        {
             return _v.end();
         }
 

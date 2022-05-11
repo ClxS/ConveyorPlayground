@@ -6,7 +6,7 @@
 
 namespace cpp_conv
 {
-    static constexpr inline uint64_t idFromStringId(const std::string_view str)
+    static constexpr uint64_t idFromStringId(const std::string_view str)
     {
         uint64_t result = 0xcbf29ce484222325;
         for (const char c : str)
@@ -15,13 +15,13 @@ namespace cpp_conv
             result ^= c;
         }
 
-        return { result };
+        return {result};
     }
 
-    #define DEFINE_UNIQUE_DATA_TYPE(NAME)\
+#define DEFINE_UNIQUE_DATA_TYPE(NAME)\
     struct NAME##Id\
     {\
-        uint64_t m_uiItemId;\
+        uint64_t m_uiItemId = 0;\
         static ItemId Empty() { return {0}; }\
         bool IsValid() const { return m_uiItemId != 0; }\
         bool IsEmpty() const { return m_uiItemId == 0; }\
@@ -57,10 +57,12 @@ namespace cpp_conv
     }
 
     DEFINE_UNIQUE_DATA_TYPE(Item);
+
     DEFINE_UNIQUE_DATA_TYPE(Factory);
+
     DEFINE_UNIQUE_DATA_TYPE(Conveyor);
+
     DEFINE_UNIQUE_DATA_TYPE(Inserter);
+
     DEFINE_UNIQUE_DATA_TYPE(Recipe);
 }
-
-

@@ -10,20 +10,17 @@ namespace cpp_conv
     class Storage : public Entity
     {
     public:
-        Storage(Vector3 position, Vector3 size, uint32_t uiMaxCapacity, uint32_t uiMaxStackSize);
+        Storage(Eigen::Vector3i position, Eigen::Vector3i size, uint32_t uiMaxCapacity, uint32_t uiMaxStackSize)
+            : Entity(position, size, EntityKind::Storage)
+              , m_ItemContainer(uiMaxCapacity, uiMaxStackSize, false)
+        {
+        }
 
-        void Tick(const SceneContext& kContext) override;
-        void Draw(RenderContext& kRenderContext) const override;
-        [[nodiscard]] bool SupportsInsertion() const override { return true; }
-        bool TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, InsertInfo insertInfo) override;
+        [[nodiscard]] const char* GetName() const { return "Storage"; }
+        [[nodiscard]] std::string GetDescription() const { return m_ItemContainer.GetDescription(); }
 
-        [[nodiscard]] bool SupportsProvidingItem() const override { return true; }
-        bool TryGrab(const SceneContext& kContext, bool bSingle, std::tuple<ItemId, uint32_t>& outItem) override;
-
-        [[nodiscard]] const char* GetName() const override { return "Storage"; }
-        [[nodiscard]] std::string GetDescription() const override { return m_itemContainer.GetDescription(); }
-
+        [[nodiscard]] const GeneralItemContainer& GetContainer() const { return m_ItemContainer; }
     private:
-        GeneralItemContainer m_itemContainer;
+        GeneralItemContainer m_ItemContainer;
     };
 }

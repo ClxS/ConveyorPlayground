@@ -2,8 +2,10 @@
 
 #include <cstdint>
 #include <string>
+#include "AtlasResource/AssetPtr.h"
 #include "DataId.h"
-#include "AssetPtr.h"
+#include "AtlasResource/FileData.h"
+#include "AtlasResource/ResourceAsset.h"
 
 namespace cpp_conv
 {
@@ -12,5 +14,9 @@ namespace cpp_conv
 
 namespace cpp_conv::resources
 {
-    const AssetPtr<FactoryDefinition> getFactoryDefinition(FactoryId id);
+    void loadFactories();
+
+    atlas::resource::AssetPtr<FactoryDefinition> getFactoryDefinition(FactoryId id);
+
+    atlas::resource::AssetPtr<atlas::resource::ResourceAsset> factoryAssetHandler(const atlas::resource::FileData& rData);
 }

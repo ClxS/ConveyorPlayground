@@ -1,27 +1,28 @@
 #pragma once
 
 #include <string>
-#include "ResourceAsset.h"
-#include "TileAsset.h"
-#include "DataId.h"
-#include "AssetPtr.h"
+#include "AtlasResource/AssetPtr.h"
 #include "AssetRegistry.h"
-#include "TileAsset.h"
 #include "DataField.h"
+#include "DataId.h"
+#include <AtlasResource/ResourceAsset.h>
 #include "Serializable.h"
+#include "TileAsset.h"
+#include "TileAsset.h"
 #include "TomlSerializer.h"
 
 namespace cpp_conv
 {
-    class ConveyorDefinition final : public Serializable<ConveyorDefinition, TomlSerializer, resources::ResourceAsset>
+    class ConveyorDefinition final : public Serializable<ConveyorDefinition, TomlSerializer, atlas::resource::ResourceAsset>
     {
-        inline static TomlSerializer::Config ms_ConveyorConfig = { "conveyor" };
+        inline static TomlSerializer::Config ms_ConveyorConfig = {"conveyor"};
     public:
         ConveyorDefinition()
             : Serializable(
                 ms_ConveyorConfig,
-                { &m_InternalId, &m_Name, &m_TickDelay })
-        {}
+                {&m_InternalId, &m_Name, &m_TickDelay})
+        {
+        }
 
         [[nodiscard]] ConveyorId GetInternalId() const { return m_InternalId.m_Value; }
 

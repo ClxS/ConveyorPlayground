@@ -1,9 +1,8 @@
 #pragma once
 
-#include "Entity.h"
 #include "Conveyor.h"
-#include "EntityGrid.h"
 #include "DataId.h"
+#include "Entity.h"
 
 namespace cpp_conv
 {
@@ -13,17 +12,19 @@ namespace cpp_conv
     constexpr int c_maxInserterLength = 6;
 
     class Inserter : public Entity
-    { 
+    {
     public:
-        Inserter(Vector3 position, Vector3 size, Direction direction, InserterId inserterId);
+        Inserter(Eigen::Vector3i position, Eigen::Vector3i size, Direction direction, InserterId inserterId)
+            : Entity(position, size, EntityKind::Conveyor)
+            , m_inserterId{inserterId}
+            , m_direction(direction)
+        {
+        }
 
-        void Tick(const SceneContext& kContext) override;
-        void Draw(RenderContext& kRenderContext) const override;
+        [[nodiscard]] Direction GetDirection() const { return m_direction; }
 
-        [[nodiscard]] Direction GetDirection() const override { return m_direction; }
-
-        [[nodiscard]] const char* GetName() const override { return "Inserter"; }
-        [[nodiscard]] std::string GetDescription() const override;
+        [[nodiscard]] const char* GetName() const { return "Inserter"; }
+        [[nodiscard]] std::string GetDescription() const;
 
     private:
         enum class State

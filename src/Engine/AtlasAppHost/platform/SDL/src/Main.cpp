@@ -8,23 +8,17 @@ void logStartUp()
 }
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
-    // ReSharper disable once CppInconsistentNaming
-    // ReSharper disable once CppParameterMayBeConst
-    int SDL_main(int argc, char* argv[])
-    {
-        if (!atlas::app_host::Application::Get().Initialise())
-        {
-            return -1;
-        }
+// ReSharper disable once CppInconsistentNaming
+// ReSharper disable once CppParameterMayBeConst
+int SDL_main(int argc, char* argv[])
+{
+    gameMain(argc, argv);
 
-        gameMain(argc, argv);
-
-        SDL_Quit();
-        return 0;
-    }
+    SDL_Quit();
+    return 0;
+}
 #ifdef __cplusplus
 }
 #endif

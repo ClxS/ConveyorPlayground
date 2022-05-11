@@ -1,8 +1,7 @@
 #pragma once
 
-#include "Entity.h"
 #include "Conveyor.h"
-#include "EntityGrid.h"
+#include "Entity.h"
 
 namespace cpp_conv
 {
@@ -14,21 +13,18 @@ namespace cpp_conv
     class Tunnel final : public Entity
     {
     public:
-        Tunnel(Vector3 position, Vector3 size, Direction direction);
+        Tunnel(Eigen::Vector3i position, Eigen::Vector3i size, Direction direction)
+            : Entity(position, size, EntityKind::Tunnel)
+              , m_pOtherSide{nullptr}
+              , m_pSequence{nullptr}
+              , m_Direction(direction)
+        {
+        }
 
-        void Tick(const SceneContext& kContext) override;
-        void Realize() override;
-        void Draw(RenderContext& kRenderContext) const override;
-        [[nodiscard]] bool SupportsInsertion() const override { return true; }
-        bool TryInsert(const SceneContext& kContext, const Entity& pSourceEntity, InsertInfo insertInfo) override;
+        [[nodiscard]] Direction GetDirection() const { return m_Direction; }
 
-        [[nodiscard]] Direction GetDirection() const override { return m_Direction; }
-
-        [[nodiscard]] const char* GetName() const override { return "Tunnel"; }
-        [[nodiscard]] std::string GetDescription() const override { return ""; }
-
-        [[nodiscard]] bool RequiresPlacementLocalityChecks() const override { return true; }
-        void OnLocalityUpdate(const WorldMap& map) override;
+        [[nodiscard]] const char* GetName() const { return "Tunnel"; }
+        [[nodiscard]] std::string GetDescription() const { return ""; }
 
     private:
         static inline constexpr uint32_t c_uiMaxLength = 7;

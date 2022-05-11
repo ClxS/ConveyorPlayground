@@ -2,6 +2,7 @@
 
 #include <format>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 bool cppconv::tools::arg_parser::TypedArgReader<bool>::Read(const std::string& value, void* pTargetVariable)
@@ -38,7 +39,23 @@ bool cppconv::tools::arg_parser::TypedArgReader<std::string>::Read(const std::st
     return true;
 }
 
-bool cppconv::tools::arg_parser::ArgumentsBase::TryRead(const int argc, char** argv)
+bool cppconv::tools::arg_parser::TypedArgReader<std::vector<std::string>>::Read(const std::string& value, void* pTargetVariable)
+{
+    const auto typedTarget = static_cast<std::vector<std::string>*>(pTargetVariable);
+
+    std::vector<std::string> values;
+    std::string segment;
+    std::stringstream test(value);
+    while(std::getline(test, segment, ';'))
+    {
+        values.push_back(segment);
+    }
+
+    *typedTarget = values;
+    return true;
+}
+
+bool cppconv::tools::arg_parser::ArgumentsBase::TryRead(const int argc, char** argv) const
 {
     bool bIsError = false;
     std::vector<std::string> errors;

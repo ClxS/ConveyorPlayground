@@ -19,6 +19,7 @@ namespace cppconv::tools::arg_parser
     DEFINE_ARG_TYPE_HANDLER(int32_t);
     DEFINE_ARG_TYPE_HANDLER(float);
     DEFINE_ARG_TYPE_HANDLER(std::string);
+    DEFINE_ARG_TYPE_HANDLER(std::vector<std::string>);
 
     struct ArgumentParameterBase
     {
@@ -108,7 +109,7 @@ namespace cppconv::tools::arg_parser
         {
         }
 
-        bool TryRead(int argc, char **argv);
+        bool TryRead(int argc, char **argv) const;
 
         VerbParameter* m_pVerb;
         std::vector<ArgumentParameterBase*> m_ArgumentFields;
@@ -127,6 +128,9 @@ namespace cppconv::tools::arg_parser
 #define ARG_CTOR_4_V(Type, Verb, A, B, C, D) Type() : cppconv::tools::arg_parser::ArgumentsBase(&(m_##Verb), {&(m_##A), &(m_##B), &(m_##C), &(m_##D)}) {}
 #define ARG_CTOR_5(Type, A, B, C, D, E) Type() : cppconv::tools::arg_parser::ArgumentsBase({&(m_##A), &(m_##B), &(m_##C), &(m_##D), &(m_##E)}) {}
 #define ARG_CTOR_5_V(Type, Verb, A, B, C, D, E) Type() : cppconv::tools::arg_parser::ArgumentsBase(&(m_##Verb), {&(m_##A), &(m_##B), &(m_##C), &(m_##D), &(m_##E)}) {}
+#define ARG_CTOR_6_V(Type, Verb, A, B, C, D, E, F) Type() : cppconv::tools::arg_parser::ArgumentsBase(&(m_##Verb), {&(m_##A), &(m_##B), &(m_##C), &(m_##D), &(m_##E), &(m_##F)}) {}
+#define ARG_CTOR_7_V(Type, Verb, A, B, C, D, E, F, G) Type() : cppconv::tools::arg_parser::ArgumentsBase(&(m_##Verb), {&(m_##A), &(m_##B), &(m_##C), &(m_##D), &(m_##E), &(m_##F), &(m_##G)}) {}
+#define ARG_CTOR_8_V(Type, Verb, A, B, C, D, E, F, G, H) Type() : cppconv::tools::arg_parser::ArgumentsBase(&(m_##Verb), {&(m_##A), &(m_##B), &(m_##C), &(m_##D), &(m_##E), &(m_##F), &(m_##G), &(m_##H)}) {}
 
 #define VERB_1(NAME, VALUE1) cppconv::tools::arg_parser::VerbParameter m_##NAME = { #NAME, { VALUE1 } }
 #define VERB_2(NAME, VALUE1, VALUE2) cppconv::tools::arg_parser::VerbParameter m_##NAME = { #NAME, { VALUE1, VALUE2 } }

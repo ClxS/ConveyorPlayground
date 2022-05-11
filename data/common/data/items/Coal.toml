@@ -2,4 +2,4 @@
 id="ITEM_COAL_ORE"
 name="Coal"
 description="The mucky stuff"
-asset="assets::items::Coal"
+asset="assets::items::OreModel"

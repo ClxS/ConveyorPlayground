@@ -6,6 +6,9 @@ project "ToolsCore"
 	files {
 		"**",
 	}
+	defines {
+	    "_CRT_SECURE_NO_WARNINGS",
+	}
 	includedirs {
 		"**",
 	}
@@ -13,5 +16,5 @@ project "ToolsCore"
 	cppdialect "C++latest"
 
 	exports {
-		["includedirs"]	= path.getabsolute("include"),	
+		["includedirs"]	= path.getabsolute("include"),
 	}

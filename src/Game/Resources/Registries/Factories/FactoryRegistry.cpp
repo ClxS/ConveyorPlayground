@@ -1,46 +1,40 @@
 #include "FactoryRegistry.h"
-#include "ResourceManager.h"
+#include <AtlasResource/ResourceAsset.h>
 #include "FactoryDefinition.h"
-#include "AssetPtr.h"
-#include "ItemRegistry.h"
+#include "AtlasResource/AssetPtr.h"
 
-#include <vector>
-#include <memory>
-#include <sstream>
 #include <iostream>
-#include "SelfRegistration.h"
+#include <memory>
+#include <vector>
 #include "DataId.h"
 #include "Profiler.h"
 
-#include <tuple>
-#include <tomlcpp.hpp>
+#include "AtlasResource/FileData.h"
+#include "AtlasResource/ResourceLoader.h"
 
-using RegistryId = cpp_conv::resources::registry::RegistryId;
-static std::vector<cpp_conv::resources::AssetPtr<cpp_conv::FactoryDefinition>> g_vFactories;
+static std::vector<atlas::resource::AssetPtr<cpp_conv::FactoryDefinition>> g_vFactories;
 
-namespace
+void cpp_conv::resources::loadFactories()
 {
-    void loadFactories()
+    using namespace cpp_conv::resources::registry;
+    for (const atlas::resource::RegistryId asset : core_bundle::data::factories::c_AllAssets)
     {
-        for(const RegistryId asset : cpp_conv::resources::registry::data::factories::c_AllAssets)
+        auto pAsset = atlas::resource::ResourceLoader::LoadAsset<CoreBundle, cpp_conv::FactoryDefinition>(asset);
+        if (!pAsset)
         {
-            auto pAsset = cpp_conv::resources::resource_manager::loadAsset<cpp_conv::FactoryDefinition>(asset);
-            if (!pAsset)
-            {
-                continue;
-            }
-
-            g_vFactories.push_back(pAsset);
+            continue;
         }
+
+        g_vFactories.push_back(pAsset);
     }
 }
 
-cpp_conv::resources::ResourceAsset* factoryAssetHandler(cpp_conv::resources::resource_manager::FileData& rData)
+atlas::resource::AssetPtr<atlas::resource::ResourceAsset> cpp_conv::resources::factoryAssetHandler(const atlas::resource::FileData& rData)
 {
-    const auto pStrData = reinterpret_cast<const char*>(rData.m_pData);
+    const auto pStrData = reinterpret_cast<const char*>(rData.m_pData.get());
 
     // ReSharper disable once CppRedundantCastExpression
-    const std::string copy(pStrData, (int)(rData.m_uiSize / sizeof(char)));
+    const std::string copy(pStrData, static_cast<int>(rData.m_Size / sizeof(char)));
 
     std::string errors;
     auto pDefinition = cpp_conv::FactoryDefinition::Deserialize(copy, &errors);
@@ -50,10 +44,11 @@ cpp_conv::resources::ResourceAsset* factoryAssetHandler(cpp_conv::resources::res
         return nullptr;
     }
 
-    return pDefinition.release();
+    atlas::resource::AssetPtr<atlas::resource::ResourceAsset> out(pDefinition.release());
+    return out;
 }
 
-const cpp_conv::resources::AssetPtr<cpp_conv::FactoryDefinition> cpp_conv::resources::getFactoryDefinition(FactoryId id)
+atlas::resource::AssetPtr<cpp_conv::FactoryDefinition> cpp_conv::resources::getFactoryDefinition(const FactoryId id)
 {
     PROFILE_FUNC();
     for (auto item : g_vFactories)
@@ -66,6 +61,3 @@ const cpp_conv::resources::AssetPtr<cpp_conv::FactoryDefinition> cpp_conv::resou
 
     return nullptr;
 }
-
-REGISTER_ASSET_LOAD_HANDLER(cpp_conv::FactoryDefinition, factoryAssetHandler);
-REGISTER_LOAD_HANDLER(loadFactories);

@@ -1,8 +1,13 @@
 #include "FactoryDefinition.h"
-#include "AssetPtr.h"
-#include "ResourceManager.h"
+#include "AtlasResource/AssetPtr.h"
+#include "AtlasResource/ResourceLoader.h"
 
-cpp_conv::resources::AssetPtr<cpp_conv::resources::TileAsset> cpp_conv::FactoryDefinition::GetTile() const
+atlas::resource::AssetPtr<atlas::render::ModelAsset> cpp_conv::FactoryDefinition::GetModel() const
 {
-    return cpp_conv::resources::resource_manager::loadAsset<resources::TileAsset>(m_AssetId.m_Value);
+    if (!m_AssetId.m_Value.IsValid())
+    {
+        return nullptr;
+    }
+
+    return atlas::resource::ResourceLoader::LoadAsset<atlas::render::ModelAsset>(m_AssetId.m_Value);
 }

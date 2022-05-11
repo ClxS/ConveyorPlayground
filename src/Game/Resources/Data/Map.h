@@ -1,12 +1,13 @@
 #pragma once
 
-#include "ResourceAsset.h"
-#include "EntityGrid.h"
 #include <vector>
+
+#include <AtlasResource/ResourceAsset.h>
+#include "Conveyor.h"
 
 namespace cpp_conv::resources
 {
-    class Map : public ResourceAsset
+    class Map : public atlas::resource::ResourceAsset
     {
     public:
         Map();
