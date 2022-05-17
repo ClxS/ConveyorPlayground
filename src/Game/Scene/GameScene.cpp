@@ -136,15 +136,36 @@ namespace
         }
     }
 
+    /*
+    *struct SphericalLookAtCamera : public CameraComponent
+    {
+        Eigen::Vector3f m_SphericalCentre;
+        float m_SphericalCentreDistance;
+        float m_LookAtPhi;
+        float m_LookAtTheta;
+        float m_Distance;
+    };
+     */
+
     void addCameras(atlas::scene::EcsManager& ecs)
     {
-        const auto cameraEntity = ecs.AddEntity();
-        auto& camera = ecs.AddComponent<LookAtCamera>(cameraEntity);
+        auto cameraEntity = ecs.AddEntity();
+        auto& camera = ecs.AddComponent<SphericalLookAtCamera>(cameraEntity);
         camera.m_bIsActive = true;
-        camera.m_Distance = 15.0f;
-        camera.m_LookAtPoint = {5.39f, 0.0f, 0.179f};
-        camera.m_Pitch = 30.0_degrees;
-        camera.m_Yaw = -135.0_degrees;
+        camera.m_SphericalCentre = { 0.0f, 0.0f, 0.0f };
+        camera.m_SphericalCentreDistance = 2.1f;
+        camera.m_LookAtPitch = atlas::maths_helpers::Angle::FromDegrees(0.0f);
+        camera.m_LookAtYaw =  atlas::maths_helpers::Angle::FromDegrees(0.0f);
+        camera.m_CameraPitch =  atlas::maths_helpers::Angle::FromDegrees(70.0f);
+        camera.m_Distance = 3.0f;
+
+        cameraEntity = ecs.AddEntity();
+        auto& camera2 = ecs.AddComponent<LookAtCamera>(cameraEntity);
+        camera2.m_bIsActive = true;
+        camera2.m_Distance = 15.0f;
+        camera2.m_LookAtPoint = {5.39f, 0.0f, 0.179f};
+        camera2.m_Pitch = 30.0_degrees;
+        camera2.m_Yaw = -135.0_degrees;
     }
 
     void addLights(atlas::scene::EcsManager& ecs)
@@ -172,11 +193,11 @@ void cpp_conv::GameScene::OnEntered(atlas::scene::SceneManager& sceneManager)
 {
     atlas::scene::EcsManager& ecs = GetEcsManager();
 
-    addGround(ecs);
+    //addGround(ecs);
     addCameras(ecs);
     addLights(ecs);
 
-    for (const auto& entity : m_InitialisationData.m_Map->GetConveyors())
+    /*for (const auto& entity : m_InitialisationData.m_Map->GetConveyors())
     {
         const auto ecsEntity = ecs.AddEntity();
         const auto& position = ecs.AddComponent<PositionComponent>(
@@ -217,7 +238,7 @@ void cpp_conv::GameScene::OnEntered(atlas::scene::SceneManager& sceneManager)
         ecs.AddComponent<DirectionComponent>(ecsEntity, entity->m_Direction);
 
         (*handlerIt).second(m_SceneData.m_LookupGrid, position.m_Position, ecs, ecsEntity, entity);
-    }
+    }*/
 
     m_InitialisationData.m_Map.reset();
 

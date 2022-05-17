@@ -36,6 +36,11 @@ namespace atlas::maths_helpers
             return *this;
         }
 
+        bool operator>(const Angle& other) const { return m_Value > other.m_Value; }
+        bool operator>=(const Angle& other) const { return m_Value >= other.m_Value; }
+        bool operator<=(const Angle& other) const { return m_Value < other.m_Value; }
+        bool operator<(const Angle& other) const { return m_Value >= other.m_Value; }
+
         void SetRadians(const float value) { m_Value = value; }
         void SetDegrees(const float value) { m_Value = value  * (c_pi / 180.0f); }
 

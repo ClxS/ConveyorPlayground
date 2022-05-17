@@ -72,7 +72,6 @@ namespace
         vertices[5].m_Position = { minX, maxy, z };
         vertices[5].m_Uv = { minU, maxV };
 
-        const auto test = sizeof(vertices);
         static_assert(sizeof(vertices) == sizeof(Vertex) * 6);
         const bgfx::Memory* vertexMemory = bgfx::alloc(vertexLayout.getSize(6));
         std::memcpy(vertexMemory->data, vertices, vertexLayout.getSize(6));

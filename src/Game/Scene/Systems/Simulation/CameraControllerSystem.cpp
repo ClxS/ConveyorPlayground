@@ -93,6 +93,32 @@ namespace
         previousMouseY = mouseY;
         return true;
     }
+
+    bool updateControls(cpp_conv::components::SphericalLookAtCamera& camera)
+    {
+        // TODO These should be moved into AtlasInput as non-statics once it exists
+        static int previousMouseX = 0;
+        static int previousMouseY = 0;
+
+        int mouseX, mouseY;
+
+        float speedFactor = camera.m_Distance / 5.0f;
+
+        const Uint8* keyboardState = SDL_GetKeyboardState(nullptr);
+        const int buttons = SDL_GetMouseState(&mouseX, &mouseY);
+        if ((buttons & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0)
+        {
+            const int deltaX = mouseX - previousMouseX;
+            const int deltaY = mouseY- previousMouseY;
+            camera.m_CameraYaw += atlas::maths_helpers::Angle::FromRadians(static_cast<float>(deltaX) * c_rotationScaling);
+            camera.m_CameraPitch += atlas::maths_helpers::Angle::FromRadians(static_cast<float>(deltaY) * c_rotationScaling);
+            camera.m_CameraPitch = atlas::maths_helpers::Angle::FromRadians(std::min(std::max(camera.m_CameraPitch.AsRadians(), 0.6f), 1.5f));
+        }
+
+        previousMouseX = mouseX;
+        previousMouseY = mouseY;
+        return true;
+    }
 }
 
 void cpp_conv::CameraControllerSystem::Update(atlas::scene::EcsManager& ecs)
@@ -113,5 +139,15 @@ void cpp_conv::CameraControllerSystem::Update(atlas::scene::EcsManager& ecs)
         }
 
         updateControls(camera);
+    }
+
+    for(auto [entity, camera] : ecs.IterateEntityComponents<SphericalLookAtCamera>())
+    {
+        if (!camera.m_bIsActive)
+        {
+            continue;
+        }
+
+        //updateControls(camera);
     }
 }

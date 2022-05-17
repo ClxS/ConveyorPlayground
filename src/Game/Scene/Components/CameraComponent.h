@@ -22,6 +22,17 @@ namespace cpp_conv::components
         float m_Distance;
     };
 
+    struct SphericalLookAtCamera : public CameraComponent
+    {
+        Eigen::Vector3f m_SphericalCentre;
+        float m_SphericalCentreDistance;
+        atlas::maths_helpers::Angle m_LookAtYaw;
+        atlas::maths_helpers::Angle m_LookAtPitch;
+        atlas::maths_helpers::Angle m_CameraYaw;
+        atlas::maths_helpers::Angle m_CameraPitch;
+        float m_Distance;
+    };
+
     struct FreeCamera : public CameraComponent
     {
         Eigen::Vector3f m_CameraPosition;

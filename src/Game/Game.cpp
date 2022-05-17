@@ -39,6 +39,7 @@ void registerComponents()
     using namespace atlas::scene;
     using namespace cpp_conv::components;
     ComponentRegistry::RegisterComponent<LookAtCamera>();
+    ComponentRegistry::RegisterComponent<SphericalLookAtCamera>();
     ComponentRegistry::RegisterComponent<FreeCamera>();
     ComponentRegistry::RegisterComponent<NameComponent>();
     ComponentRegistry::RegisterComponent<DescriptionComponent>();
