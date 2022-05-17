@@ -9,13 +9,15 @@
 #include <tuple>
 #include <vector>
 
+#include "Eigen/Geometry"
+
 namespace polyhedron
 {
     class TempSphericalCoordinate final
     {
     public:
         TempSphericalCoordinate() = default;
-        TempSphericalCoordinate(size_t id, uint32_t x, uint32_t y, uint32_t f, uint32_t d);
+        TempSphericalCoordinate(size_t id, uint32_t x, uint32_t y, uint32_t segmentIndex, uint32_t d);
 
         [[nodiscard]] std::tuple<float, float> GetParams() const { return std::make_tuple(m_Theta, m_Phi); }
 
@@ -50,14 +52,14 @@ namespace polyhedron
                 return true;
             }
 
-            assert(m_RelativePoint.has_value());
-            return m_RelativePoint.value()->IsAbsolute();
+            return m_RelativePoint->IsAbsolute();
         }
 
         size_t m_Id{};
+        uint32_t m_SegmentIndex;
         float m_Theta{};
         float m_Phi{};
-        std::optional<TempSphericalCoordinate*> m_RelativePoint;
+        TempSphericalCoordinate* m_RelativePoint{nullptr};
         std::optional<Eigen::Matrix3f> m_ConversionMatrix;
     };
 
@@ -88,13 +90,15 @@ namespace polyhedron
         }
     }
 
-    inline TempSphericalCoordinate::TempSphericalCoordinate(const size_t id, const uint32_t x, const uint32_t y, const uint32_t f, const uint32_t d)
-        : m_Id(id), m_RelativePoint(nullptr), m_ConversionMatrix(std::nullopt)
+    inline TempSphericalCoordinate::TempSphericalCoordinate(const size_t id, const uint32_t x, const uint32_t y, const uint32_t segmentIndex, const uint32_t d)
+        : m_Id(id)
+        , m_SegmentIndex{segmentIndex}
+        , m_ConversionMatrix(std::nullopt)
     {
         const auto [xx, yy, zz] = initXyz(
             static_cast<float>(x),
             static_cast<float>(y),
-            f,
+            segmentIndex,
             static_cast<float>(d));
         const auto r = std::hypot(xx, yy, zz);
         m_Theta = std::acos(zz / r);
@@ -103,10 +107,11 @@ namespace polyhedron
 
     inline Eigen::Vector3f TempSphericalCoordinate::ToVector() const
     {
-        if (m_RelativePoint.has_value())
+        if (m_RelativePoint)
         {
-            return *m_ConversionMatrix * m_RelativePoint.value()->ToVector();
+            return *m_ConversionMatrix * m_RelativePoint->ToVector();
         }
+
         return Eigen::Vector3f{
             std::sin(m_Theta) * std::cos(m_Phi), std::sin(m_Theta) * std::sin(m_Phi), std::cos(m_Theta)
         };
@@ -125,9 +130,9 @@ namespace polyhedron
             return;
         }
 
-        m_RelativePoint.value()->ShortenRelativePath();
-        m_ConversionMatrix = *m_ConversionMatrix * *m_RelativePoint.value()->m_ConversionMatrix;
-        m_RelativePoint = m_RelativePoint.value()->m_RelativePoint;
+        m_RelativePoint->ShortenRelativePath();
+        m_ConversionMatrix = *m_ConversionMatrix * *m_RelativePoint->m_ConversionMatrix;
+        m_RelativePoint = m_RelativePoint->m_RelativePoint;
         assert(RelativePathIsShortened());
     }
 }
@@ -284,17 +289,17 @@ namespace
 
     struct Points
     {
-        std::vector<Eigen::Vector3f> m_AbsolutePoints;
+        std::vector<cpp_conv::util::geometry::polyhedron::Polyhedron::Point> m_AbsolutePoints;
     };
 
-    Points createPoints(const Context& context, const std::vector<size_t>& idMapping)
+    Points createPoints(const Context& context, const std::vector<size_t>& idMapping, float scale)
     {
         #define ID(P_X, P_Y, P_F) idMapping.at(internal::index(P_X, P_Y, P_F, context.m_D))
 
         const size_t numPoints = internal::calcN(context.m_H, context.m_K);
         Points points;
         points.m_AbsolutePoints.resize(numPoints);
-        std::vector<polyhedron::TempSphericalCoordinate> sphericalPoints{numPoints};
+        std::vector<polyhedron::TempSphericalCoordinate*> sphericalPoints{numPoints};
 
         for (uint32_t f = 0; f < 6; ++f)
         {
@@ -303,7 +308,12 @@ namespace
                 for (uint32_t x = 0; x <= context.m_D; ++x)
                 {
                     const auto id = ID(x, y, f);
-                    sphericalPoints[id] = polyhedron::TempSphericalCoordinate(id, x, y, f, context.m_D);
+                    if (sphericalPoints[id] != nullptr)
+                    {
+                        continue;
+                    }
+
+                    sphericalPoints[id] = new polyhedron::TempSphericalCoordinate(id, x, y, f, context.m_D);
 
                     const auto [rot_from, rot_mat] = internal::getRotation(x, y, f, context.m_D);
                     const auto rot_from_id = ID(rot_from.m_X, rot_from.m_Y, 0);
@@ -311,15 +321,22 @@ namespace
                     {
                         continue;
                     }
-                    sphericalPoints[id].SetRelativePoint(&sphericalPoints[rot_from_id], rot_mat);
+
+                    sphericalPoints[id]->SetRelativePoint(sphericalPoints[rot_from_id], rot_mat);
                 }
             }
         }
 
         for (size_t i = 0; i < sphericalPoints.size(); ++i)
         {
-            sphericalPoints[i].ShortenRelativePath();
-            points.m_AbsolutePoints[i] = sphericalPoints[i].ToVector();
+            sphericalPoints[i]->ShortenRelativePath();
+            auto vector = sphericalPoints[i]->ToVector();
+            points.m_AbsolutePoints[i] = { vector[0] * scale, vector[1] * scale, vector[2] * scale };
+        }
+
+        for (const auto& sphericalPoint : sphericalPoints)
+        {
+            delete sphericalPoint;
         }
 
         return points;
@@ -435,10 +452,10 @@ namespace
 
 
 
-cpp_conv::util::geometry::polyhedron::Polyhedron cpp_conv::util::geometry::polyhedron::createPolyhedron(uint32_t h, uint32_t k)
+cpp_conv::util::geometry::polyhedron::Polyhedron cpp_conv::util::geometry::polyhedron::createPolyhedron(uint32_t h, uint32_t k, float scale)
 {
     assert(h >= k);
-    using cpp_conv::util::geometry::polyhedron::Polyhedron;
+    using polyhedron::Polyhedron;
 
     const Context context
     {
@@ -448,7 +465,7 @@ cpp_conv::util::geometry::polyhedron::Polyhedron cpp_conv::util::geometry::polyh
     };
 
     const auto idMapping = internal::createIdConvertMap(h, k);
-    Points points = createPoints(context, idMapping);
+    Points points = createPoints(context, idMapping, scale);
 
     std::vector<Polyhedron::Square> squares = createSquares(context, idMapping);
     std::vector<Polyhedron::Triangle> triangles = createTriangles(context, idMapping);

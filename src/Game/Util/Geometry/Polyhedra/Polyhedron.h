@@ -8,6 +8,13 @@ namespace cpp_conv::util::geometry::polyhedron
     class Polyhedron
     {
     public:
+        struct Point
+        {
+            float m_X;
+            float m_Y;
+            float m_Z;
+        };
+
         template<uint32_t TIndexCount>
         struct Polygon
         {
@@ -18,7 +25,7 @@ namespace cpp_conv::util::geometry::polyhedron
         using Triangle = Polygon<3>;
 
         Polyhedron(
-            std::vector<Eigen::Vector3f> points,
+            std::vector<Point> points,
             std::vector<Square> squares,
             std::vector<Triangle> triangles)
                 : m_Points{std::move(points)}
@@ -27,7 +34,7 @@ namespace cpp_conv::util::geometry::polyhedron
         {
         }
 
-        [[nodiscard]] const std::vector<Eigen::Vector3f>& GetPoints() const
+        [[nodiscard]] const std::vector<Point>& GetPoints() const
         {
             return m_Points;
         }
@@ -48,11 +55,11 @@ namespace cpp_conv::util::geometry::polyhedron
         }
 
     private:
-        std::vector<Eigen::Vector3f> m_Points;
+        std::vector<Point> m_Points;
         std::vector<Eigen::Vector2f> m_SphericalCoordinates;
         std::vector<Square> m_Squares;
         std::vector<Triangle> m_Triangles;
     };
 
-    Polyhedron createPolyhedron(uint32_t h, uint32_t k);
+    Polyhedron createPolyhedron(uint32_t h, uint32_t k, float scale);
 }
