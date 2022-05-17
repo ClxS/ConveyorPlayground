@@ -33,6 +33,23 @@ namespace
             UINT32_MAX);
         setUniform(g_lightMtx[shadowSlot], caster.m_LightMatrix.data());
     }
+
+    void setIntrinsicTextureSlots(const std::shared_ptr<atlas::render::ShaderProgram>& program)
+    {
+        for(const auto& slot : program->GetTextureSlotInfos())
+        {
+            switch (slot.m_TypeHash)
+            {
+            case 0: break;
+            case atlas::core::hashing::fnv1("shadowMap"):
+                setShadowState(slot.m_Slot, 0);
+                break;
+            default:
+                assert(false); // "Unknown texture slot type"
+                break;
+            }
+        }
+    }
 }
 
 void atlas::render::setShadowCaster(const uint8_t shadowIndex, ShadowCaster shadow)
@@ -51,6 +68,37 @@ void initDrawingData()
     }
 }
 
+
+void atlas::render::draw(
+    const bgfx::ViewId viewId,
+    const bgfx::VertexBufferHandle vertexBuffer,
+    const resource::AssetPtr<ShaderProgram>& program,
+    const Eigen::Matrix4f& transform,
+    const uint8_t flags)
+{
+    setIntrinsicTextureSlots(program);
+
+    bgfx::setTransform(transform.data());
+    bgfx::setVertexBuffer(0, vertexBuffer);
+    submit(viewId, program->GetHandle(), flags);
+}
+
+void atlas::render::draw(
+    const bgfx::ViewId viewId,
+    const bgfx::VertexBufferHandle vertexBuffer,
+    const bgfx::IndexBufferHandle indexBuffer,
+    const resource::AssetPtr<ShaderProgram>& program,
+    const Eigen::Matrix4f& transform,
+    const uint8_t flags)
+{
+    setIntrinsicTextureSlots(program);
+
+    bgfx::setTransform(transform.data());
+    bgfx::setVertexBuffer(0, vertexBuffer);
+    bgfx::setIndexBuffer(indexBuffer);
+    submit(viewId, program->GetHandle(), flags);
+}
+
 void atlas::render::draw(
     const bgfx::ViewId viewId,
     const resource::AssetPtr<ModelAsset>& model,
@@ -60,24 +108,11 @@ void atlas::render::draw(
 {
     for(const auto& segment : model->GetMesh()->GetSegments())
     {
-        bgfx::setTransform(transform.data());
+        setIntrinsicTextureSlots(program);
 
+        bgfx::setTransform(transform.data());
         setVertexBuffer(0, segment.m_VertexBuffer);
         setIndexBuffer(segment.m_IndexBuffer);
-
-        for(const auto& slot : program->GetTextureSlotInfos())
-        {
-            switch (slot.m_TypeHash)
-            {
-            case 0: break;
-            case core::hashing::fnv1("shadowMap"):
-                setShadowState(slot.m_Slot, 0);
-                break;
-            default:
-                assert(false); // "Unknown texture slot type"
-                break;
-            }
-        }
 
         uint8_t textureIndex = 0;
         for(const auto& texture : model->GetTextures())
@@ -117,19 +152,7 @@ void atlas::render::drawInstanced(
 
     for(const auto& segment : model->GetMesh()->GetSegments())
     {
-        for(const auto& slot : program->GetTextureSlotInfos())
-        {
-            switch (slot.m_TypeHash)
-            {
-            case 0: break;
-            case core::hashing::fnv1("shadowMap"):
-                setShadowState(slot.m_Slot, 0);
-                break;
-            default:
-                assert(false); // "Unknown texture slot type"
-                break;
-            }
-        }
+        setIntrinsicTextureSlots(program);
 
         uint8_t textureIndex = 0;
         for(const auto& texture : model->GetTextures())
