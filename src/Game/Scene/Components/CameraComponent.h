@@ -10,7 +10,8 @@ namespace cpp_conv::components
         Eigen::Matrix4f m_ViewMatrix{};
         Eigen::Matrix4f m_ProjectionMatrix{};
         Eigen::Vector2f m_NearFar{0.01f, 100.0f};
-        bool m_bIsActive{false};
+        bool m_bIsRenderActive{false};
+        bool m_bIsControlActive{false};
     };
 
     struct LookAtCamera : public CameraComponent
