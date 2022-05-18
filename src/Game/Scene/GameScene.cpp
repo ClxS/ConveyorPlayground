@@ -21,6 +21,7 @@
 #include "RecipeRegistry.h"
 #include "SequenceFormationSystem.h"
 #include "SequenceProcessingSystem.h"
+#include "SolarBodyComponent.h"
 #include "StandaloneConveyorSystem.h"
 #include "Storage.h"
 #include "StorageComponent.h"
@@ -188,11 +189,13 @@ namespace
     void addGround(atlas::scene::EcsManager& ecs)
     {
         const auto ground = ecs.AddEntity();
-        ecs.AddComponent<PositionComponent>(ground).m_Position = { 0, 0, 0 };
-        ecs.AddComponent<ModelComponent>(
-            ground,
-            ResourceLoader::LoadAsset<CoreBundle, ModelAsset>(core_bundle::assets::others::c_SurfaceFlat),
-            cpp_conv::constants::render_masks::c_surfaceClippedGeometry);
+        auto& solarBody = ecs.AddComponent<SolarBodyComponent>(ground);
+
+        solarBody.m_MeshData.m_Polyhedron = cpp_conv::util::geometry::polyhedron::createPolyhedron(50, 0, 10.0f);
+        auto [vertices, indices] = solarBody.m_MeshData.m_Polyhedron.CreateBuffers();
+
+        solarBody.m_MeshData.m_Vertices = vertices;
+        solarBody.m_MeshData.m_Indices = indices;
     }
 }
 
@@ -200,7 +203,7 @@ void cpp_conv::GameScene::OnEntered(atlas::scene::SceneManager& sceneManager)
 {
     atlas::scene::EcsManager& ecs = GetEcsManager();
 
-    //addGround(ecs);
+    addGround(ecs);
     addCameras(ecs);
     addLights(ecs);
 

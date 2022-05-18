@@ -8,7 +8,7 @@ namespace cpp_conv
 {
     constexpr int c_maxClipPositions = 32;
 
-    class ClippedSurfaceRenderSystem final : public atlas::scene::SystemBase
+    class SolarBodyRenderSystem final : public atlas::scene::SystemBase
     {
     public:
         void Initialise(
@@ -27,10 +27,10 @@ namespace cpp_conv
 
         struct
         {
-            bgfx::UniformHandle m_SurfaceColour;
-            bgfx::UniformHandle m_ClipCount;
-            bgfx::UniformHandle m_WorldClipPositions;
-            bgfx::UniformHandle m_WorldClipRadii;
+            bgfx::UniformHandle m_SurfaceColour{BGFX_INVALID_HANDLE};
+            bgfx::UniformHandle m_ClipCount{BGFX_INVALID_HANDLE};
+            bgfx::UniformHandle m_WorldClipPositions{BGFX_INVALID_HANDLE};
+            bgfx::UniformHandle m_WorldClipRadii{BGFX_INVALID_HANDLE};
         } m_Uniforms;
     };
 

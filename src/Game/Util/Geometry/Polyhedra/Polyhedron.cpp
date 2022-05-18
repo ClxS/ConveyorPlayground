@@ -56,7 +56,6 @@ namespace polyhedron
         }
 
         size_t m_Id{};
-        uint32_t m_SegmentIndex;
         float m_Theta{};
         float m_Phi{};
         TempSphericalCoordinate* m_RelativePoint{nullptr};
@@ -92,7 +91,6 @@ namespace polyhedron
 
     inline TempSphericalCoordinate::TempSphericalCoordinate(const size_t id, const uint32_t x, const uint32_t y, const uint32_t segmentIndex, const uint32_t d)
         : m_Id(id)
-        , m_SegmentIndex{segmentIndex}
         , m_ConversionMatrix(std::nullopt)
     {
         const auto [xx, yy, zz] = initXyz(
@@ -480,6 +478,83 @@ namespace
 }
 
 
+std::tuple<bgfx::VertexBufferHandle, bgfx::IndexBufferHandle>
+cpp_conv::util::geometry::polyhedron::Polyhedron::CreateBuffers() const
+{
+    bgfx::VertexLayout vertexLayout;
+    vertexLayout
+        .begin()
+        .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
+        .end();
+
+    const auto& points = GetPoints();
+    const auto& triangles = GetTriangles();
+    const auto& squares = GetSquares();
+
+    const int vertexCount = static_cast<int>(points.size());
+    const auto indexCount = static_cast<uint32_t>(triangles.size() * 3 + squares.size() * 6);
+
+    const bool use16BitIndex = points.size() < 65535;
+    const int indexBufferStride = use16BitIndex ? 2 : 4;
+
+    const auto bufferSize = vertexLayout.getSize(vertexCount);
+    const bgfx::Memory* vertexMemory = bgfx::alloc(bufferSize);
+    const bgfx::Memory* indexMemory = bgfx::alloc(indexCount * indexBufferStride);
+
+    std::memcpy(vertexMemory->data, points.data(), bufferSize);
+
+    if (use16BitIndex)
+    {
+        int offset = 0;
+        auto* indexBuffer = reinterpret_cast<uint16_t*>(indexMemory->data);
+        for(const auto& square : squares)
+        {
+            indexBuffer[offset++] = static_cast<uint16_t>(square.m_Indices[0]);
+            indexBuffer[offset++] = static_cast<uint16_t>(square.m_Indices[1]);
+            indexBuffer[offset++] = static_cast<uint16_t>(square.m_Indices[2]);
+            indexBuffer[offset++] = static_cast<uint16_t>(square.m_Indices[0]);
+            indexBuffer[offset++] = static_cast<uint16_t>(square.m_Indices[3]);
+            indexBuffer[offset++] = static_cast<uint16_t>(square.m_Indices[2]);
+        }
+
+        for(const auto& triangle : triangles)
+        {
+            indexBuffer[offset++] = static_cast<uint16_t>(triangle.m_Indices[0]);
+            indexBuffer[offset++] = static_cast<uint16_t>(triangle.m_Indices[2]);
+            indexBuffer[offset++] = static_cast<uint16_t>(triangle.m_Indices[1]);
+        }
+    }
+    else
+    {
+        int offset = 0;
+        auto* indexBuffer = reinterpret_cast<uint32_t*>(indexMemory->data);
+        for(const auto& square : squares)
+        {
+            indexBuffer[offset++] = static_cast<uint32_t>(square.m_Indices[0]);
+            indexBuffer[offset++] = static_cast<uint32_t>(square.m_Indices[1]);
+            indexBuffer[offset++] = static_cast<uint32_t>(square.m_Indices[2]);
+            indexBuffer[offset++] = static_cast<uint32_t>(square.m_Indices[0]);
+            indexBuffer[offset++] = static_cast<uint32_t>(square.m_Indices[3]);
+            indexBuffer[offset++] = static_cast<uint32_t>(square.m_Indices[2]);
+        }
+
+        for(const auto& triangle : triangles)
+        {
+            indexBuffer[offset++] = static_cast<uint32_t>(triangle.m_Indices[0]);
+            indexBuffer[offset++] = static_cast<uint32_t>(triangle.m_Indices[2]);
+            indexBuffer[offset++] = static_cast<uint32_t>(triangle.m_Indices[1]);
+        }
+    }
+
+    bgfx::VertexBufferHandle polyhedraVertices = bgfx::createVertexBuffer(vertexMemory, vertexLayout);
+    bgfx::IndexBufferHandle polyhedraIndices = bgfx::createIndexBuffer(
+        indexMemory,
+        use16BitIndex
+            ? BGFX_BUFFER_NONE
+            : BGFX_BUFFER_INDEX32);
+
+    return { polyhedraVertices, polyhedraIndices };
+}
 
 cpp_conv::util::geometry::polyhedron::Polyhedron cpp_conv::util::geometry::polyhedron::createPolyhedron(uint32_t h, uint32_t k, float scale)
 {

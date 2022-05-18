@@ -20,6 +20,7 @@
 #include "RecipeRegistry.h"
 #include "SDLTileLoadHandler.h"
 #include "SequenceComponent.h"
+#include "SolarBodyComponent.h"
 #include "StorageComponent.h"
 #include "WorldEntityInformationComponent.h"
 #include "AtlasGame/GameHost.h"
@@ -40,6 +41,7 @@ void registerComponents()
     using namespace cpp_conv::components;
     ComponentRegistry::RegisterComponent<LookAtCamera>();
     ComponentRegistry::RegisterComponent<SphericalLookAtCamera>();
+    ComponentRegistry::RegisterComponent<SolarBodyComponent>();
     ComponentRegistry::RegisterComponent<FreeCamera>();
     ComponentRegistry::RegisterComponent<NameComponent>();
     ComponentRegistry::RegisterComponent<DescriptionComponent>();

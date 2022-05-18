@@ -3,7 +3,7 @@
 #include <AtlasScene/Scene.h>
 
 #include "CameraRenderSystem.h"
-#include "ClippedSurfaceRenderSystem.h"
+#include "SolarBodyRenderSystem.h"
 #include "ConveyorRenderingSystem.h"
 #include "EntityLookupGrid.h"
 #include "FactoryDefinition.h"
@@ -88,7 +88,7 @@ namespace cpp_conv
             {
                 CameraRenderSystem m_CameraRenderSystem;
                 LightingRenderSystem m_LightingSystem;
-                ClippedSurfaceRenderSystem m_ClippedSurfaceRenderSystem;
+                SolarBodyRenderSystem m_ClippedSurfaceRenderSystem;
                 ModelRenderSystem m_ModelRenderer;
                 ConveyorRenderingSystem m_ConveyorRenderer;
 

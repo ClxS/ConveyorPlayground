@@ -3,6 +3,8 @@
 #include <vector>
 #include <Eigen/Core>
 
+#include "bgfx/bgfx.h"
+
 namespace cpp_conv::util::geometry::polyhedron
 {
     class Polyhedron
@@ -60,11 +62,26 @@ namespace cpp_conv::util::geometry::polyhedron
         {
         }
 
+        Polyhedron(const Polyhedron& other) noexcept
+        {
+            m_Points = other.m_Points;
+            m_Squares = other.m_Squares;
+            m_Triangles = other.m_Triangles;
+        }
+
         Polyhedron(Polyhedron&& other) noexcept
         {
             m_Points = std::move(other.m_Points);
             m_Squares = std::move(other.m_Squares);
             m_Triangles = std::move(other.m_Triangles);
+        }
+
+        Polyhedron& operator=(const Polyhedron& other) noexcept
+        {
+            m_Points = other.m_Points;
+            m_Squares = other.m_Squares;
+            m_Triangles = other.m_Triangles;
+            return *this;
         }
 
         Polyhedron& operator=(Polyhedron&& other) noexcept
@@ -94,6 +111,8 @@ namespace cpp_conv::util::geometry::polyhedron
         {
             return m_Triangles;
         }
+
+        [[nodiscard]] std::tuple<bgfx::VertexBufferHandle, bgfx::IndexBufferHandle> CreateBuffers() const;
 
     private:
         std::vector<Point> m_Points;
