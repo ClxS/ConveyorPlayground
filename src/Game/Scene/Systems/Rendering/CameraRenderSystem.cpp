@@ -65,7 +65,7 @@ namespace
         auto [width, height] = atlas::app_host::Application::Get().GetAppDimensions();
         Eigen::Matrix4f view = atlas::maths_helpers::createLookAtMatrix(cameraPosition - lookAtPosition, lookAtPosition, upVector);
         Eigen::Matrix4f projection = createProjectionMatrix(
-            atlas::maths_helpers::Angle::FromDegrees(60),
+            atlas::maths_helpers::Angle::FromDegrees(80),
             static_cast<float>(width) / static_cast<float>(height),
             0.1f,
             100.0f,

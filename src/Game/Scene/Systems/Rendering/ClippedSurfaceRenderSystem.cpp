@@ -5,6 +5,7 @@
 #include "PositionComponent.h"
 #include "AtlasRender/Renderer.h"
 #include "AtlasRender/AssetTypes/ModelAsset.h"
+#include "AtlasRender/Debug/debugdraw.h"
 #include "AtlasResource/ResourceLoader.h"
 #include "Eigen/Core"
 #include "Geometry/Polyhedra/Polyhedron.h"
@@ -13,10 +14,11 @@ namespace
 {
     bgfx::VertexBufferHandle polyhedraVertices;
     bgfx::IndexBufferHandle polyhedraIndices;
+    cpp_conv::util::geometry::polyhedron::Polyhedron polyhedron;
 
     void createPolyhedra()
     {
-        const auto polyhedra = cpp_conv::util::geometry::polyhedron::createPolyhedron(50, 0, 4.0f);
+        polyhedron = cpp_conv::util::geometry::polyhedron::createPolyhedron(50, 0, 10.0f);
 
         bgfx::VertexLayout vertexLayout;
         vertexLayout
@@ -24,9 +26,9 @@ namespace
             .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
             .end();
 
-        const auto& points = polyhedra.GetPoints();
-        const auto& triangles = polyhedra.GetTriangles();
-        const auto& squares = polyhedra.GetSquares();
+        const auto& points = polyhedron.GetPoints();
+        const auto& triangles = polyhedron.GetTriangles();
+        const auto& squares = polyhedron.GetSquares();
 
         const int vertexCount = static_cast<int>(points.size());
         const auto indexCount = static_cast<uint32_t>(triangles.size() * 3 + squares.size() * 6);
@@ -168,4 +170,49 @@ void cpp_conv::ClippedSurfaceRenderSystem::Update(atlas::scene::EcsManager& ecs)
         atlas::resource::ResourceLoader::LoadAsset<resources::registry::CoreBundle, atlas::render::ShaderProgram>(resources::registry::core_bundle::shaders::c_basicUntexturedUninstanced),
         Eigen::Matrix4f::Identity(),
         ~BGFX_DISCARD_STATE);
+
+    {
+        using namespace atlas::render::debug;
+        debug_draw::createScope();
+        debug_draw::setWireframe(true);
+
+        const auto& points = polyhedron.GetPoints();
+
+        debug_draw::setColor(0xff000000);
+        for(const auto& square : polyhedron.GetSquares())
+        {
+            const auto& v0 = points[square.m_Indices[0]];
+            const auto& v1 = points[square.m_Indices[1]];
+            const auto& v2 = points[square.m_Indices[2]];
+            const auto& v3 = points[square.m_Indices[3]];
+
+            debug_draw::moveTo({ v0.m_X, v0.m_Y, v0.m_Z });
+            debug_draw::lineTo({ v1.m_X, v1.m_Y, v1.m_Z });
+
+            debug_draw::moveTo({ v1.m_X, v1.m_Y, v1.m_Z });
+            debug_draw::lineTo({ v2.m_X, v2.m_Y, v2.m_Z });
+
+            debug_draw::moveTo({ v2.m_X, v2.m_Y, v2.m_Z });
+            debug_draw::lineTo({ v3.m_X, v3.m_Y, v3.m_Z });
+
+            debug_draw::moveTo({ v3.m_X, v3.m_Y, v3.m_Z });
+            debug_draw::lineTo({ v0.m_X, v0.m_Y, v0.m_Z });
+        }
+
+        for(const auto& triangle : polyhedron.GetTriangles())
+        {
+            const auto& v0 = points[triangle.m_Indices[0]];
+            const auto& v1 = points[triangle.m_Indices[1]];
+            const auto& v2 = points[triangle.m_Indices[2]];
+
+            debug_draw::moveTo({ v0.m_X, v0.m_Y, v0.m_Z });
+            debug_draw::lineTo({ v1.m_X, v1.m_Y, v1.m_Z });
+
+            debug_draw::moveTo({ v0.m_X, v0.m_Y, v0.m_Z });
+            debug_draw::lineTo({ v1.m_X, v1.m_Y, v1.m_Z });
+
+            debug_draw::moveTo({ v0.m_X, v0.m_Y, v0.m_Z });
+            debug_draw::lineTo({ v1.m_X, v1.m_Y, v1.m_Z });
+        }
+    }
 }

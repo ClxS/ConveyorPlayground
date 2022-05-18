@@ -39,7 +39,7 @@ namespace
         pitch = atlas::maths_helpers::Angle::FromRadians(std::acos(position.y() / r), atlas::maths_helpers::Angle::WrapMode::None);
         if (position.x() != 0.0f)
         {
-            yaw = atlas::maths_helpers::Angle::FromRadians(std::atan(position.z() / position.x()), atlas::maths_helpers::Angle::WrapMode::None);
+            yaw = atlas::maths_helpers::Angle::FromRadians(std::atan2(position.z(), position.x()), atlas::maths_helpers::Angle::WrapMode::None);
         }
         else
         {
@@ -175,15 +175,11 @@ namespace
 
         if(keyboardState[SDL_SCANCODE_A])
         {
-            // auto [_, right] = getForwardAndRight(camera);
-            // right *= static_cast<float>(1) * -c_keyboardMoveScaling * speedFactor;
-            // camera.m_LookAtPoint += right;
+            moveCamera(camera, 0.0f, c_keyboardMoveScaling * speedFactor);
         }
         else if(keyboardState[SDL_SCANCODE_D])
         {
-            // auto [_, right] = getForwardAndRight(camera);
-            // right *= static_cast<float>(1) * c_keyboardMoveScaling * speedFactor;
-            // camera.m_LookAtPoint += right;
+            moveCamera(camera, 0.0f, c_keyboardMoveScaling * -speedFactor);
         }
 
         previousMouseX = mouseX;
