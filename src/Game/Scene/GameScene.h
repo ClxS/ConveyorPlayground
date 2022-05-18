@@ -108,7 +108,7 @@ namespace cpp_conv
             {
                 UIControllerSystem m_UIController;
                 GameSceneDebugUI m_DebugUI;
-                void Initialise(atlas::scene::EcsManager& ecsManager);
+                void Initialise(atlas::scene::EcsManager& ecsManager, CameraRenderSystem* pCameraRenderer);
                 void Update(atlas::scene::EcsManager& ecsManager);
             } m_UI;
 
