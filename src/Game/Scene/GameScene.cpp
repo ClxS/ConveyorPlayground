@@ -196,6 +196,11 @@ namespace
 
         solarBody.m_MeshData.m_Vertices = vertices;
         solarBody.m_MeshData.m_Indices = indices;
+
+        solarBody.m_SphereData.m_K = solarBody.m_MeshData.m_Polyhedron.GetK();
+        solarBody.m_SphereData.m_H = solarBody.m_MeshData.m_Polyhedron.GetH();
+        solarBody.m_SphereData.m_D = solarBody.m_MeshData.m_Polyhedron.GetD();
+        solarBody.m_SphereData.m_Radius = solarBody.m_MeshData.m_Polyhedron.GetRadius();
     }
 }
 

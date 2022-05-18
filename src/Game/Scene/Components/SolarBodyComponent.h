@@ -59,6 +59,7 @@ namespace cpp_conv::components
             uint32_t m_K{0};
             uint32_t m_H{0};
             uint32_t m_D{0};
+            float m_Radius{0.0f};
         } m_SphereData;
     };
 }

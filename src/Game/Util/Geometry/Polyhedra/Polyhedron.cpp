@@ -574,5 +574,5 @@ cpp_conv::util::geometry::polyhedron::Polyhedron cpp_conv::util::geometry::polyh
     std::vector<Polyhedron::Square> squares = createSquares(context, idMapping);
     std::vector<Polyhedron::Triangle> triangles = createTriangles(context, idMapping);
 
-    return { points.m_AbsolutePoints, squares, triangles };
+    return { points.m_AbsolutePoints, squares, triangles, k, h, internal::calcD(h, k), scale };
 }
