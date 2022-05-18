@@ -1,6 +1,36 @@
 #include "AtlasCorePCH.h"
 #include "MathsHelpers.h"
 
+void atlas::maths_helpers::Angle::SetRadians(const float value)
+{
+    m_Value = value;
+    switch (m_WrapMode)
+    {
+    case WrapMode::Wrap:
+        while(m_Value < m_ClampMin)
+        {
+            m_Value += m_ClampMax;
+        }
+
+        while(m_Value > m_ClampMax)
+        {
+            m_Value -= m_ClampMax;
+        }
+        break;
+    case WrapMode::Clamp:
+        if (m_Value < m_ClampMin)
+        {
+            m_Value = m_ClampMin;
+        }
+
+        if (m_Value > m_ClampMax)
+        {
+            m_Value = m_ClampMax;
+        }
+        break;
+    }
+}
+
 Eigen::Matrix4f atlas::maths_helpers::createLookAtMatrix(const Eigen::Vector3f& eye, const Eigen::Vector3f& target, const Eigen::Vector3f& inUp, const bool leftHanded)
 {
     const Eigen::Vector3f view = (leftHanded ? (target - eye) : (eye - target)).normalized();
@@ -70,4 +100,23 @@ Eigen::Matrix4f atlas::maths_helpers::createOrthographicMatrix(
     mat(2, 3) = ff;
     mat(3, 3) = 1.0f;
     return mat;
+}
+
+Eigen::Matrix4f atlas::maths_helpers::getMatrixForSphericalCoordinate(const Angle pitch, const Angle yaw, const float distance)
+{
+    const Eigen::Affine3f translation{Eigen::Translation3f( 0.0f, distance, 0.0f )};
+    const Eigen::Affine3f rotYaw{Eigen::AngleAxisf{yaw.AsRadians(), -Eigen::Vector3f::UnitY()}};
+    const Eigen::Affine3f rotPitch{Eigen::AngleAxisf{pitch.AsRadians(), -Eigen::Vector3f::UnitZ()}};
+    Eigen::Matrix4f m = (rotYaw * rotPitch * translation).matrix();
+    return m;
+}
+
+Eigen::Vector3f atlas::maths_helpers::sphericalCoordinateToCartesian(const Angle pitch, const Angle yaw, float distance)
+{
+    return
+    {
+        distance * std::sinf(pitch.AsRadians()) * std::cosf(yaw.AsRadians()),
+        distance * std::cosf(pitch.AsRadians()),
+        distance * std::sinf(pitch.AsRadians()) * std::sinf(yaw.AsRadians()),
+    };
 }

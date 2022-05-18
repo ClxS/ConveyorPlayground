@@ -1,5 +1,5 @@
 #pragma once
-#include <Eigen/Core>
+#include <Eigen/Dense>
 
 namespace atlas::maths_helpers
 {
@@ -8,6 +8,13 @@ namespace atlas::maths_helpers
     class Angle
     {
     public:
+        enum class WrapMode
+        {
+            Clamp,
+            Wrap,
+            None
+        };
+
         [[nodiscard]] float AsRadians() const { return m_Value; }
         [[nodiscard]] float AsDegrees() const { return m_Value * (180.0f / c_pi); }
 
@@ -23,6 +30,20 @@ namespace atlas::maths_helpers
             return angle;
         }
 
+        static Angle FromRadians(const float value, const WrapMode wrapMode)
+        {
+            Angle angle;
+            angle.SetRadians(value, 0.0f, c_pi * 2.0f, wrapMode);
+            return angle;
+        }
+
+        static Angle FromRadians(const float value, const float min, const float max, const WrapMode wrapMode)
+        {
+            Angle angle;
+            angle.SetRadians(value, min, max, wrapMode);
+            return angle;
+        }
+
         static Angle FromDegrees(const float value)
         {
             Angle angle;
@@ -30,9 +51,40 @@ namespace atlas::maths_helpers
             return angle;
         }
 
+        static Angle FromDegrees(const float value, const WrapMode wrapMode)
+        {
+            Angle angle;
+            angle.SetDegrees(value, 0.0f, 360.0f, wrapMode);
+            return angle;
+        }
+
+        static Angle FromDegrees(const float value, const float min, const float max, const WrapMode wrapMode)
+        {
+            Angle angle;
+            angle.SetDegrees(value, min, max, wrapMode);
+            return angle;
+        }
+
         Angle& operator+=(const Angle& other)
         {
-            m_Value += other.m_Value;
+            SetRadians(m_Value + other.m_Value);
+            return *this;
+        }
+
+        Angle& operator-=(const Angle& other)
+        {
+            SetRadians(m_Value - other.m_Value, m_ClampMin, m_ClampMax, m_WrapMode);
+            return *this;
+        }
+
+        Angle operator-(const Angle& other) const
+        {
+            return FromRadians(m_Value - other.m_Value, m_ClampMin, m_ClampMax, m_WrapMode);
+        }
+
+        Angle& operator=(const Angle& other)
+        {
+            SetRadians(other.m_Value);
             return *this;
         }
 
@@ -41,11 +93,51 @@ namespace atlas::maths_helpers
         bool operator<=(const Angle& other) const { return m_Value < other.m_Value; }
         bool operator<(const Angle& other) const { return m_Value >= other.m_Value; }
 
-        void SetRadians(const float value) { m_Value = value; }
-        void SetDegrees(const float value) { m_Value = value  * (c_pi / 180.0f); }
+        void SetRadians(const float value, const float min, const float max, const WrapMode wrapMode)
+        {
+            m_ClampMin = min;
+            m_ClampMax = max;
+            m_WrapMode = wrapMode;
+            SetRadians(value);
+        }
+
+        void SetRadians(const float value, const WrapMode wrapMode)
+        {
+            m_WrapMode = wrapMode;
+            SetRadians(value);
+        }
+
+        void SetRadians(const float value);
+
+        void SetDegrees(const float value, const float min, const float max, const WrapMode wrapMode)
+        {
+            SetRadians(
+                value  * (c_pi / 180.0f),
+                min  * (c_pi / 180.0f),
+                max  * (c_pi / 180.0f),
+                wrapMode);
+        }
+
+        void SetDegrees(const float value, const WrapMode wrapMode)
+        {
+            SetRadians(
+                value  * (c_pi / 180.0f),
+                m_ClampMin,
+                m_ClampMax,
+                wrapMode);
+        }
+
+        void SetDegrees(const float value)
+        {
+            SetRadians(value  * (c_pi / 180.0f));
+        }
 
     private:
         float m_Value{};
+
+        float m_ClampMin{0.0f};
+        float m_ClampMax{c_pi * 2.0f};
+        WrapMode m_WrapMode{WrapMode::Wrap};
     };
 
     struct Rectangle
@@ -83,6 +175,9 @@ namespace atlas::maths_helpers
         bool homogenousDepth,
         bool leftHanded = true);
 
+    Eigen::Matrix4f getMatrixForSphericalCoordinate(Angle pitch, Angle yaw, float distance);
+
+    Eigen::Vector3f sphericalCoordinateToCartesian(Angle pitch, Angle yaw, float distance);
 }
 
 inline atlas::maths_helpers::Angle operator ""_radians(long double value)
