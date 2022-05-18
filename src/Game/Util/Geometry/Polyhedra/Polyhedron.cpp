@@ -299,6 +299,9 @@ namespace
         const size_t numPoints = internal::calcN(context.m_H, context.m_K);
         Points points;
         points.m_AbsolutePoints.resize(numPoints);
+        std::vector<uint32_t> segments;
+        segments.resize(numPoints);
+
         std::vector<polyhedron::TempSphericalCoordinate*> sphericalPoints{numPoints};
 
         for (uint32_t f = 0; f < 6; ++f)
@@ -323,6 +326,7 @@ namespace
                     }
 
                     sphericalPoints[id]->SetRelativePoint(sphericalPoints[rot_from_id], rot_mat);
+                    segments[id] = f;
                 }
             }
         }
@@ -332,6 +336,31 @@ namespace
             sphericalPoints[i]->ShortenRelativePath();
             auto vector = sphericalPoints[i]->ToVector();
             points.m_AbsolutePoints[i] = { vector[0] * scale, vector[1] * scale, vector[2] * scale };
+
+            constexpr float c_scaleFactor = 0.5f;
+            switch (segments[i])
+            {
+            case 0:
+                points.m_AbsolutePoints[i] += cpp_conv::util::geometry::polyhedron::Polyhedron::Point {0.0f, 0.0f, (-scale / context.m_D) * c_scaleFactor};
+                break;
+            case 1:
+                points.m_AbsolutePoints[i] += cpp_conv::util::geometry::polyhedron::Polyhedron::Point {(-scale / context.m_D) * c_scaleFactor, 0.0f, 0.0f};
+                break;
+            case 2:
+                points.m_AbsolutePoints[i] += cpp_conv::util::geometry::polyhedron::Polyhedron::Point {0.0f, (-scale / context.m_D) * c_scaleFactor, 0.0f};
+                break;
+            case 3:
+                points.m_AbsolutePoints[i] += cpp_conv::util::geometry::polyhedron::Polyhedron::Point {0.0f, (scale / context.m_D) * c_scaleFactor, 0.0f};
+                break;
+            case 4:
+                points.m_AbsolutePoints[i] += cpp_conv::util::geometry::polyhedron::Polyhedron::Point {0.0f, 0.0f, (scale / context.m_D) * c_scaleFactor};
+                break;
+            case 5:
+                points.m_AbsolutePoints[i] += cpp_conv::util::geometry::polyhedron::Polyhedron::Point {(scale / context.m_D) * c_scaleFactor, 0.0f, 0.0f};
+                break;
+            default:
+                break;
+            }
         }
 
         for (const auto& sphericalPoint : sphericalPoints)

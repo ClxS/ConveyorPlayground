@@ -13,6 +13,28 @@ namespace cpp_conv::util::geometry::polyhedron
             float m_X;
             float m_Y;
             float m_Z;
+
+            Point operator+(const Point& other) const
+            {
+                return { m_X + other.m_X, m_Y + other.m_Y, m_Z + other.m_Z };
+            }
+
+            Point operator-(const Point& other) const
+            {
+                return { m_X - other.m_X, m_Y - other.m_Y, m_Z - other.m_Z };
+            }
+
+            Point& operator+=(const Point& other)
+            {
+                *this = *this + other;
+                return *this;
+            }
+
+            Point& operator-=(const Point& other)
+            {
+                *this = *this - other;
+                return *this;
+            }
         };
 
         template<uint32_t TIndexCount>
@@ -24,6 +46,10 @@ namespace cpp_conv::util::geometry::polyhedron
         using Square = Polygon<4>;
         using Triangle = Polygon<3>;
 
+        Polyhedron()
+        {
+        }
+
         Polyhedron(
             std::vector<Point> points,
             std::vector<Square> squares,
@@ -32,6 +58,21 @@ namespace cpp_conv::util::geometry::polyhedron
                 , m_Squares{std::move(squares)}
                 , m_Triangles{std::move(triangles)}
         {
+        }
+
+        Polyhedron(Polyhedron&& other) noexcept
+        {
+            m_Points = std::move(other.m_Points);
+            m_Squares = std::move(other.m_Squares);
+            m_Triangles = std::move(other.m_Triangles);
+        }
+
+        Polyhedron& operator=(Polyhedron&& other) noexcept
+        {
+            m_Points = std::move(other.m_Points);
+            m_Squares = std::move(other.m_Squares);
+            m_Triangles = std::move(other.m_Triangles);
+            return *this;
         }
 
         [[nodiscard]] const std::vector<Point>& GetPoints() const
