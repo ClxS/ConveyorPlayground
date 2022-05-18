@@ -16,7 +16,7 @@ namespace
 
     void createPolyhedra()
     {
-        const auto polyhedra = cpp_conv::util::geometry::polyhedron::createPolyhedron(50, 0, 2.0f);
+        const auto polyhedra = cpp_conv::util::geometry::polyhedron::createPolyhedron(50, 0, 4.0f);
 
         bgfx::VertexLayout vertexLayout;
         vertexLayout
