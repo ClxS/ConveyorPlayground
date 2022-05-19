@@ -43,5 +43,7 @@ temp/
 
 CookFast.bat
 
+*.log
+
 # Prebuilt Renderdoc
 !src/ThirdParty/renderdoc_api/**
