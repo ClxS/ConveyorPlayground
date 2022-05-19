@@ -32,6 +32,12 @@ namespace cpp_conv
             bgfx::UniformHandle m_WorldClipPositions{BGFX_INVALID_HANDLE};
             bgfx::UniformHandle m_WorldClipRadii{BGFX_INVALID_HANDLE};
         } m_Uniforms;
+
+        struct
+        {
+            bgfx::UniformHandle m_Color{BGFX_INVALID_HANDLE};
+            bgfx::UniformHandle m_Normal{BGFX_INVALID_HANDLE};
+        } m_Samplers;
     };
 
 }

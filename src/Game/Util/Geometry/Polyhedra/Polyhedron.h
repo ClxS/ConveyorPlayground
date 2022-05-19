@@ -16,14 +16,17 @@ namespace cpp_conv::util::geometry::polyhedron
             float m_Y;
             float m_Z;
 
+            float m_U;
+            float m_V;
+
             Point operator+(const Point& other) const
             {
-                return { m_X + other.m_X, m_Y + other.m_Y, m_Z + other.m_Z };
+                return { m_X + other.m_X, m_Y + other.m_Y, m_Z + other.m_Z, m_U, m_V };
             }
 
             Point operator-(const Point& other) const
             {
-                return { m_X - other.m_X, m_Y - other.m_Y, m_Z - other.m_Z };
+                return { m_X - other.m_X, m_Y - other.m_Y, m_Z - other.m_Z, m_U, m_V };
             }
 
             Point& operator+=(const Point& other)

@@ -20,7 +20,7 @@ void cpp_conv::LightingRenderSystem::Initialise(atlas::scene::EcsManager& ecsMan
 
 void cpp_conv::LightingRenderSystem::Update(atlas::scene::EcsManager& ecs)
 {
-    Eigen::Vector4f ambient = { 0.8f, 0.8f, 0.8f, 1.0f };
+    Eigen::Vector4f ambient = { 0.5f, 0.5f, 0.5f, 1.0f };
     bgfx::setUniform(m_Uniforms.m_AmbientColour, ambient.data());
 
     uint8_t lightIndex = 0;

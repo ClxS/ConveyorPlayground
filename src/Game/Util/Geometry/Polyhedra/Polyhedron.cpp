@@ -44,6 +44,12 @@ namespace polyhedron
 
         void ShortenRelativePath();
 
+        float GetTheta() const { return m_Theta; }
+        float GetPhi() const { return m_Phi; }
+
+        uint32_t m_X;
+        uint32_t m_Y;
+
     private:
         [[nodiscard]] bool RelativePathIsShortened() const
         {
@@ -92,6 +98,8 @@ namespace polyhedron
     inline TempSphericalCoordinate::TempSphericalCoordinate(const size_t id, const uint32_t x, const uint32_t y, const uint32_t segmentIndex, const uint32_t d)
         : m_Id(id)
         , m_ConversionMatrix(std::nullopt)
+        , m_X{x}
+        , m_Y{y}
     {
         const auto [xx, yy, zz] = initXyz(
             static_cast<float>(x),
@@ -331,9 +339,23 @@ namespace
 
         for (size_t i = 0; i < sphericalPoints.size(); ++i)
         {
-            sphericalPoints[i]->ShortenRelativePath();
-            auto vector = sphericalPoints[i]->ToVector();
-            points.m_AbsolutePoints[i] = { vector[0] * scale, vector[1] * scale, vector[2] * scale };
+            polyhedron::TempSphericalCoordinate* point = sphericalPoints[i];
+            point->ShortenRelativePath();
+            auto vector = point->ToVector();
+
+            points.m_AbsolutePoints[i] =
+            {
+                vector[0] * scale,
+                vector[1] * scale,
+                vector[2] * scale,
+                0.0f,
+                0.0f
+            };
+
+            float minU = 0.0f;
+            float maxU = 1.0f;
+            float minV = 0.0f;
+            float maxV = 1.0f;
 
             constexpr float c_scaleFactor = 0.5f;
             switch (segments[i])
@@ -359,6 +381,9 @@ namespace
             default:
                 break;
             }
+
+            points.m_AbsolutePoints[i].m_U = std::lerp(minU, maxU, 2.0f * (static_cast<float>(point->m_X) / context.m_D));
+            points.m_AbsolutePoints[i].m_V = std::lerp(minV, maxV, 2.0f * (static_cast<float>(point->m_Y) / context.m_D));
         }
 
         for (const auto& sphericalPoint : sphericalPoints)
@@ -485,6 +510,7 @@ cpp_conv::util::geometry::polyhedron::Polyhedron::CreateBuffers() const
     vertexLayout
         .begin()
         .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
+        .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
         .end();
 
     const auto& points = GetPoints();

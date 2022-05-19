@@ -31,6 +31,7 @@
 #include "AtlasRender/Debug/debugdraw.h"
 #include "AtlasResource/ResourceLoader.h"
 #include "Lighting/DirectionalLightComponent.h"
+#include "SolarBodies/SolarBodyGeneration.h"
 
 using namespace cpp_conv::components;
 using namespace cpp_conv::resources::registry;
@@ -189,18 +190,7 @@ namespace
     void addGround(atlas::scene::EcsManager& ecs)
     {
         const auto ground = ecs.AddEntity();
-        auto& solarBody = ecs.AddComponent<SolarBodyComponent>(ground);
-
-        solarBody.m_MeshData.m_Polyhedron = cpp_conv::util::geometry::polyhedron::createPolyhedron(50, 0, 10.0f);
-        auto [vertices, indices] = solarBody.m_MeshData.m_Polyhedron.CreateBuffers();
-
-        solarBody.m_MeshData.m_Vertices = vertices;
-        solarBody.m_MeshData.m_Indices = indices;
-
-        solarBody.m_SphereData.m_K = solarBody.m_MeshData.m_Polyhedron.GetK();
-        solarBody.m_SphereData.m_H = solarBody.m_MeshData.m_Polyhedron.GetH();
-        solarBody.m_SphereData.m_D = solarBody.m_MeshData.m_Polyhedron.GetD();
-        solarBody.m_SphereData.m_Radius = solarBody.m_MeshData.m_Polyhedron.GetRadius();
+        ecs.AddComponent<SolarBodyComponent>(ground, createSolarBody(cpp_conv::util::solar_bodies::SolarBodySpecification::CrateredMoon));
     }
 }
 

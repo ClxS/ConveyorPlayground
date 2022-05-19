@@ -4,6 +4,16 @@
 
 #include "Polyhedron.h"
 #include "bgfx/bgfx.h"
+#include "AtlasResource/AssetPtr.h"
+
+namespace atlas
+{
+    namespace render
+    {
+        class ShaderProgram;
+        class TextureAsset;
+    }
+}
 
 namespace cpp_conv::components
 {
@@ -12,38 +22,42 @@ namespace cpp_conv::components
         SolarBodyComponent() {}
         ~SolarBodyComponent()
         {
-            bgfx::destroy(m_MeshData.m_Vertices);
-            bgfx::destroy(m_MeshData.m_Indices);
-        }
-        SolarBodyComponent(const SolarBodyComponent& other) noexcept
-        {
-            m_MeshData.m_Polyhedron = other.m_MeshData.m_Polyhedron;
-            m_MeshData.m_Vertices = other.m_MeshData.m_Vertices;
-            m_MeshData.m_Indices = other.m_MeshData.m_Indices;
-            m_SphereData = other.m_SphereData;
+            if (isValid(m_MeshData.m_Vertices))
+            {
+                bgfx::destroy(m_MeshData.m_Vertices);
+            }
+
+            if (isValid(m_MeshData.m_Indices))
+            {
+                bgfx::destroy(m_MeshData.m_Indices);
+            }
         }
         SolarBodyComponent(SolarBodyComponent&& other) noexcept
         {
             m_MeshData.m_Polyhedron = std::move(other.m_MeshData.m_Polyhedron);
             m_MeshData.m_Vertices = other.m_MeshData.m_Vertices;
             m_MeshData.m_Indices = other.m_MeshData.m_Indices;
+            m_MeshData.m_Diffuse = other.m_MeshData.m_Diffuse;
+            m_MeshData.m_Normal = other.m_MeshData.m_Normal;
+            m_MeshData.m_Program = other.m_MeshData.m_Program;
             m_SphereData = other.m_SphereData;
-        }
 
-        SolarBodyComponent& operator=(const SolarBodyComponent& other) noexcept
-        {
-            m_MeshData.m_Polyhedron = other.m_MeshData.m_Polyhedron;
-            m_MeshData.m_Vertices = other.m_MeshData.m_Vertices;
-            m_MeshData.m_Indices = other.m_MeshData.m_Indices;
-            m_SphereData = other.m_SphereData;
-            return *this;
+            other.m_MeshData.m_Vertices = BGFX_INVALID_HANDLE;
+            other.m_MeshData.m_Indices = BGFX_INVALID_HANDLE;
         }
         SolarBodyComponent& operator=(SolarBodyComponent&& other) noexcept
         {
             m_MeshData.m_Polyhedron = std::move(other.m_MeshData.m_Polyhedron);
             m_MeshData.m_Vertices = other.m_MeshData.m_Vertices;
             m_MeshData.m_Indices = other.m_MeshData.m_Indices;
+            m_MeshData.m_Diffuse = other.m_MeshData.m_Diffuse;
+            m_MeshData.m_Normal = other.m_MeshData.m_Normal;
+            m_MeshData.m_Program = other.m_MeshData.m_Program;
             m_SphereData = other.m_SphereData;
+
+            other.m_MeshData.m_Vertices = BGFX_INVALID_HANDLE;
+            other.m_MeshData.m_Indices = BGFX_INVALID_HANDLE;
+            other.m_MeshData.m_Indices = BGFX_INVALID_HANDLE;
             return *this;
         }
 
@@ -52,6 +66,10 @@ namespace cpp_conv::components
             util::geometry::polyhedron::Polyhedron m_Polyhedron;
             bgfx::VertexBufferHandle m_Vertices{BGFX_INVALID_HANDLE};
             bgfx::IndexBufferHandle m_Indices{BGFX_INVALID_HANDLE};
+
+            atlas::resource::AssetPtr<atlas::render::TextureAsset> m_Diffuse;
+            atlas::resource::AssetPtr<atlas::render::TextureAsset> m_Normal;
+            atlas::resource::AssetPtr<atlas::render::ShaderProgram> m_Program;
         } m_MeshData;
 
         struct

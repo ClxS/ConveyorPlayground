@@ -21,6 +21,9 @@ void cpp_conv::SolarBodyRenderSystem::Initialise(atlas::scene::EcsManager&,
     m_Uniforms.m_ClipCount = createUniform("u_clipCount", bgfx::UniformType::Vec4);
     m_Uniforms.m_WorldClipPositions = createUniform("u_worldClipPositions", bgfx::UniformType::Vec4);
     m_Uniforms.m_WorldClipRadii = createUniform("u_worldClipRadii", bgfx::UniformType::Vec4);
+
+    m_Samplers.m_Color = bgfx::createUniform("s_diffuse", bgfx::UniformType::Sampler);
+    m_Samplers.m_Normal = bgfx::createUniform("s_normal", bgfx::UniformType::Sampler);
 }
 
 void cpp_conv::SolarBodyRenderSystem::Update(atlas::scene::EcsManager& ecs)
@@ -68,11 +71,14 @@ void cpp_conv::SolarBodyRenderSystem::Update(atlas::scene::EcsManager& ecs)
                         | BGFX_STATE_DEPTH_TEST_LESS
                         | BGFX_STATE_FRONT_CCW
                         | BGFX_STATE_MSAA);
+
+        bgfx::setTexture(0, m_Samplers.m_Color, solarBody.m_MeshData.m_Diffuse->GetHandle());
+        bgfx::setTexture(1, m_Samplers.m_Normal, solarBody.m_MeshData.m_Normal->GetHandle());
         draw(
             constants::render_views::c_geometry,
             solarBody.m_MeshData.m_Vertices,
             solarBody.m_MeshData.m_Indices,
-            atlas::resource::ResourceLoader::LoadAsset<resources::registry::CoreBundle, atlas::render::ShaderProgram>(resources::registry::core_bundle::shaders::c_basicUntexturedUninstanced),
+            solarBody.m_MeshData.m_Program,
             Eigen::Matrix4f::Identity(),
             ~BGFX_DISCARD_STATE);
 
