@@ -25,6 +25,13 @@ namespace cpp_conv
             IncrementAppendPosition();
         }
 
+        constexpr void Push(T&& item)
+        {
+            assert(m_uiSize < m_vData.size());
+            m_vData[m_uiAppendPivot] = item;
+            IncrementAppendPosition();
+        }
+
         constexpr T Pop()
         {
             assert(m_uiSize > 0);

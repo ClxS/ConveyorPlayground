@@ -45,15 +45,22 @@ namespace atlas::scene
             return m_Data[uiIndex];
         }
 
+        [[nodiscard]] TDataType MoveOut(int32_t uiIndex)
+        {
+            assert(uiIndex >= 0 && uiIndex < m_Data.size());
+            TDataType value = std::move(m_Data[uiIndex]);
+            return value;
+        }
+
         [[nodiscard]] TDataType GetCopy(int32_t uiIndex) const
         {
             assert(uiIndex >= 0 && uiIndex < m_Data.size());
             return m_Data[uiIndex];
         }
 
-        TDataType& Push(TDataType data)
+        TDataType& Push(TDataType&& data)
         {
-            m_Data.push_back(data);
+            m_Data.push_back(std::forward<TDataType>(data));
             return m_Data.back();
         }
 
@@ -100,14 +107,14 @@ namespace atlas::scene
 
         void SwapAndPop(int32_t uiRemovedIndex) override
         {
-            m_Data[uiRemovedIndex] = m_Data[m_Data.size() - 1];
+            m_Data[uiRemovedIndex] = std::move(m_Data[m_Data.size() - 1]);
             m_Data.pop_back();
         }
 
         void ClaimFromOtherPool(PoolBase* pOther, int32_t otherIndex) override
         {
             auto* pTypedOther = static_cast<Pool<TDataType, TIsSparse, TInitialSize>*>(pOther);
-            Push(pTypedOther->GetReference(otherIndex));
+            Push(pTypedOther->MoveOut(otherIndex));
 
             if (pTypedOther->Size() > 1 || otherIndex != pTypedOther->Size() - 1)
             {

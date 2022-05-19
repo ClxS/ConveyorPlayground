@@ -233,7 +233,7 @@ namespace atlas::scene
             }
         }
 
-        newEntityPool.Push({entity});
+        newEntityPool.Push(std::move(entity));
         if (oldPool.m_EntityPool.Size() > 1 && oldEntityIndex != oldPool.m_EntityPool.Size() - 1)
         {
             oldPool.m_EntityPool.SwapAndPop(oldEntityIndex);
@@ -267,7 +267,7 @@ namespace atlas::scene
     {
         return DoAddComponent<TComponent>(entity, [&](ComponentPool<TComponent>* pool)
         {
-            return &pool->Push(value);
+            return &pool->Push(std::forward<TComponent>(value));
         });
     }
 
@@ -315,16 +315,16 @@ namespace atlas::scene
             }
         }
 
-        newEntityPool.Push({entity});
+        newEntityPool.Push(std::move(entity));
         if (oldPool.m_EntityPool.Size() > 1 && oldEntityIndex != oldPool.m_EntityPool.Size() - 1)
         {
             oldPool.m_EntityPool.SwapAndPop(oldEntityIndex);
             m_EntityIndices.Set(
                 oldPool.m_EntityPool.GetCopy(oldEntityIndex).m_Value,
             {
-                    oldEntityIndex,
-                    oldArchetypeIndex
-                });
+                oldEntityIndex,
+                oldArchetypeIndex
+            });
         }
         else
         {
@@ -343,7 +343,6 @@ namespace atlas::scene
         const uint64_t targetMask = ComponentRegistry::GetComponentMask<TComponent>();
         return pool.m_ArchetypeComponentMask & targetMask;
     }
-
 
     template <typename TComponent, typename ... TOtherComponents>
     bool EcsManager::DoesEntityHaveComponents(const EntityId entity) const
