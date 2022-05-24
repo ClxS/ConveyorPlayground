@@ -55,3 +55,6 @@
 [submodule "src/ThirdParty/fmt"]
 	path = src/ThirdParty/fmt
 	url = https://github.com/fmtlib/fmt
+[submodule "docs"]
+	path = docs
+	url = https://github.com/ClxS/ConveyorPlayground_Documentation.git
