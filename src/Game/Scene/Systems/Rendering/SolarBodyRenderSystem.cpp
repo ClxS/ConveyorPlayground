@@ -125,6 +125,20 @@ void cpp_conv::SolarBodyRenderSystem::Update(atlas::scene::EcsManager& ecs)
                 debug_draw::moveTo({ v0.m_X, v0.m_Y, v0.m_Z });
                 debug_draw::lineTo({ v1.m_X, v1.m_Y, v1.m_Z });
             }
+
+            constexpr bool c_showAxis = false;
+            if constexpr(c_showAxis)
+            {
+                // Draw Axis Gizmos
+                debug_draw::setColor(0xffff0000);
+                debug_draw::drawAxis(1.0f, 0.0f, 0.0f, 15, 1);
+
+                debug_draw::setColor(0xff00ff00);
+                debug_draw::drawAxis(0.0f, 1.0f, 0.0f, 15, 1);
+
+                debug_draw::setColor(0xff0000ff);
+                debug_draw::drawAxis(0.0f, 0.0f, 1.0f, 15, 1);
+            }
         }
     }
 }
