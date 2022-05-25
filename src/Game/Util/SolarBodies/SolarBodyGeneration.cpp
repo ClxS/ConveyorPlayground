@@ -12,7 +12,7 @@ namespace
 cpp_conv::components::SolarBodyComponent cpp_conv::util::solar_bodies::createSolarBody(SolarBodySpecification type)
 {
     components::SolarBodyComponent solarBody;
-    solarBody.m_MeshData.m_Polyhedron = cpp_conv::util::geometry::polyhedron::createPolyhedron(50, 0, 10.0f);
+    solarBody.m_MeshData.m_Polyhedron = cpp_conv::util::geometry::polyhedron::createPolyhedron(100, 0, 10.0f);
     auto [vertices, indices] = solarBody.m_MeshData.m_Polyhedron.CreateBuffers();
 
     solarBody.m_MeshData.m_Vertices = vertices;

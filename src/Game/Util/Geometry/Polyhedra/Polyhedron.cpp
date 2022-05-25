@@ -9,6 +9,7 @@
 #include <tuple>
 #include <vector>
 
+#include "AtlasCore/MathsHelpers.h"
 #include "Eigen/Geometry"
 
 namespace polyhedron
@@ -356,6 +357,13 @@ namespace
             float maxU = 1.0f;
             float minV = 0.0f;
             float maxV = 1.0f;
+
+            Eigen::Vector2f uv = {
+                std::lerp(minU, maxU, 2.0f * (static_cast<float>(point->m_X) / context.m_D)),
+                std::lerp(minV, maxV, 2.0f * (static_cast<float>(point->m_Y) / context.m_D))
+            };
+
+            const Eigen::Translation2f t{0.5f, 0.5f};
 
             constexpr float c_scaleFactor = 0.5f;
             switch (segments[i])
