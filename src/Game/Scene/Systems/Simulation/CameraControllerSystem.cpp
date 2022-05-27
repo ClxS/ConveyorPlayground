@@ -148,7 +148,7 @@ namespace
 
         int mouseX, mouseY;
 
-        float speedFactor = camera.m_Distance / 5.0f;
+        float speedFactor = camera.m_Distance / 2.5f;
 
         const Uint8* keyboardState = SDL_GetKeyboardState(nullptr);
         const int buttons = SDL_GetMouseState(&mouseX, &mouseY);
@@ -156,7 +156,7 @@ namespace
         {
             const int deltaX = mouseX - previousMouseX;
             const int deltaY = mouseY- previousMouseY;
-            camera.m_CameraYaw += atlas::maths_helpers::Angle::FromRadians(
+            camera.m_CameraYaw -= atlas::maths_helpers::Angle::FromRadians(
                 static_cast<float>(deltaX) * c_rotationScaling,
                 atlas::maths_helpers::Angle::WrapMode::None);
             camera.m_CameraPitch -= atlas::maths_helpers::Angle::FromRadians(

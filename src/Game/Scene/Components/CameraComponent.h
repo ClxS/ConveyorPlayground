@@ -34,6 +34,14 @@ namespace cpp_conv::components
         float m_Distance;
     };
 
+    struct SphericalLookAtCamera_Private
+    {
+        Eigen::Vector3f m_LookAt;
+        Eigen::Vector3f m_Camera;
+        Eigen::Matrix4f m_View;
+        Eigen::Matrix4f m_Projection;
+    };
+
     struct FreeCamera : public CameraComponent
     {
         Eigen::Vector3f m_CameraPosition;

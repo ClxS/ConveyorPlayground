@@ -41,6 +41,7 @@ void registerComponents()
     using namespace cpp_conv::components;
     ComponentRegistry::RegisterComponent<LookAtCamera>();
     ComponentRegistry::RegisterComponent<SphericalLookAtCamera>();
+    ComponentRegistry::RegisterComponent<SphericalLookAtCamera_Private>();
     ComponentRegistry::RegisterComponent<SolarBodyComponent>();
     ComponentRegistry::RegisterComponent<FreeCamera>();
     ComponentRegistry::RegisterComponent<NameComponent>();

@@ -153,24 +153,25 @@ namespace
     void addCameras(atlas::scene::EcsManager& ecs)
     {
         auto cameraEntity = ecs.AddEntity();
+        ecs.AddComponent<SphericalLookAtCamera_Private>(cameraEntity);
         auto& camera = ecs.AddComponent<SphericalLookAtCamera>(cameraEntity);
-        camera.m_bIsRenderActive = false;
-        camera.m_bIsControlActive = false;
+        camera.m_bIsRenderActive = true;
+        camera.m_bIsControlActive = true;
         camera.m_SphericalCentre = { 0.0f, 0.0f, 0.0f };
         camera.m_SphericalCentreDistance = 10.1f;
         camera.m_LookAtPitch.SetDegrees(80.0f, 30.0f, 150.0f, atlas::maths_helpers::Angle::WrapMode::Clamp);
         camera.m_LookAtYaw.SetDegrees(0.0f, atlas::maths_helpers::Angle::WrapMode::Wrap);
         camera.m_CameraPitch.SetDegrees(
-            35.0f,
+            25.0f,
             10.0f,
-            35.0f,
+            75.0f,
             atlas::maths_helpers::Angle::WrapMode::Clamp);
-        camera.m_Distance = 7.0f;
+        camera.m_Distance = 1.0f;
 
         cameraEntity = ecs.AddEntity();
         auto& camera2 = ecs.AddComponent<LookAtCamera>(cameraEntity);
-        camera2.m_bIsRenderActive = true;
-        camera2.m_bIsControlActive = true;
+        camera2.m_bIsRenderActive = false;
+        camera2.m_bIsControlActive = false;
         camera2.m_Distance = 25.0f;
         camera2.m_LookAtPoint = {0.0f, 0.0f, 0.0f};
         camera2.m_Pitch = 30.0_degrees;

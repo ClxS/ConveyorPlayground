@@ -11,7 +11,7 @@ namespace cpp_conv
 
         void SetDebugRenderingEnabled(bool bEnabled);
     private:
-        bool m_bDebugRenderingEnabled{false};
+        bool m_bDebugRenderingEnabled{true};
     };
 
 }

@@ -35,7 +35,7 @@ namespace
         }
     }
 
-    void updateViewProjectMatrix(const cpp_conv::components::SphericalLookAtCamera& camera, bool bAddDebugRendering)
+    void updateViewProjectMatrix(const cpp_conv::components::SphericalLookAtCamera& camera, cpp_conv::components::SphericalLookAtCamera_Private& cameraPrivate, bool bAddDebugRendering)
     {
         Eigen::Vector3f upVector;
         Eigen::Vector3f forwardVector;
@@ -63,13 +63,18 @@ namespace
         Eigen::Vector3f cameraPosition = (lookAtSpaceConversion * cameraSpaceConversion * mulIdentity).head<3>();
 
         auto [width, height] = atlas::app_host::Application::Get().GetAppDimensions();
-        Eigen::Matrix4f view = atlas::maths_helpers::createLookAtMatrix(cameraPosition - lookAtPosition, lookAtPosition, upVector);
+        Eigen::Matrix4f view = atlas::maths_helpers::createLookAtMatrix(cameraPosition, lookAtPosition, upVector);
         Eigen::Matrix4f projection = createProjectionMatrix(
             atlas::maths_helpers::Angle::FromDegrees(80),
             static_cast<float>(width) / static_cast<float>(height),
             0.1f,
             100.0f,
             bgfx::getCaps()->homogeneousDepth);
+
+        cameraPrivate.m_Camera = cameraPosition;
+        cameraPrivate.m_LookAt = lookAtPosition;
+        cameraPrivate.m_View = view;
+        cameraPrivate.m_Projection = projection;
 
         if (camera.m_bIsRenderActive)
         {
@@ -89,14 +94,17 @@ namespace
                 debug_draw::draw(sphere);
             }
 
-            debug_draw::setWireframe(true);
+            if constexpr (false)
             {
-                const bx::Sphere sphere = { { cameraPosition.x(), cameraPosition.y(), cameraPosition.z() }, 0.15f };
-                debug_draw::createScope();
-                debug_draw::setColor(0xff000000);
-                debug_draw::createScope();
-                debug_draw::setLod(0);
-                debug_draw::draw(sphere);
+                debug_draw::setWireframe(true);
+                {
+                    const bx::Sphere sphere = { { cameraPosition.x(), cameraPosition.y(), cameraPosition.z() }, 0.15f };
+                    debug_draw::createScope();
+                    debug_draw::setColor(0xff000000);
+                    debug_draw::createScope();
+                    debug_draw::setLod(0);
+                    debug_draw::draw(sphere);
+                }
             }
 
             debug_draw::setWireframe(true);
@@ -162,9 +170,9 @@ void cpp_conv::CameraRenderSystem::Update(atlas::scene::EcsManager& ecs)
 
     debug_draw::drawGrid({ 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, 100);
 
-    for(auto [entity, camera] : ecs.IterateEntityComponents<SphericalLookAtCamera>())
+    for(auto [entity, camera, cameraPrivate] : ecs.IterateEntityComponents<SphericalLookAtCamera, SphericalLookAtCamera_Private>())
     {
-        updateViewProjectMatrix(camera, m_bDebugRenderingEnabled);
+        updateViewProjectMatrix(camera, cameraPrivate, m_bDebugRenderingEnabled);
         //camera.m_LookAtYaw += atlas::maths_helpers::Angle::FromRadians(0.02f);
         //camera.m_LookAtPitch += atlas::maths_helpers::Angle::FromRadians(0.005f);
 
