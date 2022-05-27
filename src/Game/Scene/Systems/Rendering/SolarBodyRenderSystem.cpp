@@ -1,6 +1,7 @@
 #include "SolarBodyRenderSystem.h"
 
 #include "AssetRegistry.h"
+#include "CameraComponent.h"
 #include "ModelComponent.h"
 #include "PositionComponent.h"
 #include "SolarBodyComponent.h"
@@ -10,6 +11,19 @@
 #include "AtlasResource/ResourceLoader.h"
 #include "Eigen/Core"
 #include "Geometry/Polyhedra/Polyhedron.h"
+
+namespace
+{
+    Eigen::Vector3f asEigen(std::vector<cpp_conv::util::geometry::polyhedron::Polyhedron::Point>::const_reference point)
+    {
+        return
+        {
+            point.m_X,
+            point.m_Y,
+            point.m_Z,
+        };
+    }
+}
 
 void cpp_conv::SolarBodyRenderSystem::Initialise(atlas::scene::EcsManager&,
                                                       const uint8_t surfaceRenderMask,
@@ -53,6 +67,13 @@ void cpp_conv::SolarBodyRenderSystem::Update(atlas::scene::EcsManager& ecs)
         clipCount++;
     }
 
+    constexpr float c_gridDrawRadiusSqr = 1.5;
+    Eigen::Vector3f sphericalLookAtLocation {0.0f, 0.0f, 0.0f};
+    for(auto [entity, camera] : ecs.IterateEntityComponents<components::SphericalLookAtCamera_Private>())
+    {
+        sphericalLookAtLocation = camera.m_LookAt;
+    }
+
     // Annoying bgfx only really supports vec4s... We have to pretend to be one.
     Eigen::Vector4f vecColour = { 150.0f / 255.0f, 117.0f / 255.0f, 66.0f / 255.0f, 1.0f };
     Eigen::Vector4f vecClipCount = { static_cast<float>(clipCount), 0.0f, 0.0f, 0.0f };
@@ -89,41 +110,69 @@ void cpp_conv::SolarBodyRenderSystem::Update(atlas::scene::EcsManager& ecs)
 
             const auto& points = solarBody.m_MeshData.m_Polyhedron.GetPoints();
 
-            debug_draw::setColor(0xff000000);
-            for(const auto& square : solarBody.m_MeshData.m_Polyhedron.GetSquares())
+            debug_draw::setColor(0xaa000000);
+            constexpr bool c_showCells = true;
+            if constexpr (c_showCells)
             {
-                const auto& v0 = points[square.m_Indices[0]];
-                const auto& v1 = points[square.m_Indices[1]];
-                const auto& v2 = points[square.m_Indices[2]];
-                const auto& v3 = points[square.m_Indices[3]];
+                for(const auto& square : solarBody.m_MeshData.m_Polyhedron.GetSquares())
+                {
+                    auto v0 = asEigen(points[square.m_Indices[0]]);
+                    auto v1 = asEigen(points[square.m_Indices[1]]);
+                    auto v2 = asEigen(points[square.m_Indices[2]]);
+                    auto v3 = asEigen(points[square.m_Indices[3]]);
 
-                debug_draw::moveTo({ v0.m_X, v0.m_Y, v0.m_Z });
-                debug_draw::lineTo({ v1.m_X, v1.m_Y, v1.m_Z });
+                    if (
+                        (v0 - sphericalLookAtLocation).squaredNorm() > c_gridDrawRadiusSqr ||
+                        (v1 - sphericalLookAtLocation).squaredNorm() > c_gridDrawRadiusSqr ||
+                        (v2 - sphericalLookAtLocation).squaredNorm() > c_gridDrawRadiusSqr ||
+                        (v3 - sphericalLookAtLocation).squaredNorm() > c_gridDrawRadiusSqr
+                        )
+                    {
+                        continue;
+                    }
 
-                debug_draw::moveTo({ v1.m_X, v1.m_Y, v1.m_Z });
-                debug_draw::lineTo({ v2.m_X, v2.m_Y, v2.m_Z });
+                    v0 += v0.normalized() * 0.1f;
+                    v1 += v1.normalized() * 0.1f;
+                    v2 += v2.normalized() * 0.1f;
+                    v3 += v3.normalized() * 0.1f;
 
-                debug_draw::moveTo({ v2.m_X, v2.m_Y, v2.m_Z });
-                debug_draw::lineTo({ v3.m_X, v3.m_Y, v3.m_Z });
+                    debug_draw::moveTo({ v0.x(), v0.y(), v0.z() });
+                    debug_draw::lineTo({ v1.x(), v1.y(), v1.z() });
 
-                debug_draw::moveTo({ v3.m_X, v3.m_Y, v3.m_Z });
-                debug_draw::lineTo({ v0.m_X, v0.m_Y, v0.m_Z });
-            }
+                    debug_draw::moveTo({ v1.x(), v1.y(), v1.z() });
+                    debug_draw::lineTo({ v2.x(), v2.y(), v2.z() });
 
-            for(const auto& triangle : solarBody.m_MeshData.m_Polyhedron.GetTriangles())
-            {
-                const auto& v0 = points[triangle.m_Indices[0]];
-                const auto& v1 = points[triangle.m_Indices[1]];
-                const auto& v2 = points[triangle.m_Indices[2]];
+                    debug_draw::moveTo({ v2.x(), v2.y(), v2.z() });
+                    debug_draw::lineTo({ v3.x(), v3.y(), v3.z() });
 
-                debug_draw::moveTo({ v0.m_X, v0.m_Y, v0.m_Z });
-                debug_draw::lineTo({ v1.m_X, v1.m_Y, v1.m_Z });
+                    debug_draw::moveTo({ v3.x(), v3.y(), v3.z() });
+                    debug_draw::lineTo({ v0.x(), v0.y(), v0.z() });
+                }
 
-                debug_draw::moveTo({ v0.m_X, v0.m_Y, v0.m_Z });
-                debug_draw::lineTo({ v1.m_X, v1.m_Y, v1.m_Z });
+                if constexpr (false)
+                {
+                    for(const auto& triangle : solarBody.m_MeshData.m_Polyhedron.GetTriangles())
+                    {
+                        const auto& v0 = points[triangle.m_Indices[0]];
+                        const auto& v1 = points[triangle.m_Indices[1]];
+                        const auto& v2 = points[triangle.m_Indices[2]];
 
-                debug_draw::moveTo({ v0.m_X, v0.m_Y, v0.m_Z });
-                debug_draw::lineTo({ v1.m_X, v1.m_Y, v1.m_Z });
+                        Eigen::Vector3f vComp { v0.m_X, v0.m_Y, v0.m_Z };
+                        if ((vComp - sphericalLookAtLocation).squaredNorm() > c_gridDrawRadiusSqr)
+                        {
+                            continue;
+                        }
+
+                        debug_draw::moveTo({ v0.m_X, v0.m_Y, v0.m_Z });
+                        debug_draw::lineTo({ v1.m_X, v1.m_Y, v1.m_Z });
+
+                        debug_draw::moveTo({ v0.m_X, v0.m_Y, v0.m_Z });
+                        debug_draw::lineTo({ v1.m_X, v1.m_Y, v1.m_Z });
+
+                        debug_draw::moveTo({ v1.m_X, v1.m_Y, v1.m_Z });
+                        debug_draw::lineTo({ v2.m_X, v2.m_Y, v2.m_Z });
+                    }
+                }
             }
 
             constexpr bool c_showAxis = false;
