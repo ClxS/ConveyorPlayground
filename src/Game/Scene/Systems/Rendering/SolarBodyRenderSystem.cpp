@@ -7,14 +7,14 @@
 #include "SolarBodyComponent.h"
 #include "AtlasRender/Renderer.h"
 #include "AtlasRender/AssetTypes/ModelAsset.h"
-#include "AtlasRender/Debug/debugdraw.h"
+#include "AtlasRender/Debug/DebugDraw.h"
 #include "AtlasResource/ResourceLoader.h"
 #include "Eigen/Core"
-#include "Geometry/Polyhedra/Polyhedron.h"
+#include "Geometry/Polyhedra/SquareCelledPolyhedron.h"
 
 namespace
 {
-    Eigen::Vector3f asEigen(std::vector<cpp_conv::util::geometry::polyhedron::Polyhedron::Point>::const_reference point)
+    Eigen::Vector3f asEigen(std::vector<cpp_conv::util::geometry::polyhedron::Point>::const_reference point)
     {
         return
         {

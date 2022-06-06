@@ -1,7 +1,7 @@
 // This is based on https://github.com/eduidl/tgp-ceres (Apache 2.0).
 // It has been very heavily modified
 
-#include "Polyhedron.h"
+#include "SquareCelledPolyhedron.h"
 
 #include <cassert>
 #include <cmath>
@@ -296,7 +296,7 @@ namespace
 
     struct Points
     {
-        std::vector<cpp_conv::util::geometry::polyhedron::Polyhedron::Point> m_AbsolutePoints;
+        std::vector<cpp_conv::util::geometry::polyhedron::Point> m_AbsolutePoints;
     };
 
     Points createPoints(const Context& context, const std::vector<size_t>& idMapping, float scale)
@@ -353,14 +353,14 @@ namespace
                 0.0f
             };
 
-            float minU = 0.0f;
-            float maxU = 1.0f;
-            float minV = 0.0f;
-            float maxV = 1.0f;
+            constexpr float c_minU = 0.0f;
+            constexpr float c_maxU = 1.0f;
+            constexpr float c_minV = 0.0f;
+            constexpr float c_maxV = 1.0f;
 
             Eigen::Vector2f uv = {
-                std::lerp(minU, maxU, 2.0f * (static_cast<float>(point->m_X) / context.m_D)),
-                std::lerp(minV, maxV, 2.0f * (static_cast<float>(point->m_Y) / context.m_D))
+                std::lerp(c_minU, c_maxU, 2.0f * (static_cast<float>(point->m_X) / context.m_D)),
+                std::lerp(c_minV, c_maxV, 2.0f * (static_cast<float>(point->m_Y) / context.m_D))
             };
 
             const Eigen::Translation2f t{0.5f, 0.5f};
@@ -369,29 +369,29 @@ namespace
             switch (segments[i])
             {
             case 0:
-                points.m_AbsolutePoints[i] += cpp_conv::util::geometry::polyhedron::Polyhedron::Point {0.0f, 0.0f, (-scale / context.m_D) * c_scaleFactor};
+                points.m_AbsolutePoints[i] += cpp_conv::util::geometry::polyhedron::Point {0.0f, 0.0f, (-scale / context.m_D) * c_scaleFactor};
                 break;
             case 1:
-                points.m_AbsolutePoints[i] += cpp_conv::util::geometry::polyhedron::Polyhedron::Point {(-scale / context.m_D) * c_scaleFactor, 0.0f, 0.0f};
+                points.m_AbsolutePoints[i] += cpp_conv::util::geometry::polyhedron::Point {(-scale / context.m_D) * c_scaleFactor, 0.0f, 0.0f};
                 break;
             case 2:
-                points.m_AbsolutePoints[i] += cpp_conv::util::geometry::polyhedron::Polyhedron::Point {0.0f, (-scale / context.m_D) * c_scaleFactor, 0.0f};
+                points.m_AbsolutePoints[i] += cpp_conv::util::geometry::polyhedron::Point {0.0f, (-scale / context.m_D) * c_scaleFactor, 0.0f};
                 break;
             case 3:
-                points.m_AbsolutePoints[i] += cpp_conv::util::geometry::polyhedron::Polyhedron::Point {0.0f, (scale / context.m_D) * c_scaleFactor, 0.0f};
+                points.m_AbsolutePoints[i] += cpp_conv::util::geometry::polyhedron::Point {0.0f, (scale / context.m_D) * c_scaleFactor, 0.0f};
                 break;
             case 4:
-                points.m_AbsolutePoints[i] += cpp_conv::util::geometry::polyhedron::Polyhedron::Point {0.0f, 0.0f, (scale / context.m_D) * c_scaleFactor};
+                points.m_AbsolutePoints[i] += cpp_conv::util::geometry::polyhedron::Point {0.0f, 0.0f, (scale / context.m_D) * c_scaleFactor};
                 break;
             case 5:
-                points.m_AbsolutePoints[i] += cpp_conv::util::geometry::polyhedron::Polyhedron::Point {(scale / context.m_D) * c_scaleFactor, 0.0f, 0.0f};
+                points.m_AbsolutePoints[i] += cpp_conv::util::geometry::polyhedron::Point {(scale / context.m_D) * c_scaleFactor, 0.0f, 0.0f};
                 break;
             default:
                 break;
             }
 
-            points.m_AbsolutePoints[i].m_U = std::lerp(minU, maxU, 2.0f * (static_cast<float>(point->m_X) / context.m_D));
-            points.m_AbsolutePoints[i].m_V = std::lerp(minV, maxV, 2.0f * (static_cast<float>(point->m_Y) / context.m_D));
+            points.m_AbsolutePoints[i].m_U = std::lerp(c_minU, c_maxU, 2.0f * (static_cast<float>(point->m_X) / context.m_D));
+            points.m_AbsolutePoints[i].m_V = std::lerp(c_minV, c_maxV, 2.0f * (static_cast<float>(point->m_Y) / context.m_D));
         }
 
         for (const auto& sphericalPoint : sphericalPoints)
@@ -402,12 +402,12 @@ namespace
         return points;
     }
 
-    std::vector<cpp_conv::util::geometry::polyhedron::Polyhedron::Square> createSquares(const Context& context, const std::vector<size_t>& idMapping)
+    std::vector<cpp_conv::util::geometry::polyhedron::SquareCelledPolyhedron::Square> createSquares(const Context& context, const std::vector<size_t>& idMapping)
     {
         #define ID(P_X, P_Y, P_F) idMapping.at(internal::index(P_X, P_Y, P_F, context.m_D))
-        using cpp_conv::util::geometry::polyhedron::Polyhedron;
+        using cpp_conv::util::geometry::polyhedron::SquareCelledPolyhedron;
 
-        std::vector<Polyhedron::Square> squares;
+        std::vector<SquareCelledPolyhedron::Square> squares;
         const auto append_square = [&](const size_t id1, const size_t id2, const size_t id3, const size_t id4)
         {
             squares.emplace_back(
@@ -464,11 +464,11 @@ namespace
         return squares;
     }
 
-    std::vector<cpp_conv::util::geometry::polyhedron::Polyhedron::Triangle> createTriangles(const Context& context, const std::vector<size_t>& idMapping)
+    std::vector<cpp_conv::util::geometry::polyhedron::SquareCelledPolyhedron::Triangle> createTriangles(const Context& context, const std::vector<size_t>& idMapping)
     {
         #define ID(P_X, P_Y, P_F) idMapping.at(internal::index(P_X, P_Y, P_F, context.m_D))
 
-        std::vector<cpp_conv::util::geometry::polyhedron::Polyhedron::Triangle> triangles;
+        std::vector<cpp_conv::util::geometry::polyhedron::SquareCelledPolyhedron::Triangle> triangles;
         const auto append_triangle = [&](const size_t id1, const size_t id2, const size_t id3)
         {
             triangles.emplace_back(
@@ -512,7 +512,7 @@ namespace
 
 
 std::tuple<bgfx::VertexBufferHandle, bgfx::IndexBufferHandle>
-cpp_conv::util::geometry::polyhedron::Polyhedron::CreateBuffers() const
+cpp_conv::util::geometry::polyhedron::SquareCelledPolyhedron::CreateBuffers() const
 {
     bgfx::VertexLayout vertexLayout;
     vertexLayout
@@ -590,10 +590,10 @@ cpp_conv::util::geometry::polyhedron::Polyhedron::CreateBuffers() const
     return { polyhedraVertices, polyhedraIndices };
 }
 
-cpp_conv::util::geometry::polyhedron::Polyhedron cpp_conv::util::geometry::polyhedron::createPolyhedron(uint32_t h, uint32_t k, float scale)
+cpp_conv::util::geometry::polyhedron::SquareCelledPolyhedron cpp_conv::util::geometry::polyhedron::createPolyhedron(uint32_t h, uint32_t k, float scale)
 {
     assert(h >= k);
-    using polyhedron::Polyhedron;
+    using polyhedron::SquareCelledPolyhedron;
 
     const Context context
     {
@@ -605,8 +605,8 @@ cpp_conv::util::geometry::polyhedron::Polyhedron cpp_conv::util::geometry::polyh
     const auto idMapping = internal::createIdConvertMap(h, k);
     Points points = createPoints(context, idMapping, scale);
 
-    std::vector<Polyhedron::Square> squares = createSquares(context, idMapping);
-    std::vector<Polyhedron::Triangle> triangles = createTriangles(context, idMapping);
+    std::vector<SquareCelledPolyhedron::Square> squares = createSquares(context, idMapping);
+    std::vector<SquareCelledPolyhedron::Triangle> triangles = createTriangles(context, idMapping);
 
     return { points.m_AbsolutePoints, squares, triangles, k, h, internal::calcD(h, k), scale };
 }

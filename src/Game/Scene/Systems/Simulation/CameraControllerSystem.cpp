@@ -148,7 +148,7 @@ namespace
 
         int mouseX, mouseY;
 
-        float speedFactor = camera.m_Distance / 2.5f;
+        float speedFactor = camera.m_Distance / 1.8f;
 
         const Uint8* keyboardState = SDL_GetKeyboardState(nullptr);
         const int buttons = SDL_GetMouseState(&mouseX, &mouseY);

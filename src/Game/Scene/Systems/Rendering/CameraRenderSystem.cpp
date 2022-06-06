@@ -86,7 +86,7 @@ namespace
         {
             debug_draw::setWireframe(true);
             {
-                const bx::Sphere sphere = { { lookAtPosition.x(), lookAtPosition.y(), lookAtPosition.z() }, 0.25f };
+                const bx::Sphere sphere = { { lookAtPosition.x(), lookAtPosition.y(), lookAtPosition.z() }, 0.025f };
                 debug_draw::createScope();
                 debug_draw::setColor(0xfff0c0ff);
                 debug_draw::createScope();
@@ -98,7 +98,7 @@ namespace
             {
                 debug_draw::setWireframe(true);
                 {
-                    const bx::Sphere sphere = { { cameraPosition.x(), cameraPosition.y(), cameraPosition.z() }, 0.15f };
+                    const bx::Sphere sphere = { { cameraPosition.x(), cameraPosition.y(), cameraPosition.z() }, 0.015f };
                     debug_draw::createScope();
                     debug_draw::setColor(0xff000000);
                     debug_draw::createScope();
@@ -109,7 +109,7 @@ namespace
 
             debug_draw::setWireframe(true);
             {
-                const bx::Sphere sphere = { { lookAtRealPosition.x(), lookAtRealPosition.y(), lookAtRealPosition.z() }, 0.15f };
+                const bx::Sphere sphere = { { lookAtRealPosition.x(), lookAtRealPosition.y(), lookAtRealPosition.z() }, 0.015f };
                 debug_draw::createScope();
                 debug_draw::setColor(0xff0000ff);
                 debug_draw::createScope();

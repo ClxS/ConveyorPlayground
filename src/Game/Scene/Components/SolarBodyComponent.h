@@ -2,7 +2,7 @@
 
 #include <Eigen/Dense>
 
-#include "Polyhedron.h"
+#include "SquareCelledPolyhedron.h"
 #include "bgfx/bgfx.h"
 #include "AtlasResource/AssetPtr.h"
 
@@ -63,7 +63,7 @@ namespace cpp_conv::components
 
         struct
         {
-            util::geometry::polyhedron::Polyhedron m_Polyhedron;
+            util::geometry::polyhedron::SquareCelledPolyhedron m_Polyhedron;
             bgfx::VertexBufferHandle m_Vertices{BGFX_INVALID_HANDLE};
             bgfx::IndexBufferHandle m_Indices{BGFX_INVALID_HANDLE};
 
