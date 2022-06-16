@@ -119,5 +119,5 @@ namespace cpp_conv::util::geometry::polyhedron
         float m_Radius{0.0f};
     };
 
-    SquareCelledPolyhedron createPolyhedron(uint32_t h, uint32_t k, float scale);
+    SquareCelledPolyhedron createPolyhedronSquared(uint32_t h, uint32_t k, float scale);
 }

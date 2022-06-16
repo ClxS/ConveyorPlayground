@@ -590,7 +590,7 @@ cpp_conv::util::geometry::polyhedron::SquareCelledPolyhedron::CreateBuffers() co
     return { polyhedraVertices, polyhedraIndices };
 }
 
-cpp_conv::util::geometry::polyhedron::SquareCelledPolyhedron cpp_conv::util::geometry::polyhedron::createPolyhedron(uint32_t h, uint32_t k, float scale)
+cpp_conv::util::geometry::polyhedron::SquareCelledPolyhedron cpp_conv::util::geometry::polyhedron::createPolyhedronSquared(uint32_t h, uint32_t k, float scale)
 {
     assert(h >= k);
     using polyhedron::SquareCelledPolyhedron;
