@@ -1,7 +1,8 @@
 #pragma once
-#include "Eigen/Core"
 
-namespace cpp_conv::components
+#include <Eigen/Core>
+
+namespace atlas::game::scene::components::cameras
 {
     struct DirectionalLightComponent
     {

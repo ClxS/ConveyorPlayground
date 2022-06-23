@@ -5,9 +5,9 @@
 #include "EntityLookupGrid.h"
 #include "FactoryComponent.h"
 #include "ItemPassingUtility.h"
-#include "PositionComponent.h"
 #include "PositionHelper.h"
 #include "Transform2D.h"
+#include "AtlasGame/Scene/Components/PositionComponent.h"
 #include "AtlasScene/ECS/Components/EcsManager.h"
 
 namespace
@@ -140,14 +140,14 @@ namespace
     {
         if (!factory.m_OutputPipe.has_value() ||
             factory.m_OutputItems.IsEmpty() ||
-            !ecs.DoesEntityHaveComponents<cpp_conv::components::PositionComponent,
+            !ecs.DoesEntityHaveComponents<atlas::game::scene::components::PositionComponent,
                                           cpp_conv::components::DirectionComponent>(entity))
         {
             return;
         }
 
         const auto& [position, direction] = ecs.GetComponents<
-            cpp_conv::components::PositionComponent,
+            atlas::game::scene::components::PositionComponent,
             cpp_conv::components::DirectionComponent>(entity);
 
         auto rotatedXy = rotate(

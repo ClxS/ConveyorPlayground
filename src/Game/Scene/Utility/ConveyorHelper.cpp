@@ -1,7 +1,6 @@
 #include "ConveyorHelper.h"
 
 #include "DirectionComponent.h"
-#include "PositionComponent.h"
 #include "WorldEntityInformationComponent.h"
 
 #include <AtlasScene/ECS/Components/EcsManager.h>
@@ -9,6 +8,7 @@
 #include "EntityLookupGrid.h"
 #include "FactoryComponent.h"
 #include "PositionHelper.h"
+#include "AtlasGame/Scene/Components/PositionComponent.h"
 
 atlas::scene::EntityId cpp_conv::conveyor_helper::findNextTailConveyor(
     const atlas::scene::EcsManager& ecs,
@@ -37,7 +37,7 @@ atlas::scene::EntityId cpp_conv::conveyor_helper::findNextTailConveyor(
     {
         EntityId directionEntity = grid.GetEntity(vPositions[static_cast<int>(d)]);
         if (directionEntity.IsInvalid() || !ecs.DoesEntityHaveComponents<
-            PositionComponent, DirectionComponent, WorldEntityInformationComponent>(directionEntity))
+            atlas::game::scene::components::PositionComponent, DirectionComponent, WorldEntityInformationComponent>(directionEntity))
         {
             continue;
         }
@@ -49,7 +49,7 @@ atlas::scene::EntityId cpp_conv::conveyor_helper::findNextTailConveyor(
         case EntityKind::Tunnel:
         case EntityKind::Conveyor:
             {
-                auto [targetPosition, targetDirection] = ecs.GetComponents<PositionComponent, DirectionComponent>(
+                auto [targetPosition, targetDirection] = ecs.GetComponents<atlas::game::scene::components::PositionComponent, DirectionComponent>(
                     directionEntity);
                 if (position_helper::getForwardPosition(targetPosition.m_Position, targetDirection.m_Direction) == position)
                 {
@@ -63,7 +63,7 @@ atlas::scene::EntityId cpp_conv::conveyor_helper::findNextTailConveyor(
         case EntityKind::Producer:
             {
                 const auto& [targetPosition, targetDirection, targetFactory] = ecs.GetComponents<
-                    PositionComponent, DirectionComponent, FactoryComponent>(directionEntity);
+                    atlas::game::scene::components::PositionComponent, DirectionComponent, FactoryComponent>(directionEntity);
                 if (targetFactory.m_OutputPipe.has_value() && vPositions[static_cast<int>(direction)] == targetPosition.
                     m_Position + targetFactory.m_OutputPipe.value())
                 {

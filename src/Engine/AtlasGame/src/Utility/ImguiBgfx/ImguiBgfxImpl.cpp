@@ -13,7 +13,7 @@
 // examples/README.txt and documentation at the top of imgui.cpp.
 // https://github.com/ocornut/imgui
 
-#include "ImguiBgfxImpl.h"
+#include "AtlasGamePCH.h"
 #include "imgui.h"
 
 // BGFX/BX

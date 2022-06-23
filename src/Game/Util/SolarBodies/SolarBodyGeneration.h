@@ -8,5 +8,5 @@ namespace cpp_conv::util::solar_bodies
         CrateredMoon
     };
 
-    components::SolarBodyComponent createSolarBody(SolarBodySpecification type);
+    components::SquareSolarBodyComponent createSolarBody(SolarBodySpecification type);
 }

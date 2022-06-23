@@ -1,6 +1,5 @@
 #include "Game.h"
 
-#include "CameraComponent.h"
 #include "Constants.h"
 #include "ConveyorComponent.h"
 #include "ConveyorDefinition.h"
@@ -15,7 +14,6 @@
 #include "MapLoadHandler.h"
 #include "ModelComponent.h"
 #include "NameComponent.h"
-#include "PositionComponent.h"
 #include "RecipeDefinition.h"
 #include "RecipeRegistry.h"
 #include "SDLTileLoadHandler.h"
@@ -24,10 +22,14 @@
 #include "StorageComponent.h"
 #include "WorldEntityInformationComponent.h"
 #include "AtlasGame/GameHost.h"
+#include "AtlasGame/Scene/Components/PositionComponent.h"
+#include "AtlasGame/Scene/Components/Cameras/FreeCameraComponent.h"
+#include "AtlasGame/Scene/Components/Cameras/LookAtCameraComponent.h"
+#include "AtlasGame/Scene/Components/Cameras/SphericalLookAtCameraComponent.h"
+#include "AtlasGame/Scene/Components/Lighting/DirectionalLightComponent.h"
 #include "AtlasRender/AssetTypes/ModelAsset.h"
 #include "AtlasRender/AssetTypes/ShaderAsset.h"
 #include "AtlasRender/AssetTypes/TextureAsset.h"
-#include "Lighting/DirectionalLightComponent.h"
 
 #undef max
 #undef min
@@ -38,12 +40,15 @@ void registerComponents()
 {
     using namespace atlas::resource;
     using namespace atlas::scene;
+    using namespace atlas::game::scene::components;
+    using namespace cameras;
     using namespace cpp_conv::components;
-    ComponentRegistry::RegisterComponent<LookAtCamera>();
-    ComponentRegistry::RegisterComponent<SphericalLookAtCamera>();
-    ComponentRegistry::RegisterComponent<SphericalLookAtCamera_Private>();
-    ComponentRegistry::RegisterComponent<SolarBodyComponent>();
-    ComponentRegistry::RegisterComponent<FreeCamera>();
+    ComponentRegistry::RegisterComponent<LookAtCameraComponent>();
+    ComponentRegistry::RegisterComponent<SphericalLookAtCameraComponent>();
+    ComponentRegistry::RegisterComponent<SphericalLookAtCameraComponent_Private>();
+    ComponentRegistry::RegisterComponent<SquareSolarBodyComponent>();
+    ComponentRegistry::RegisterComponent<HexagonSolarBodyComponent>();
+    ComponentRegistry::RegisterComponent<FreeCameraComponent>();
     ComponentRegistry::RegisterComponent<NameComponent>();
     ComponentRegistry::RegisterComponent<DescriptionComponent>();
     ComponentRegistry::RegisterComponent<ConveyorComponent>();

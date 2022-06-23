@@ -1,14 +1,14 @@
-#include "CameraControllerSystem.h"
+#include "AtlasGamePCH.h"
+#include "Scene/Systems/Cameras/CameraControllerSystem.h"
 
-#include <valarray>
-
-#include "CameraComponent.h"
 #include "imgui.h"
 #include "AtlasScene/ECS/Components/EcsManager.h"
 #include "SDL_mouse.h"
 #include "SDL_keyboard.h"
 #include "AtlasAppHost/Application.h"
 #include "bx/math.h"
+#include "Scene/Components/Cameras/LookAtCameraComponent.h"
+#include "Scene/Components/Cameras/SphericalLookAtCameraComponent.h"
 
 namespace
 {
@@ -17,7 +17,7 @@ namespace
     constexpr float c_keyboardMoveScaling = 0.1f;
 
     std::tuple<Eigen::Vector3f, Eigen::Vector3f> getForwardAndRight(
-        const cpp_conv::components::LookAtCamera& camera,
+        const atlas::game::scene::components::cameras::LookAtCameraComponent& camera,
         const Eigen::Vector3f& up = { 0.0f, 1.0f, 0.0f })
     {
         Eigen::Matrix3f cameraRotation;
@@ -47,18 +47,18 @@ namespace
         }
     }
 
-    void moveCamera(cpp_conv::components::SphericalLookAtCamera& camera, float forwardMovement, float rightMovement)
+    void moveCamera(atlas::game::scene::components::cameras::SphericalLookAtCameraComponent& camera, float forwardMovement, float rightMovement)
     {
         Eigen::Vector3f cameraForwardVector;
         Eigen::Vector3f cameraRightVector;
         {
-            const Eigen::Matrix4f tmpLookSpace = getMatrixForSphericalCoordinate(camera.m_LookAtPitch, camera.m_LookAtYaw, 0.0f);
+            const Eigen::Matrix4f tmpLookSpace = atlas::maths_helpers::getMatrixForSphericalCoordinate(camera.m_LookAtPitch, camera.m_LookAtYaw, 0.0f);
             const Eigen::Matrix4f tmpCameraSpace = getMatrixForSphericalCoordinate(atlas::maths_helpers::Angle::FromDegrees(90.0f), camera.m_CameraYaw, 0.0f);
             cameraForwardVector = (tmpLookSpace * tmpCameraSpace * Eigen::Vector4f{0.0f, -1.0f, 0.0f, 1.0f}).head<3>().normalized();
             cameraRightVector = (tmpLookSpace * tmpCameraSpace * Eigen::Vector4f{0.0f, 0.0f, -1.0f, 1.0f}).head<3>().normalized();
         }
 
-        const Eigen::Matrix4f lookAtSpaceConversion = getMatrixForSphericalCoordinate(camera.m_LookAtPitch, camera.m_LookAtYaw, camera.m_SphericalCentreDistance);
+        const Eigen::Matrix4f lookAtSpaceConversion = atlas::maths_helpers::getMatrixForSphericalCoordinate(camera.m_LookAtPitch, camera.m_LookAtYaw, camera.m_SphericalCentreDistance);
 
         const Eigen::Vector3f lookAtPosition = (lookAtSpaceConversion * Eigen::Vector4f{0.0f, 0.0f, 0.0f, 1.0f}).head<3>();
         Eigen::Vector3f finalPosition = lookAtPosition;
@@ -77,7 +77,7 @@ namespace
     }
 
 
-    bool updateControls(cpp_conv::components::LookAtCamera& camera)
+    bool updateControls(atlas::game::scene::components::cameras::LookAtCameraComponent& camera)
     {
         // TODO These should be moved into AtlasInput as non-statics once it exists
         static int previousMouseX = 0;
@@ -140,7 +140,7 @@ namespace
         return true;
     }
 
-    bool updateControls(cpp_conv::components::SphericalLookAtCamera& camera)
+    bool updateControls(atlas::game::scene::components::cameras::SphericalLookAtCameraComponent& camera)
     {
         // TODO These should be moved into AtlasInput as non-statics once it exists
         static int previousMouseX = 0;
@@ -148,7 +148,7 @@ namespace
 
         int mouseX, mouseY;
 
-        float speedFactor = camera.m_Distance / 1.8f;
+        const float speedFactor = camera.m_Distance / 1.8f;
 
         const Uint8* keyboardState = SDL_GetKeyboardState(nullptr);
         const int buttons = SDL_GetMouseState(&mouseX, &mouseY);
@@ -170,7 +170,7 @@ namespace
         }
         else if(keyboardState[SDL_SCANCODE_S])
         {
-            moveCamera(camera, { c_keyboardMoveScaling * -speedFactor }, 0.0f);
+            moveCamera(camera, c_keyboardMoveScaling * -speedFactor, 0.0f);
         }
 
         if(keyboardState[SDL_SCANCODE_A])
@@ -188,17 +188,15 @@ namespace
     }
 }
 
-void cpp_conv::CameraControllerSystem::Update(atlas::scene::EcsManager& ecs)
+void atlas::game::scene::systems::cameras::CameraControllerSystem::Update(atlas::scene::EcsManager& ecs)
 {
     using namespace atlas::scene;
-    using namespace cpp_conv::components;
-
     if (ImGui::IsAnyItemHovered())
     {
         return;
     }
 
-    for(auto [entity, camera] : ecs.IterateEntityComponents<LookAtCamera>())
+    for(auto [entity, camera] : ecs.IterateEntityComponents<components::cameras::LookAtCameraComponent>())
     {
         if (!camera.m_bIsControlActive)
         {
@@ -208,7 +206,7 @@ void cpp_conv::CameraControllerSystem::Update(atlas::scene::EcsManager& ecs)
         updateControls(camera);
     }
 
-    for(auto [entity, camera] : ecs.IterateEntityComponents<SphericalLookAtCamera>())
+    for(auto [entity, camera] : ecs.IterateEntityComponents<components::cameras::SphericalLookAtCameraComponent>())
     {
         if (!camera.m_bIsControlActive)
         {

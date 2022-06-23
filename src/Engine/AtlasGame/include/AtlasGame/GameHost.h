@@ -32,7 +32,7 @@ namespace atlas::game
         }
 
     protected:
-        scene::SceneManager m_SceneManager;
+        atlas::scene::SceneManager m_SceneManager;
     };
 
     template<typename TGameImplementation>

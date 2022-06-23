@@ -4,10 +4,10 @@
 #include "ConveyorHelper.h"
 #include "DirectionComponent.h"
 #include "FactoryComponent.h"
-#include "PositionComponent.h"
 #include "PositionHelper.h"
 #include "SequenceComponent.h"
 #include "vector_set.h"
+#include "AtlasGame/Scene/Components/PositionComponent.h"
 
 namespace
 {
@@ -30,19 +30,19 @@ namespace
 
         while (true)
         {
-            auto [position, direction] = ecs.GetComponents<PositionComponent, DirectionComponent>(currentConveyor);
+            auto [position, direction] = ecs.GetComponents<atlas::game::scene::components::PositionComponent, DirectionComponent>(currentConveyor);
             Eigen::Vector3i forwardPosition = cpp_conv::position_helper::getForwardPosition(
                 position.m_Position, direction.m_Direction);
             EntityId targetEntity = grid.GetEntity(forwardPosition);
 
             if (targetEntity.IsInvalid() || !ecs.DoesEntityHaveComponents<
-                PositionComponent, DirectionComponent, ConveyorComponent>(targetEntity))
+                atlas::game::scene::components::PositionComponent, DirectionComponent, ConveyorComponent>(targetEntity))
             {
                 break;
             }
 
             auto [targetPosition, targetDirection, targetConveyor] = ecs.GetComponents<
-                PositionComponent, DirectionComponent, ConveyorComponent>(targetEntity);
+                atlas::game::scene::components::PositionComponent, DirectionComponent, ConveyorComponent>(targetEntity);
             if (targetConveyor.m_bIsCorner)
             {
                 break;
@@ -62,7 +62,7 @@ namespace
                 {
                     auto neighbourEntity = grid.GetEntity(vPotentialNeighbours[static_cast<int>(neighbourCell)]);
                     if (neighbourEntity == EntityId::Invalid() || !ecs.DoesEntityHaveComponents<
-                        PositionComponent, DirectionComponent, ConveyorComponent>(neighbourEntity))
+                        atlas::game::scene::components::PositionComponent, DirectionComponent, ConveyorComponent>(neighbourEntity))
                     {
                         continue;
                     }
@@ -73,7 +73,7 @@ namespace
                     }
 
                     const auto& [neighbourPosition, neighbourDirection] = ecs.GetComponents<
-                        PositionComponent, DirectionComponent>(neighbourEntity);
+                        atlas::game::scene::components::PositionComponent, DirectionComponent>(neighbourEntity);
 
                     // Node ahead of has a better candidate, meaning we are the terminus.
                     if (cpp_conv::position_helper::getForwardPosition(neighbourPosition.m_Position, neighbourDirection.m_Direction)
@@ -109,7 +109,7 @@ namespace
 
         while (true)
         {
-            const auto& [position, direction] = ecs.GetComponents<PositionComponent, DirectionComponent>(
+            const auto& [position, direction] = ecs.GetComponents<atlas::game::scene::components::PositionComponent, DirectionComponent>(
                 currentConveyor);
             vOutConveyors.push_back(currentConveyor);
 
@@ -120,7 +120,7 @@ namespace
             if (targetConveyor.IsInvalid() ||
                 targetConveyor == searchStart ||
                 targetConveyor == head ||
-                !ecs.DoesEntityHaveComponents<PositionComponent, DirectionComponent, ConveyorComponent>(targetConveyor))
+                !ecs.DoesEntityHaveComponents<atlas::game::scene::components::PositionComponent, DirectionComponent, ConveyorComponent>(targetConveyor))
             {
                 break;
             }
@@ -149,7 +149,7 @@ void cpp_conv::SequenceFormationSystem::Initialise(atlas::scene::EcsManager& ecs
     using atlas::scene::EntityId;
 
     const auto conveyorEntities = ecs.GetEntitiesWithComponents<
-        PositionComponent, DirectionComponent, ConveyorComponent>();
+        atlas::game::scene::components::PositionComponent, DirectionComponent, ConveyorComponent>();
     cpp_conveyor::vector_set<EntityId> alreadyProcessedConveyors(conveyorEntities.size());
 
     // Remove existing sequences
@@ -166,7 +166,7 @@ void cpp_conv::SequenceFormationSystem::Initialise(atlas::scene::EcsManager& ecs
         }
 
         const auto& [position, direction, conveyor] = ecs.GetComponents<
-            PositionComponent, DirectionComponent, ConveyorComponent>(entity);
+            atlas::game::scene::components::PositionComponent, DirectionComponent, ConveyorComponent>(entity);
 
         if (conveyor.m_bIsCorner)
         {

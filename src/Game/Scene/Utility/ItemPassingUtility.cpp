@@ -5,9 +5,9 @@
 #include "ConveyorHelper.h"
 #include "DirectionComponent.h"
 #include "FactoryComponent.h"
-#include "PositionComponent.h"
 #include "StorageComponent.h"
 #include "WorldEntityInformationComponent.h"
+#include "AtlasGame/Scene/Components/PositionComponent.h"
 
 namespace
 {
@@ -29,7 +29,7 @@ namespace
 
         const auto& [sourceInfo, sourceDirection] = ecs.GetComponents<
             WorldEntityInformationComponent, DirectionComponent>(sourceEntity);
-        const auto& [targetPosition, targetDirection] = ecs.GetComponents<PositionComponent, DirectionComponent>(
+        const auto& [targetPosition, targetDirection] = ecs.GetComponents<atlas::game::scene::components::PositionComponent, DirectionComponent>(
             targetEntity);
 
         const int mask = static_cast<int>(sourceDirection.m_Direction) | static_cast<int>(targetDirection.m_Direction);
@@ -90,7 +90,7 @@ namespace
 
         const auto& [sourceInfo, sourceDirection] = ecs.GetComponents<
             WorldEntityInformationComponent, DirectionComponent>(sourceEntity);
-        const auto& [targetPosition, targetDirection] = ecs.GetComponents<PositionComponent, DirectionComponent>(
+        const auto& [targetPosition, targetDirection] = ecs.GetComponents<atlas::game::scene::components::PositionComponent, DirectionComponent>(
             targetEntity);
 
         const Direction eSourceDirection = sourceDirection.m_Direction;

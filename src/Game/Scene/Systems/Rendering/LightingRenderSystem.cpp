@@ -2,8 +2,8 @@
 
 #include <format>
 
+#include "AtlasGame/Scene/Components/Lighting/DirectionalLightComponent.h"
 #include "Eigen/Geometry"
-#include "Lighting/DirectionalLightComponent.h"
 
 void cpp_conv::LightingRenderSystem::Initialise(atlas::scene::EcsManager& ecsManager)
 {
@@ -24,7 +24,7 @@ void cpp_conv::LightingRenderSystem::Update(atlas::scene::EcsManager& ecs)
     bgfx::setUniform(m_Uniforms.m_AmbientColour, ambient.data());
 
     uint8_t lightIndex = 0;
-    for(auto [entity, light] : ecs.IterateEntityComponents<components::DirectionalLightComponent>())
+    for(auto [entity, light] : ecs.IterateEntityComponents<atlas::game::scene::components::cameras::DirectionalLightComponent>())
     {
         if (lightIndex >= c_MaxDirectionalLights)
         {

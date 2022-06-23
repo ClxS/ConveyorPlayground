@@ -10,9 +10,7 @@
 
 #include <Eigen/Core>
 
-#include "bx/math.h"
-#include "Eigen/Geometry"
-#include "Lighting/DirectionalLightComponent.h"
+#include "AtlasGame/Scene/Components/Lighting/DirectionalLightComponent.h"
 
 void cpp_conv::ShadowMappingSystem::Initialise(atlas::scene::EcsManager& ecsManager, const uint16_t shadowMapWidth, const uint16_t shadowMapHeight)
 {
@@ -45,7 +43,7 @@ void cpp_conv::ShadowMappingSystem::Initialise(atlas::scene::EcsManager& ecsMana
 
 void cpp_conv::ShadowMappingSystem::Update(atlas::scene::EcsManager& ecs)
 {
-    const auto lightEntities = ecs.GetEntitiesWithComponents<components::DirectionalLightComponent>();
+    const auto lightEntities = ecs.GetEntitiesWithComponents<atlas::game::scene::components::cameras::DirectionalLightComponent>();
     if (lightEntities.empty())
     {
         bgfx::touch(constants::render_views::c_shadowPass);
@@ -54,7 +52,7 @@ void cpp_conv::ShadowMappingSystem::Update(atlas::scene::EcsManager& ecs)
 
     // c_lightDistance is sufficiently far away that we can consider it to be at infinity
     constexpr float c_lightDistance = 100.0f;
-    const auto light = ecs.GetComponent<components::DirectionalLightComponent>(lightEntities[0]);
+    const auto light = ecs.GetComponent<atlas::game::scene::components::cameras::DirectionalLightComponent>(lightEntities[0]);
     Eigen::Matrix4f lightViewMatrix = atlas::maths_helpers::createLookAtMatrix(
         -light.m_LightDirection * c_lightDistance,
         { 0.0f, 0.0f, 0.0f },

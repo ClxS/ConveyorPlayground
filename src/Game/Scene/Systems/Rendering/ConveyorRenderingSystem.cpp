@@ -9,11 +9,11 @@
 #include "DirectionComponent.h"
 #include "ItemDefinition.h"
 #include "ItemRegistry.h"
-#include "PositionComponent.h"
 #include "RenderContext.h"
 #include "SDL_mouse.h"
 #include "SequenceComponent.h"
 #include "TileRenderHandler.h"
+#include "AtlasGame/Scene/Components/PositionComponent.h"
 #include "AtlasRender/Renderer.h"
 #include "AtlasRender/AssetTypes/ModelAsset.h"
 #include "AtlasRender/AssetTypes/ShaderAsset.h"
@@ -69,10 +69,10 @@ void ConveyorRenderingSystem::Update(atlas::scene::EcsManager& ecs)
     {
         const auto& sequence = ecs.GetComponent<cpp_conv::components::SequenceComponent>(entity);
 
-        bool hasComponents = ecs.DoesEntityHaveComponents<cpp_conv::components::PositionComponent, cpp_conv::components::DirectionComponent>(sequence.m_HeadConveyor);
+        bool hasComponents = ecs.DoesEntityHaveComponents<atlas::game::scene::components::PositionComponent, cpp_conv::components::DirectionComponent>(sequence.m_HeadConveyor);
         assert(hasComponents);
         auto [headPositionComponent, direction] = ecs.GetComponents<
-            cpp_conv::components::PositionComponent,
+            atlas::game::scene::components::PositionComponent,
             cpp_conv::components::DirectionComponent>(sequence.m_HeadConveyor);
         Eigen::Vector3f headPosition = (headPositionComponent.m_Position).cast<float>();
 
@@ -150,11 +150,11 @@ void ConveyorRenderingSystem::Update(atlas::scene::EcsManager& ecs)
     for(const auto entity : ecs.GetEntitiesWithComponents<cpp_conv::components::ConveyorComponent, cpp_conv::components::IndividuallyProcessableConveyorComponent>())
     {
         const auto& conveyor = ecs.GetComponent<cpp_conv::components::ConveyorComponent>(entity);
-        bool hasComponents = ecs.DoesEntityHaveComponents<cpp_conv::components::PositionComponent, cpp_conv::components::DirectionComponent>(entity);
+        bool hasComponents = ecs.DoesEntityHaveComponents<atlas::game::scene::components::PositionComponent, cpp_conv::components::DirectionComponent>(entity);
         assert(hasComponents);
 
         auto [position, direction] = ecs.GetComponents<
-            cpp_conv::components::PositionComponent,
+            atlas::game::scene::components::PositionComponent,
             cpp_conv::components::DirectionComponent>(entity);
 
         const ConveyorType type = conveyor.m_bIsClockwise ? Clockwise : AntiClockwise;

@@ -3,8 +3,8 @@
 #include "Constants.h"
 #include "DirectionComponent.h"
 #include "ModelComponent.h"
-#include "PositionComponent.h"
 #include "Transform2D.h"
+#include "AtlasGame/Scene/Components/PositionComponent.h"
 #include "AtlasRender/Renderer.h"
 #include "AtlasRender/AssetTypes/ModelAsset.h"
 
@@ -26,7 +26,7 @@ void cpp_conv::ModelRenderSystem::Update(atlas::scene::EcsManager& ecs)
         renderMask |= pass.m_RenderMask;
     }
 
-    for(auto [entity, model, position] : ecs.IterateEntityComponents<ModelComponent, PositionComponent>())
+    for(auto [entity, model, position] : ecs.IterateEntityComponents<ModelComponent, atlas::game::scene::components::PositionComponent>())
     {
         if ((model.m_RenderMask & renderMask) == 0 || !model.m_Model || !model.m_Model->GetMesh() || !model.m_Model->GetProgram())
         {

@@ -5,9 +5,9 @@
 #include "DirectionComponent.h"
 #include "EntityLookupGrid.h"
 #include "ItemPassingUtility.h"
-#include "PositionComponent.h"
 #include "PositionHelper.h"
 #include "SequenceComponent.h"
+#include "AtlasGame/Scene/Components/PositionComponent.h"
 #include "AtlasScene/ECS/Components/EcsManager.h"
 
 #if defined(DEBUG)
@@ -38,14 +38,14 @@ bool moveItemToForwardsNode(
 
     const Eigen::Vector2f startPosition = cpp_conv::conveyor_helper::getSlotPosition(component, component.m_Length - 1, lane, 1);
 
-    if (!ecs.DoesEntityHaveComponents<cpp_conv::components::PositionComponent,
+    if (!ecs.DoesEntityHaveComponents<atlas::game::scene::components::PositionComponent,
                                       cpp_conv::components::DirectionComponent>(component.m_HeadConveyor))
     {
         return false;
     }
 
     const auto& [position, direction] = ecs.GetComponents<
-        cpp_conv::components::PositionComponent, cpp_conv::components::DirectionComponent>(component.m_HeadConveyor);
+        atlas::game::scene::components::PositionComponent, cpp_conv::components::DirectionComponent>(component.m_HeadConveyor);
 
     const auto forwardEntity = grid.GetEntity(
         cpp_conv::position_helper::getForwardPosition(position.m_Position, direction.m_Direction));
@@ -221,7 +221,6 @@ void cpp_conv::SequenceProcessingSystem_Realize::Update(atlas::scene::EcsManager
             while (uiInsertions != 0)
             {
                 const SequenceComponent::SlotItem item = pendingState.m_NewItems.Pop();
-                auto test = std::countr_zero(uiInsertions);
                 const uint64_t uiCurrentInsertIndex = 1ULL << std::countr_zero(uiInsertions);
                 if (item.m_Position.has_value())
                 {

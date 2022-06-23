@@ -2,7 +2,6 @@
 
 #include <AtlasScene/Scene.h>
 
-#include "CameraRenderSystem.h"
 #include "SolarBodyRenderSystem.h"
 #include "ConveyorRenderingSystem.h"
 #include "EntityLookupGrid.h"
@@ -13,6 +12,7 @@
 #include "PostProcessSystem.h"
 #include "ShadowMappingSystem.h"
 #include "UIControllerSystem.h"
+#include "AtlasGame/Scene/Systems/Cameras/CameraViewProjectionUpdateSystem.h"
 #include "AtlasRender/Renderer.h"
 #include "AtlasRender/Types/FrameBuffer.h"
 #include "DebugUI/GameSceneDebugUI.h"
@@ -86,7 +86,7 @@ namespace cpp_conv
 
             struct GeometryPass
             {
-                CameraRenderSystem m_CameraRenderSystem;
+                atlas::game::scene::systems::cameras::CameraViewProjectionUpdateSystem m_CameraViewProjectionUpdateSystem{constants::render_views::c_geometry};
                 LightingRenderSystem m_LightingSystem;
                 SolarBodyRenderSystem m_ClippedSurfaceRenderSystem;
                 ModelRenderSystem m_ModelRenderer;
@@ -108,7 +108,8 @@ namespace cpp_conv
             {
                 UIControllerSystem m_UIController;
                 GameSceneDebugUI m_DebugUI;
-                void Initialise(atlas::scene::EcsManager& ecsManager, CameraRenderSystem* pCameraRenderer);
+                void Initialise(atlas::scene::EcsManager& ecsManager, atlas::game::scene::systems::cameras::CameraViewProjectionUpdateSystem*
+                                pCameraRenderer);
                 void Update(atlas::scene::EcsManager& ecsManager);
             } m_UI;
 

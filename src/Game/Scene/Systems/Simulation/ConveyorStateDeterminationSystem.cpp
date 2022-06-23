@@ -6,9 +6,9 @@
 #include "DirectionComponent.h"
 #include "Entity.h"
 #include "EntityLookupGrid.h"
-#include "PositionComponent.h"
 #include "PositionHelper.h"
 #include "WorldEntityInformationComponent.h"
+#include "AtlasGame/Scene/Components/PositionComponent.h"
 #include "AtlasResource/ResourceLoader.h"
 #include "AtlasScene/ECS/Components/EcsManager.h"
 
@@ -35,7 +35,7 @@ namespace
     bool isCornerConveyor(
         const atlas::scene::EcsManager& ecs,
         const cpp_conv::EntityLookupGrid& lookupGraph,
-        const cpp_conv::components::PositionComponent& position,
+        const atlas::game::scene::components::PositionComponent& position,
         const cpp_conv::components::DirectionComponent& direction)
     {
         RelativeDirection outDirection;
@@ -56,7 +56,7 @@ namespace
     bool isClockwiseCorner(
         const atlas::scene::EcsManager& ecs,
         const cpp_conv::EntityLookupGrid& lookupGraph,
-        const cpp_conv::components::PositionComponent& position,
+        const atlas::game::scene::components::PositionComponent& position,
         const cpp_conv::components::DirectionComponent& direction)
     {
         RelativeDirection outDirection;
@@ -84,7 +84,7 @@ namespace
     std::tuple<int, Direction> getInnerMostCornerChannel(
         const atlas::scene::EcsManager& ecs,
         const cpp_conv::EntityLookupGrid& lookupGraph,
-        const cpp_conv::components::PositionComponent& position,
+        const atlas::game::scene::components::PositionComponent& position,
         const cpp_conv::components::DirectionComponent& direction)
     {
         RelativeDirection outDirection;
@@ -124,7 +124,7 @@ namespace
     }
 
     Eigen::Vector2f getRenderPosition(
-        const cpp_conv::components::PositionComponent& positionComponent,
+        const atlas::game::scene::components::PositionComponent& positionComponent,
         const cpp_conv::components::DirectionComponent& directionComponent,
         const cpp_conv::components::ConveyorComponent& conveyor,
         const ConveyorSlot slot,
@@ -219,7 +219,7 @@ void cpp_conv::ConveyorStateDeterminationSystem::Initialise(atlas::scene::EcsMan
     using atlas::scene::EntityId;
 
     const auto conveyorEntities = ecs.GetEntitiesWithComponents<
-        WorldEntityInformationComponent, PositionComponent, DirectionComponent, ConveyorComponent>();
+        WorldEntityInformationComponent, atlas::game::scene::components::PositionComponent, DirectionComponent, ConveyorComponent>();
 
     std::vector<EntityId> toAddIndividualTag;
     std::vector<EntityId> toRemoveIndividualTag;
@@ -227,7 +227,7 @@ void cpp_conv::ConveyorStateDeterminationSystem::Initialise(atlas::scene::EcsMan
     {
         // Good job this doesn't run frequently...
         const auto& [info, position, direction, conveyor] = ecs.GetComponents<
-            WorldEntityInformationComponent, PositionComponent, DirectionComponent, ConveyorComponent>(entity);
+            WorldEntityInformationComponent, atlas::game::scene::components::PositionComponent, DirectionComponent, ConveyorComponent>(entity);
         const EntityId forwardEntity = m_LookupGrid.GetEntity(position_helper::getForwardPosition(position.m_Position, direction.m_Direction));
         const EntityId backwardsEntity = m_LookupGrid.GetEntity(position_helper::getBackwardsPosition(position.m_Position, direction.m_Direction));
 

@@ -1,15 +1,20 @@
-#include "CameraRenderSystem.h"
-#include "CameraComponent.h"
-#include "Constants.h"
-#include "AtlasScene/ECS/Components/EcsManager.h"
+// ReSharper disable CppClangTidyClangDiagnosticUnreachableCode
+#include "AtlasGamePCH.h"
+#include "Scene/Systems/Cameras/CameraViewProjectionUpdateSystem.h"
+
 #include "AtlasAppHost/Application.h"
-#include "AtlasRender/Debug/debugdraw.h"
+#include "AtlasRender/Debug/DebugDraw.h"
+#include "AtlasScene/ECS/Components/EcsManager.h"
 #include "bgfx/bgfx.h"
 #include "bx/math.h"
+#include "Scene/Components/Cameras/LookAtCameraComponent.h"
+#include "Scene/Components/Cameras/SphericalLookAtCameraComponent.h"
+
+using namespace atlas::game::scene::components::cameras;
 
 namespace
 {
-    void updateViewProjectMatrix(const cpp_conv::components::LookAtCamera& camera)
+    void updateViewProjectMatrix(const bgfx::ViewId viewId, const LookAtCameraComponent& camera)
     {
         Eigen::Matrix3f cameraRotation;
         cameraRotation =
@@ -31,11 +36,11 @@ namespace
 
         if (camera.m_bIsRenderActive)
         {
-            bgfx::setViewTransform(cpp_conv::constants::render_views::c_geometry, view.data(), projection.data());
+            bgfx::setViewTransform(viewId, view.data(), projection.data());
         }
     }
 
-    void updateViewProjectMatrix(const cpp_conv::components::SphericalLookAtCamera& camera, cpp_conv::components::SphericalLookAtCamera_Private& cameraPrivate, bool bAddDebugRendering)
+    void updateViewProjectMatrix(const bgfx::ViewId viewId, const SphericalLookAtCameraComponent& camera, SphericalLookAtCameraComponent_Private& cameraPrivate, bool bAddDebugRendering)
     {
         Eigen::Vector3f upVector;
         Eigen::Vector3f forwardVector;
@@ -43,7 +48,7 @@ namespace
         Eigen::Vector3f cameraRightVector;
         Eigen::Vector3f lookAtRealPosition;
         {
-            auto tmpLookSpace = getMatrixForSphericalCoordinate(camera.m_LookAtPitch, camera.m_LookAtYaw, 0.0f);
+            auto tmpLookSpace = atlas::maths_helpers::getMatrixForSphericalCoordinate(camera.m_LookAtPitch, camera.m_LookAtYaw, 0.0f);
             upVector = (tmpLookSpace * Eigen::Vector4f{0.0f, 1.0f, 0.0f, 1.0f}).head<3>();
             forwardVector = (tmpLookSpace * Eigen::Vector4f{1.0f, 0.0f, 0.0f, 1.0f}).head<3>();
 
@@ -56,8 +61,8 @@ namespace
 
         const Eigen::Vector4f mulIdentity{0.0f, 0.0f, 0.0f, 1.0f};
 
-        const Eigen::Matrix4f lookAtSpaceConversion = getMatrixForSphericalCoordinate(camera.m_LookAtPitch, camera.m_LookAtYaw, camera.m_SphericalCentreDistance);
-        const Eigen::Matrix4f cameraSpaceConversion = getMatrixForSphericalCoordinate(camera.m_CameraPitch, camera.m_CameraYaw, camera.m_Distance);
+        const Eigen::Matrix4f lookAtSpaceConversion = atlas::maths_helpers::getMatrixForSphericalCoordinate(camera.m_LookAtPitch, camera.m_LookAtYaw, camera.m_SphericalCentreDistance);
+        const Eigen::Matrix4f cameraSpaceConversion = atlas::maths_helpers::getMatrixForSphericalCoordinate(camera.m_CameraPitch, camera.m_CameraYaw, camera.m_Distance);
 
         Eigen::Vector3f lookAtPosition = (lookAtSpaceConversion * mulIdentity).head<3>();
         Eigen::Vector3f cameraPosition = (lookAtSpaceConversion * cameraSpaceConversion * mulIdentity).head<3>();
@@ -78,7 +83,7 @@ namespace
 
         if (camera.m_bIsRenderActive)
         {
-            bgfx::setViewTransform(cpp_conv::constants::render_views::c_geometry, view.data(), projection.data());
+            bgfx::setViewTransform(viewId, view.data(), projection.data());
         }
 
         using namespace atlas::render::debug;
@@ -157,44 +162,35 @@ namespace
     }
 }
 
-void cpp_conv::CameraRenderSystem::Initialise(atlas::scene::EcsManager& ecsManager)
+void atlas::game::scene::systems::cameras::CameraViewProjectionUpdateSystem::Initialise(atlas::scene::EcsManager& ecsManager)
 {
     atlas::render::debug::initialise();
 }
 
-void cpp_conv::CameraRenderSystem::Update(atlas::scene::EcsManager& ecs)
+void atlas::game::scene::systems::cameras::CameraViewProjectionUpdateSystem::Update(atlas::scene::EcsManager& ecs)
 {
     using namespace atlas::scene;
-    using namespace cpp_conv::components;
     using namespace atlas::render::debug;
 
     debug_draw::drawGrid({ 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, 100);
 
-    for(auto [entity, camera, cameraPrivate] : ecs.IterateEntityComponents<SphericalLookAtCamera, SphericalLookAtCamera_Private>())
+    for(auto [entity, camera, cameraPrivate] : ecs.IterateEntityComponents<SphericalLookAtCameraComponent, SphericalLookAtCameraComponent_Private>())
     {
-        updateViewProjectMatrix(camera, cameraPrivate, m_bDebugRenderingEnabled);
-        //camera.m_LookAtYaw += atlas::maths_helpers::Angle::FromRadians(0.02f);
-        //camera.m_LookAtPitch += atlas::maths_helpers::Angle::FromRadians(0.005f);
-
-        //camera.m_CameraPitch += atlas::maths_helpers::Angle::FromRadians(0.01f);
-        if (camera.m_CameraPitch > atlas::maths_helpers::Angle::FromDegrees(80.0f))
-        {
-            //camera.m_CameraPitch = atlas::maths_helpers::Angle::FromDegrees(10.0f);
-        }
+        updateViewProjectMatrix(m_ViewId, camera, cameraPrivate, m_bDebugRenderingEnabled);
     }
 
-    for(auto [entity, camera] : ecs.IterateEntityComponents<LookAtCamera>())
+    for(auto [entity, camera] : ecs.IterateEntityComponents<LookAtCameraComponent>())
     {
         if (!camera.m_bIsRenderActive)
         {
             continue;
         }
 
-        updateViewProjectMatrix(camera);
+        updateViewProjectMatrix(m_ViewId, camera);
     }
 }
 
-void cpp_conv::CameraRenderSystem::SetDebugRenderingEnabled(const bool bEnabled)
+void atlas::game::scene::systems::cameras::CameraViewProjectionUpdateSystem::SetDebugRenderingEnabled(const bool bEnabled)
 {
     m_bDebugRenderingEnabled = bEnabled;
 }

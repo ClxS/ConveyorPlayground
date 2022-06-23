@@ -1,13 +1,9 @@
 #include "GameScene.h"
 
-#include "CameraComponent.h"
-#include "CameraControllerSystem.h"
 #include "Constants.h"
 #include "ConveyorComponent.h"
 #include "ConveyorRenderingSystem.h"
 #include "ConveyorStateDeterminationSystem.h"
-#include "DescriptionComponent.h"
-#include "DirectionComponent.h"
 #include "Factory.h"
 #include "FactoryComponent.h"
 #include "FactoryRegistry.h"
@@ -15,7 +11,6 @@
 #include "ModelComponent.h"
 #include "ModelRenderSystem.h"
 #include "NameComponent.h"
-#include "PositionComponent.h"
 #include "PostProcessSystem.h"
 #include "RecipeDefinition.h"
 #include "RecipeRegistry.h"
@@ -25,12 +20,14 @@
 #include "StandaloneConveyorSystem.h"
 #include "Storage.h"
 #include "StorageComponent.h"
-#include "WorldEntityInformationComponent.h"
 #include "AtlasAppHost/Application.h"
+#include "AtlasGame/Scene/Components/Cameras/LookAtCameraComponent.h"
+#include "AtlasGame/Scene/Components/Cameras/SphericalLookAtCameraComponent.h"
+#include "AtlasGame/Scene/Components/Lighting/DirectionalLightComponent.h"
+#include "AtlasGame/Scene/Systems/Cameras/CameraControllerSystem.h"
 #include "AtlasRender/Renderer.h"
 #include "AtlasRender/Debug/debugdraw.h"
 #include "AtlasResource/ResourceLoader.h"
-#include "Lighting/DirectionalLightComponent.h"
 #include "SolarBodies/SolarBodyGeneration.h"
 
 using namespace cpp_conv::components;
@@ -153,8 +150,8 @@ namespace
     void addCameras(atlas::scene::EcsManager& ecs)
     {
         auto cameraEntity = ecs.AddEntity();
-        ecs.AddComponent<SphericalLookAtCamera_Private>(cameraEntity);
-        auto& camera = ecs.AddComponent<SphericalLookAtCamera>(cameraEntity);
+        ecs.AddComponent<atlas::game::scene::components::cameras::SphericalLookAtCameraComponent_Private>(cameraEntity);
+        auto& camera = ecs.AddComponent<atlas::game::scene::components::cameras::SphericalLookAtCameraComponent>(cameraEntity);
         camera.m_bIsRenderActive = true;
         camera.m_bIsControlActive = true;
         camera.m_SphericalCentre = { 0.0f, 0.0f, 0.0f };
@@ -169,7 +166,7 @@ namespace
         camera.m_Distance = 1.0f;
 
         cameraEntity = ecs.AddEntity();
-        auto& camera2 = ecs.AddComponent<LookAtCamera>(cameraEntity);
+        auto& camera2 = ecs.AddComponent<atlas::game::scene::components::cameras::LookAtCameraComponent>(cameraEntity);
         camera2.m_bIsRenderActive = false;
         camera2.m_bIsControlActive = false;
         camera2.m_Distance = 25.0f;
@@ -181,7 +178,7 @@ namespace
     void addLights(atlas::scene::EcsManager& ecs)
     {
         const auto lightEntity = ecs.AddEntity();
-        auto& light = ecs.AddComponent<DirectionalLightComponent>(lightEntity);
+        auto& light = ecs.AddComponent<atlas::game::scene::components::cameras::DirectionalLightComponent>(lightEntity);
         light.m_LightDirection = {0.08f, -0.5, -0.70f };
         light.m_LightColour = {1.0, 1.0, 1.0, 1.0f};
 
@@ -191,7 +188,7 @@ namespace
     void addGround(atlas::scene::EcsManager& ecs)
     {
         const auto ground = ecs.AddEntity();
-        ecs.AddComponent<SolarBodyComponent>(ground, createSolarBody(cpp_conv::util::solar_bodies::SolarBodySpecification::CrateredMoon));
+        ecs.AddComponent<SquareSolarBodyComponent>(ground, createSolarBody(cpp_conv::util::solar_bodies::SolarBodySpecification::CrateredMoon));
     }
 }
 
@@ -278,7 +275,7 @@ void cpp_conv::GameScene::ConstructSystems(atlas::scene::SystemsBuilder& builder
     builder.RegisterGroup("Camera",
         [](atlas::scene::SystemsBuilder& groupBuilder)
         {
-            groupBuilder.RegisterSystem<CameraControllerSystem>();
+            groupBuilder.RegisterSystem<atlas::game::scene::systems::cameras::CameraControllerSystem>();
         });
 
     builder.RegisterGroup(
@@ -319,7 +316,7 @@ void cpp_conv::GameScene::ConstructFrameGraph()
     AddToFrameGraph("ShadowPass", &m_RenderSystems.m_ShadowPass);
     AddToFrameGraph("GeometryPass", &m_RenderSystems.m_GeometryPass);
     AddToFrameGraph("PostGeometryPass", &m_RenderSystems.m_PostGeometry, &m_RenderSystems.m_GBuffer);
-    AddToFrameGraph("UI", &m_RenderSystems.m_UI, &m_RenderSystems.m_GeometryPass.m_CameraRenderSystem);
+    AddToFrameGraph("UI", &m_RenderSystems.m_UI, &m_RenderSystems.m_GeometryPass.m_CameraViewProjectionUpdateSystem);
 }
 
 void cpp_conv::GameScene::RenderSystems::ShadowPass::Initialise(atlas::scene::EcsManager& ecsManager)
@@ -334,7 +331,7 @@ void cpp_conv::GameScene::RenderSystems::ShadowPass::Update(atlas::scene::EcsMan
 
 void cpp_conv::GameScene::RenderSystems::GeometryPass::Initialise(atlas::scene::EcsManager& ecsManager)
 {
-    m_CameraRenderSystem.Initialise(ecsManager);
+    m_CameraViewProjectionUpdateSystem.Initialise(ecsManager);
     m_LightingSystem.Initialise(ecsManager);
     m_ClippedSurfaceRenderSystem.Initialise(ecsManager);
     m_ModelRenderer.Initialise(ecsManager);
@@ -347,8 +344,8 @@ void cpp_conv::GameScene::RenderSystems::GeometryPass::Update(atlas::scene::EcsM
     debug::debug_draw::begin(constants::render_views::c_geometry);
 
     {
-        bgfx::setMarker("CameraRenderingSystem");
-        atlas::scene::SystemsManager::Update(ecsManager, &m_CameraRenderSystem);
+        bgfx::setMarker("CameraViewProjectionUpdateSystem");
+        atlas::scene::SystemsManager::Update(ecsManager, &m_CameraViewProjectionUpdateSystem);
     }
     {
         bgfx::setMarker("LightingSystem");
@@ -382,7 +379,7 @@ void cpp_conv::GameScene::RenderSystems::PostGeometry::Update(atlas::scene::EcsM
     atlas::scene::SystemsManager::Update(ecsManager, &m_PostProcess);
 }
 
-void cpp_conv::GameScene::RenderSystems::UI::Initialise(atlas::scene::EcsManager& ecsManager, CameraRenderSystem* pCameraRenderer)
+void cpp_conv::GameScene::RenderSystems::UI::Initialise(atlas::scene::EcsManager& ecsManager, atlas::game::scene::systems::cameras::CameraViewProjectionUpdateSystem* pCameraRenderer)
 {
     m_UIController.Initialise(ecsManager);
     m_DebugUI.Initialise(ecsManager, pCameraRenderer);

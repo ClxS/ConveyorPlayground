@@ -9,19 +9,19 @@ namespace
 
 }
 
-cpp_conv::components::SolarBodyComponent cpp_conv::util::solar_bodies::createSolarBody(SolarBodySpecification type)
+cpp_conv::components::SquareSolarBodyComponent cpp_conv::util::solar_bodies::createSolarBody(SolarBodySpecification type)
 {
-    components::SolarBodyComponent solarBody;
-    solarBody.m_MeshData.m_Polyhedron = cpp_conv::util::geometry::polyhedron::createPolyhedronSquared(100, 0, 10.0f);
-    auto [vertices, indices] = solarBody.m_MeshData.m_Polyhedron.CreateBuffers();
+    components::SquareSolarBodyComponent solarBody;
+    solarBody.m_SphereData.m_Polyhedron = cpp_conv::util::geometry::polyhedron::createPolyhedronSquared(100, 0, 10.0f);
+    auto [vertices, indices] = solarBody.m_SphereData.m_Polyhedron.CreateBuffers();
 
     solarBody.m_MeshData.m_Vertices = vertices;
     solarBody.m_MeshData.m_Indices = indices;
 
-    solarBody.m_SphereData.m_K = solarBody.m_MeshData.m_Polyhedron.GetK();
-    solarBody.m_SphereData.m_H = solarBody.m_MeshData.m_Polyhedron.GetH();
-    solarBody.m_SphereData.m_D = solarBody.m_MeshData.m_Polyhedron.GetD();
-    solarBody.m_SphereData.m_Radius = solarBody.m_MeshData.m_Polyhedron.GetRadius();
+    solarBody.m_SphereData.m_K = solarBody.m_SphereData.m_Polyhedron.GetK();
+    solarBody.m_SphereData.m_H = solarBody.m_SphereData.m_Polyhedron.GetH();
+    solarBody.m_SphereData.m_D = solarBody.m_SphereData.m_Polyhedron.GetD();
+    solarBody.m_SphereData.m_Radius = solarBody.m_SphereData.m_Polyhedron.GetRadius();
 
     switch(type)
     {

@@ -1,10 +1,9 @@
 #pragma once
+
 #include "AtlasScene/ECS/Systems/SystemBase.h"
 
-namespace cpp_conv
+namespace atlas::game::scene::systems::cameras
 {
-    class EntityLookupGrid;
-
     class CameraControllerSystem final : public atlas::scene::SystemBase
     {
     public:

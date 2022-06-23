@@ -5,8 +5,8 @@
 #include "DirectionComponent.h"
 #include "EntityLookupGrid.h"
 #include "ItemPassingUtility.h"
-#include "PositionComponent.h"
 #include "PositionHelper.h"
+#include "AtlasGame/Scene/Components/PositionComponent.h"
 #include "AtlasScene/ECS/Components/EcsManager.h"
 
 cpp_conv::StandaloneConveyorSystem_Process::StandaloneConveyorSystem_Process(EntityLookupGrid& lookupGrid): m_LookupGrid{lookupGrid}
@@ -16,7 +16,7 @@ cpp_conv::StandaloneConveyorSystem_Process::StandaloneConveyorSystem_Process(Ent
 void cpp_conv::StandaloneConveyorSystem_Process::Update(atlas::scene::EcsManager& ecs)
 {
     for (const auto& entity : ecs.GetEntitiesWithComponents<
-        components::PositionComponent,
+        atlas::game::scene::components::PositionComponent,
         components::DirectionComponent,
         components::ConveyorComponent,
         components::IndividuallyProcessableConveyorComponent>())
@@ -33,7 +33,7 @@ void cpp_conv::StandaloneConveyorSystem_Process::Update(atlas::scene::EcsManager
             continue;
         }
 
-        const auto& [position, direction] = ecs.GetComponents<components::PositionComponent, components::DirectionComponent>(entity);
+        const auto& [position, direction] = ecs.GetComponents<atlas::game::scene::components::PositionComponent, components::DirectionComponent>(entity);
 
         conveyor.m_CurrentTick = 0;
         for (int iChannelIdx = 0; iChannelIdx < components::c_conveyorChannels; iChannelIdx++)

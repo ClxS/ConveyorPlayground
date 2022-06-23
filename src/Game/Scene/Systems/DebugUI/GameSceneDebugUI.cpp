@@ -2,15 +2,16 @@
 
 #include <format>
 
-#include "CameraComponent.h"
-#include "CameraRenderSystem.h"
 #include "Constants.h"
 #include "imgui.h"
 #include "AtlasAppHost/Application.h"
 #include "AtlasAppHost/PlatformApplication.h"
+#include "AtlasGame/Scene/Components/Cameras/LookAtCameraComponent.h"
+#include "AtlasGame/Scene/Components/Cameras/SphericalLookAtCameraComponent.h"
+#include "AtlasGame/Scene/Systems/Cameras/CameraViewProjectionUpdateSystem.h"
+#include "AtlasGame/Utility/ImguiBgfx/ImguiBgfxImpl.h"
 #include "AtlasScene/ECS/Components/EcsManager.h"
 #include "backends/imgui_impl_sdl.h"
-#include "ImguiBgfx/ImguiBgfxImpl.h"
 
 namespace
 {
@@ -47,12 +48,12 @@ namespace
         Control
     };
 
-    std::string getCameraIdentifier(const atlas::scene::EntityId entityId, const cpp_conv::components::SphericalLookAtCamera&)
+    std::string getCameraIdentifier(const atlas::scene::EntityId entityId, const atlas::game::scene::components::cameras::SphericalLookAtCameraComponent&)
     {
         return std::format("SphericalLookAt ({})", entityId.m_Value);
     }
 
-    std::string getCameraIdentifier(const atlas::scene::EntityId entityId, const cpp_conv::components::LookAtCamera&)
+    std::string getCameraIdentifier(const atlas::scene::EntityId entityId, const atlas::game::scene::components::cameras::LookAtCameraComponent&)
     {
         return std::format("LookAt ({})", entityId.m_Value);
     }
@@ -62,7 +63,7 @@ namespace
         using namespace atlas::scene;
         using namespace cpp_conv;
 
-        for(auto [entity, camera] : ecs.IterateEntityComponents<components::SphericalLookAtCamera>())
+        for(auto [entity, camera] : ecs.IterateEntityComponents<atlas::game::scene::components::cameras::SphericalLookAtCameraComponent>())
         {
             if ((!camera.m_bIsRenderActive && type == ActiveCameraType::Rendering) || (!camera.m_bIsControlActive && type == ActiveCameraType::Control))
             {
@@ -72,7 +73,7 @@ namespace
             return getCameraIdentifier(entity, camera);
         }
 
-        for(auto [entity, camera] : ecs.IterateEntityComponents<components::LookAtCamera>())
+        for(auto [entity, camera] : ecs.IterateEntityComponents<atlas::game::scene::components::cameras::LookAtCameraComponent>())
         {
             if ((!camera.m_bIsRenderActive && type == ActiveCameraType::Rendering) || (!camera.m_bIsControlActive && type == ActiveCameraType::Control))
             {
@@ -102,10 +103,10 @@ namespace
         return false;
     }
 
-    void setActiveCamera(atlas::scene::EcsManager& ecs, cpp_conv::components::CameraComponent& activeCamera, const ActiveCameraType type)
+    void setActiveCamera(atlas::scene::EcsManager& ecs, atlas::game::scene::components::cameras::BaseCameraComponent& activeCamera, const ActiveCameraType type)
     {
         using namespace cpp_conv;
-        for(auto [entity, camera] : ecs.IterateEntityComponents<components::SphericalLookAtCamera>())
+        for(auto [entity, camera] : ecs.IterateEntityComponents<atlas::game::scene::components::cameras::SphericalLookAtCameraComponent>())
         {
             if (type == ActiveCameraType::Rendering)
             {
@@ -117,7 +118,7 @@ namespace
             }
         }
 
-        for(auto [entity, camera] : ecs.IterateEntityComponents<components::LookAtCamera>())
+        for(auto [entity, camera] : ecs.IterateEntityComponents<atlas::game::scene::components::cameras::LookAtCameraComponent>())
         {
             if (type == ActiveCameraType::Rendering)
             {
@@ -139,7 +140,7 @@ namespace
         }
     }
 
-    void addCameraDebugUi(atlas::scene::EcsManager& ecs, cpp_conv::CameraRenderSystem* pCameraRenderer)
+    void addCameraDebugUi(atlas::scene::EcsManager& ecs, atlas::game::scene::systems::cameras::CameraViewProjectionUpdateSystem* pCameraRenderer)
     {
         if (!pCameraRenderer)
         {
@@ -156,14 +157,14 @@ namespace
         static std::string s_selectedControlCamera = findCurrentCamera(ecs, ActiveCameraType::Control);
         if (ImGui::BeginCombo("Control Camera", s_selectedControlCamera.c_str()))
         {
-            for(auto [entity, camera] : ecs.IterateEntityComponents<components::SphericalLookAtCamera>())
+            for(auto [entity, camera] : ecs.IterateEntityComponents<atlas::game::scene::components::cameras::SphericalLookAtCameraComponent>())
             {
                 if (addComboItem(s_selectedControlCamera, getCameraIdentifier(entity, camera)))
                 {
                     setActiveCamera(ecs, camera, ActiveCameraType::Control);
                 }
             }
-            for(auto [entity, camera] : ecs.IterateEntityComponents<components::LookAtCamera>())
+            for(auto [entity, camera] : ecs.IterateEntityComponents<atlas::game::scene::components::cameras::LookAtCameraComponent>())
             {
                 if (addComboItem(s_selectedControlCamera, getCameraIdentifier(entity, camera)))
                 {
@@ -177,14 +178,14 @@ namespace
         static std::string s_selectedRenderCamera = findCurrentCamera(ecs, ActiveCameraType::Rendering);
         if (ImGui::BeginCombo("Render Camera", s_selectedRenderCamera.c_str()))
         {
-            for(auto [entity, camera] : ecs.IterateEntityComponents<components::SphericalLookAtCamera>())
+            for(auto [entity, camera] : ecs.IterateEntityComponents<atlas::game::scene::components::cameras::SphericalLookAtCameraComponent>())
             {
                 if (addComboItem(s_selectedRenderCamera, getCameraIdentifier(entity, camera)))
                 {
                     setActiveCamera(ecs, camera, ActiveCameraType::Rendering);
                 }
             }
-            for(auto [entity, camera] : ecs.IterateEntityComponents<components::LookAtCamera>())
+            for(auto [entity, camera] : ecs.IterateEntityComponents<atlas::game::scene::components::cameras::LookAtCameraComponent>())
             {
                 if (addComboItem(s_selectedRenderCamera, getCameraIdentifier(entity, camera)))
                 {
@@ -197,7 +198,7 @@ namespace
 
         if (ImGui::BeginTable("Spherical Cameras", 2))
         {
-            for(auto [entity, camera] : ecs.IterateEntityComponents<components::SphericalLookAtCamera>())
+            for(auto [entity, camera] : ecs.IterateEntityComponents<atlas::game::scene::components::cameras::SphericalLookAtCameraComponent>())
             {
                 ImGui::TableNextRow();
                 ImGui::TableSetColumnIndex(0);
@@ -231,7 +232,7 @@ namespace
     }
 }
 
-void cpp_conv::GameSceneDebugUI::Initialise(atlas::scene::EcsManager& ecsManager, CameraRenderSystem* pCameraRenderer)
+void cpp_conv::GameSceneDebugUI::Initialise(atlas::scene::EcsManager& ecsManager, atlas::game::scene::systems::cameras::CameraViewProjectionUpdateSystem* pCameraRenderer)
 {
     m_pCameraRenderer = pCameraRenderer;
 
