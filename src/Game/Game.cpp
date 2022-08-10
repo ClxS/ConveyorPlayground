@@ -1,5 +1,6 @@
 #include "Game.h"
 
+#include "AssetHandlerCommon.h"
 #include "Constants.h"
 #include "ConveyorComponent.h"
 #include "ConveyorDefinition.h"
@@ -9,7 +10,9 @@
 #include "FactoryComponent.h"
 #include "FactoryRegistry.h"
 #include "GameMapLoadInterstitialScene.h"
+#include "InserterDefinition.h"
 #include "InserterRegistry.h"
+#include "ItemDefinition.h"
 #include "ItemRegistry.h"
 #include "MapLoadHandler.h"
 #include "ModelComponent.h"
@@ -69,16 +72,24 @@ void registerAssetBundles()
     ResourceLoader::RegisterBundle<registry::CoreBundle>();
 }
 
+template<typename TDefinition>
+void registerDefinitionTypeHandler()
+{
+    using namespace atlas::resource;
+    ResourceLoader::RegisterTypeHandler<TDefinition>(asset_handler_common::deserializingAssetHandler<TDefinition>);
+}
+
 void registerTypeHandlers()
 {
     using namespace atlas::resource;
     ResourceLoader::RegisterTypeHandler<Map>(mapAssetHandler);
-    ResourceLoader::RegisterTypeHandler<cpp_conv::ConveyorDefinition>(conveyorAssetHandler);
-    ResourceLoader::RegisterTypeHandler<cpp_conv::FactoryDefinition>(factoryAssetHandler);
-    ResourceLoader::RegisterTypeHandler<cpp_conv::InserterDefinition>(inserterAssetHandler);
-    ResourceLoader::RegisterTypeHandler<cpp_conv::ItemDefinition>(itemAssetHandler);
-    ResourceLoader::RegisterTypeHandler<cpp_conv::RecipeDefinition>(recipeAssetHandler);
     ResourceLoader::RegisterTypeHandler<TileAsset>(cpp_conv::textTileLoadHandler);
+
+    registerDefinitionTypeHandler<cpp_conv::ConveyorDefinition>();
+    registerDefinitionTypeHandler<cpp_conv::FactoryDefinition>();
+    registerDefinitionTypeHandler<cpp_conv::InserterDefinition>();
+    registerDefinitionTypeHandler<cpp_conv::ItemDefinition>();
+    registerDefinitionTypeHandler<cpp_conv::RecipeDefinition>();
 
     ResourceLoader::RegisterTypeHandler<atlas::render::VertexShader>(atlas::render::vertexShaderLoadHandler);
     ResourceLoader::RegisterTypeHandler<atlas::render::FragmentShader>(atlas::render::fragmentShaderLoadHandler);

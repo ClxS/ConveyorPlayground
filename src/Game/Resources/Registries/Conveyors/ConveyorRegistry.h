@@ -15,6 +15,4 @@ namespace cpp_conv::resources
     void loadConveyors();
 
     atlas::resource::AssetPtr<ConveyorDefinition> getConveyorDefinition(ConveyorId id);
-
-    atlas::resource::AssetPtr<atlas::resource::ResourceAsset> conveyorAssetHandler(const atlas::resource::FileData& rData);
 }

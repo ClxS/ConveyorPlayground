@@ -15,6 +15,4 @@ namespace cpp_conv::resources
     void loadItems();
 
     atlas::resource::AssetPtr<ItemDefinition> getItemDefinition(ItemId id);
-
-    atlas::resource::AssetPtr<atlas::resource::ResourceAsset> itemAssetHandler(const atlas::resource::FileData& rData);
 }

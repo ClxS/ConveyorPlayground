@@ -17,6 +17,4 @@ namespace cpp_conv::resources
     void loadFactories();
 
     atlas::resource::AssetPtr<FactoryDefinition> getFactoryDefinition(FactoryId id);
-
-    atlas::resource::AssetPtr<atlas::resource::ResourceAsset> factoryAssetHandler(const atlas::resource::FileData& rData);
 }

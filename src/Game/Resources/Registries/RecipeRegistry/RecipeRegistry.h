@@ -15,6 +15,4 @@ namespace cpp_conv::resources
     void loadRecipes();
 
     atlas::resource::AssetPtr<RecipeDefinition> getRecipeDefinition(RecipeId id);
-
-    atlas::resource::AssetPtr<atlas::resource::ResourceAsset> recipeAssetHandler(const atlas::resource::FileData& rData);
 }

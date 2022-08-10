@@ -17,6 +17,4 @@ namespace cpp_conv::resources
     void loadInserters();
 
     atlas::resource::AssetPtr<InserterDefinition> getInserterDefinition(InserterId id);
-
-    atlas::resource::AssetPtr<atlas::resource::ResourceAsset> inserterAssetHandler(const atlas::resource::FileData& rData);
 }
