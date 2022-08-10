@@ -9,6 +9,9 @@ workspace "CppConveyor"
 	filter { "platforms:SDL" }
 		system "Windows"
 		architecture "x86_64"
+		buildoptions {
+		    "/Zc:__cplusplus",
+        }
 	filter{}
 
 	filter { "platforms:Tools_Win64" }
