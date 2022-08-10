@@ -4,3 +4,6 @@
 [submodule "docs"]
 	path = docs
 	url = https://github.com/ClxS/ConveyorPlayground_Documentation.git
+[submodule "src/Atlas"]
+	path = src/Atlas
+	url = https://github.com/ClxS/Atlas.git
